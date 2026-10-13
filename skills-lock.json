@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "database-normalization": {
+      "source": "cookiemonsterdev/agents-skills",
+      "sourceType": "github",
+      "skillPath": "architecture-skills/database-normalization/SKILL.md",
+      "computedHash": "53300acd81ae2c40f5e503c85b90216e009a313072068920bf7aa69adf8e4ed2"
+    }
+  }
+}

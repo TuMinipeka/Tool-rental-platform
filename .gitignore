@@ -1,0 +1,15 @@
+# Archivos locales de editores y sistema
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Credenciales y configuración local
+.env
+.env.*
+!.env.example
+
+# Artefactos de futuras implementaciones
+target/
+node_modules/
+*.log
