@@ -105,7 +105,7 @@ class ReservaTest {
     assertEquals(EstadoReserva.CONFIRMADA, confirmada.estado());
     assertEquals(original.id(), confirmada.id());
     assertEquals(dinero("15000"), confirmada.total());
-    assertEquals(clock.instant(), confirmada.confirmacion().orElseThrow().ocurridaEn());
+    assertEquals(clock.instant(), confirmada.confirmacion().orElseThrow().occurredOn());
     assertThrows(UnsupportedOperationException.class, () -> confirmada.detalles().clear());
   }
 
@@ -140,22 +140,22 @@ class ReservaTest {
   @Test
   void rechazarYCancelarRespetanEstadosTerminales() {
     var rechazada = pendiente();
-    rechazada.rechazar();
-    assertThrows(ReglaNegocioException.class, rechazada::cancelar);
-    assertThrows(ReglaNegocioException.class, rechazada::rechazar);
+    rechazada.rechazar(clock);
+    assertThrows(ReglaNegocioException.class, () -> rechazada.cancelar(clock));
+    assertThrows(ReglaNegocioException.class, () -> rechazada.rechazar(clock));
     assertThrows(
         ReglaNegocioException.class, () -> rechazada.confirmarConTarifas(List.of(linea()), clock));
     var cancelada = pendiente();
-    cancelada.cancelar();
-    assertThrows(ReglaNegocioException.class, cancelada::cancelar);
-    assertThrows(ReglaNegocioException.class, cancelada::rechazar);
+    cancelada.cancelar(clock);
+    assertThrows(ReglaNegocioException.class, () -> cancelada.cancelar(clock));
+    assertThrows(ReglaNegocioException.class, () -> cancelada.rechazar(clock));
     assertThrows(
         ReglaNegocioException.class, () -> cancelada.confirmarConTarifas(List.of(linea()), clock));
     var confirmada = pendiente().confirmarConTarifas(List.of(linea()), clock);
-    assertThrows(ReglaNegocioException.class, confirmada::rechazar);
+    assertThrows(ReglaNegocioException.class, () -> confirmada.rechazar(clock));
     assertThrows(
         ReglaNegocioException.class, () -> confirmada.confirmarConTarifas(List.of(linea()), clock));
-    confirmada.cancelar();
+    confirmada.cancelar(clock);
     assertEquals(EstadoReserva.CANCELADA, confirmada.estado());
   }
 
@@ -170,7 +170,7 @@ class ReservaTest {
 
   @Test
   void catalogoValidaNombresImagenesYEstadosOperativos() {
-    assertThrows(ReglaNegocioException.class, () -> Categoria.registrar(" "));
+    assertThrows(ReglaNegocioException.class, () -> Categoria.registrar(" ", clock));
     assertThrows(
         ReglaNegocioException.class,
         () ->
@@ -180,8 +180,9 @@ class ReservaTest {
                 "Equipo",
                 "Descripción",
                 dinero("1"),
-                Set.of(URI.create("file:///tmp/foto"))));
-    var u = UnidadEquipo.registrar(HerramientaId.generar(), "EQ-1");
+                Set.of(URI.create("file:///tmp/foto")),
+                clock));
+    var u = UnidadEquipo.registrar(HerramientaId.generar(), "EQ-1", clock);
     u.enviarAMantenimiento();
     assertFalse(u.operativa());
     u.habilitar();

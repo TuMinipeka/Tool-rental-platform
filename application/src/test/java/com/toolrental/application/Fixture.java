@@ -1,6 +1,8 @@
 package com.toolrental.application;
 
-import com.toolrental.application.common.exception.RecursoNoEncontradoException;
+import com.toolrental.application.catalog.exception.HerramientaNotFoundApplicationException;
+import com.toolrental.application.catalog.exception.UnidadEquipoNotFoundApplicationException;
+import com.toolrental.application.reservation.exception.ReservaNotFoundApplicationException;
 import com.toolrental.domain.catalog.model.aggregate.Categoria;
 import com.toolrental.domain.catalog.model.aggregate.Herramienta;
 import com.toolrental.domain.catalog.model.aggregate.UnidadEquipo;
@@ -102,10 +104,10 @@ final class Fixture {
         }
       };
   final RegistroUnidadAtomico registroUnidad =
-      (id, codigo) -> {
+      (id, codigo, clock) -> {
         synchronized (this) {
           var h = herramienta(id);
-          var unidad = UnidadEquipo.registrar(id, codigo);
+          var unidad = UnidadEquipo.registrar(id, codigo, clock);
           boolean duplicado =
               unidades.values().stream()
                   .anyMatch(
@@ -132,7 +134,7 @@ final class Fixture {
                 public UnidadEquipo unidad(UnidadEquipoId unidadId) {
                   return unidadRepository
                       .buscar(unidadId)
-                      .orElseThrow(() -> new RecursoNoEncontradoException("Unidad"));
+                      .orElseThrow(() -> new UnidadEquipoNotFoundApplicationException(unidadId));
                 }
 
                 public Herramienta herramienta(HerramientaId herramientaId) {
@@ -167,12 +169,12 @@ final class Fixture {
 
   private Herramienta herramienta(HerramientaId id) {
     return Optional.ofNullable(herramientas.get(id))
-        .orElseThrow(() -> new RecursoNoEncontradoException("Herramienta"));
+        .orElseThrow(() -> new HerramientaNotFoundApplicationException(id));
   }
 
   private Reserva reserva(ReservaId id) {
     return reservaRepository
         .buscar(id)
-        .orElseThrow(() -> new RecursoNoEncontradoException("Reserva"));
+        .orElseThrow(() -> new ReservaNotFoundApplicationException(id));
   }
 }

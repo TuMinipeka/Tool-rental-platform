@@ -3,7 +3,7 @@ package com.toolrental.application.catalog.usecase;
 import com.toolrental.application.catalog.dto.CategoriaResponse;
 import com.toolrental.application.catalog.dto.HerramientaResponse;
 import com.toolrental.application.catalog.dto.UnidadEquipoResponse;
-import com.toolrental.application.common.exception.RecursoNoEncontradoException;
+import com.toolrental.application.catalog.exception.HerramientaNotFoundApplicationException;
 import com.toolrental.domain.catalog.model.aggregate.Herramienta;
 import com.toolrental.domain.catalog.model.valueobject.HerramientaId;
 import com.toolrental.domain.catalog.port.repository.CategoriaRepository;
@@ -37,7 +37,7 @@ public final class ConsultarCatalogoUseCase {
 
   public HerramientaResponse herramienta(HerramientaId id) {
     return HerramientaResponse.desde(
-        herramientas.buscar(id).orElseThrow(() -> new RecursoNoEncontradoException("Herramienta")));
+        herramientas.buscar(id).orElseThrow(() -> new HerramientaNotFoundApplicationException(id)));
   }
 
   public List<UnidadEquipoResponse> unidades(HerramientaId id) {

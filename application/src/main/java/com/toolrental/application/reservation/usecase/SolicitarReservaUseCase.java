@@ -1,8 +1,11 @@
 package com.toolrental.application.reservation.usecase;
 
-import com.toolrental.application.common.exception.RecursoNoEncontradoException;
+import com.toolrental.application.catalog.exception.HerramientaNotFoundApplicationException;
+import com.toolrental.application.catalog.exception.ProveedorNotFoundApplicationException;
+import com.toolrental.application.catalog.exception.UnidadEquipoNotFoundApplicationException;
 import com.toolrental.application.reservation.command.SolicitarReservaCommand;
 import com.toolrental.application.reservation.dto.ReservaResponse;
+import com.toolrental.application.reservation.exception.ClienteNotFoundApplicationException;
 import com.toolrental.domain.catalog.port.repository.HerramientaRepository;
 import com.toolrental.domain.catalog.port.repository.UnidadEquipoRepository;
 import com.toolrental.domain.common.exception.ReglaNegocioException;
@@ -35,7 +38,7 @@ public final class SolicitarReservaUseCase {
 
   public ReservaResponse execute(SolicitarReservaCommand c) {
     if (!participantes.clienteActivo(c.clienteId()))
-      throw new RecursoNoEncontradoException("Cliente activo");
+      throw new ClienteNotFoundApplicationException(c.clienteId());
     var lineas =
         c.unidades().stream()
             .map(
@@ -43,15 +46,16 @@ public final class SolicitarReservaUseCase {
                   var u =
                       unidades
                           .buscar(id)
-                          .orElseThrow(() -> new RecursoNoEncontradoException("Unidad"));
+                          .orElseThrow(() -> new UnidadEquipoNotFoundApplicationException(id));
                   var h =
                       herramientas
                           .buscar(u.herramientaId())
-                          .orElseThrow(() -> new RecursoNoEncontradoException("Herramienta"));
+                          .orElseThrow(
+                              () -> new HerramientaNotFoundApplicationException(u.herramientaId()));
                   if (!u.operativa() || !h.publicada())
                     throw new ReglaNegocioException("Equipo no alquilable");
                   if (!participantes.proveedorActivo(h.proveedorId()))
-                    throw new RecursoNoEncontradoException("Proveedor activo");
+                    throw new ProveedorNotFoundApplicationException(h.proveedorId());
                   return new DetalleReserva(id, h.proveedorId(), h.tarifaDiaria());
                 })
             .toList();

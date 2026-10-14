@@ -1,16 +1,20 @@
 package com.toolrental.domain.catalog.model.aggregate;
 
+import com.toolrental.domain.catalog.event.HerramientaRegistrada;
 import com.toolrental.domain.catalog.model.valueobject.CategoriaId;
 import com.toolrental.domain.catalog.model.valueobject.HerramientaId;
 import com.toolrental.domain.common.exception.ReglaNegocioException;
+import com.toolrental.domain.common.model.AggregateRoot;
 import com.toolrental.domain.common.model.valueobject.Dinero;
 import com.toolrental.domain.common.model.valueobject.ProveedorId;
 import com.toolrental.domain.common.model.valueobject.Validacion;
 import java.net.URI;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Set;
 
-public final class Herramienta {
+public final class Herramienta extends AggregateRoot {
   private final HerramientaId id;
   private final ProveedorId proveedorId;
   private final CategoriaId categoriaId;
@@ -18,16 +22,19 @@ public final class Herramienta {
   private final String descripcion;
   private final Set<URI> imagenes;
   private Dinero tarifaDiaria;
-  private boolean publicada = true;
+  private boolean publicada;
 
   private Herramienta(
+      HerramientaId id,
       ProveedorId proveedor,
       CategoriaId categoria,
       String nombre,
       String descripcion,
       Dinero tarifa,
-      Set<URI> imagenes) {
-    this.id = HerramientaId.generar();
+      Set<URI> imagenes,
+      boolean publicada) {
+    this.id = Objects.requireNonNull(id);
+    this.publicada = publicada;
     this.proveedorId = Objects.requireNonNull(proveedor);
     this.categoriaId = Objects.requireNonNull(categoria);
     this.nombre = Validacion.texto(nombre, "nombre");
@@ -48,8 +55,33 @@ public final class Herramienta {
       String nombre,
       String descripcion,
       Dinero tarifa,
-      Set<URI> imagenes) {
-    return new Herramienta(proveedor, categoria, nombre, descripcion, tarifa, imagenes);
+      Set<URI> imagenes,
+      Clock clock) {
+    var herramienta =
+        new Herramienta(
+            HerramientaId.generar(),
+            proveedor,
+            categoria,
+            nombre,
+            descripcion,
+            tarifa,
+            imagenes,
+            true);
+    herramienta.recordEvent(new HerramientaRegistrada(herramienta.id, Instant.now(clock)));
+    return herramienta;
+  }
+
+  public static Herramienta restaurar(
+      HerramientaId id,
+      ProveedorId proveedor,
+      CategoriaId categoria,
+      String nombre,
+      String descripcion,
+      Dinero tarifa,
+      Set<URI> imagenes,
+      boolean publicada) {
+    return new Herramienta(
+        id, proveedor, categoria, nombre, descripcion, tarifa, imagenes, publicada);
   }
 
   public void cambiarTarifa(Dinero tarifa) {

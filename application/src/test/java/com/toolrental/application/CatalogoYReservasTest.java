@@ -5,13 +5,16 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.toolrental.application.catalog.command.RegistrarCategoriaCommand;
 import com.toolrental.application.catalog.command.RegistrarHerramientaCommand;
 import com.toolrental.application.catalog.command.RegistrarUnidadCommand;
+import com.toolrental.application.catalog.exception.CategoriaNotFoundApplicationException;
+import com.toolrental.application.catalog.exception.ProveedorNotFoundApplicationException;
+import com.toolrental.application.catalog.exception.UnidadEquipoNotFoundApplicationException;
 import com.toolrental.application.catalog.usecase.ConsultarCatalogoUseCase;
 import com.toolrental.application.catalog.usecase.RegistrarCategoriaUseCase;
 import com.toolrental.application.catalog.usecase.RegistrarHerramientaUseCase;
 import com.toolrental.application.catalog.usecase.RegistrarUnidadUseCase;
-import com.toolrental.application.common.exception.RecursoNoEncontradoException;
 import com.toolrental.application.reservation.command.SolicitarReservaCommand;
 import com.toolrental.application.reservation.dto.ReservaResponse;
+import com.toolrental.application.reservation.exception.ClienteNotFoundApplicationException;
 import com.toolrental.application.reservation.usecase.CancelarReservaUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmarReservaUseCase;
 import com.toolrental.application.reservation.usecase.RechazarReservaUseCase;
@@ -43,18 +46,18 @@ class CatalogoYReservasTest {
   private final ProveedorId proveedor = ProveedorId.generar();
   private final LocalDate fecha = LocalDate.of(2026, 10, 14);
   private final RegistrarCategoriaUseCase registrarCategoria =
-      new RegistrarCategoriaUseCase(f.categoriaRepository);
+      new RegistrarCategoriaUseCase(f.categoriaRepository, clock);
   private final RegistrarHerramientaUseCase registrarHerramienta =
       new RegistrarHerramientaUseCase(
-          f.herramientaRepository, f.categoriaRepository, f.participantes);
+          f.herramientaRepository, f.categoriaRepository, f.participantes, clock);
   private final RegistrarUnidadUseCase registrarUnidad =
-      new RegistrarUnidadUseCase(f.registroUnidad);
+      new RegistrarUnidadUseCase(f.registroUnidad, clock);
   private final SolicitarReservaUseCase solicitar =
       new SolicitarReservaUseCase(
           f.reservaRepository, f.unidadRepository, f.herramientaRepository, f.participantes, clock);
   private final ConfirmarReservaUseCase confirmar = new ConfirmarReservaUseCase(f.gestion, clock);
-  private final CancelarReservaUseCase cancelar = new CancelarReservaUseCase(f.gestion);
-  private final RechazarReservaUseCase rechazar = new RechazarReservaUseCase(f.gestion);
+  private final CancelarReservaUseCase cancelar = new CancelarReservaUseCase(f.gestion, clock);
+  private final RechazarReservaUseCase rechazar = new RechazarReservaUseCase(f.gestion, clock);
   private final CategoriaId categoria;
   private final HerramientaId herramienta;
   private final UnidadEquipoId unidad;
@@ -104,12 +107,13 @@ class CatalogoYReservasTest {
         ReglaNegocioException.class,
         () -> registrarCategoria.execute(new RegistrarCategoriaCommand(" Perforación ")));
     assertThrows(
-        RecursoNoEncontradoException.class,
+        CategoriaNotFoundApplicationException.class,
         () ->
             registrarHerramienta.execute(
                 new RegistrarHerramientaCommand(
                     proveedor, CategoriaId.generar(), "X", "Y", dinero("1"), Set.of())));
-    assertThrows(RecursoNoEncontradoException.class, () -> crearHerramienta(ProveedorId.generar()));
+    assertThrows(
+        ProveedorNotFoundApplicationException.class, () -> crearHerramienta(ProveedorId.generar()));
     var otraHerramienta = crearHerramienta(proveedor);
     assertThrows(
         ReglaNegocioException.class,
@@ -215,13 +219,14 @@ class CatalogoYReservasTest {
   void solicitudNoGuardaCuandoFallaValidacion() {
     int antes = f.reservas.size();
     assertThrows(ReglaNegocioException.class, () -> solicitar(unidad, unidad));
-    assertThrows(RecursoNoEncontradoException.class, () -> solicitar(UnidadEquipoId.generar()));
+    assertThrows(
+        UnidadEquipoNotFoundApplicationException.class, () -> solicitar(UnidadEquipoId.generar()));
     var p = ProveedorId.generar();
     f.proveedores.add(p);
     var u = registrarUnidad.execute(new RegistrarUnidadCommand(crearHerramienta(p), "Otro")).id();
     assertThrows(ReglaNegocioException.class, () -> solicitar(unidad, u));
     f.clientes.remove(cliente);
-    assertThrows(RecursoNoEncontradoException.class, () -> solicitar(unidad));
+    assertThrows(ClienteNotFoundApplicationException.class, () -> solicitar(unidad));
     assertEquals(antes, f.reservas.size());
   }
 
@@ -234,7 +239,7 @@ class CatalogoYReservasTest {
             f.gestion.ejecutar(
                 r.id(),
                 contexto -> {
-                  contexto.reserva().cancelar();
+                  contexto.reserva().cancelar(clock);
                   throw new IllegalStateException("Simulación de fallo antes de guardar");
                 }));
     assertEquals(EstadoReserva.PENDIENTE, f.reservas.get(r.id()).estado());

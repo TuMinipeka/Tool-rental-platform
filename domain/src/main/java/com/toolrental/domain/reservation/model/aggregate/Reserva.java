@@ -1,10 +1,14 @@
 package com.toolrental.domain.reservation.model.aggregate;
 
 import com.toolrental.domain.common.exception.ReglaNegocioException;
+import com.toolrental.domain.common.model.AggregateRoot;
 import com.toolrental.domain.common.model.valueobject.ClienteId;
 import com.toolrental.domain.common.model.valueobject.Dinero;
 import com.toolrental.domain.common.model.valueobject.ProveedorId;
+import com.toolrental.domain.reservation.event.ReservaCancelada;
 import com.toolrental.domain.reservation.event.ReservaConfirmada;
+import com.toolrental.domain.reservation.event.ReservaRechazada;
+import com.toolrental.domain.reservation.event.ReservaSolicitada;
 import com.toolrental.domain.reservation.model.entity.DetalleReserva;
 import com.toolrental.domain.reservation.model.valueobject.EstadoReserva;
 import com.toolrental.domain.reservation.model.valueobject.PeriodoReserva;
@@ -16,7 +20,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public final class Reserva {
+public final class Reserva extends AggregateRoot {
   private final ReservaId id;
   private final ClienteId clienteId;
   private final PeriodoReserva periodo;
@@ -51,7 +55,9 @@ public final class Reserva {
 
   public static Reserva solicitar(
       ClienteId cliente, PeriodoReserva periodo, List<DetalleReserva> lineas, Clock clock) {
-    return new Reserva(cliente, periodo, lineas, clock);
+    var reserva = new Reserva(cliente, periodo, lineas, clock);
+    reserva.recordEvent(new ReservaSolicitada(reserva.id, reserva.creadaEn));
+    return reserva;
   }
 
   /** Devuelve la versión confirmada; el puerto atómico debe reemplazar la versión pendiente. */
@@ -74,8 +80,10 @@ public final class Reserva {
         .moneda()
         .equals(nuevas.getFirst().tarifaDiaria().moneda()))
       throw new ReglaNegocioException("La confirmación no puede cambiar la moneda");
-    return new Reserva(
-        this, nuevas, EstadoReserva.CONFIRMADA, new ReservaConfirmada(id, Instant.now(clock)));
+    var evento = new ReservaConfirmada(id, Instant.now(clock));
+    var confirmada = new Reserva(this, nuevas, EstadoReserva.CONFIRMADA, evento);
+    confirmada.recordEvent(evento);
+    return confirmada;
   }
 
   private Reserva(
@@ -96,15 +104,53 @@ public final class Reserva {
     return new Reserva(this, detalles, estado, confirmacion);
   }
 
-  public void rechazar() {
-    exigirPendiente();
-    estado = EstadoReserva.RECHAZADA;
+  /** Reconstruye estado persistido sin registrar eventos nuevos. */
+  public static Reserva restaurar(
+      ReservaId id,
+      ClienteId cliente,
+      PeriodoReserva periodo,
+      List<DetalleReserva> detalles,
+      Instant creadaEn,
+      EstadoReserva estado,
+      Instant confirmadaEn) {
+    return new Reserva(id, cliente, periodo, detalles, creadaEn, estado, confirmadaEn);
   }
 
-  public void cancelar() {
+  private Reserva(
+      ReservaId id,
+      ClienteId cliente,
+      PeriodoReserva periodo,
+      List<DetalleReserva> detalles,
+      Instant creadaEn,
+      EstadoReserva estado,
+      Instant confirmadaEn) {
+    this.id = Objects.requireNonNull(id);
+    this.clienteId = Objects.requireNonNull(cliente);
+    this.periodo = Objects.requireNonNull(periodo);
+    this.detalles = validar(detalles);
+    this.creadaEn = Objects.requireNonNull(creadaEn);
+    this.estado = Objects.requireNonNull(estado);
+    if (estado == EstadoReserva.CONFIRMADA && confirmadaEn == null)
+      throw new ReglaNegocioException("Reserva confirmada requiere fecha de confirmación");
+    if ((estado == EstadoReserva.PENDIENTE || estado == EstadoReserva.RECHAZADA)
+        && confirmadaEn != null)
+      throw new ReglaNegocioException("Estado incompatible con fecha de confirmación");
+    this.confirmacion = confirmadaEn == null ? null : new ReservaConfirmada(id, confirmadaEn);
+  }
+
+  public void rechazar(Clock clock) {
+    exigirPendiente();
+    var evento = new ReservaRechazada(id, Instant.now(clock));
+    estado = EstadoReserva.RECHAZADA;
+    recordEvent(evento);
+  }
+
+  public void cancelar(Clock clock) {
     if (estado != EstadoReserva.PENDIENTE && estado != EstadoReserva.CONFIRMADA)
       throw new ReglaNegocioException("Reserva terminal");
+    var evento = new ReservaCancelada(id, Instant.now(clock));
     estado = EstadoReserva.CANCELADA;
+    recordEvent(evento);
   }
 
   private void exigirPendiente() {
