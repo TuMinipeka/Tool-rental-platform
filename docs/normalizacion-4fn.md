@@ -2,7 +2,7 @@
 
 ## Base del análisis
 
-Se parte del [modelo conceptual](modelo-conceptual.md), especialmente sus supuestos. La normalización evalúa relaciones y dependencias, no pantallas ni diagramas por sí solos. `X → Y` es dependencia funcional; `X ↠ Y`, dependencia multivaluada (DMV). Una superclave determina toda una fila; una clave candidata es una superclave mínima.
+Se parte del [modelo conceptual](modelo-conceptual.md), especialmente sus supuestos. Desde el 14 de octubre de 2026 PostgreSQL es el motor elegido por el usuario y el período de reserva usa fechas inclusivas, admitiendo inicio igual a devolución. Esas decisiones sustituyen el motor y la política temporal iniciales sin cambiar las dependencias funcionales del esquema lógico. La normalización evalúa relaciones y dependencias, no pantallas ni diagramas por sí solos. `X → Y` es dependencia funcional; `X ↠ Y`, dependencia multivaluada (DMV). Una superclave determina toda una fila; una clave candidata es una superclave mínima.
 
 Se aplicó la skill [database-normalization](../.agents/skills/database-normalization/SKILL.md), sus referencias de 1FN, 2FN, 3FN, BCNF y 4FN y su ejemplo MySQL de 4FN. La condición formal de 2FN se evalúa sobre **todas las claves candidatas**, no únicamente sobre la PK elegida. Agregar un ID artificial no elimina dependencias existentes. En BCNF y 4FN se exige que el determinante sea una **superclave**, no necesariamente una clave mínima.
 
@@ -181,13 +181,13 @@ En cada fila, `clave → resto` resume todas las DF de los atributos descriptivo
 | Factura | idFactura; idReserva; numero → resto | Un documento por alquiler; líneas externas. Las instantáneas no dependen de un documento de persona vivo. 4FN. |
 | DetalleFactura | (idFactura,numeroLinea) → resto | Descripción, cantidad y precio forman un concepto facturado concreto. 4FN. |
 
-Resultado: 18 relaciones en 4FN **respecto de las DF/DMV y supuestos identificados**. No es una certificación sobre reglas desconocidas ni una validación física en MySQL. Una PK artificial, un diagrama o una prueba SQL no demuestran por sí solos 4FN; la evidencia es el análisis de dependencias.
+Resultado: 18 relaciones en 4FN **respecto de las DF/DMV y supuestos identificados**. No es una certificación sobre reglas desconocidas ni una validación física en PostgreSQL. Una PK artificial, un diagrama o una prueba SQL no demuestran por sí solos 4FN; la evidencia es el análisis de dependencias. Los cuatro agregados Java iniciales no equivalen a estas 18 relaciones: las fronteras DDD se explican en [arquitectura del backend](arquitectura-backend.md).
 
 ## Restricciones que la normalización no resuelve
 
 | Restricción | Validación posterior propuesta |
 | --- | --- |
-| PK, AK, referencias, importes positivos, inicio anterior a fin | Restricciones declarativas del DDL cuando sean expresables localmente. |
+| PK, AK, referencias, importes positivos, inicio anterior o igual a devolución | Restricciones declarativas del DDL cuando sean expresables localmente. |
 | Mismo proveedor en todas las líneas; código de inventario único por proveedor | Consulta y escritura en una transacción con bloqueo del proveedor, o rediseño justificado. |
 | No solapamiento y no entregar una unidad que sigue fuera | Bloquear la unidad, verificar reservas/alquileres y confirmar en la misma transacción; comprobar carreras concurrentes. |
 | Perfil coherente con rol; mínimos de líneas al enviar/emitir | Servicios de dominio y transacciones; PK/FK no garantizan estos mínimos. |

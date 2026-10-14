@@ -2,7 +2,7 @@
 
 ## Alcance y lectura del enunciado
 
-Fuente: [ejercicioDemo.md](../ejercicioDemo.md). Esta primera entrega identifica conceptos, atributos, relaciones y reglas, y deriva un modelo lógico hasta 4FN. No implementa todavía Spring Boot, SQL, JWT, pagos, frontend ni despliegue. Los entregables del documento fuente son requisitos futuros del producto, no capacidades existentes.
+Fuente: [ejercicioDemo.md](../ejercicioDemo.md). Este documento identifica conceptos, atributos, relaciones y reglas, y deriva un modelo lógico hasta 4FN. Desde el 14 de octubre de 2026 existe una primera implementación Java 21/Spring Boot de catálogo y reservas; consultar su alcance en [arquitectura del backend](arquitectura-backend.md). El SQL, JPA, JWT, pagos, frontend y despliegue siguen pendientes. El usuario eligió PostgreSQL en sustitución del MySQL del enunciado, que se conserva intacto.
 
 El modelo conceptual expresa hechos del negocio; las claves foráneas, tablas y dependencias se presentan después en [normalización](normalizacion-4fn.md). Un panel, un CRUD, JWT, Swagger o una estadística no son por sí mismos entidades del negocio.
 
@@ -25,7 +25,7 @@ Las entidades asociativas UsuarioRol y DetalleReserva representan relaciones con
 2. Una herramienta es una oferta del catálogo de un proveedor, con una categoría principal. Cada unidad física tiene un código de inventario único dentro del proveedor. No se presupone que el número de serie sea universalmente único.
 3. Las imágenes describen la oferta completa, no una unidad concreta. Sus imágenes y sus unidades físicas son conjuntos independientes. Si se necesitan fotos de daños o de unidades concretas, serán relaciones diferentes.
 4. Una reserva contiene una o varias unidades concretas de un solo proveedor. Si el cliente selecciona equipos de varios proveedores, se generan reservas independientes. No se modela un carrito compartido entre proveedores.
-5. Todas las líneas de una reserva comparten un intervalo `[inicio, fin)` y moneda. El alquiler se mide en días facturables según una política aún por acordar. La tarifa acordada por unidad se congela al confirmar; no cambia al editar la tarifa del catálogo.
+5. Todas las líneas de una reserva comparten fechas `[inicio, devolucion]` inclusivas y moneda. Por decisión confirmada, se cobran ambos días: diferencia de fechas más uno; se permite reservar un solo día. La tarifa acordada por unidad se toma del catálogo y se congela al confirmar; no cambia al editar posteriormente la tarifa del catálogo.
 6. Una reserva confirmada origina como máximo un alquiler. La reserva es la solicitud; el alquiler representa su ejecución, no una copia del inventario reservado.
 7. Por cada unidad del alquiler hay como máximo una entrega y una devolución. Ambas pueden suceder en momentos distintos para cada unidad. Se permiten varios reportes de daño por devolución. No se contemplan sustituciones ni múltiples ciclos de entrega de una misma unidad dentro del mismo alquiler.
 8. Se permiten varios intentos o pagos parciales por reserva. Cada pago pertenece a una sola reserva. No se almacena información de tarjetas. Reembolsos, pagos repartidos entre reservas y disputas quedan por definir.
@@ -111,14 +111,14 @@ Las cardinalidades mínimas 1 de líneas corresponden a reserva enviada y factur
 
 ## Reglas e información derivada
 
-- `inicio < fin`; importes no negativos y pagos estrictamente positivos. Una unidad no puede estar comprometida por dos reservas vigentes con intervalos que se solapen. En reservas confirmadas, `[inicio, fin)` permite devolver e iniciar otra reserva en el mismo instante límite.
+- `inicio <= devolucion`; importes no negativos y pagos estrictamente positivos. Una unidad no puede estar comprometida por dos reservas confirmadas con fechas inclusivas que se solapen. Compartir la fecha de devolución también genera conflicto; el siguiente alquiler puede comenzar al día siguiente.
 - La disponibilidad para un período se calcula con reservas que bloquean inventario, vencimientos, estado operativo y alquileres aún sin devolución. Una devolución tardía exige bloquear nuevas entregas hasta resolverla. No es un booleano global ni solo una propiedad del catálogo.
 - Todas las líneas de una reserva deben pertenecer al mismo proveedor. La propiedad de una herramienta no cambia mientras haya compromisos; después, una transferencia necesitaría un modelo histórico específico.
 - Las líneas, fechas y moneda se congelan al confirmar la reserva. El detalle del alquiler se obtiene de ellas, sin duplicarlo. La creación del alquiler requiere confirmación; una devolución requiere una entrega realizada. No se borran equipos, personas ni documentos referenciados por operaciones históricas: se inactivan.
 - Historiales, paneles e ingresos se consultan a partir de operaciones. Los ingresos cobrados se calculan con pagos confirmados; facturado y cobrado son métricas distintas.
 - Total estimado de reserva: suma de tarifa acordada por días facturables. Total básico de factura: suma de cantidad por precio unitario emitido. Saldo: obligación definida menos pagos confirmados; la política de recargos/impuestos está pendiente. No almacenar estos valores derivados en el modelo normalizado inicial.
-- Los estados necesitan transiciones de negocio, no solo cadenas válidas. Aceptación por proveedor y confirmación de pago aparecen con distinto orden en el enunciado; su secuencia exacta debe acordarse antes de implementar.
+- Los estados necesitan transiciones de negocio, no solo cadenas válidas. Por decisión confirmada, el proveedor confirma y bloquea las unidades sin exigir pago previo. El pago se incorporará después como condición de entrega. Una solicitud pendiente no bloquea unidades; no se implementan vencimientos ni retenciones temporales en esta etapa.
 
 ## Orientación posterior para DDD y arquitectura hexagonal
 
-Posibles módulos: identidad, catálogo/inventario, reservas/alquileres y cobros/facturación. Las entidades conceptuales no equivalen automáticamente a agregados DDD ni a clases JPA. Límites de transacción, puertos y agregados se definirán al implementar las reglas; pagos externos y almacenamiento de imágenes serán adaptadores. Esta organización es una propuesta, no una arquitectura ya implementada.
+El backend usa los módulos Maven domain, application e infrastructure y paquetes por funcionalidad. Las entidades conceptuales no equivalen automáticamente a agregados DDD ni a clases JPA: se implementaron Categoria, Herramienta, UnidadEquipo y Reserva como raíces; DetalleReserva pertenece a Reserva y las imágenes son valores de Herramienta. Identidad, alquileres y cobros/facturación siguen pendientes. Ver los puertos y límites transaccionales en [arquitectura del backend](arquitectura-backend.md).
