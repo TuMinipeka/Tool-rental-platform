@@ -413,3 +413,18 @@ El frontend debe proporcionar una experiencia de usuario **intuitiva, fluida y r
 📌 **Despliegue en Apache Tomcat**:
 
  ✅ Configuración del servidor embebido para ejecutar el backend.
+
+ 📌 **Rubricas de evaluacion**:
+
+    Diseño y Arquitectura del Proyecto
+    Modelo Lógico de la Base de Datos (Diagrama Relacional)
+    Modelo Físico de la Base de Datos (Estructura y Datos)
+    Implementación de CRUDs y Lógica de Negocio
+    Implementación de Seguridad y Autenticación con JWT
+    Implementación del Sistema de Pagos y Facturación
+    Implementación del Sistema de Reservas y Disponibilidad
+    Implementación del Panel de Reportes y Estadísticas
+    Documentación del README.md
+    Documentación de la API con Swagger
+    Gestión de Repositorio en GitHub y Commits
+    Implementación de JWT
