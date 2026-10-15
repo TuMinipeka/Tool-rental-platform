@@ -14,7 +14,7 @@ public record Money(BigDecimal amount, Currency currency) {
   }
 
   public Money multiply(long quantity) {
-    if (quantity < 0) throw new BusinessRuleException("Cantidad negativa");
+    if (quantity < 0) throw new BusinessRuleException("Quantity cannot be negative");
     return new Money(amount.multiply(BigDecimal.valueOf(quantity)), currency);
   }
 

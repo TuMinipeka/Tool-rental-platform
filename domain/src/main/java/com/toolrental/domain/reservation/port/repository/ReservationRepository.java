@@ -4,7 +4,7 @@ import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import java.util.Optional;
 
-/** Solo crea requestes. Las transiciones deben pasar por AtomicReservationManagement. */
+/** Creates requests only. State transitions must use AtomicReservationManagement. */
 public interface ReservationRepository {
   void addRequest(Reservation reservation);
 
