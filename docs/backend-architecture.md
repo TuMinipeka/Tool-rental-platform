@@ -24,7 +24,7 @@ flowchart LR
 
 `ReservationItem` is internal to `Reservation` and has no independent repository. Images are URI values inside `Tool`. A future relational model may store both in separate tables without changing the aggregate boundaries.
 
-Customer and supplier are currently typed IDs checked through `ParticipantsPort`. Identity, multiple roles, rentals, payments, and invoicing remain future contexts. Empty aggregates are not created as placeholders.
+Customer and supplier are currently typed IDs checked through a PostgreSQL `ParticipantsPort` adapter. Identity writes, rentals, payments, and invoicing remain future contexts. Empty aggregates are not created as placeholders.
 
 Aggregates expose behavior instead of generic setters. Collections are immutable snapshots. `Money` combines `BigDecimal` and `Currency`, rejects negative amounts, and rejects addition across currencies. Typed IDs prevent accidental identity interchange.
 
@@ -100,20 +100,20 @@ stateDiagram-v2
 
 Both reservation dates are billable and participate in availability. October 14–15 costs two days. A reservation ending October 15 conflicts with another starting October 15; the next non-overlapping reservation may start October 16.
 
-## Persistence rules for the next phase
+## Persistence implementation
 
-- Use PostgreSQL and versioned Flyway migrations.
-- Use plural `snake_case` table names and singular `snake_case` columns.
-- Keep JPA entities and mappers in infrastructure.
-- Rebuild aggregates through `restore` without emitting new events.
-- Configure Hibernate with `ddl-auto: validate`.
-- Add physical keys, unique constraints, foreign keys, indexes, and integration tests.
-- Prove the locking/versioning strategy with concurrent confirmation tests.
+- PostgreSQL uses versioned Flyway migrations with plural `snake_case` table names and singular columns.
+- JPA entities, Spring Data repositories, mappers, and domain-port adapters remain in infrastructure.
+- Mappers rebuild aggregates through `restore` without emitting new events.
+- Hibernate uses `ddl-auto: validate`; Flyway exclusively owns schema changes.
+- Primary keys, alternate keys, foreign keys, checks, and indexes reinforce local invariants.
+- Atomic adapters use pessimistic locks in stable order for equipment-unit registration and reservation transitions.
+- Integration and concurrent confirmation tests against real PostgreSQL remain pending.
 
 The normalized database has more relations than the domain has aggregates. That is intentional: normalization protects stored facts, while DDD protects transactional business invariants.
 
 ## Current operational boundary
 
-The test adapter exists only under `application/src/test`; it is not packaged in production. The Spring application starts without a `DataSource`. No REST endpoint, JPA entity, durable repository, JWT filter, external event publisher, or payment processor exists yet.
+Production JPA adapters now implement catalog, participant-read, reservation, and atomic-operation ports. Flyway defines all 18 normalized relations, although only current catalog/reservation capabilities have adapters. A configured PostgreSQL instance is required for normal startup. No REST endpoint, identity-write adapter, JWT filter, external event publisher, rental/payment/invoice adapter, or payment processor exists yet.
 
-Run `mvnw clean verify` with Java 21 to compile all modules, execute tests, check architecture, start the Spring test context, and validate formatting.
+Compilation verifies the Java integration without a database. Full completion still requires Testcontainers tests that apply Flyway and exercise mappings and locks against PostgreSQL; these are tracked in [Pending database work](pendientes-base-datos.md).

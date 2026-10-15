@@ -4,9 +4,9 @@ Backend for renting construction tools and equipment, built with Java 21, hexago
 
 ## Current status
 
-Implemented: a multi-module Maven structure, catalog and reservation aggregates, application use cases, domain ports, domain events, and automated tests. Spring Boot starts without a database or HTTP server. Test-only in-memory adapters exercise the use cases; production adapters do not exist yet.
+Implemented: a multi-module Maven structure, catalog and reservation aggregates, application use cases, domain ports, domain events, PostgreSQL/Flyway configuration, an executable 4NF schema, JPA mappings, and production persistence adapters. The application still has no HTTP server.
 
-Pending: PostgreSQL/JPA adapters, Flyway migrations, REST API, JWT identity and authorization, rentals, payments, invoicing, reporting, deployment, and frontend.
+Pending: PostgreSQL integration and concurrency tests, database provisioning, identity writes, REST API, JWT authorization, rental/payment/invoice adapters, reporting, deployment, and frontend. See [Pending database work](docs/pendientes-base-datos.md).
 
 ## Technology
 
@@ -17,16 +17,16 @@ Pending: PostgreSQL/JPA adapters, Flyway migrations, REST API, JWT identity and 
 | Build | Maven multi-module project; Maven Wrapper 3.9.9 |
 | Tests | JUnit 5, Spring Boot Test, ArchUnit |
 | Formatting | Spotless 2.43.0 with Google Java Format 1.27.0 |
-| Planned database | PostgreSQL |
+| Database | PostgreSQL, Spring Data JPA, Flyway |
 
-The [original assignment (Spanish)](ejercicioDemo.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision; no JDBC driver or physical schema has been added yet.
+The [original assignment (Spanish)](ejercicioDemo.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision.
 
 ## Architecture
 
 ```text
 domain/          # Aggregates, entities, value objects, events, and ports
 application/     # Commands, responses, exceptions, and use cases
-infrastructure/  # Spring Boot entry point, configuration, and future adapters
+infrastructure/  # Spring Boot entry point, JPA adapters, and Flyway migrations
 docs/            # Conceptual model, 4NF analysis, architecture, and conventions
 pom.xml          # Maven reactor and centralized versions
 ```
@@ -87,7 +87,16 @@ java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
 .\mvnw.cmd spotless:apply
 ```
 
-The application currently starts a Spring context and exits normally because it has no web server or background task. It needs no database credentials at this stage.
+The default `local` profile connects to `jdbc:postgresql://localhost:5432/tool_rental` with user and password `tool_rental`. Override any value through environment variables:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'local'
+$env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
+$env:DB_USERNAME = 'tool_rental'
+$env:DB_PASSWORD = 'change-me'
+```
+
+The `production` profile requires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Flyway applies versioned migrations and Hibernate uses `ddl-auto: validate`; Hibernate never creates or updates the schema.
 
 ## Documentation
 
@@ -97,12 +106,13 @@ The application currently starts a Spring context and exits normally because it 
 4. [Backend architecture](docs/backend-architecture.md)
 5. [Development guide](docs/development-guide.md)
 6. [Infrastructure structure](infrastructure/STRUCTURE.md)
+7. [Pending database work](docs/pendientes-base-datos.md)
 
 `AGENTS.md` records repository-wide rules for future automated work. ArchUnit protects dependency direction and key hierarchies; Spotless protects Java formatting.
 
 ## Next delivery
 
-The next phase will add PostgreSQL, Flyway, JPA entities and mappers isolated in infrastructure, `ddl-auto: validate`, physical constraints, and integration/concurrency tests. REST and JWT security follow after persistence. Frontend technology will be selected separately.
+The next database phase will provision PostgreSQL and validate Flyway, mappings, transactions, and locks with Testcontainers integration and concurrency tests. REST and JWT security follow after persistence is proven against a real database. Frontend technology will be selected separately.
 
 The installed [database-normalization skill](.agents/skills/database-normalization/SKILL.md) supports the relational analysis. Its source and license are tracked by `skills-lock.json`.
 

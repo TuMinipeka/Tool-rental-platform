@@ -139,7 +139,7 @@ Other independent sets also stay separate: `user_roles` from customer/supplier p
 
 ## Resulting logical schema
 
-PK = primary key, AK = alternate candidate key, FK = foreign key. `?` means optional. This is a logical model, not yet an executable Flyway migration.
+PK = primary key, AK = alternate candidate key, FK = foreign key. `?` means optional. Flyway implements this model in [`V1__create_initial_schema.sql`](../infrastructure/src/main/resources/db/migration/V1__create_initial_schema.sql); the notation below remains the compact logical view.
 
 ```text
 users(
@@ -279,7 +279,7 @@ invoice_items(
 | `invoices` | `invoice_id`; `reservation_id`; `number -> rest` | One immutable issued document; 4NF. |
 | `invoice_items` | `(invoice_id, line_number) -> rest` | One issued line; 4NF. |
 
-Result: 18 relations are in 4NF under the documented functional and multivalued dependencies. This is not proof about unknown business rules and is not a physical PostgreSQL validation.
+Result: 18 relations are in 4NF under the documented functional and multivalued dependencies. The migration adds physical constraints and indexes, but validation against a running PostgreSQL instance remains pending.
 
 ## Rules normalization does not enforce alone
 

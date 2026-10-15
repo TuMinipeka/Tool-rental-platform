@@ -13,31 +13,31 @@ Reference: [TuMinipeka/SpringBootDataJPA-DDD, main branch](https://github.com/Tu
 | `domain/<context>/event` | `domain/catalog/event` and `domain/reservation/event` | Concrete registration and reservation-transition events. |
 | `register` / `restore` factories | Used by all four aggregates | `restore` preserves state and emits no new events. |
 | `domain/<context>/model/{aggregate,valueobject}` | Same relative organization | `ReservationItem` remains under `model/entity` because it is internal to `Reservation`. |
-| `domain/<context>/port/repository` | Domain-owned output contracts | Infrastructure will implement them without moving the interfaces outward. |
+| `domain/<context>/port/repository` | Domain-owned output contracts | JPA adapters implement them without moving the interfaces outward. |
 | `infrastructure/<context>/config` | `CatalogBeanConfiguration` and `ReservationBeanConfiguration` | Constructor-based assembly when required ports exist. |
 | REST input adapters | `adapters/in/rest/{controllers,dtos}` | Directory template only; no endpoint is implemented. |
-| Persistence output adapters | `adapters/out/persistence/{entity,mapper,repository}` | Directory template only; no JPA implementation exists. |
+| Persistence output adapters | `adapters/out/persistence/{entity,mapper,repository}` | Implemented for catalog, participant reads, and reservations. |
 
 ## Error hierarchies
 
 - `ApplicationException` is the base for application failures such as missing resources.
 - `DomainException` is the base for domain failures; `BusinessRuleException` represents violated invariants.
-- `InfrastructureException` and `PersistenceException` reserve a technical failure hierarchy for future adapters.
+- `InfrastructureException` and `PersistenceException` define the technical failure hierarchy for adapters.
 
 Concrete exceptions stay with their context. `CustomerId` and `SupplierId` are typed references until the identity context is implemented.
 
 ## Runtime configuration
 
-Context configurations use `@Bean` and domain ports. Conditional beans do not create fake production repositories: without adapters, only the replaceable `Clock` is configured and the application still starts without a database.
+Context configurations use `@Bean` and domain ports. Spring discovers the production persistence adapters, so the related use cases are assembled when PostgreSQL infrastructure is available.
 
 Creation and state transitions receive an explicit `Clock`. `domainEvents()` exposes pending events as an immutable list, and `clearDomainEvents()` clears them after a future publisher persists them. No broker, automatic publisher, or Outbox exists yet.
 
-The empty REST and JPA directories contain `.gitkeep` because Git does not track empty directories. They are an agreed location, not an implementation claim.
+The empty REST directories contain `.gitkeep` because Git does not track empty directories. Persistence directories now contain JPA entities, mappers, Spring Data repositories, and port adapters.
 
 ## Naming
 
-All source identifiers are English. Java follows `PascalCase`/`camelCase`. Future PostgreSQL tables use plural `snake_case`, including natural irregular plurals such as `categories` and `countries`.
+All source identifiers are English. Java follows `PascalCase`/`camelCase`. PostgreSQL tables use plural `snake_case`, including natural irregular plurals such as `categories` and `countries`.
 
 ## Verification
 
-Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS with Java 21. Tests cover domain rules, application coordination, event behavior, layer direction, Spring context startup, and conditional use-case assembly. They do not validate REST, JPA, PostgreSQL locking, or production transactions because those adapters are not implemented.
+Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS with Java 21. Existing tests cover domain rules, application coordination, event behavior, and layer direction. PostgreSQL mapping, migration, transaction, and concurrency coverage remains pending.
