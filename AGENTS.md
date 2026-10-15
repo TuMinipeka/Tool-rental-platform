@@ -59,4 +59,7 @@ Do not add speculative empty classes or abstractions. Empty adapter directories 
 - Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.
 - Update documentation whenever a rule, contract, structure, technology, or implementation status changes.
 - Do not describe templates or planned work as implemented.
+- Treat `docs/product-scope.md` as the approved product contract and `docs/pendientes.md` as the delivery roadmap. Record unresolved commercial rules instead of inventing values in code.
+- Keep Terms and Conditions, privacy notices, protection terms, and user acceptances versioned. Never preselect optional consent or describe the internal Damage Protection Plan as insurance.
+- Keep tax rates, tax-base rules, protection prices, deductibles, and monetary limits explicit and historically reproducible; do not bury changeable commercial or legal values in application code.
 - Use the English Conventional Commit format shown in `README.md`.

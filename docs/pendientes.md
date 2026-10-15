@@ -1,128 +1,114 @@
-# Pendientes y orden de trabajo
+# Project roadmap and pending work
 
-## Objetivo
+## Purpose
 
-Este documento define qué está confirmado, qué falta decidir y en qué orden conviene avanzar. El objetivo es evitar que una capa dependa de contratos inestables: el frontend puede diseñarse temprano, pero no debe integrarse hasta que el alcance y la API del backend estén definidos y funcionando.
+This document records the agreed delivery order, the decisions already closed, and the decisions that still block implementation. It prevents one layer from depending on an unstable contract.
 
-## Stack tecnológico
+## Confirmed product decisions
 
-### Confirmado
+- The complete product includes catalog, inventory, reservations, rentals, deliveries, returns, damage management, simulated payments, simulated invoicing, administration, and reporting.
+- The initial roles are Customer, Supplier, and Administrator. The Supplier handles delivery and return activities.
+- A reservation charges 50% when the supplier confirms it and the remaining 50% after return and rental completion.
+- Debit card, credit card, PayPal, Visa, and Mastercard are simulated. Visa and Mastercard are card networks, not separate payment processors.
+- The Optional Damage Protection Plan is optional, off by default, and is not presented as insurance.
+- Protection prices, deductibles, limits, and exclusions are versioned commercial parameters. They are not described as percentages required by Colombian law.
+- Prices use Colombian pesos. The general VAT reference is 19%, while the special taxable-base rule for movable-property rental must be implemented and professionally validated before a real launch.
+- The current environment issues academic simulation documents, not tax-valid DIAN invoices.
+- The approved scope and legal safeguards are detailed in [Product scope](product-scope.md).
+- The future public terms page uses the draft in [Terms and Conditions](terms-and-conditions.md).
 
-| Área | Tecnología | Estado |
+## Confirmed technology
+
+| Area | Technology | Current status |
 | --- | --- | --- |
-| Lenguaje backend | Java 21 | Configurado |
-| Framework backend | Spring Boot 3.5.16 | Configurado |
-| Construcción | Maven multi-módulo | Configurado |
-| Arquitectura | Hexagonal, DDD y dependencia `infrastructure -> application -> domain` | Implementada |
-| Base de datos | PostgreSQL | Esquema y configuración preparados; instancia pendiente |
-| Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para catálogo y reservas |
-| Migraciones | Flyway | Dos migraciones disponibles |
-| Datos de desarrollo | SQL manual con cinco `INSERT` por tabla | Preparado |
-| Pruebas actuales | JUnit 5, Spring Boot Test y ArchUnit | Disponibles para dominio, aplicación y arquitectura |
-| Formato | Spotless con Google Java Format | Configurado |
+| Backend language | Java 21 | Configured |
+| Backend framework | Spring Boot 3.5.16 | Configured |
+| Application server | Embedded Apache Tomcat | Supplied by Spring Boot; no HTTP API exists yet |
+| Build | Multi-module Maven | Configured |
+| Architecture | Hexagonal architecture and DDD | Implemented for current contexts |
+| Database | PostgreSQL | Schema and configuration prepared; instance pending |
+| Persistence | Spring Data JPA and Hibernate with `ddl-auto: validate` | Implemented for catalog and reservations |
+| Migrations | Flyway | Two migrations available |
+| Development data | Manual SQL seed with five distinct rows per table | Prepared |
+| API | REST with OpenAPI and Swagger UI | Confirmed, not implemented |
+| Frontend | React with Node.js tooling, HTML, and CSS | Confirmed, not created |
 
-### Pendiente de decisión
+Node.js is used only for the frontend toolchain. Java and Spring Boot remain the only backend stack.
 
-| Área | Decisión necesaria |
-| --- | --- |
-| Alcance MVP | Decidir si la primera entrega termina en reserva o incluye alquiler, entrega, devolución, daños, pagos y facturación. |
-| API | Aprobar REST, formato de errores, versionado y contrato OpenAPI. |
-| Seguridad | Aprobar Spring Security, estrategia JWT, renovación de tokens y recuperación de cuenta. |
-| Frontend | Elegir framework, lenguaje, manejo de estado, librería visual y estrategia de pruebas. |
-| Despliegue | Elegir proveedor, contenedores, registro de imágenes, CI/CD, dominios y manejo de secretos. |
-| Observabilidad | Elegir métricas, logs, trazas y alertas. |
+## Remaining Phase 0 decisions
 
-El stack de base de datos y backend central está claro. El stack completo todavía no está cerrado porque frontend, seguridad y despliegue requieren decisiones del equipo antes de implementarse.
+The following business choices must be approved before their implementation:
 
-## Orden recomendado
+1. Cancellation windows, cancellation charges, no-show handling, and the relationship with statutory withdrawal rights.
+2. Late-return grace period, extension approval, and late charges.
+3. Delivery and collection modes, geographic limits, fees, and failed-delivery handling.
+4. Initial Protection Plan price, deductible, monetary limit, exact exclusions, and dispute period. These values must be identified as project assumptions until supported by a real provider proposal.
+5. Replacement-value calculation and depreciation policy for lost or irreparable equipment.
+6. Identity of the future operator, customer-service channels, privacy-policy details, and retention periods.
+7. Frontend language choice between JavaScript and TypeScript, state management, component library, and testing tools.
+8. API versioning, error format, JWT renewal, account recovery, and session revocation.
+9. Hosting provider, CI/CD, domains, secrets, observability, backups, and incident response.
 
-### Fase 0: alcance del producto
+Phase 0 finishes when these decisions have acceptance criteria and priority. Wireframes may start during this phase, but API integration waits for an approved OpenAPI contract.
 
-Definir primero:
+## Phase 1: executable database
 
-- usuarios y roles del MVP;
-- recorridos completos de cliente, proveedor y administrador;
-- funcionalidades obligatorias y funcionalidades posteriores;
-- reglas de cancelación, pagos, daños y facturación que todavía no estén cerradas;
-- criterios de aceptación y prioridades.
+1. Provision local PostgreSQL.
+2. Apply Flyway migrations to an empty database.
+3. Run `infrastructure/src/main/resources/db/seed/demo-data.sql`.
+4. Review keys, constraints, and representative queries against the real engine.
+5. Add migrations for approved payment, tax, protection, legal-document, evidence, and dispute requirements.
+6. Add Testcontainers coverage for migrations, repositories, rollback, and concurrency when the team begins the testing work.
 
-Se puede avanzar cuando existe un backlog priorizado y todos entienden qué incluye la primera entrega. Durante esta fase el frontend puede producir wireframes, pero no integraciones.
+Exit criterion: a new database can be created repeatably, the application validates its mappings, and the approved schema supports the complete product contract. See [Pending database work](pendientes-base-datos.md).
 
-### Fase 1: base de datos ejecutable
+## Phase 2: backend and API contract
 
-Orden:
+1. Complete the approved aggregates and use cases.
+2. Implement identity, authentication, and authorization.
+3. Add Spring Web, input validation, and uniform error handling.
+4. Implement the complete REST API.
+5. Publish and approve the OpenAPI contract through Swagger UI.
+6. Implement simulated payment, protection, tax, invoicing, evidence, and dispute adapters.
 
-1. Levantar PostgreSQL local.
-2. Aplicar las migraciones Flyway desde una base vacía.
-3. Ejecutar `infrastructure/src/main/resources/db/seed/demo-data.sql`.
-4. Revisar claves, restricciones y datos con consultas reales.
-5. Incorporar Testcontainers y pruebas de migración, repositorios, rollback y concurrencia.
+Exit criterion: all approved journeys work against PostgreSQL and the versioned HTTP contract is stable.
 
-Esta fase termina cuando una base nueva puede crearse de forma repetible y el backend puede leer y escribir datos sin errores de mapeo.
+## Phase 3: shared integration environment
 
-### Fase 2: backend y contrato de API
+Build a reproducible backend image and deploy a development or staging environment with PostgreSQL, automatic migrations, isolated secrets, controlled data, logs, and health checks.
 
-Orden:
+Exit criterion: frontend and quality work can use one shared API without depending on a developer workstation.
 
-1. Cerrar los casos de uso incluidos en el MVP.
-2. Implementar identidad, autenticación y autorización.
-3. Agregar Spring Web, validación de entrada y manejo uniforme de errores.
-4. Exponer endpoints de catálogo y reservas.
-5. Publicar y aprobar el contrato OpenAPI.
-6. Implementar los contextos adicionales aprobados en la fase 0.
+## Phase 4: frontend
 
-Esta fase termina cuando los recorridos del MVP funcionan contra PostgreSQL y el contrato HTTP está versionado. El frontend no debe adivinar nombres de campos, estados ni errores antes de este punto.
+1. Create the React project using Node.js tooling.
+2. Establish navigation, accessibility, loading, empty, success, and error states.
+3. Implement authentication and role-aware navigation.
+4. Implement catalog, availability, reservations, rentals, payments, returns, damage review, invoices, and administrative screens.
+5. Implement the public `/terms-and-conditions` page and link it from the footer and all required acceptance points.
+6. Integrate only against the approved OpenAPI contract.
 
-### Fase 3: ambiente compartido de integración
+Exit criterion: the three roles can complete their approved journeys through a responsive interface.
 
-Crear una imagen del backend y desplegar una instancia de desarrollo o staging con PostgreSQL, migraciones automáticas, secretos separados y datos controlados. Esto permite que frontend y QA consuman una API común sin depender de una máquina local.
+## Phase 5: end-to-end validation and hardening
 
-Esta fase no es el despliegue final de producción; es una plataforma temprana de integración.
+Testing is added with each implemented behavior; this phase completes cross-cutting validation:
 
-### Fase 4: frontend
+- domain and application unit coverage;
+- PostgreSQL migration, mapping, rollback, and concurrency coverage;
+- REST contract and authorization coverage;
+- end-to-end coverage of each role's critical journeys;
+- price, VAT, split-payment, refund, and damage-calculation scenarios;
+- accessibility, security, performance, backup, and restore validation.
 
-Después de aprobar alcance, flujos y OpenAPI:
+Exit criterion: acceptance criteria pass, no critical defect remains open, and accepted risks are documented.
 
-1. Elegir y documentar el stack frontend.
-2. Definir navegación, componentes, estados de carga y errores.
-3. Implementar autenticación.
-4. Implementar catálogo, detalle de herramienta y disponibilidad.
-5. Implementar solicitud y administración de reservas.
-6. Agregar las pantallas de capacidades adicionales incluidas en el MVP.
-7. Integrar exclusivamente contra el contrato publicado.
+## Phase 6: production deployment
 
-Los prototipos visuales pueden comenzar antes, pero la integración funcional debe esperar una API estable.
+Complete reproducible builds, CI/CD, managed infrastructure, TLS, domains, secrets, least-privilege access, migration and rollback procedures, monitoring, alerts, backups, restore exercises, and an incident-response plan.
 
-### Fase 5: pruebas integrales y endurecimiento
+A real commercial launch additionally requires professional Colombian legal, tax, privacy, and security review. Until that review and a DIAN integration are complete, deployments remain academic simulations.
 
-Las pruebas no deben dejarse para el final: cada fase agrega las suyas. En este punto se completa la cobertura transversal:
+## Immediate next decision
 
-- pruebas unitarias de dominio y aplicación;
-- pruebas PostgreSQL con Testcontainers;
-- pruebas de concurrencia de reservas e inventario;
-- pruebas de contrato API;
-- pruebas de seguridad y permisos;
-- pruebas end-to-end de los recorridos del MVP;
-- pruebas de carga sobre búsquedas y confirmación de reservas;
-- verificación de respaldo y restauración.
-
-La salida exige cero fallos críticos, criterios de aceptación cumplidos y riesgos conocidos documentados.
-
-### Fase 6: despliegue de producción
-
-Completar:
-
-- imágenes reproducibles y pipeline CI/CD;
-- infraestructura y PostgreSQL administrado o correctamente operado;
-- secretos, TLS, dominios y políticas de acceso;
-- migraciones con estrategia de rollback compatible;
-- monitoreo, alertas, copias de seguridad y restauración probada;
-- checklist de lanzamiento y plan de respuesta a incidentes.
-
-Producción solo debe habilitarse después de validar staging con el mismo mecanismo de construcción y migración.
-
-## Siguiente paso inmediato
-
-El siguiente paso recomendado es levantar PostgreSQL y validar migraciones más datos demo. En paralelo, el equipo debe cerrar el alcance del MVP. Después se puede terminar el backend REST y congelar OpenAPI; ese contrato marcará el momento correcto para iniciar la integración frontend.
-
-Los pendientes específicos de persistencia se mantienen en [Pendientes de base de datos](pendientes-base-datos.md).
+Finish Phase 0 one rule at a time. The next recommended decision is the cancellation and no-show policy because it affects reservation totals, refunds, consumer information, backend state transitions, database history, and frontend copy.

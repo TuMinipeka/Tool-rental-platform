@@ -6,7 +6,7 @@ Backend for renting construction tools and equipment, built with Java 21, hexago
 
 Implemented: a multi-module Maven structure, catalog and reservation aggregates, application use cases, domain ports, domain events, PostgreSQL/Flyway configuration, an executable 4NF schema, JPA mappings, and production persistence adapters. The application still has no HTTP server.
 
-Pending: PostgreSQL integration and concurrency tests, database provisioning, identity writes, REST API, JWT authorization, rental/payment/invoice adapters, reporting, deployment, and frontend. See [Pending database work](docs/pendientes-base-datos.md).
+Pending: the remaining Phase 0 commercial decisions, PostgreSQL integration and concurrency validation, database provisioning, identity writes, REST/OpenAPI, JWT authorization, rental/payment/protection/invoice adapters, reporting, deployment, and the React frontend. See the [product roadmap](docs/pendientes.md) and [pending database work](docs/pendientes-base-datos.md).
 
 ## Technology
 
@@ -18,6 +18,9 @@ Pending: PostgreSQL integration and concurrency tests, database provisioning, id
 | Tests | JUnit 5, Spring Boot Test, ArchUnit |
 | Formatting | Spotless 2.43.0 with Google Java Format 1.27.0 |
 | Database | PostgreSQL, Spring Data JPA, Flyway |
+| HTTP server | Embedded Apache Tomcat through Spring Boot |
+| API | REST with OpenAPI and Swagger UI; confirmed but not implemented |
+| Frontend | React with Node.js tooling, HTML, and CSS; confirmed but not created |
 
 The [original assignment (Spanish)](ejercicioDemo.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision.
 
@@ -115,13 +118,15 @@ The seed script is intentionally outside `db/migration`; it must never populate 
 5. [Development guide](docs/development-guide.md)
 6. [Infrastructure structure](infrastructure/STRUCTURE.md)
 7. [Pending database work](docs/pendientes-base-datos.md)
-8. [Project roadmap and pending work (Spanish)](docs/pendientes.md)
+8. [Project roadmap and pending work](docs/pendientes.md)
+9. [Product scope](docs/product-scope.md)
+10. [Terms and Conditions draft](docs/terms-and-conditions.md)
 
 `AGENTS.md` records repository-wide rules for future automated work. ArchUnit protects dependency direction and key hierarchies; Spotless protects Java formatting.
 
 ## Next delivery
 
-The next database phase will provision PostgreSQL and validate Flyway, mappings, transactions, and locks with Testcontainers integration and concurrency tests. REST and JWT security follow after persistence is proven against a real database. Frontend technology will be selected separately.
+The team is finishing Phase 0 business rules, beginning with cancellation and no-show handling. The next database phase will provision PostgreSQL, validate Flyway and mappings, and extend the schema for the approved tax, split-payment, damage-protection, evidence, dispute, and legal-acceptance rules. REST/OpenAPI and JWT security follow before the React frontend integrates with the backend.
 
 The installed [database-normalization skill](.agents/skills/database-normalization/SKILL.md) supports the relational analysis. Its source and license are tracked by `skills-lock.json`.
 

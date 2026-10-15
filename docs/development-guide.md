@@ -10,6 +10,8 @@ infrastructure -> application -> domain
 
 Domain is technology-independent. Application coordinates business behavior through ports. Infrastructure connects HTTP, Spring, PostgreSQL, and external services to those contracts.
 
+Business scope, payment timing, tax safeguards, damage protection, and the future Terms and Conditions page are defined in [Product scope](product-scope.md). Unresolved decisions remain in [Project roadmap and pending work](pendientes.md); developers must not replace them with undocumented assumptions.
+
 ## Required structure
 
 ```text
