@@ -101,13 +101,7 @@ $env:DB_PASSWORD = 'change-me'
 
 The `production` profile requires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Flyway applies versioned migrations and Hibernate uses `ddl-auto: validate`; Hibernate never creates or updates the schema.
 
-After Flyway initializes a local database, load the development dataset manually:
-
-```powershell
-psql -h localhost -U tool_rental -d tool_rental -f infrastructure/src/main/resources/db/seed/demo-data.sql
-```
-
-The seed script is intentionally outside `db/migration`; it must never populate production automatically.
+Flyway creates the schema through 18 ordered migrations, one per table. With the `local` profile it also loads 18 demonstration-data migrations, each containing at least five rows. The `production` profile only uses `db/migration` and never loads the demonstration dataset. The tool rates and their public Colombian references are recorded in [Data sources](docs/data-sources.md).
 
 ## Documentation
 
@@ -130,13 +124,19 @@ The team is finishing Phase 0 business rules, beginning with cancellation and no
 
 The installed [database-normalization skill](.agents/skills/database-normalization/SKILL.md) supports the relational analysis. Its source and license are tracked by `skills-lock.json`.
 
-## Commit convention
+## Convención de commits
 
-Use Conventional Commits in English:
+Todos los mensajes deben escribirse en inglés con Conventional Commits, un código Gitmoji y un resumen concatenado en estilo `CamelCase`:
 
 ```text
-feat: add reservation confirmation endpoint
-fix: prevent overlapping confirmed reservations
-docs: document database naming conventions
-refactor: rename catalog types in English
+<type>: :<gitmoji>: <CamelCaseSummary>
+```
+
+Ejemplos:
+
+```text
+feat: :card_file_box: AddImplementationMigrations
+fix: :bug: PreventOverlappingReservations
+docs: :memo: DocumentDatabaseConventions
+refactor: :recycle: RenameCatalogTypes
 ```

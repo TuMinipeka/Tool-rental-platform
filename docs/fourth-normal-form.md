@@ -139,7 +139,7 @@ Other independent sets also stay separate: `user_roles` from customer/supplier p
 
 ## Resulting logical schema
 
-PK = primary key, AK = alternate candidate key, FK = foreign key. `?` means optional. Flyway implements this model in [`V1__create_initial_schema.sql`](../infrastructure/src/main/resources/db/migration/V1__create_initial_schema.sql); the notation below remains the compact logical view.
+PK = primary key, AK = alternate candidate key, FK = foreign key. `?` means optional. Flyway implements this model through the 18 migrations in [`db/migration`](../infrastructure/src/main/resources/db/migration); the notation below remains the compact logical view.
 
 ```text
 users(

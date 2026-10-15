@@ -14,7 +14,8 @@ These instructions apply to the entire repository. Read `docs/development-guide.
 
 ## Language and naming
 
-- Write filenames, source identifiers, comments, messages, test names, configuration keys, and documentation in English.
+- Write filenames, source identifiers, comments, messages, test names, and configuration keys in English.
+- Write human-facing documentation in Spanish. Keep AI-facing operational instructions, such as this file and skill instructions, in English.
 - Keep the root package `com.toolrental`.
 - Use `PascalCase` for Java types, `camelCase` for members, and lowercase package names.
 - Use the established suffixes `UseCase`, `Command`, `Response`, `Repository`, `Controller`, and `Configuration`.
@@ -62,4 +63,5 @@ Do not add speculative empty classes or abstractions. Empty adapter directories 
 - Treat `docs/product-scope.md` as the approved product contract and `docs/pendientes.md` as the delivery roadmap. Record unresolved commercial rules instead of inventing values in code.
 - Keep Terms and Conditions, privacy notices, protection terms, and user acceptances versioned. Never preselect optional consent or describe the internal Damage Protection Plan as insurance.
 - Keep tax rates, tax-base rules, protection prices, deductibles, and monetary limits explicit and historically reproducible; do not bury changeable commercial or legal values in application code.
-- Use the English Conventional Commit format shown in `README.md`.
+- Write every commit message in English using `<type>: :<gitmoji>: <CamelCaseSummary>`.
+- Keep the summary concatenated without spaces, for example `feat: :card_file_box: AddImplementationMigrations`.

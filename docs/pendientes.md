@@ -1,114 +1,114 @@
-# Project roadmap and pending work
+# Hoja de ruta del proyecto y trabajo pendiente
 
-## Purpose
+## Propósito
 
-This document records the agreed delivery order, the decisions already closed, and the decisions that still block implementation. It prevents one layer from depending on an unstable contract.
+Este documento registra el orden de entrega acordado, las decisiones ya cerradas y las decisiones que todavía bloquean la implementación. Evita que una capa dependa de un contrato inestable.
 
-## Confirmed product decisions
+## Decisiones de producto confirmadas
 
-- The complete product includes catalog, inventory, reservations, rentals, deliveries, returns, damage management, simulated payments, simulated invoicing, administration, and reporting.
-- The initial roles are Customer, Supplier, and Administrator. The Supplier handles delivery and return activities.
-- A reservation charges 50% when the supplier confirms it and the remaining 50% after return and rental completion.
-- Debit card, credit card, PayPal, Visa, and Mastercard are simulated. Visa and Mastercard are card networks, not separate payment processors.
-- The Optional Damage Protection Plan is optional, off by default, and is not presented as insurance.
-- Protection prices, deductibles, limits, and exclusions are versioned commercial parameters. They are not described as percentages required by Colombian law.
-- Prices use Colombian pesos. The general VAT reference is 19%, while the special taxable-base rule for movable-property rental must be implemented and professionally validated before a real launch.
-- The current environment issues academic simulation documents, not tax-valid DIAN invoices.
-- The approved scope and legal safeguards are detailed in [Product scope](product-scope.md).
-- The future public terms page uses the draft in [Terms and Conditions](terms-and-conditions.md).
+- El producto completo incluye catálogo, inventario, reservas, alquileres, entregas, devoluciones, gestión de daños, pagos simulados, facturación simulada, administración y reportes.
+- Los roles iniciales son Cliente, Proveedor y Administrador. El Proveedor se encarga de las actividades de entrega y devolución.
+- Una reserva cobra el 50 % cuando el proveedor la confirma y el 50 % restante después de la devolución y finalización del alquiler.
+- Las tarjetas débito y crédito, PayPal, Visa y Mastercard son simulados. Visa y Mastercard son redes de tarjetas, no procesadores de pago independientes.
+- El Plan Opcional de Protección contra Daños es opcional, está desactivado de forma predeterminada y no se presenta como un seguro.
+- Los precios, deducibles, límites y exclusiones de la protección son parámetros comerciales versionados. No se describen como porcentajes exigidos por la legislación colombiana.
+- Los precios usan pesos colombianos. La referencia general del IVA es 19 %, mientras que la regla especial de base gravable para el alquiler de bienes muebles debe implementarse y validarse profesionalmente antes de un lanzamiento real.
+- El entorno actual emite documentos de simulación académica, no facturas válidas ante la DIAN.
+- El alcance aprobado y las salvaguardas legales se detallan en [Alcance del producto](product-scope.md).
+- La futura página pública de términos usa el borrador de [Términos y condiciones](terms-and-conditions.md).
 
-## Confirmed technology
+## Tecnología confirmada
 
-| Area | Technology | Current status |
+| Área | Tecnología | Estado actual |
 | --- | --- | --- |
-| Backend language | Java 21 | Configured |
-| Backend framework | Spring Boot 3.5.16 | Configured |
-| Application server | Embedded Apache Tomcat | Supplied by Spring Boot; no HTTP API exists yet |
-| Build | Multi-module Maven | Configured |
-| Architecture | Hexagonal architecture and DDD | Implemented for current contexts |
-| Database | PostgreSQL | Schema and configuration prepared; instance pending |
-| Persistence | Spring Data JPA and Hibernate with `ddl-auto: validate` | Implemented for catalog and reservations |
-| Migrations | Flyway | Two migrations available |
-| Development data | Manual SQL seed with five distinct rows per table | Prepared |
-| API | REST with OpenAPI and Swagger UI | Confirmed, not implemented |
-| Frontend | React with Node.js tooling, HTML, and CSS | Confirmed, not created |
+| Lenguaje del backend | Java 21 | Configurado |
+| Framework del backend | Spring Boot 3.5.16 | Configurado |
+| Servidor de aplicaciones | Apache Tomcat embebido | Suministrado por Spring Boot; todavía no existe una API HTTP |
+| Construcción | Maven multimódulo | Configurado |
+| Arquitectura | Arquitectura hexagonal y DDD | Implementada para los contextos actuales |
+| Base de datos | PostgreSQL | Esquema y configuración preparados; instancia pendiente |
+| Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para catálogo y reservas |
+| Migraciones | Flyway | 18 migraciones de esquema, una por tabla |
+| Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Preparados |
+| API | REST con OpenAPI y Swagger UI | Confirmada, no implementada |
+| Frontend | React con herramientas de Node.js, HTML y CSS | Confirmado, no creado |
 
-Node.js is used only for the frontend toolchain. Java and Spring Boot remain the only backend stack.
+Node.js se usa únicamente para las herramientas del frontend. Java y Spring Boot siguen siendo la única pila del backend.
 
-## Remaining Phase 0 decisions
+## Decisiones restantes de la Fase 0
 
-The following business choices must be approved before their implementation:
+Las siguientes decisiones de negocio deben aprobarse antes de implementarlas:
 
-1. Cancellation windows, cancellation charges, no-show handling, and the relationship with statutory withdrawal rights.
-2. Late-return grace period, extension approval, and late charges.
-3. Delivery and collection modes, geographic limits, fees, and failed-delivery handling.
-4. Initial Protection Plan price, deductible, monetary limit, exact exclusions, and dispute period. These values must be identified as project assumptions until supported by a real provider proposal.
-5. Replacement-value calculation and depreciation policy for lost or irreparable equipment.
-6. Identity of the future operator, customer-service channels, privacy-policy details, and retention periods.
-7. Frontend language choice between JavaScript and TypeScript, state management, component library, and testing tools.
-8. API versioning, error format, JWT renewal, account recovery, and session revocation.
-9. Hosting provider, CI/CD, domains, secrets, observability, backups, and incident response.
+1. Plazos y cargos de cancelación, manejo de inasistencia y relación con el derecho legal de retracto.
+2. Periodo de gracia para devoluciones tardías, aprobación de extensiones y cargos por mora.
+3. Modalidades de entrega y recogida, límites geográficos, tarifas y manejo de entregas fallidas.
+4. Precio inicial, deducible, límite monetario, exclusiones exactas y periodo de disputa del Plan de Protección. Estos valores deben identificarse como supuestos del proyecto hasta contar con una propuesta de un proveedor real.
+5. Cálculo del valor de reposición y política de depreciación para equipos perdidos o irreparables.
+6. Identidad del futuro operador, canales de atención, detalles de la política de privacidad y periodos de retención.
+7. Elección entre JavaScript y TypeScript para el frontend, gestión de estado, biblioteca de componentes y herramientas de pruebas.
+8. Versionado de la API, formato de errores, renovación de JWT, recuperación de cuentas y revocación de sesiones.
+9. Proveedor de alojamiento, CI/CD, dominios, secretos, observabilidad, copias de seguridad y respuesta a incidentes.
 
-Phase 0 finishes when these decisions have acceptance criteria and priority. Wireframes may start during this phase, but API integration waits for an approved OpenAPI contract.
+La Fase 0 termina cuando estas decisiones tengan criterios de aceptación y prioridad. Los wireframes pueden comenzar durante esta fase, pero la integración con la API espera un contrato OpenAPI aprobado.
 
-## Phase 1: executable database
+## Fase 1: base de datos ejecutable
 
-1. Provision local PostgreSQL.
-2. Apply Flyway migrations to an empty database.
-3. Run `infrastructure/src/main/resources/db/seed/demo-data.sql`.
-4. Review keys, constraints, and representative queries against the real engine.
-5. Add migrations for approved payment, tax, protection, legal-document, evidence, and dispute requirements.
-6. Add Testcontainers coverage for migrations, repositories, rollback, and concurrency when the team begins the testing work.
+1. Aprovisionar PostgreSQL local.
+2. Aplicar las 18 migraciones de esquema de Flyway sobre una base de datos vacía.
+3. Verificar que el perfil `local` aplique además las 18 migraciones de datos de demostración.
+4. Revisar claves, restricciones y consultas representativas contra el motor real.
+5. Agregar migraciones para los requisitos aprobados de pagos, impuestos, protección, documentos legales, evidencias y disputas.
+6. Agregar cobertura con Testcontainers para migraciones, repositorios, rollback y concurrencia cuando el equipo inicie las pruebas.
 
-Exit criterion: a new database can be created repeatably, the application validates its mappings, and the approved schema supports the complete product contract. See [Pending database work](pendientes-base-datos.md).
+Criterio de salida: se puede crear una base de datos nueva de forma repetible, la aplicación valida sus mapeos y el esquema aprobado soporta el contrato completo del producto. Véase [Trabajo pendiente de base de datos](pendientes-base-datos.md).
 
-## Phase 2: backend and API contract
+## Fase 2: backend y contrato de API
 
-1. Complete the approved aggregates and use cases.
-2. Implement identity, authentication, and authorization.
-3. Add Spring Web, input validation, and uniform error handling.
-4. Implement the complete REST API.
-5. Publish and approve the OpenAPI contract through Swagger UI.
-6. Implement simulated payment, protection, tax, invoicing, evidence, and dispute adapters.
+1. Completar los agregados y casos de uso aprobados.
+2. Implementar identidad, autenticación y autorización.
+3. Agregar Spring Web, validación de entradas y manejo uniforme de errores.
+4. Implementar la API REST completa.
+5. Publicar y aprobar el contrato OpenAPI mediante Swagger UI.
+6. Implementar adaptadores de pagos simulados, protección, impuestos, facturación, evidencias y disputas.
 
-Exit criterion: all approved journeys work against PostgreSQL and the versioned HTTP contract is stable.
+Criterio de salida: todos los recorridos aprobados funcionan con PostgreSQL y el contrato HTTP versionado es estable.
 
-## Phase 3: shared integration environment
+## Fase 3: entorno de integración compartido
 
-Build a reproducible backend image and deploy a development or staging environment with PostgreSQL, automatic migrations, isolated secrets, controlled data, logs, and health checks.
+Construir una imagen reproducible del backend y desplegar un entorno de desarrollo o pruebas con PostgreSQL, migraciones automáticas, secretos aislados, datos controlados, registros y comprobaciones de salud.
 
-Exit criterion: frontend and quality work can use one shared API without depending on a developer workstation.
+Criterio de salida: el frontend y el trabajo de calidad pueden usar una API compartida sin depender del equipo de un desarrollador.
 
-## Phase 4: frontend
+## Fase 4: frontend
 
-1. Create the React project using Node.js tooling.
-2. Establish navigation, accessibility, loading, empty, success, and error states.
-3. Implement authentication and role-aware navigation.
-4. Implement catalog, availability, reservations, rentals, payments, returns, damage review, invoices, and administrative screens.
-5. Implement the public `/terms-and-conditions` page and link it from the footer and all required acceptance points.
-6. Integrate only against the approved OpenAPI contract.
+1. Crear el proyecto React con las herramientas de Node.js.
+2. Establecer navegación, accesibilidad y estados de carga, vacío, éxito y error.
+3. Implementar autenticación y navegación según el rol.
+4. Implementar las pantallas de catálogo, disponibilidad, reservas, alquileres, pagos, devoluciones, revisión de daños, facturas y administración.
+5. Implementar la página pública `/terms-and-conditions` y enlazarla desde el pie de página y todos los puntos de aceptación requeridos.
+6. Integrar únicamente contra el contrato OpenAPI aprobado.
 
-Exit criterion: the three roles can complete their approved journeys through a responsive interface.
+Criterio de salida: los tres roles pueden completar sus recorridos aprobados mediante una interfaz adaptable.
 
-## Phase 5: end-to-end validation and hardening
+## Fase 5: validación de extremo a extremo y robustecimiento
 
-Testing is added with each implemented behavior; this phase completes cross-cutting validation:
+Las pruebas se agregan con cada comportamiento implementado; esta fase completa la validación transversal:
 
-- domain and application unit coverage;
-- PostgreSQL migration, mapping, rollback, and concurrency coverage;
-- REST contract and authorization coverage;
-- end-to-end coverage of each role's critical journeys;
-- price, VAT, split-payment, refund, and damage-calculation scenarios;
-- accessibility, security, performance, backup, and restore validation.
+- cobertura unitaria del dominio y la aplicación;
+- cobertura de migraciones, mapeos, rollback y concurrencia en PostgreSQL;
+- cobertura del contrato REST y de autorización;
+- cobertura de extremo a extremo de los recorridos críticos de cada rol;
+- escenarios de precios, IVA, pagos fraccionados, reembolsos y cálculo de daños;
+- validación de accesibilidad, seguridad, rendimiento, copias de seguridad y restauración.
 
-Exit criterion: acceptance criteria pass, no critical defect remains open, and accepted risks are documented.
+Criterio de salida: se cumplen los criterios de aceptación, no queda abierto ningún defecto crítico y los riesgos aceptados están documentados.
 
-## Phase 6: production deployment
+## Fase 6: despliegue en producción
 
-Complete reproducible builds, CI/CD, managed infrastructure, TLS, domains, secrets, least-privilege access, migration and rollback procedures, monitoring, alerts, backups, restore exercises, and an incident-response plan.
+Completar construcciones reproducibles, CI/CD, infraestructura administrada, TLS, dominios, secretos, acceso de mínimo privilegio, procedimientos de migración y rollback, monitoreo, alertas, copias de seguridad, ejercicios de restauración y un plan de respuesta a incidentes.
 
-A real commercial launch additionally requires professional Colombian legal, tax, privacy, and security review. Until that review and a DIAN integration are complete, deployments remain academic simulations.
+Un lanzamiento comercial real requiere además revisión profesional colombiana en materia legal, tributaria, de privacidad y de seguridad. Hasta completar esa revisión y una integración con la DIAN, los despliegues seguirán siendo simulaciones académicas.
 
-## Immediate next decision
+## Próxima decisión inmediata
 
-Finish Phase 0 one rule at a time. The next recommended decision is the cancellation and no-show policy because it affects reservation totals, refunds, consumer information, backend state transitions, database history, and frontend copy.
+Finalizar la Fase 0 una regla a la vez. La siguiente decisión recomendada es la política de cancelación e inasistencia, porque afecta los totales de las reservas, reembolsos, información al consumidor, transiciones de estado del backend, historial de la base de datos y textos del frontend.
