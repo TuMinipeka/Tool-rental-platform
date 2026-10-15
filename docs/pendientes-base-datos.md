@@ -2,18 +2,20 @@
 
 ## Estado actual
 
-La capa de persistencia incluye PostgreSQL, Spring Data JPA, Flyway, perfiles de entorno, 18 migraciones estructurales para las relaciones normalizadas, mapeos JPA, adaptadores para los puertos actuales y 18 migraciones locales de demostración con un mínimo de cinco filas por tabla.
+La capa de persistencia incluye PostgreSQL 17.11, Spring Data JPA, Flyway, perfiles de entorno, 18 migraciones estructurales para las relaciones normalizadas, una migración de compatibilidad JPA, mapeos JPA, adaptadores para los puertos actuales y 18 migraciones locales de demostración con un mínimo de cinco filas por tabla.
 
-La compilación de Java se validó anteriormente sin ejecutar las pruebas. La base de datos no está lista para producción porque el esquema y el comportamiento transaccional aún no se han probado contra una instancia aprovisionada de PostgreSQL.
+El entorno local se aprovisiona con Docker Compose. Testcontainers crea una base vacía y verifica las 37 migraciones, `ddl-auto: validate`, los datos demo, una restricción del motor, un adaptador JPA, rollback transaccional, unicidad concurrente de inventario y prevención de doble reserva. La base de datos todavía no está lista para producción porque faltan reglas del producto, controles operativos y capacidades de persistencia descritas abajo.
 
 ## Trabajo operativo prioritario
 
-- Aprovisionar instancias PostgreSQL locales, de integración, pruebas y producción a medida que cada entorno sea necesario.
-- Aplicar Flyway desde una base de datos vacía y validar las actualizaciones entre versiones.
-- Ejecutar e inspeccionar las migraciones de `db/demo` mediante el perfil `local`; producción no debe incluir esa ubicación.
-- Agregar cobertura con Testcontainers para mapeos, repositorios, migraciones, rollback de transacciones y bloqueos cuando comiencen las pruebas de base de datos.
-- Demostrar que las confirmaciones concurrentes no pueden reservar la misma unidad de equipo.
-- Demostrar la unicidad de `inventory_code` por proveedor bajo escrituras concurrentes.
+- [x] Aprovisionar PostgreSQL local de forma reproducible.
+- [x] Aplicar Flyway desde una base de datos vacía y validar las migraciones actuales.
+- [x] Ejecutar e inspeccionar las migraciones de `db/demo` mediante el perfil `local`; producción no incluye esa ubicación.
+- [x] Agregar cobertura con Testcontainers para mapeos, repositorios, migraciones, rollback y bloqueos.
+- [x] Demostrar que las confirmaciones concurrentes no pueden reservar la misma unidad de equipo.
+- [x] Demostrar la unicidad de `inventory_code` por proveedor bajo escrituras concurrentes.
+- [ ] Aprovisionar los futuros entornos compartidos de integración, pruebas y producción.
+- [ ] Validar las actualizaciones incrementales entre versiones cuando exista un entorno persistente compartido.
 - Definir roles de base de datos con mínimo privilegio, límites del pool de conexiones, tiempos de espera, monitoreo, copias de seguridad, restauración y retención.
 
 ## Adiciones al esquema requeridas por el alcance aprobado del producto

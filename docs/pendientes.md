@@ -26,10 +26,10 @@ Este documento registra el orden de entrega acordado, las decisiones ya cerradas
 | Servidor de aplicaciones | Apache Tomcat embebido | Suministrado por Spring Boot; todavía no existe una API HTTP |
 | Construcción | Maven multimódulo | Configurado |
 | Arquitectura | Arquitectura hexagonal y DDD | Implementada para los contextos actuales |
-| Base de datos | PostgreSQL | Esquema y configuración preparados; instancia pendiente |
+| Base de datos | PostgreSQL 17.11 | Entorno local reproducible y validado con Testcontainers |
 | Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para catálogo y reservas |
-| Migraciones | Flyway | 18 migraciones de esquema, una por tabla |
-| Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Preparados |
+| Migraciones | Flyway | 18 migraciones de tablas y una migración de compatibilidad JPA, validadas desde una base vacía |
+| Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Validados en PostgreSQL |
 | API | REST con OpenAPI y Swagger UI | Confirmada, no implementada |
 | Frontend | React con herramientas de Node.js, HTML y CSS | Confirmado, no creado |
 
@@ -53,14 +53,16 @@ La Fase 0 termina cuando estas decisiones tengan criterios de aceptación y prio
 
 ## Fase 1: base de datos ejecutable
 
-1. Aprovisionar PostgreSQL local.
-2. Aplicar las 18 migraciones de esquema de Flyway sobre una base de datos vacía.
-3. Verificar que el perfil `local` aplique además las 18 migraciones de datos de demostración.
-4. Revisar claves, restricciones y consultas representativas contra el motor real.
-5. Agregar migraciones para los requisitos aprobados de pagos, impuestos, protección, documentos legales, evidencias y disputas.
-6. Agregar cobertura con Testcontainers para migraciones, repositorios, rollback y concurrencia cuando el equipo inicie las pruebas.
+Estado: la base técnica del modelo actual quedó terminada el 15 de octubre de 2026. La ampliación del esquema para el contrato completo del producto continúa bloqueada por las decisiones comerciales y legales de la Fase 0.
 
-Criterio de salida: se puede crear una base de datos nueva de forma repetible, la aplicación valida sus mapeos y el esquema aprobado soporta el contrato completo del producto. Véase [Trabajo pendiente de base de datos](pendientes-base-datos.md).
+- [x] Aprovisionar PostgreSQL 17.11 local mediante Docker Compose y variables en `.env`.
+- [x] Aplicar las 18 migraciones de tablas y la migración de compatibilidad JPA sobre una base de datos vacía.
+- [x] Verificar que el perfil `local` aplique además las 18 migraciones de datos de demostración.
+- [x] Revisar claves, restricciones y consultas representativas contra el motor real.
+- [ ] Agregar migraciones para pagos fraccionados, impuestos, protección, documentos legales, evidencias y disputas. Requiere cerrar primero las reglas correspondientes de la Fase 0.
+- [x] Agregar cobertura con Testcontainers para migraciones, mapeos JPA, repositorios, rollback, unicidad concurrente del inventario y doble confirmación de reservas.
+
+La parte verificable del criterio de salida ya se cumple: una base de datos nueva se crea de forma repetible y la aplicación valida sus mapeos. La Fase 1 completa se cerrará cuando las decisiones de la Fase 0 permitan demostrar que el esquema soporta todo el contrato del producto. Véase [Trabajo pendiente de base de datos](pendientes-base-datos.md).
 
 ## Fase 2: backend y contrato de API
 
