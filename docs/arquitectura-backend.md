@@ -32,6 +32,8 @@ Los IDs tipados evitan intercambiar entidades por accidente. Las fechas de reser
 
 ## Convenciones por capa
 
+Estas convenciones son obligatorias para cambios futuros. La explicación operativa, el flujo de implementación y la lista de comprobación se mantienen en la [guía de desarrollo](guia-desarrollo.md).
+
 ```text
 domain/<funcionalidad>/
   model/aggregate/

@@ -94,6 +94,9 @@ Las pruebas cubren precios y fechas inclusivas, estados, referencias, disponibil
 1. [Modelo conceptual](docs/modelo-conceptual.md): entidades, atributos, cardinalidades y decisiones de negocio.
 2. [Normalización hasta 4FN](docs/normalizacion-4fn.md): esquema lógico de 18 relaciones; todavía no implementado físicamente.
 3. [Arquitectura del backend](docs/arquitectura-backend.md): límites de agregados, casos de uso y contratos transaccionales.
+4. [Guía de desarrollo](docs/guia-desarrollo.md): estructura obligatoria, responsabilidades por capa, convenciones y lista de comprobación para cambios futuros.
+
+La estructura descrita en la guía es una regla del proyecto. `AGENTS.md` la convierte en instrucciones para futuras tareas automatizadas. Las fronteras de dependencia existentes se comprueban con `ArchitectureTest` y el formato Java con Spotless.
 
 Siguiente entrega: PostgreSQL, Flyway, mapeos JPA separados del dominio, `ddl-auto: validate`, implementación de puertos y pruebas de integración y concurrencia. Después: seguridad JWT y autorización por rol y propietario. Las tecnologías del frontend se acordarán posteriormente. No se conecta un procesador de pagos en esta etapa.
 
