@@ -4,7 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.domain.catalog.port.repository.CategoryRepository;
+import com.toolrental.domain.common.exception.BusinessRuleException;
+import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -76,6 +80,8 @@ class PostgreSqlPersistenceIntegrationTest {
   @Autowired private JdbcTemplate jdbcTemplate;
 
   @Autowired private CategoryRepository categoryRepository;
+
+  @Autowired private ConfirmReservationUseCase confirmReservationUseCase;
 
   @Autowired private PlatformTransactionManager transactionManager;
 
@@ -167,6 +173,92 @@ class PostgreSqlPersistenceIntegrationTest {
     } finally {
       executor.shutdownNow();
       jdbcTemplate.update("DELETE FROM equipment_units WHERE inventory_code = ?", inventoryCode);
+    }
+  }
+
+  @Test
+  void preventsConcurrentConfirmationsFromBookingTheSameEquipmentUnit() throws Exception {
+    UUID firstReservationId = UUID.randomUUID();
+    UUID secondReservationId = UUID.randomUUID();
+    insertPendingReservation(
+        firstReservationId, UUID.fromString("00000000-0000-0000-0000-000000000002"));
+    insertPendingReservation(
+        secondReservationId, UUID.fromString("00000000-0000-0000-0000-000000000003"));
+
+    var ready = new CountDownLatch(2);
+    var start = new CountDownLatch(1);
+    ExecutorService executor = Executors.newFixedThreadPool(2);
+
+    try {
+      List<Future<Boolean>> attempts =
+          List.of(
+              executor.submit(() -> confirmReservation(firstReservationId, ready, start)),
+              executor.submit(() -> confirmReservation(secondReservationId, ready, start)));
+
+      assertTrue(ready.await(10, TimeUnit.SECONDS));
+      start.countDown();
+
+      long confirmedAttempts =
+          attempts.stream()
+              .map(PostgreSqlPersistenceIntegrationTest::completedSuccessfully)
+              .filter(Boolean::booleanValue)
+              .count();
+
+      assertEquals(1, confirmedAttempts);
+      assertEquals(
+          1,
+          jdbcTemplate.queryForObject(
+              """
+              SELECT count(*)
+              FROM reservations
+              WHERE reservation_id IN (?, ?)
+                AND reservation_status = 'CONFIRMED'
+              """,
+              Integer.class,
+              firstReservationId,
+              secondReservationId));
+    } finally {
+      executor.shutdownNow();
+      jdbcTemplate.update(
+          "DELETE FROM reservations WHERE reservation_id IN (?, ?)",
+          firstReservationId,
+          secondReservationId);
+    }
+  }
+
+  private void insertPendingReservation(UUID reservationId, UUID customerId) {
+    jdbcTemplate.update(
+        """
+        INSERT INTO reservations (
+            reservation_id, customer_id, created_at, start_date, return_date,
+            reservation_status, currency
+        ) VALUES (?, ?, now(), DATE '2030-01-10', DATE '2030-01-12', 'PENDING', 'COP')
+        """,
+        reservationId,
+        customerId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO reservation_items (
+            reservation_id, equipment_unit_id, agreed_daily_rate
+        ) VALUES (?, '30000000-0000-0000-0000-000000000001', 10000.0000)
+        """,
+        reservationId);
+  }
+
+  private boolean confirmReservation(UUID reservationId, CountDownLatch ready, CountDownLatch start)
+      throws InterruptedException {
+    ready.countDown();
+    if (!start.await(10, TimeUnit.SECONDS)) {
+      throw new IllegalStateException("Concurrent confirmations did not start in time");
+    }
+
+    try {
+      confirmReservationUseCase.execute(
+          new ReservationId(reservationId),
+          new SupplierId(UUID.fromString("00000000-0000-0000-0000-000000000001")));
+      return true;
+    } catch (BusinessRuleException exception) {
+      return false;
     }
   }
 
