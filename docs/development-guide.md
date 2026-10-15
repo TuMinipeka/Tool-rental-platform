@@ -89,7 +89,7 @@ All repository-owned content is written in English.
 
 | Element | Convention | Example |
 | --- | --- | --- |
-| Root package | `com.toolrental.<module>.<context>` | `com.toolrental.application.catalog` |
+| Root package | `com.toolrental.<module>.<context>` | `com.toolrental.application.category` |
 | Use case | intention + `UseCase` | `ConfirmReservationUseCase` |
 | Command | intention + `Command` | `RequestReservationCommand` |
 | Response | concept + `Response` | `ReservationResponse` |
@@ -122,7 +122,7 @@ JPA entities are not domain objects. Keep them in infrastructure and map explici
 
 ### Security
 
-Ownership and role checks remain in use cases. When JWT exists, the input adapter obtains identity from the authenticated principal. A freely supplied `actorId` request field is not authentication.
+Ownership and role checks remain in use cases. The HTTP adapter obtains identity from an authenticated UUID Principal; JWT authentication will be added later. A freely supplied `actorId` request field is not authentication.
 
 ### Events
 
@@ -152,3 +152,7 @@ Domain events record aggregate facts. No external publisher or Outbox exists yet
 - [ ] `mvnw clean verify` succeeds.
 
 ArchUnit checks dependency direction and core hierarchies. Spotless checks Java formatting during `verify`. These safeguards do not replace review of aggregate boundaries or transaction consistency.
+
+## Table-aligned contexts
+
+Use the 18 contexts listed in README. Port adapters belong directly in `adapters/out/persistence`; only Spring Data interfaces belong in its `repository` child. Preserve shared/composite keys instead of creating surrogate IDs. Reservation-item and invoice-item writes remain inside their owner operation. Run PostgreSQL integration tests as part of verification; an explicit isolated test database may replace Docker, never the database assertions.

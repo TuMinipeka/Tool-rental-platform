@@ -2,19 +2,11 @@
 
 ## Current state
 
-The persistence layer includes PostgreSQL, Spring Data JPA, Flyway, environment profiles, migrations for 18 normalized relations, JPA mappings, adapters for the current ports, and a manual development dataset with five distinct rows per table.
+The base 18 tables have complete JPA mappings, scalar references, shared/composite keys, application use cases, and REST adapters. Flyway V1/V2 are unchanged; V3 seeds ADMIN. The integration suite validates fresh migration, Hibernate schema validation, HTTP contracts, rate snapshots, invoice snapshots, rollback and concurrent confirmations against real PostgreSQL.
 
-Java compilation was previously validated without running tests. The database is not production-ready because the schema and transactional behavior have not yet been exercised against a provisioned PostgreSQL instance.
+Docker/Testcontainers is the default test path. An explicit dedicated PostgreSQL URL supports the same assertions without Docker. Operational environment provisioning, migration upgrades from representative production data, least-privilege database roles, backup/restore, retention, monitoring and timeout tuning remain pending.
 
-## Priority operational work
-
-- Provision local, integration, staging, and production PostgreSQL instances as each environment becomes necessary.
-- Apply Flyway from an empty database and validate version-to-version upgrades.
-- Run and inspect `infrastructure/src/main/resources/db/seed/demo-data.sql` locally after Flyway.
-- Add Testcontainers coverage for mappings, repositories, migrations, transaction rollback, and locks when database testing begins.
-- Demonstrate that concurrent confirmations cannot reserve the same equipment unit.
-- Demonstrate supplier-scoped `inventory_code` uniqueness under concurrent writes.
-- Define least-privilege database roles, connection-pool limits, timeouts, monitoring, backup, restore, and retention.
+The manual demo dataset remains separate from Flyway and is not production account provisioning.
 
 ## Schema additions required by the approved product scope
 

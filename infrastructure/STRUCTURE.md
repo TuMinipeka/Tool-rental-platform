@@ -1,43 +1,21 @@
-# Alignment with SpringBootDataJPA-DDD
+# Infrastructure structure
 
-Reference: [TuMinipeka/SpringBootDataJPA-DDD, main branch](https://github.com/TuMinipeka/SpringBootDataJPA-DDD). This project adopts the three-module layout and relative package conventions while preserving its own tool-rental domain and business rules.
+Each of the 18 contexts follows the reference repository:
 
-## Mapping
+```text
+<context>/
+  adapters/in/rest/controllers/<Entity>Controller.java
+  adapters/in/rest/dtos/                 # HTTP requests, separate from application commands
+  adapters/out/persistence/<Entity>PersistenceAdapter.java
+  adapters/out/persistence/entity/<Entity>JpaEntity.java
+  adapters/out/persistence/entity/<Entity>JpaId.java  # Composite keys only
+  adapters/out/persistence/mapper/<Entity>PersistenceMapper.java
+  adapters/out/persistence/repository/<Entity>JpaRepository.java
+  config/<Entity>BeanConfiguration.java
+```
 
-| Reference pattern | Tool Rental Platform | Decision |
-| --- | --- | --- |
-| `application/common/exception/ApplicationException` | Same relative package and abstract type | Protected constructors for message and message/cause. |
-| `application/<context>/{command,dto,usecase}` | `application/{catalog,reservation}/{command,dto,usecase}` | Contexts represent business capabilities, not tables. |
-| `domain/common/event/DomainEvent` | Same relative package and interface | Uses `Instant` and injected `Clock`; common method is `occurredOn()`. |
-| `domain/common/model/AggregateRoot` | Same relative package and abstract type | Protected event recording, immutable access, and event clearing. |
-| `domain/<context>/event` | `domain/catalog/event` and `domain/reservation/event` | Concrete registration and reservation-transition events. |
-| `register` / `restore` factories | Used by all four aggregates | `restore` preserves state and emits no new events. |
-| `domain/<context>/model/{aggregate,valueobject}` | Same relative organization | `ReservationItem` remains under `model/entity` because it is internal to `Reservation`. |
-| `domain/<context>/port/repository` | Domain-owned output contracts | JPA adapters implement them without moving the interfaces outward. |
-| `infrastructure/<context>/config` | `CatalogBeanConfiguration` and `ReservationBeanConfiguration` | Constructor-based assembly when required ports exist. |
-| REST input adapters | `adapters/in/rest/{controllers,dtos}` | Directory template only; no endpoint is implemented. |
-| Persistence output adapters | `adapters/out/persistence/{entity,mapper,repository}` | Implemented for catalog, participant reads, and reservations. |
+Controllers validate/map input and invoke use cases. Adapters implement domain ports. Spring Data repository interfaces never escape infrastructure. Scalar foreign keys preserve context independence; child writes are coordinated by reservation/invoice owners. There are 18 JPA entities, one for each table.
 
-## Error hierarchies
+`common` supplies transaction, authorization, Principal enforcement, exception translation, and Clock configuration. `user` supplies BCrypt hashing without adding a login flow or JWT filter. `rental` implements operational lifecycle queries.
 
-- `ApplicationException` is the base for application failures such as missing resources.
-- `DomainException` is the base for domain failures; `BusinessRuleException` represents violated invariants.
-- `InfrastructureException` and `PersistenceException` define the technical failure hierarchy for adapters.
-
-Concrete exceptions stay with their context. `CustomerId` and `SupplierId` are typed references until the identity context is implemented.
-
-## Runtime configuration
-
-Context configurations use `@Bean` and domain ports. Spring discovers the production persistence adapters, so the related use cases are assembled when PostgreSQL infrastructure is available.
-
-Creation and state transitions receive an explicit `Clock`. `domainEvents()` exposes pending events as an immutable list, and `clearDomainEvents()` clears them after a future publisher persists them. No broker, automatic publisher, or Outbox exists yet.
-
-The empty REST directories contain `.gitkeep` because Git does not track empty directories. Persistence directories now contain JPA entities, mappers, Spring Data repositories, and port adapters.
-
-## Naming
-
-All source identifiers are English. Java follows `PascalCase`/`camelCase`. PostgreSQL tables use plural `snake_case`, including natural irregular plurals such as `categories` and `countries`.
-
-## Verification
-
-Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS with Java 21. Existing tests cover domain rules, application coordination, event behavior, and layer direction. PostgreSQL mapping, migration, transaction, and concurrency coverage remains pending.
+Run the reactor's `mvnw clean verify` with JDK 21 and Docker, or supply the dedicated PostgreSQL URL described in README. PostgreSQL integration is mandatory, not silently skipped.

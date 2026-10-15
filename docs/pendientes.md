@@ -4,6 +4,10 @@
 
 This document records the agreed delivery order, the decisions already closed, and the decisions that still block implementation. It prevents one layer from depending on an unstable contract.
 
+## Base-context delivery update
+
+The 18 base tables now have domain, application, JPA and REST implementations. This delivery adds restricted administrative records and preserves atomic reservation/invoice operations. It does not implement the future 50/50 collection schedule, payment-provider simulation, protection/evidence/consent extensions, or unresolved tax calculations described below. JWT and OpenAPI remain pending. See [REST API](rest-api.md) and [backend architecture](backend-architecture.md).
+
 ## Confirmed product decisions
 
 - The complete product includes catalog, inventory, reservations, rentals, deliveries, returns, damage management, simulated payments, simulated invoicing, administration, and reporting.
@@ -23,14 +27,14 @@ This document records the agreed delivery order, the decisions already closed, a
 | --- | --- | --- |
 | Backend language | Java 21 | Configured |
 | Backend framework | Spring Boot 3.5.16 | Configured |
-| Application server | Embedded Apache Tomcat | Supplied by Spring Boot; no HTTP API exists yet |
+| Application server | Embedded Apache Tomcat | Running REST adapter; authenticated Principal required |
 | Build | Multi-module Maven | Configured |
 | Architecture | Hexagonal architecture and DDD | Implemented for current contexts |
-| Database | PostgreSQL | Schema and configuration prepared; instance pending |
-| Persistence | Spring Data JPA and Hibernate with `ddl-auto: validate` | Implemented for catalog and reservations |
-| Migrations | Flyway | Two migrations available |
+| Database | PostgreSQL | Base schema exercised against an isolated PostgreSQL test instance; environment provisioning pending |
+| Persistence | Spring Data JPA and Hibernate with `ddl-auto: validate` | Implemented for all 18 base-table contexts |
+| Migrations | Flyway | Three migrations available; applied V1/V2 preserved |
 | Development data | Manual SQL seed with five distinct rows per table | Prepared |
-| API | REST with OpenAPI and Swagger UI | Confirmed, not implemented |
+| API | REST with OpenAPI and Swagger UI | REST implemented; OpenAPI/Swagger pending |
 | Frontend | React with Node.js tooling, HTML, and CSS | Confirmed, not created |
 
 Node.js is used only for the frontend toolchain. Java and Spring Boot remain the only backend stack.

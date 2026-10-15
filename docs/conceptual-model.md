@@ -4,7 +4,7 @@
 
 Source: [original assignment (Spanish)](../ejercicioDemo.md). This document identifies business concepts, attributes, relationships, and rules. The logical relational model appears in [Fourth normal form](fourth-normal-form.md), and implemented aggregate boundaries appear in [Backend architecture](backend-architecture.md).
 
-Catalog and reservation behavior currently exists in Java. SQL, JPA, JWT, rentals, payments, invoicing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
+The base 18 entities now have table-aligned Java contexts, JPA mappings, application operations, and REST adapters. JWT, external payment processing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
 
 ## Derived concepts
 
@@ -125,3 +125,7 @@ erDiagram
 ## DDD mapping
 
 The conceptual model does not imply one aggregate or JPA entity per row. The current implementation uses `Category`, `Tool`, `EquipmentUnit`, and `Reservation` as aggregate roots. `ReservationItem` belongs to `Reservation`, while tool images are values owned by `Tool`. Identity, rentals, payments, invoicing, and reporting remain pending.
+
+## Implementation mapping
+
+The project uses one package context per base table by explicit organizational decision. This does not change the conceptual relationships or allow child writes to bypass reservation/invoice transactions. See [architecture](backend-architecture.md) and the [embedded conceptual diagram](../README.md#conceptual-model). The base diagram excludes future protection, evidence and consent extensions.
