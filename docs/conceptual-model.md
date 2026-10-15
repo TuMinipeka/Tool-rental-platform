@@ -80,6 +80,10 @@ Money values use exact decimals and explicit currencies. No implicit currency co
 | Rental — Invoice | Rental 0..1; invoice exactly 1 rental |
 | Invoice — InvoiceItem | Issued invoice 1..N; item exactly 1 invoice |
 
+## Editable conceptual diagram
+
+The 18-entity baseline is available as an [editable Excalidraw scene](diagrams/conceptual-er-model.excalidraw), a [vector preview](diagrams/conceptual-er-model.svg), and a [PNG image](diagrams/conceptual-er-model.png). See the [notation and editing guide](diagrams/README.md).
+
 ## Conceptual diagram
 
 ```mermaid

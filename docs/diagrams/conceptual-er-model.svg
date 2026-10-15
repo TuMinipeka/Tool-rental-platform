@@ -1,0 +1,324 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1915" height="4738" viewBox="0 0 1915 4738">
+<rect width="100%" height="100%" fill="white"/>
+<text x="80" y="62.0" font-family="Arial, sans-serif" font-size="40" fill="#0f172a">Tool Rental Platform</text>
+<text x="80" y="103.0" font-family="Arial, sans-serif" font-size="23" fill="#475569">CONCEPTUAL ENTITY–RELATIONSHIP MODEL  /  BASELINE: 18 ENTITIES</text>
+<text x="80" y="141.0" font-family="Arial, sans-serif" font-size="19" fill="#475569">Business attributes • relationship diamonds • endpoint multiplicities • no SQL types or foreign keys</text>
+<polyline points="1030.7,476.3 1021.6600000000001,484.93 1012.82,493.37 1004.24,501.57 995.96,509.47 988.0600000000001,517.01 980.59,524.15 973.6,530.82 967.1600000000001,536.97" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="916.65,586.63 905.77,596.77 893.53,608.18 880.1899999999999,620.61 866.01,633.83 851.23,647.6 836.13,661.68 820.9499999999999,675.83 805.9399999999999,689.8199999999999" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="721.0,456.24 721.0,465.62 721.0,474.93 721.0,484.1 721.0,493.06 721.0,501.75 721.0,510.11 721.0,518.0600000000001 721.0,525.54" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="721.0,598.41 721.0,608.24 721.0,618.8199999999999 721.0,629.99 721.0,641.62 721.0,653.55 721.0,665.63 721.0,677.72 721.0,689.66" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1306.31,476.3 1316.1,485.06 1325.6799999999998,493.62 1334.97,501.94 1343.9199999999998,509.94 1352.45,517.57 1360.51,524.78 1368.02,531.5 1374.9299999999998,537.6800000000001" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1403.15,597.52 1405.01,627.43 1407.3000000000002,664.2 1409.92,706.27 1412.77,752.1 1415.76,800.11 1418.7900000000002,848.76 1421.76,896.5 1424.5800000000002,941.75" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1164.0,476.3 1164.0,483.05 1164.0,489.69 1164.0,496.19 1164.0,502.54 1164.0,508.7 1164.0,514.65 1164.0,520.36 1164.0,525.8100000000001" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1164.0,598.41 1164.0,603.85 1164.0,609.56 1164.0,615.49 1164.0,621.64 1164.0,627.9599999999999 1164.0,634.43 1164.0,641.03 1164.0,647.72" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1086.65,892.38 1072.71,914.26 1058.65,936.31 1044.74,958.14 1031.24,979.33 1018.4000000000001,999.48 1006.4900000000001,1018.18 995.7600000000001,1035.01 986.4800000000001,1049.57" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="956.49,1108.64 950.42,1123.01 943.47,1139.49 935.76,1157.74 927.45,1177.41 918.69,1198.18 909.61,1219.69 900.35,1241.6100000000001 891.07,1263.6000000000001" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="354.6,856.24 377.67,881.91 401.82000000000005,908.78 426.36,936.09 450.59000000000003,963.05 473.82000000000005,988.89 495.34000000000003,1012.84 514.46,1034.12 530.48,1051.95" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="574.12,1104.65 585.84,1118.89 599.52,1135.5 614.85,1154.1200000000001 631.5,1174.3500000000001 649.17,1195.8100000000002 667.54,1218.1200000000001 686.3,1240.9 705.12,1263.7600000000002" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="893.67,1564.19 897.11,1572.0 900.4599999999999,1579.63 903.7299999999999,1587.05 906.89,1594.23 909.92,1601.1200000000001 912.8199999999999,1607.69 915.55,1613.91 918.12,1619.74" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="938.59,1682.91 941.88,1696.74 945.57,1712.23 949.5600000000001,1729.01 953.77,1746.72 958.12,1764.99 962.52,1783.46 966.87,1801.77 971.1,1819.54" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="724.71,1564.19 719.0300000000001,1572.39 713.49,1580.4 708.11,1588.17 702.9300000000001,1595.66 697.96,1602.8300000000002 693.25,1609.64 688.82,1616.05 684.69,1622.01" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="652.12,1679.93 648.08,1688.3600000000001 643.66,1697.5600000000002 638.91,1707.46 633.88,1717.93 628.62,1728.89 623.18,1740.24 617.59,1751.88 611.92,1763.71" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1433.0,1214.37 1433.0,1236.81 1433.0,1259.3999999999999 1433.0,1281.77 1433.0,1303.55 1433.0,1324.3799999999999 1433.0,1343.8899999999999 1433.0,1361.6999999999998 1433.0,1377.4599999999998" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1433.0,1450.2 1433.0,1475.31 1433.0,1505.45 1433.0,1539.6100000000001 1433.0,1576.8 1433.0,1616.01 1433.0,1656.23 1433.0,1696.48 1433.0,1735.74" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1234.82,2047.17 1229.81,2050.87 1225.33,2054.17 1221.4299999999998,2057.05 1218.1399999999999,2059.4700000000003 1215.52,2061.41 1213.59,2062.83 1212.3999999999999,2063.7000000000003 1212.0,2064.0 1202.83,2066.17 1177.82,2072.09 1140.6999999999998,2080.88 1095.1999999999998,2091.65 1045.05,2103.53 993.9799999999999,2115.62 945.74,2127.04 904.05,2136.91" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="840.7,2180.91 835.6,2193.3199999999997 829.88,2207.21 823.6800000000001,2222.29 817.1,2238.29 810.26,2254.91 803.2900000000001,2271.8599999999997 796.2900000000001,2288.87 789.3900000000001,2305.6499999999996" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="565.54,2036.25 567.06,2047.33 568.56,2058.25 570.02,2068.93 571.4399999999999,2079.28 572.81,2089.23 574.0999999999999,2098.69 575.3199999999999,2107.6 576.4499999999999,2115.85" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="599.52,2178.01 608.01,2190.4 617.63,2204.44 628.17,2219.8100000000004 639.4,2236.2000000000003 651.12,2253.2900000000004 663.1,2270.7700000000004 675.13,2288.32 687.0,2305.6400000000003" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1320.37,2064.35 1314.6699999999998,2072.62 1309.11,2080.67 1303.7399999999998,2088.47 1298.56,2095.98 1293.62,2103.14 1288.9299999999998,2109.94 1284.53,2116.33 1280.4399999999998,2122.2599999999998" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1253.39,2182.41 1250.3700000000001,2193.41 1247.0400000000002,2205.5499999999997 1243.46,2218.6299999999997 1239.66,2232.48 1235.71,2246.8799999999997 1231.66,2261.6499999999996 1227.5600000000002,2276.6 1223.47,2291.52" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1098.35,2508.33 1083.9699999999998,2524.47 1069.58,2540.62 1055.4099999999999,2556.5299999999997 1041.6599999999999,2571.95 1028.56,2586.66 1016.3199999999999,2600.38 1005.1699999999998,2612.89 995.3299999999999,2623.94" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="951.31,2676.6 946.2399999999999,2682.58 940.77,2689.04 934.92,2695.95 928.7199999999999,2703.2599999999998 922.2099999999999,2710.94 915.43,2718.94 908.41,2727.23 901.18,2735.7599999999998" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,2494.4 751.0,2510.19 751.0,2526.21 751.0,2542.2000000000003 751.0,2557.94 751.0,2573.1800000000003 751.0,2587.69 751.0,2601.23 751.0,2613.55" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,2686.33 751.0,2691.69 751.0,2697.3199999999997 751.0,2703.21 751.0,2709.33 751.0,2715.67 751.0,2722.19 751.0,2728.9 751.0,2735.75" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,3092.3 751.0,3099.17 751.0,3105.88 751.0,3112.42 751.0,3118.77 751.0,3124.9 751.0,3130.79 751.0,3136.4300000000003 751.0,3141.79" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,3214.41 751.0,3219.85 751.0,3225.56 751.0,3231.49 751.0,3237.64 751.0,3243.96 751.0,3250.43 751.0,3257.0299999999997 751.0,3263.72" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,3508.32 751.0,3515.03 751.0,3521.63 751.0,3528.1200000000003 751.0,3534.44 751.0,3540.59 751.0,3546.54 751.0,3552.2400000000002 751.0,3557.69" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="751.0,3630.4 751.0,3635.88 751.0,3641.61 751.0,3647.58 751.0,3653.7400000000002 751.0,3660.07 751.0,3666.55 751.0,3673.15 751.0,3679.83" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1500.18,2064.35 1503.3600000000001,2072.0899999999997 1506.47,2079.64 1509.49,2086.97 1512.4,2094.0499999999997 1515.2,2100.85 1517.8600000000001,2107.33 1520.39,2113.47 1522.76,2119.23" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1547.3,2180.91 1549.6699999999998,2186.67 1552.19,2192.7999999999997 1554.86,2199.27 1557.6499999999999,2206.06 1560.55,2213.1299999999997 1563.56,2220.44 1566.6599999999999,2227.98 1569.84,2235.7" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1194.0,2508.33 1194.0,2522.59 1194.0,2536.88 1194.0,2551.02 1194.0,2564.86 1194.0,2578.22 1194.0,2590.93 1194.0,2602.8199999999997 1194.0,2613.72" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1194.0,2686.33 1194.0,2691.69 1194.0,2697.3199999999997 1194.0,2703.21 1194.0,2709.33 1194.0,2715.67 1194.0,2722.19 1194.0,2728.9 1194.0,2735.75" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1194.0,3092.3 1194.0,3099.17 1194.0,3105.88 1194.0,3112.42 1194.0,3118.77 1194.0,3124.9 1194.0,3130.79 1194.0,3136.4300000000003 1194.0,3141.79" fill="none" stroke="#475569" stroke-width="1.6"/>
+<polyline points="1194.0,3214.41 1194.0,3219.85 1194.0,3225.56 1194.0,3231.49 1194.0,3237.64 1194.0,3243.96 1194.0,3250.43 1194.0,3257.0299999999997 1194.0,3263.72" fill="none" stroke="#475569" stroke-width="1.6"/>
+<rect x="966.0" y="220.0" width="396.0" height="256.0" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+<rect x="966.0" y="220.0" width="396.0" height="51" fill="#dbeafe" stroke="#1e40af" stroke-width="1"/>
+<text x="984.0" y="257.0" font-family="Arial, sans-serif" font-size="27" fill="#1e40af">User</text>
+<text x="984.0" y="307.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">userId [ID]</text>
+<text x="984.0" y="335.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">displayName</text>
+<text x="984.0" y="363.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">email [unique]</text>
+<text x="984.0" y="391.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">passwordHash</text>
+<text x="984.0" y="419.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">accountStatus</text>
+<text x="984.0" y="447.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">registeredAt</text>
+<rect x="523.0" y="240.0" width="396.0" height="216.0" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+<rect x="523.0" y="240.0" width="396.0" height="51" fill="#dbeafe" stroke="#1e40af" stroke-width="1"/>
+<text x="541.0" y="277.0" font-family="Arial, sans-serif" font-size="27" fill="#1e40af">Role</text>
+<text x="541.0" y="327.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">roleId [ID]</text>
+<text x="541.0" y="355.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">code [unique]</text>
+<text x="541.0" y="383.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">description</text>
+<text x="541.0" y="416.0" font-family="Arial, sans-serif" font-size="16" fill="#1e40af">ADMIN / SUPPLIER / CUSTOMER</text>
+<rect x="523.0" y="690.0" width="396.0" height="160.0" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+<rect x="523.0" y="690.0" width="396.0" height="51" fill="#dbeafe" stroke="#1e40af" stroke-width="1"/>
+<text x="541.0" y="727.0" font-family="Arial, sans-serif" font-size="27" fill="#1e40af">UserRole</text>
+<text x="541.0" y="777.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">User + Role [ID]</text>
+<text x="541.0" y="810.0" font-family="Arial, sans-serif" font-size="16" fill="#1e40af">Role assignment; no extra attributes</text>
+<rect x="1235.0" y="942.0" width="396.0" height="272.0" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+<rect x="1235.0" y="942.0" width="396.0" height="51" fill="#dbeafe" stroke="#1e40af" stroke-width="1"/>
+<text x="1253.0" y="979.0" font-family="Arial, sans-serif" font-size="27" fill="#1e40af">Customer</text>
+<text x="1253.0" y="1029.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">User [ID]</text>
+<text x="1253.0" y="1057.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">personType</text>
+<text x="1253.0" y="1085.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">documentType</text>
+<text x="1253.0" y="1113.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">documentNumber</text>
+<text x="1253.0" y="1141.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">billingName</text>
+<text x="1253.0" y="1174.0" font-family="Arial, sans-serif" font-size="16" fill="#1e40af">Unique: documentType + documentNumber</text>
+<rect x="966.0" y="648.0" width="396.0" height="244.0" fill="#ffffff" stroke="#1e40af" stroke-width="2"/>
+<rect x="966.0" y="648.0" width="396.0" height="51" fill="#dbeafe" stroke="#1e40af" stroke-width="1"/>
+<text x="984.0" y="685.0" font-family="Arial, sans-serif" font-size="27" fill="#1e40af">Supplier</text>
+<text x="984.0" y="735.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">User [ID]</text>
+<text x="984.0" y="763.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">documentType</text>
+<text x="984.0" y="791.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">documentNumber</text>
+<text x="984.0" y="819.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">businessName</text>
+<text x="984.0" y="852.0" font-family="Arial, sans-serif" font-size="16" fill="#1e40af">Unique: documentType + documentNumber</text>
+<rect x="80.0" y="684.0" width="396.0" height="172.0" fill="#ffffff" stroke="#065f46" stroke-width="2"/>
+<rect x="80.0" y="684.0" width="396.0" height="51" fill="#d1fae5" stroke="#065f46" stroke-width="1"/>
+<text x="98.0" y="721.0" font-family="Arial, sans-serif" font-size="27" fill="#065f46">Category</text>
+<text x="98.0" y="771.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">categoryId [ID]</text>
+<text x="98.0" y="799.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">name [unique]</text>
+<text x="98.0" y="827.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">description?</text>
+<rect x="630.0" y="1264.0" width="396.0" height="300.0" fill="#ffffff" stroke="#065f46" stroke-width="2"/>
+<rect x="630.0" y="1264.0" width="396.0" height="51" fill="#d1fae5" stroke="#065f46" stroke-width="1"/>
+<text x="648.0" y="1301.0" font-family="Arial, sans-serif" font-size="27" fill="#065f46">Tool</text>
+<text x="648.0" y="1351.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">toolId [ID]</text>
+<text x="648.0" y="1379.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">name</text>
+<text x="648.0" y="1407.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">description</text>
+<text x="648.0" y="1435.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">currentDailyRate</text>
+<text x="648.0" y="1463.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">rateCurrency</text>
+<text x="648.0" y="1491.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">publicationStatus</text>
+<text x="648.0" y="1524.0" font-family="Arial, sans-serif" font-size="16" fill="#065f46">One supplier; one primary category</text>
+<rect x="792.0" y="1820.0" width="396.0" height="160.0" fill="#ffffff" stroke="#065f46" stroke-width="2"/>
+<rect x="792.0" y="1820.0" width="396.0" height="51" fill="#d1fae5" stroke="#065f46" stroke-width="1"/>
+<text x="810.0" y="1857.0" font-family="Arial, sans-serif" font-size="27" fill="#065f46">ToolImage</text>
+<text x="810.0" y="1907.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">Tool + imageUrl [ID]</text>
+<text x="810.0" y="1940.0" font-family="Arial, sans-serif" font-size="16" fill="#065f46">Image of the catalog offer, not a unit</text>
+<rect x="349.0" y="1764.0" width="396.0" height="272.0" fill="#ffffff" stroke="#065f46" stroke-width="2"/>
+<rect x="349.0" y="1764.0" width="396.0" height="51" fill="#d1fae5" stroke="#065f46" stroke-width="1"/>
+<text x="367.0" y="1801.0" font-family="Arial, sans-serif" font-size="27" fill="#065f46">EquipmentUnit</text>
+<text x="367.0" y="1851.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">equipmentUnitId [ID]</text>
+<text x="367.0" y="1879.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">inventoryCode</text>
+<text x="367.0" y="1907.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">serialNumber?</text>
+<text x="367.0" y="1935.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">currentCondition</text>
+<text x="367.0" y="1963.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">operationalStatus</text>
+<text x="367.0" y="1996.0" font-family="Arial, sans-serif" font-size="16" fill="#065f46">Unique within supplier: inventoryCode</text>
+<rect x="1235.0" y="1736.0" width="396.0" height="328.0" fill="#ffffff" stroke="#5b21b6" stroke-width="2"/>
+<rect x="1235.0" y="1736.0" width="396.0" height="51" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+<text x="1253.0" y="1773.0" font-family="Arial, sans-serif" font-size="27" fill="#5b21b6">Reservation</text>
+<text x="1253.0" y="1823.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">reservationId [ID]</text>
+<text x="1253.0" y="1851.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">createdAt</text>
+<text x="1253.0" y="1879.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">startDate</text>
+<text x="1253.0" y="1907.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">returnDate</text>
+<text x="1253.0" y="1935.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">expiresAt?</text>
+<text x="1253.0" y="1963.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">reservationStatus</text>
+<text x="1253.0" y="1991.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">currency</text>
+<text x="1253.0" y="2024.0" font-family="Arial, sans-serif" font-size="16" fill="#5b21b6">Inclusive dates; one supplier per</text>
+<text x="1253.0" y="2044.8" font-family="Arial, sans-serif" font-size="16" fill="#5b21b6">reservation</text>
+<rect x="553.0" y="2306.0" width="396.0" height="188.0" fill="#ffffff" stroke="#5b21b6" stroke-width="2"/>
+<rect x="553.0" y="2306.0" width="396.0" height="51" fill="#ede9fe" stroke="#5b21b6" stroke-width="1"/>
+<text x="571.0" y="2343.0" font-family="Arial, sans-serif" font-size="27" fill="#5b21b6">ReservationItem</text>
+<text x="571.0" y="2393.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">Reservation + EquipmentUnit [ID]</text>
+<text x="571.0" y="2421.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">agreedDailyRate</text>
+<text x="571.0" y="2454.0" font-family="Arial, sans-serif" font-size="16" fill="#5b21b6">One physical unit per item; frozen rate</text>
+<rect x="996.0" y="2292.0" width="396.0" height="216.0" fill="#ffffff" stroke="#9a3412" stroke-width="2"/>
+<rect x="996.0" y="2292.0" width="396.0" height="51" fill="#ffedd5" stroke="#9a3412" stroke-width="1"/>
+<text x="1014.0" y="2329.0" font-family="Arial, sans-serif" font-size="27" fill="#9a3412">Rental</text>
+<text x="1014.0" y="2379.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">Reservation [ID]</text>
+<text x="1014.0" y="2407.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">startedAt</text>
+<text x="1014.0" y="2435.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">rentalStatus</text>
+<text x="1014.0" y="2468.0" font-family="Arial, sans-serif" font-size="16" fill="#9a3412">Execution of a confirmed reservation</text>
+<rect x="553.0" y="2736.0" width="396.0" height="356.0" fill="#ffffff" stroke="#9a3412" stroke-width="2"/>
+<rect x="553.0" y="2736.0" width="396.0" height="51" fill="#ffedd5" stroke="#9a3412" stroke-width="1"/>
+<text x="571.0" y="2773.0" font-family="Arial, sans-serif" font-size="27" fill="#9a3412">UnitDelivery</text>
+<text x="571.0" y="2823.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">ReservationItem [ID]</text>
+<text x="571.0" y="2851.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">scheduledAt</text>
+<text x="571.0" y="2879.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">deliveredAt?</text>
+<text x="571.0" y="2907.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">outboundCondition?</text>
+<text x="571.0" y="2935.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">addressLine</text>
+<text x="571.0" y="2963.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">city</text>
+<text x="571.0" y="2991.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">region</text>
+<text x="571.0" y="3019.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">country</text>
+<text x="571.0" y="3052.0" font-family="Arial, sans-serif" font-size="16" fill="#9a3412">Also belongs to exactly one Rental</text>
+<rect x="553.0" y="3264.0" width="396.0" height="244.0" fill="#ffffff" stroke="#9a3412" stroke-width="2"/>
+<rect x="553.0" y="3264.0" width="396.0" height="51" fill="#ffedd5" stroke="#9a3412" stroke-width="1"/>
+<text x="571.0" y="3301.0" font-family="Arial, sans-serif" font-size="27" fill="#9a3412">UnitReturn</text>
+<text x="571.0" y="3351.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">UnitDelivery [ID]</text>
+<text x="571.0" y="3379.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">receivedAt</text>
+<text x="571.0" y="3407.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">inboundCondition</text>
+<text x="571.0" y="3435.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">notes?</text>
+<text x="571.0" y="3468.0" font-family="Arial, sans-serif" font-size="16" fill="#9a3412">Requires a completed delivery</text>
+<rect x="553.0" y="3680.0" width="396.0" height="228.0" fill="#ffffff" stroke="#9a3412" stroke-width="2"/>
+<rect x="553.0" y="3680.0" width="396.0" height="51" fill="#ffedd5" stroke="#9a3412" stroke-width="1"/>
+<text x="571.0" y="3717.0" font-family="Arial, sans-serif" font-size="27" fill="#9a3412">DamageReport</text>
+<text x="571.0" y="3767.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">damageReportId [ID]</text>
+<text x="571.0" y="3795.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">reportedAt</text>
+<text x="571.0" y="3823.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">description</text>
+<text x="571.0" y="3851.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">reportStatus</text>
+<text x="571.0" y="3879.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">assessedCost?</text>
+<rect x="1439.0" y="2236.0" width="396.0" height="328.0" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+<rect x="1439.0" y="2236.0" width="396.0" height="51" fill="#fce7f3" stroke="#9d174d" stroke-width="1"/>
+<text x="1457.0" y="2273.0" font-family="Arial, sans-serif" font-size="27" fill="#9d174d">Payment</text>
+<text x="1457.0" y="2323.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">paymentId [ID]</text>
+<text x="1457.0" y="2351.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">processor</text>
+<text x="1457.0" y="2379.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">externalReference</text>
+<text x="1457.0" y="2407.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">amount</text>
+<text x="1457.0" y="2435.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">paymentStatus</text>
+<text x="1457.0" y="2463.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">recordedAt</text>
+<text x="1457.0" y="2491.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">confirmedAt?</text>
+<text x="1457.0" y="2524.0" font-family="Arial, sans-serif" font-size="16" fill="#9d174d">Unique: processor + externalReference</text>
+<rect x="996.0" y="2736.0" width="396.0" height="356.0" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+<rect x="996.0" y="2736.0" width="396.0" height="51" fill="#fce7f3" stroke="#9d174d" stroke-width="1"/>
+<text x="1014.0" y="2773.0" font-family="Arial, sans-serif" font-size="27" fill="#9d174d">Invoice</text>
+<text x="1014.0" y="2823.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">invoiceId [ID]</text>
+<text x="1014.0" y="2851.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">number [unique]</text>
+<text x="1014.0" y="2879.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedAt</text>
+<text x="1014.0" y="2907.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">invoiceStatus</text>
+<text x="1014.0" y="2935.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedSupplierName</text>
+<text x="1014.0" y="2963.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedSupplierDocument</text>
+<text x="1014.0" y="2991.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedCustomerName</text>
+<text x="1014.0" y="3019.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedCustomerDocument</text>
+<text x="1014.0" y="3052.0" font-family="Arial, sans-serif" font-size="16" fill="#9d174d">Identity snapshots at issue time</text>
+<rect x="996.0" y="3264.0" width="396.0" height="244.0" fill="#ffffff" stroke="#9d174d" stroke-width="2"/>
+<rect x="996.0" y="3264.0" width="396.0" height="51" fill="#fce7f3" stroke="#9d174d" stroke-width="1"/>
+<text x="1014.0" y="3301.0" font-family="Arial, sans-serif" font-size="27" fill="#9d174d">InvoiceItem</text>
+<text x="1014.0" y="3351.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">Invoice + lineNumber [ID]</text>
+<text x="1014.0" y="3379.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedDescription</text>
+<text x="1014.0" y="3407.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">quantity</text>
+<text x="1014.0" y="3435.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">issuedUnitPrice</text>
+<text x="1014.0" y="3468.0" font-family="Arial, sans-serif" font-size="16" fill="#9d174d">Historical values; not live catalog</text>
+<text x="1014.0" y="3488.8" font-family="Arial, sans-serif" font-size="16" fill="#9d174d">values</text>
+<polygon points="942.0,526.0 1021.1999999999999,562.0 942.0,598.0 862.8,562.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="927.18" y="568.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Has</text>
+<polygon points="721.0,526.0 800.1999999999999,562.0 721.0,598.0 641.8,562.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="686.42" y="568.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Assigns</text>
+<polygon points="1401.0,526.0 1480.2,562.0 1401.0,598.0 1321.8,562.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1366.42" y="568.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Profile</text>
+<polygon points="1164.0,526.0 1243.2,562.0 1164.0,598.0 1084.8,562.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1129.42" y="568.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Profile</text>
+<polygon points="969.0,1042.0 1048.2,1078.0 969.0,1114.0 889.8,1078.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="939.36" y="1084.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Offers</text>
+<polygon points="553.0,1042.0 632.2,1078.0 553.0,1114.0 473.8,1078.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="503.6" y="1084.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Classifies</text>
+<polygon points="931.0,1614.0 1010.1999999999999,1650.0 931.0,1686.0 851.8,1650.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="906.3" y="1656.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Shows</text>
+<polygon points="666.0,1614.0 745.1999999999999,1650.0 666.0,1686.0 586.8,1650.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="646.24" y="1656.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Owns</text>
+<polygon points="1433.0,1378.0 1512.2,1414.0 1433.0,1450.0 1353.8,1414.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1393.48" y="1420.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Requests</text>
+<polygon points="853.0,2114.0 932.1999999999999,2150.0 853.0,2186.0 773.8,2150.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="813.48" y="2156.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Contains</text>
+<polygon points="581.0,2114.0 660.2,2150.0 581.0,2186.0 501.8,2150.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="541.48" y="2156.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Reserves</text>
+<polygon points="1262.0,2114.0 1341.2,2150.0 1262.0,2186.0 1182.8,2150.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1227.42" y="2156.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Creates</text>
+<polygon points="973.0,2614.0 1052.2,2650.0 973.0,2686.0 893.8,2650.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="933.48" y="2656.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Executes</text>
+<polygon points="751.0,2614.0 830.1999999999999,2650.0 751.0,2686.0 671.8,2650.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="706.54" y="2656.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Schedules</text>
+<polygon points="751.0,3142.0 830.1999999999999,3178.0 751.0,3214.0 671.8,3178.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="711.48" y="3184.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Receives</text>
+<polygon points="751.0,3558.0 830.1999999999999,3594.0 751.0,3630.0 671.8,3594.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="716.42" y="3600.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Records</text>
+<polygon points="1535.0,2114.0 1614.2,2150.0 1535.0,2186.0 1455.8,2150.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1495.48" y="2156.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Receives</text>
+<polygon points="1194.0,2614.0 1273.2,2650.0 1194.0,2686.0 1114.8,2650.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1154.48" y="2656.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Invoices</text>
+<polygon points="1194.0,3142.0 1273.2,3178.0 1194.0,3214.0 1114.8,3178.0" fill="#fff3bf" stroke="#a16207" stroke-width="1.5"/>
+<text x="1159.42" y="3184.65" font-family="Arial, sans-serif" font-size="19" fill="#713f12">Details</text>
+<rect x="1012.41" y="483.66" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1016.41" y="505.66" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="806.43" y="667.41" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="810.43" y="689.41" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="721.58" y="462.99" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="725.58" y="484.99" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="708.8" y="652.91" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="712.8" y="674.91" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1319.72" y="468.24" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1323.72" y="490.24" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1412.67" y="904.41" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1416.67" y="926.41" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="1164.58" y="483.05" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1168.58" y="505.05" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1153.46" y="610.97" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1157.46" y="632.97" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="1073.96" y="901.17" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1077.96" y="923.17" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="886.53" y="1232.51" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="890.53" y="1254.51" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="367.13" y="850.64" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="371.13" y="872.64" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="676.79" y="1225.52" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="680.79" y="1247.52" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="902.16" y="1565.01" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="906.16" y="1587.01" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="953.59" y="1781.03" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="957.59" y="1803.03" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="711.11" y="1572.85" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="715.11" y="1594.85" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="608.13" y="1733.49" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="612.13" y="1755.49" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1433.58" y="1221.12" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1437.58" y="1243.12" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1420.8" y="1698.99" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1424.8" y="1720.99" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1213.77" y="2053.24" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1217.77" y="2075.24" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="784.71" y="2274.39" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="788.71" y="2296.39" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1..N</text>
+<rect x="568.99" y="2041.42" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="572.99" y="2063.42" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="660.73" y="2266.96" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="664.73" y="2288.96" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1306.81" y="2073.01" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1310.81" y="2095.01" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1218.32" y="2258.22" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1222.32" y="2280.22" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="1081.89" y="2516.32" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1085.89" y="2538.32" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="900.64" y="2710.73" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="904.64" y="2732.73" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="751.58" y="2501.16" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="755.58" y="2523.16" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="740.46" y="2699.0" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="744.46" y="2721.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="751.58" y="3099.05" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="755.58" y="3121.05" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="740.46" y="3226.97" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="744.46" y="3248.97" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="751.58" y="3515.07" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="755.58" y="3537.07" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="738.8" y="3643.08" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="742.8" y="3665.08" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1508.28" y="2065.6" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1512.28" y="2087.6" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1548.6" y="2196.73" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1552.6" y="2218.73" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..N</text>
+<rect x="1194.58" y="2515.09" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1198.58" y="2537.09" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1183.46" y="2699.0" width="41.36" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1187.46" y="2721.0" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">0..1</text>
+<rect x="1194.58" y="3099.05" width="19.12" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1198.58" y="3121.05" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1</text>
+<rect x="1181.8" y="3226.97" width="44.68" height="30.0" fill="#ffffff" stroke="transparent" stroke-width="0"/>
+<text x="1185.8" y="3248.97" font-family="Arial, sans-serif" font-size="20" fill="#0f172a">1..N</text>
+<rect x="80" y="4008.0" width="1755.0" height="650" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+<text x="105" y="4055.0" font-family="Arial, sans-serif" font-size="27" fill="#0f172a">HOW TO READ THIS CONCEPTUAL MODEL</text>
+<text x="105" y="4102.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">1. Rectangles: entities with business attributes. Diamonds: relationships. No SQL types or foreign keys.</text>
+<text x="105" y="4160.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">2. [ID]: conceptual identity. [unique]: alternate identifier. ?: optional attribute. Composite identities use +.</text>
+<text x="105" y="4218.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">3. Multiplicity near an entity counts its instances for ONE instance at the opposite end; N means many.</text>
+<text x="105" y="4276.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">4. Customer and Supplier are optional, overlapping User profiles. A user may have both profiles and several roles.</text>
+<text x="105" y="4334.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">5. Reservation items refer to physical units from one supplier. startDate and returnDate are both inclusive.</text>
+<text x="105" y="4392.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">6. Tool images and physical units are independent sets. Availability and totals are derived, not stored attributes.</text>
+<text x="105" y="4450.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">7. Minimum 1 item applies to a reservation with selected units and to an issued invoice.</text>
+<text x="105" y="4508.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">8. UnitDelivery is identified by its ReservationItem; UnitReturn by its delivery. The original composite identity is</text>
+<text x="105" y="4531.4" font-family="Arial, sans-serif" font-size="18" fill="#334155">preserved.</text>
+<text x="105" y="4566.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">9. Baseline only: 18 entities. Protection, evidence, disputes, refunds and consent extensions are excluded.</text>
+<text x="105" y="4634.0" font-family="Arial, sans-serif" font-size="16" fill="#475569">Source: docs/conceptual-model.md + docs/fourth-normal-form.md   |   15 October 2026</text>
+</svg>
