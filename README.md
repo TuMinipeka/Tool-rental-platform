@@ -6,7 +6,7 @@ Backend para alquilar herramientas y equipos de construcción, construido con Ja
 
 Están implementados la estructura Maven multimódulo, los agregados de catálogo y reservas, los casos de uso, los puertos del dominio, los eventos, la persistencia JPA, PostgreSQL, Flyway y los adaptadores actuales. La base de datos local es reproducible y cuenta con pruebas reales de migraciones, mapeos, rollback y concurrencia.
 
-Continúan pendientes las decisiones comerciales de la Fase 0, las ampliaciones correspondientes del esquema, las escrituras de identidad, REST/OpenAPI, autorización JWT, los adaptadores restantes, reportes, despliegue y el frontend React. La aplicación todavía no ofrece un servidor HTTP. Consulta la [hoja de ruta](docs/pendientes.md) y el [trabajo pendiente de base de datos](docs/pendientes-base-datos.md).
+Continúan pendientes las decisiones comerciales de la Fase 0, las ampliaciones correspondientes del esquema, las escrituras de identidad, REST/OpenAPI, autorización JWT, los adaptadores restantes, reportes y los recorridos funcionales del frontend. La aplicación todavía no ofrece un servidor HTTP. Consulta la [hoja de ruta](docs/pendientes.md) y el [trabajo pendiente de base de datos](docs/pendientes-base-datos.md).
 
 ## Tecnologías
 
@@ -19,7 +19,7 @@ Continúan pendientes las decisiones comerciales de la Fase 0, las ampliaciones 
 | Formato | Spotless 2.43.0 con Google Java Format 1.27.0 |
 | Base de datos | PostgreSQL 17.11, Spring Data JPA y Flyway |
 | API | REST con OpenAPI y Swagger UI; confirmada, no implementada |
-| Frontend | React con herramientas de Node.js; confirmado, no creado |
+| Frontend | React 19.3.1 con JavaScript y Vite 8.3.4; base creada |
 
 El [enunciado original](ejercicioDemo.md) solicitaba MySQL. PostgreSQL lo reemplaza por decisión explícita del proyecto.
 
@@ -60,7 +60,7 @@ Consulta la [arquitectura del backend](docs/backend-architecture.md) y la [guía
 
 - JDK 21.
 - Docker con Docker Compose para PostgreSQL y las pruebas de integración.
-- Node.js se necesitará únicamente para el frontend cuando se cree.
+- Node.js 24 para instalar, verificar y construir el frontend.
 
 El Maven Wrapper descarga Maven, pero no instala Java.
 
@@ -90,7 +90,17 @@ docker compose --env-file .env up -d postgres
 
 El volumen `postgres_data` conserva la base entre reinicios. `docker compose down` detiene los servicios sin eliminar los datos; agregar `--volumes` también elimina la base local.
 
-El contenedor del backend usa una construcción por etapas con JDK 21 y una imagen de ejecución JRE 21 sin usuario privilegiado. Actualmente ejecuta Flyway y arranca la aplicación sin publicar un puerto HTTP, porque la API aún no existe.
+El contenedor del backend usa una construcción por etapas con JDK 21 y una imagen de ejecución JRE 21 sin usuario privilegiado. Actualmente ejecuta Flyway y arranca la aplicación sin publicar un puerto HTTP, porque la API aún no existe. El frontend se construye con Node 24.22.0, se sirve con Nginx y queda disponible en `http://localhost:5173`.
+
+Para trabajar únicamente en el frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Los comandos `npm run lint` y `npm run build` validan el código y generan la distribución de producción.
 
 ## Compilar y verificar
 
@@ -137,7 +147,7 @@ Las tarifas demo y sus referencias públicas colombianas se registran en [Fuente
 
 ## Próxima entrega
 
-La base técnica de la Fase 1 está terminada para el modelo actual. La siguiente prioridad es cerrar las reglas comerciales de la Fase 0 que permiten ampliar el esquema sin inventar valores. REST/OpenAPI y JWT siguen antes de integrar el frontend con el backend.
+La base técnica de la Fase 1 está terminada para el modelo actual y la base React de la Fase 4 se adelantó sin integrarla todavía. La siguiente prioridad es cerrar las reglas comerciales de la Fase 0 que permiten ampliar el esquema sin inventar valores. REST/OpenAPI y JWT siguen antes de integrar el frontend con el backend.
 
 ## Convención de commits
 

@@ -31,7 +31,7 @@ Este documento registra el orden de entrega acordado, las decisiones ya cerradas
 | Migraciones | Flyway | 18 migraciones de tablas y una migración de compatibilidad JPA, validadas desde una base vacía |
 | Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Validados en PostgreSQL |
 | API | REST con OpenAPI y Swagger UI | Confirmada, no implementada |
-| Frontend | React con herramientas de Node.js, HTML y CSS | Confirmado, no creado |
+| Frontend | React 19 con JavaScript, Vite, Node.js, HTML y CSS | Base creada; recorridos del producto pendientes |
 
 Node.js se usa únicamente para las herramientas del frontend. Java y Spring Boot siguen siendo la única pila del backend.
 
@@ -45,7 +45,7 @@ Las siguientes decisiones de negocio deben aprobarse antes de implementarlas:
 4. Precio inicial, deducible, límite monetario, exclusiones exactas y periodo de disputa del Plan de Protección. Estos valores deben identificarse como supuestos del proyecto hasta contar con una propuesta de un proveedor real.
 5. Cálculo del valor de reposición y política de depreciación para equipos perdidos o irreparables.
 6. Identidad del futuro operador, canales de atención, detalles de la política de privacidad y periodos de retención.
-7. Elección entre JavaScript y TypeScript para el frontend, gestión de estado, biblioteca de componentes y herramientas de pruebas.
+7. Gestión de estado, biblioteca de componentes y herramientas de pruebas del frontend. JavaScript ya fue elegido como lenguaje.
 8. Versionado de la API, formato de errores, renovación de JWT, recuperación de cuentas y revocación de sesiones.
 9. Proveedor de alojamiento, CI/CD, dominios, secretos, observabilidad, copias de seguridad y respuesta a incidentes.
 
@@ -83,12 +83,12 @@ Criterio de salida: el frontend y el trabajo de calidad pueden usar una API comp
 
 ## Fase 4: frontend
 
-1. Crear el proyecto React con las herramientas de Node.js.
-2. Establecer navegación, accesibilidad y estados de carga, vacío, éxito y error.
-3. Implementar autenticación y navegación según el rol.
-4. Implementar las pantallas de catálogo, disponibilidad, reservas, alquileres, pagos, devoluciones, revisión de daños, facturas y administración.
-5. Implementar la página pública `/terms-and-conditions` y enlazarla desde el pie de página y todos los puntos de aceptación requeridos.
-6. Integrar únicamente contra el contrato OpenAPI aprobado.
+- [x] Crear la base del proyecto React con JavaScript, Vite y herramientas de Node.js.
+- [ ] Establecer navegación, accesibilidad y estados de carga, vacío, éxito y error.
+- [ ] Implementar autenticación y navegación según el rol.
+- [ ] Implementar las pantallas de catálogo, disponibilidad, reservas, alquileres, pagos, devoluciones, revisión de daños, facturas y administración.
+- [ ] Implementar la página pública `/terms-and-conditions` y enlazarla desde el pie de página y todos los puntos de aceptación requeridos.
+- [ ] Integrar únicamente contra el contrato OpenAPI aprobado.
 
 Criterio de salida: los tres roles pueden completar sus recorridos aprobados mediante una interfaz adaptable.
 
