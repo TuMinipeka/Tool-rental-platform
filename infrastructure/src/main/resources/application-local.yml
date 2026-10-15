@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/tool_rental}
+    username: ${DB_USERNAME:tool_rental}
+    password: ${DB_PASSWORD:tool_rental}
+    driver-class-name: org.postgresql.Driver
