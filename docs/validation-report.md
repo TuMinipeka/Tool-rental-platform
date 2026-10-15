@@ -1,38 +1,50 @@
-# Reporte de validación del merge y los contextos base
+# Reporte de validación de migraciones e integración
 
-Fecha: 15 de octubre de 2026.
+Fecha: 15 de octubre de 2026. Rama: `developer/daniel`.
 
-## Entorno y resultado
+## Resultado reproducible
 
-JDK 21, Spring Boot 3.5.16 y PostgreSQL 18.6 en una instancia temporal aislada, separada de la base de trabajo. Las dos suites PostgreSQL crean esquemas distintos. La ruta predeterminada con Testcontainers se conserva; en esta ejecución se usó una URL explícita porque Docker Desktop no tiene un motor operativo.
+**BUILD SUCCESS: 59 pruebas, 0 fallos, 0 errores y 0 omitidas.**
+
+| Módulo | Pruebas | Resultado |
+| --- | ---: | --- |
+| Domain | 19 | Aprobado |
+| Application | 13 | Aprobado |
+| Infrastructure | 27 | Aprobado |
 
 ```powershell
+$env:JAVA_HOME = 'C:\Users\danie\scoop\apps\temurin21-jdk\current'
 .\mvnw.cmd '-Dpostgres.test.url=jdbc:postgresql://127.0.0.1:55439/toolrental_validation' clean verify
 ```
 
-**BUILD SUCCESS: 58 pruebas, 0 fallos, 0 errores y 0 omitidas.**
+Se utilizó JDK 21 y PostgreSQL 18.6 temporal, separado de la base de trabajo, con esquemas aislados por suite. La ruta predeterminada Testcontainers se conserva; esta ejecución no acredita su arranque Docker, cuyo motor no estaba operativo. Spotless pasó durante `verify`.
 
-- Dominio: 19 pruebas.
-- Aplicación: 13 pruebas.
-- Infraestructura: 26 pruebas, incluidas las siete pruebas PostgreSQL aportadas por Conde.
-- Spotless: aprobado.
-- Frontend integrado desde Conde: `npm ci`, `npm run lint` y `npm run build` correctos.
-- `docker compose config --quiet`: correcto; no acredita el arranque de los contenedores.
+## Qué se comprobó
 
-## Compatibilidad de datos
+- Instalación vacía: 24 versiones estructurales y de roles, 18 tablas de negocio y validación Hibernate.
+- Actualización V3 → V24: 21 versiones nuevas, conservación de un registro previo y checksums V1–V3, un solo trigger de inventario y segunda migración sin cambios.
+- Demostración aislada: 42 versiones numeradas, con al menos cinco registros por cada tabla base.
+- Correspondencia de columnas/claves JPA, claves compuestas, BCrypt y restauración de dominio.
+- Fechas inclusivas, tarifas confirmadas, errores de negocio y transacciones con rollback.
+- Confirmaciones concurrentes incompatibles, cancelación que libera disponibilidad y unicidad de inventario por proveedor.
+- Contratos HTTP, 401 sin Principal y estado de conexión real.
 
-Las migraciones V1–V3 se conservan byte por byte respecto a `developer/daniel` antes del merge. La propuesta de reemplazo V1–V21 de Conde se conserva como referencia fuera de las ubicaciones de Flyway. No se ejecutó `repair`, no se alteró el historial y no se recreó la base de trabajo.
+Las siete pruebas de persistencia aportadas por Conde se conservan. Se añadió `FlywayUpgradeIntegrationTest` para comprobar la transición desde la historia ya aplicada, además de las suites existentes.
 
-La suite base valida tres migraciones sobre una base vacía. La suite demo aplica esas tres más las 18 migraciones demo, verifica 21 versiones, datos por tabla, rollback y concurrencia. El perfil `local` no carga ejemplos; `demo` requiere activación explícita.
+## Base de trabajo después de actualizar
 
-## Página de conexión
+Antes del cambio se generó un respaldo privado con `pg_dump -Fc`. El backend arrancó con el perfil `local` y aplicó V4–V24. Se compararon huellas privadas del contenido ordenado de las 18 tablas y los checksums previos de V1–V3: **sin diferencias**. No se borraron tablas ni se cargaron datos demo. No se ejecutó `repair`.
 
-Las pruebas verifican la consulta real, cierre de recursos JDBC, HTTP 200 con conexión, HTTP 503 sin conexión y ausencia de detalles de credenciales. La prueba integrada confirma el acceso a la página y mantiene HTTP 401 para las rutas de negocio sin `Principal`.
+Resultado: 18 tablas de negocio más historial Flyway; versiones 1–24 exitosas; roles ADMIN, CUSTOMER y SUPPLIER conservados. Las conversiones de moneda concluyeron y Hibernate validó el esquema. El respaldo no se versionó y no se afirma un ensayo de restauración.
 
-La comprobación del proceso final y del navegador se registra en [el reporte de integración](branch-merge-report.md).
+## Página web después de migrar
 
-## Comprobación final del navegador y de la base de trabajo
+`GET /status/database` respondió 200 con `connected: true`; `/api/categories` sin autenticación respondió 401. El backend permanece disponible en [localhost:8080](http://localhost:8080).
 
-El backend fusionado inició con el perfil `local` y la configuración privada original. La base conserva 18 tablas de dominio, V1–V3 y los roles iniciales. El endpoint de estado respondió 200 con conexión verificada; las rutas de negocio conservaron su respuesta 401 sin autenticación.
+Playwright volvió a comprobar el mensaje «Conexión a la base de datos exitosa.», actualización manual, escritorio 1440 × 1000 y móvil 390 × 844 sin desbordamiento. También verificó el estado de error con una respuesta 503 simulada en el navegador y la recuperación al restaurar la consulta real, sin excepciones JavaScript. No se interrumpió PostgreSQL para simular ese fallo.
 
-Playwright confirmó la página en escritorio y móvil, el botón de actualización, ausencia de desbordamiento horizontal, estado de error ante una respuesta 503 simulada y recuperación al restaurar la consulta real. No se desconectó PostgreSQL para simular ese fallo.
+## Documentación y alcance de la evidencia
+
+Se verificaron enlaces relativos de README y guías, codificación UTF-8 y conservación del enunciado original. Las instrucciones de compilación, despliegue y migraciones están en español y enlazadas desde la [matriz de rúbrica](requirements-coverage.md).
+
+Frontend: `npm ci`, `npm run lint` y `npm run build` fueron verificados durante el merge anterior; su código no se modificó en esta entrega. La configuración Compose se valida separadamente; no se presenta como un despliegue ejecutado. JWT, pasarela, frontend funcional y condiciones de producción siguen [pendientes](production-readiness.md).

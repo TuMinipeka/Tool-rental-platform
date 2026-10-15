@@ -1,145 +1,70 @@
-# Normalization through fourth normal form
+# Normalización hasta cuarta forma normal
 
-## Analysis basis
+## Base del análisis
 
-This analysis starts from the [conceptual model](conceptual-model.md). PostgreSQL is the selected database, and reservation periods use inclusive dates. Normalization evaluates relations and dependencies, not screens or diagrams.
+El análisis parte del [modelo conceptual](conceptual-model.md), con PostgreSQL y periodos de reserva inclusivos. `X -> Y` indica dependencia funcional; `X ->> Y`, dependencia multivaluada. Una superclave determina toda la fila y una clave candidata es una superclave mínima.
 
-- `X -> Y` means functional dependency.
-- `X ->> Y` means multivalued dependency.
-- A superkey determines an entire row.
-- A candidate key is a minimal superkey.
+La revisión original utilizó la skill `database-normalization`. Una relación cumple 4FN si toda dependencia multivaluada no trivial tiene una superclave como determinante. La conclusión depende de los supuestos del negocio; no se demuestra únicamente contando tablas.
 
-The installed `database-normalization` skill, its 4NF reference, and its PostgreSQL example informed this review. Fourth normal form requires every non-trivial multivalued dependency to be determined by a superkey. It prevents independent one-to-many facts from being stored as a false cross-product.
+## Datos sin normalizar
 
-## Database naming convention
+Un documento con usuario, roles, herramientas, imágenes, unidades, pagos y factura anidados mezcla hechos independientes. No permitiría registrar inventario sin reserva, repetiría datos de proveedor y podría borrar la última descripción de herramienta al borrar una operación.
 
-PostgreSQL identifiers follow these rules:
+## Primera forma normal
 
-- tables: English, plural, `snake_case`;
-- columns: English, singular, `snake_case`;
-- primary keys: `<singular_entity>_id` unless a composite natural relationship key is clearer;
-- foreign keys reuse the referenced key name;
-- constraints and indexes use descriptive `snake_case` names;
-- natural English plurals are required: `category -> categories`, `country -> countries`, `person -> people`.
+Cada columna contiene un valor y cada fila un hecho. Se separan roles, imágenes, líneas, pagos y líneas de factura. Inicio y devolución son columnas diferentes y la dirección se descompone en sus componentes. Aplanar todo en una relación de reserva/unidad produce valores atómicos, pero aún repite cabecera y catálogo.
 
-A country lookup entity would therefore use table `countries` and key `country_id`. In the current model, country is only an address value, so `unit_deliveries.country` remains a singular column rather than introducing an unnecessary table.
+## Segunda forma normal
 
-## Illustrative unnormalized relation
-
-The assignment does not provide an original table. A single-row reservation document might look like:
+Con clave `(reservation_id, equipment_unit_id)` aparecen dependencias parciales:
 
 ```text
-ReservationRecord(
-  reservationId, dates, status, customerData,
-  tools[{toolId, name, category, supplierName, currentRate,
-         images[imageUrl], equipmentUnits[inventoryCode]}],
-  reservedUnits[{equipmentUnitId, agreedRate}],
-  payments[{externalReference, amount, status}],
-  invoice{header, items[...]}
-)
-```
-
-This shape cannot insert inventory without a reservation, repeats supplier/catalog data, and may delete the last copy of a tool description with the last reservation. Independent image and equipment-unit sets also create a false cross-product.
-
-## First normal form
-
-Each row records one fact and each column contains one value. Roles, images, reservation items, payments, and invoice items become separate relations. Dates become separate `start_date` and `return_date` columns; address components are explicit columns.
-
-A provisional flat relation would be:
-
-```text
-reservation_units(
-  reservation_id, equipment_unit_id, start_date, return_date,
-  customer_id, customer_name, tool_id, tool_name, agreed_daily_rate
-)
-
-candidate key: (reservation_id, equipment_unit_id)
-```
-
-It is atomic but repeats header and catalog values.
-
-## Second normal form
-
-The provisional relation has partial dependencies:
-
-```text
-reservation_id -> start_date, return_date, customer_id, customer_name
-equipment_unit_id -> tool_id, tool_name
+reservation_id -> start_date, return_date, customer_id
+equipment_unit_id -> tool_id
 (reservation_id, equipment_unit_id) -> agreed_daily_rate
 ```
 
-Split reservation facts, equipment-unit facts, and the relationship:
+Se separan `reservations`, `equipment_units` y `reservation_items`. La tarifa acordada depende del par y es distinta de la tarifa actual del catálogo.
 
-```text
-reservations(...)
-equipment_units(...)
-reservation_items(reservation_id, equipment_unit_id, agreed_daily_rate)
-```
+## Tercera forma normal
 
-The agreed rate depends on the pair and represents a historical fact distinct from the catalog's current rate.
-
-## Third normal form
-
-Remaining transitive dependencies include:
+Se eliminan dependencias transitivas:
 
 ```text
 reservation_id -> customer_id -> billing_name, document_number
-equipment_unit_id -> tool_id -> tool_name, supplier_id, category_id
+equipment_unit_id -> tool_id -> name, supplier_id, category_id
 tool_id -> supplier_id -> business_name
 tool_id -> category_id -> category_name
 ```
 
-Extract customers, tools, suppliers, and categories. Reservations retain only `customer_id`; equipment units retain `tool_id`; tools retain `supplier_id` and `category_id`. Reservations do not store live customer or catalog names.
+Cliente, herramienta, proveedor y categoría tienen relaciones propias. Las reservas conservan referencias; no duplican nombres actuales. Las instantáneas de factura son atributos históricos del documento emitido, no dependencias del nombre vigente del perfil.
 
-Invoice snapshot values are deliberately historical attributes of the issued document and do not depend on current profile names.
+## Boyce-Codd
 
-## Boyce-Codd normal form
+En toda dependencia funcional no trivial el determinante debe ser superclave. También se revisan correo, código de rol, documentos, número de factura y referencia del procesador. Añadir `tool_id` a `reservation_items` sería redundante: `equipment_unit_id -> tool_id`, pero la unidad sola no determina una línea de reserva. Por eso se conserva como referencia derivable desde la unidad.
 
-For every non-trivial functional dependency `X -> Y`, `X` must be a superkey. Review alternate identifiers such as email, role code, documents, invoice number, and processor reference—not only surrogate IDs.
+## Cuarta forma normal
 
-Avoid this redundant relation:
-
-```text
-expanded_reservation_items(
-  reservation_id, equipment_unit_id, tool_id, agreed_daily_rate
-)
-
-equipment_unit_id -> tool_id
-```
-
-`equipment_unit_id` does not identify a row across reservations, so the relation violates BCNF. Obtain the tool through `equipment_units` instead.
-
-## Fourth normal form
-
-Tool images and physical units are independent sets. The hypothetical relation:
-
-```text
-expanded_catalog(tool_id, image_url, equipment_unit_id)
-```
-
-contains these multivalued dependencies:
+Una relación que mezclara herramienta, imagen y unidad generaría un producto cruzado:
 
 ```text
 tool_id ->> image_url
 tool_id ->> equipment_unit_id
 ```
 
-Three images and two units force six rows even though no image/unit pairing is a business fact. Adding one unit requires one row per image, and deleting combinations can accidentally lose an image.
-
-Decompose it into:
+El determinante no sería superclave de la relación combinada. Se descompone sin pérdida, bajo el supuesto de independencia, en:
 
 ```text
+tools(tool_id, ...)
 tool_images(tool_id, image_url)
 equipment_units(equipment_unit_id, tool_id, inventory_code, ...)
 ```
 
-Each independent fact is inserted once. This is a lossless decomposition under the stated independence rule. If an image later describes one specific physical unit, that becomes a different relation such as `equipment_unit_images`; it must not recreate every tool-image/unit combination.
+También se separan roles de perfiles y líneas de reserva de pagos. Una asociación N:M no viola por sí misma 4FN: la tarifa acordada pertenece realmente al par reserva/unidad. Si una imagen pasa a describir una unidad específica, se necesita una relación distinta y revisar el supuesto.
 
-Other independent sets also stay separate: `user_roles` from customer/supplier profiles, and `reservation_items` from `payments`. An N:M relation is not automatically a 4NF violation: `agreed_daily_rate` genuinely belongs to the reservation/unit pair.
+## Esquema lógico resultante
 
-## Resulting logical schema
-
-PK = primary key, AK = alternate candidate key, FK = foreign key. `?` means optional. Flyway implements this model through the 18 migrations in [`db/migration`](../infrastructure/src/main/resources/db/migration); the notation below remains the compact logical view.
+PK: clave primaria; AK: clave candidata alternativa; FK: referencia; `?`: opcional. Tablas en inglés plural y `snake_case`; columnas en singular. El [historial Flyway](database-migrations.md) implementa estas 18 relaciones, sin confundir cantidad de tablas con cantidad de migraciones.
 
 ```text
 users(
@@ -256,41 +181,43 @@ invoice_items(
 )
 ```
 
-## Dependency audit
+## Auditoría de dependencias
 
-| Relation | Candidate keys / important determinant | 4NF result |
+| Relación | Claves candidatas / determinante | Resultado 4FN |
 | --- | --- | --- |
-| `users` | `user_id`; `email -> rest` | One account fact; 4NF. |
-| `roles` | `role_id`; `code -> rest` | One role fact; 4NF. |
-| `user_roles` | `(user_id, role_id)` | Binary relation; only trivial MVDs. |
-| `customers` | `user_id`; `(document_type, document_number) -> rest` | One customer profile; 4NF. |
-| `suppliers` | `user_id`; `(document_type, document_number) -> rest` | One supplier profile; 4NF. |
-| `categories` | `category_id`; `name -> rest` | One category fact; 4NF. |
-| `tools` | `tool_id -> rest` | Images and units are external; 4NF. |
-| `tool_images` | `(tool_id, image_url)` | Binary relation; trivial MVDs. |
-| `equipment_units` | `equipment_unit_id -> rest` | One ownership/status fact; 4NF. |
-| `reservations` | `reservation_id -> rest` | Items and payments are external; 4NF. |
-| `reservation_items` | `(reservation_id, equipment_unit_id) -> agreed_daily_rate` | Rate belongs to the pair; 4NF. |
-| `rentals` | `reservation_id -> rest` | At most one rental per reservation; 4NF. |
-| `unit_deliveries` | `(reservation_id, equipment_unit_id) -> rest` | One delivery fact; 4NF. |
-| `unit_returns` | `(reservation_id, equipment_unit_id) -> rest` | Damage reports are external; 4NF. |
-| `damage_reports` | `damage_report_id -> rest` | One report fact; 4NF. |
-| `payments` | `payment_id`; `(processor, external_reference) -> rest` | One payment attempt; 4NF. |
-| `invoices` | `invoice_id`; `reservation_id`; `number -> rest` | One immutable issued document; 4NF. |
-| `invoice_items` | `(invoice_id, line_number) -> rest` | One issued line; 4NF. |
+| `users` | `user_id`; `email -> demás atributos` | Un hecho de cuenta; 4FN. |
+| `roles` | `role_id`; `code -> demás atributos` | Un hecho de rol; 4FN. |
+| `user_roles` | `(user_id, role_id)` | Relación binaria; dependencias multivaluadas triviales. |
+| `customers` | `user_id`; `(document_type, document_number) -> demás atributos` | Un perfil de cliente; 4FN. |
+| `suppliers` | `user_id`; `(document_type, document_number) -> demás atributos` | Un perfil de proveedor; 4FN. |
+| `categories` | `category_id`; `name -> demás atributos` | Un hecho de categoría; 4FN. |
+| `tools` | `tool_id -> demás atributos` | Imágenes y unidades separadas; 4FN. |
+| `tool_images` | `(tool_id, image_url)` | Relación binaria; dependencias multivaluadas triviales. |
+| `equipment_units` | `equipment_unit_id -> demás atributos` | Un hecho de unidad y estado; 4FN. |
+| `reservations` | `reservation_id -> demás atributos` | Líneas y pagos separados; 4FN. |
+| `reservation_items` | `(reservation_id, equipment_unit_id) -> agreed_daily_rate` | Tarifa propia del par; 4FN. |
+| `rentals` | `reservation_id -> demás atributos` | Como máximo un alquiler por reserva; 4FN. |
+| `unit_deliveries` | `(reservation_id, equipment_unit_id) -> demás atributos` | Un hecho de entrega; 4FN. |
+| `unit_returns` | `(reservation_id, equipment_unit_id) -> demás atributos` | Reportes separados; 4FN. |
+| `damage_reports` | `damage_report_id -> demás atributos` | Un hecho de reporte; 4FN. |
+| `payments` | `payment_id`; `(processor, external_reference) -> demás atributos` | Un intento de pago; 4FN. |
+| `invoices` | `invoice_id`; `reservation_id`; `number -> demás atributos` | Documento histórico inmutable; 4FN. |
+| `invoice_items` | `(invoice_id, line_number) -> demás atributos` | Una línea emitida; 4FN. |
 
-Result: 18 relations are in 4NF under the documented functional and multivalued dependencies. The migration adds physical constraints and indexes, but validation against a running PostgreSQL instance remains pending.
 
-## Rules normalization does not enforce alone
+Las 18 relaciones cumplen 4FN bajo las dependencias documentadas. Las pruebas PostgreSQL validan restricciones y mapeos físicos; no sustituyen la revisión de supuestos de normalización.
 
-| Rule | Future enforcement |
+## Reglas que requieren algo más que normalización
+
+| Regla | Mecanismo actual / límite |
 | --- | --- |
-| Keys, references, positive values, `start_date <= return_date` | PostgreSQL constraints where locally expressible |
-| One supplier per reservation; inventory code unique per supplier | Atomic service plus locking, or a justified physical redesign |
-| No overlapping confirmed reservations | Lock/version the unit and check/save in one transaction |
-| Profiles coherent with roles; non-empty submitted documents | Domain/application rules and transaction checks |
-| Rental only from confirmed reservation; return only after delivery | State transitions and atomic validation |
-| Immutable historical rate/currency/invoice | Domain write policy and persistence permissions |
-| Payment idempotency | Unique `(processor, external_reference)` plus adapter retry policy |
+| Claves, referencias, importes y orden de fechas | Restricciones SQL y dominio |
+| Inventario único por proveedor | Trigger y bloqueo asesor; no unicidad global falsa |
+| Un proveedor por reserva | Coordinación y comprobación de referencias |
+| Solapamientos confirmados | Bloqueos ordenados y comprobación/guardado atómicos |
+| Roles, perfiles y propiedad | Aplicación; autenticación JWT pendiente |
+| Devolución posterior a entrega | Transiciones y validación operativa |
+| Tarifas y facturas históricas | Política de escritura y transacciones |
+| Referencia única de pago | Restricción `(processor, external_reference)`; reintentos externos pendientes |
 
-The supplier-scoped uniqueness of `equipment_units.inventory_code` crosses `equipment_units -> tools -> suppliers` in this logical design. It must not be represented as a false local unique constraint on `inventory_code` alone. The physical model must choose an explicit transaction/locking strategy or a documented denormalization that preserves consistency.
+El código de inventario depende del proveedor a través de herramienta; no debe imponerse un `UNIQUE(inventory_code)` global. No se añaden totales duplicados ni conjuntos multivaluados en una misma columna.

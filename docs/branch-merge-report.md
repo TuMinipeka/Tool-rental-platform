@@ -1,5 +1,8 @@
 # Comparación e integración de developer/conde con developer/daniel
 
+> [!NOTE]
+> Este reporte describe el primer merge. La decisión de archivar migraciones se corrigió después: los 21 scripts de Conde ahora son ejecutables como V4–V24. Consulta [migraciones](database-migrations.md) y el [reporte vigente](validation-report.md).
+
 Fecha: 15 de octubre de 2026. Rama destino: `developer/daniel`.
 
 ## Referencias comparadas

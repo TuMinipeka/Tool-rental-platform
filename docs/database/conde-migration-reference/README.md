@@ -1,7 +1,7 @@
-# Referencia de las migraciones de developer/conde
+# Originales de las migraciones de Conde
 
-Estos archivos conservan la propuesta de migraciones V1–V21 de `developer/conde` para revisión. No son una ubicación de Flyway y no deben ejecutarse sobre una base existente.
+Esta carpeta conserva los 21 archivos originales como evidencia de comparación de `developer/conde` en `ac149a1db7a95d3cc2bb4f313e063927fb7a0915`. No pertenece al classpath ejecutable.
 
-El merge conserva el historial aplicado V1–V3 de `developer/daniel`. Reemplazar versiones que ya se aplicaron produciría conflictos de validación y duplicación de tablas. Las modificaciones futuras del esquema deben añadirse mediante versiones nuevas en `infrastructure/src/main/resources/db/migration`.
+**Sus adaptaciones están implementadas y activas como V4–V24** en [`db/migration`](../../../infrastructure/src/main/resources/db/migration). Consulta [correspondencia, autoría y compatibilidad](../../database-migrations.md).
 
-Los datos demo permanecen en `db/demo`, con activación explícita mediante el perfil adicional `demo`. La conexión local habitual no carga datos ficticios.
+No copies estos originales como V1–V21 sobre una base ya migrada: entran en conflicto con V1–V3 de Daniel. Los originales sirven para auditar cómo se integró el aporte.

@@ -1,21 +1,21 @@
-# Infrastructure structure
+# Estructura de infraestructura
 
-Each of the 18 contexts follows the reference repository:
+Cada uno de los 18 contextos sigue esta organización, incorporando tipos con responsabilidad real:
 
 ```text
 <context>/
   adapters/in/rest/controllers/<Entity>Controller.java
-  adapters/in/rest/dtos/                 # HTTP requests, separate from application commands
+  adapters/in/rest/dtos/
   adapters/out/persistence/<Entity>PersistenceAdapter.java
   adapters/out/persistence/entity/<Entity>JpaEntity.java
-  adapters/out/persistence/entity/<Entity>JpaId.java  # Composite keys only
+  adapters/out/persistence/entity/<Entity>JpaId.java
   adapters/out/persistence/mapper/<Entity>PersistenceMapper.java
   adapters/out/persistence/repository/<Entity>JpaRepository.java
   config/<Entity>BeanConfiguration.java
 ```
 
-Controllers validate/map input and invoke use cases. Adapters implement domain ports. Spring Data repository interfaces never escape infrastructure. Scalar foreign keys preserve context independence; child writes are coordinated by reservation/invoice owners. There are 18 JPA entities, one for each table.
+`JpaId` corresponde a claves compuestas. Los controladores convierten contratos HTTP e invocan casos de uso. Los adaptadores implementan puertos; las interfaces Spring Data no salen de infraestructura. Existen 18 entidades JPA, sin dos propietarios del mismo mapeo. Las escrituras de detalles siguen coordinadas por sus propietarios.
 
-`common` supplies transaction, authorization, Principal enforcement, exception translation, and Clock configuration. `user` supplies BCrypt hashing without adding a login flow or JWT filter. `rental` implements operational lifecycle queries.
+`common` reúne transacciones, autorización, Principal, excepciones HTTP, estado JDBC y `Clock`. `user` incorpora BCrypt sin implementar login/JWT. Las migraciones están en recursos: [trazabilidad](../docs/database-migrations.md).
 
-Run the reactor's `mvnw clean verify` with JDK 21 and Docker, or supply the dedicated PostgreSQL URL described in README. PostgreSQL integration is mandatory, not silently skipped.
+Verifica el reactor con JDK 21 y PostgreSQL real siguiendo [compilación](../docs/build-and-test.md).

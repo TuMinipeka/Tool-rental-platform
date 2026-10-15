@@ -1,176 +1,65 @@
-# Development guide
+# Guía de desarrollo
 
-## Purpose
+## Fuente de decisiones
 
-This guide is the source of truth for extending Tool Rental Platform without eroding its architecture. The directory layout expresses ownership, dependency direction, and the location of business rules.
+La estructura sigue la [arquitectura](backend-architecture.md). El [alcance aprobado](product-scope.md) y la [hoja de ruta](pendientes.md) gobiernan reglas comerciales pendientes. No inventes impuestos, precios de protección, deducibles ni condiciones de pago sin una decisión documentada.
 
-```text
-infrastructure -> application -> domain
-```
+## Responsabilidades por capa
 
-Domain is technology-independent. Application coordinates business behavior through ports. Infrastructure connects HTTP, Spring, PostgreSQL, and external services to those contracts.
-
-Business scope, payment timing, tax safeguards, damage protection, and the future Terms and Conditions page are defined in [Product scope](product-scope.md). Unresolved decisions remain in [Project roadmap and pending work](pendientes.md); developers must not replace them with undocumented assumptions.
-
-## Required structure
-
-```text
-domain/src/main/java/com/toolrental/domain/
-  common/
-  <context>/
-    model/aggregate/
-    model/entity/          # Only entities internal to an aggregate
-    model/valueobject/
-    event/
-    port/repository/
-
-application/src/main/java/com/toolrental/application/
-  common/exception/
-  <context>/
-    command/
-    dto/
-    exception/
-    usecase/
-
-infrastructure/src/main/java/com/toolrental/infrastructure/
-  common/
-  <context>/
-    adapters/in/rest/controllers/
-    adapters/in/rest/dtos/
-    adapters/out/persistence/entity/
-    adapters/out/persistence/mapper/
-    adapters/out/persistence/repository/
-    config/
-```
-
-Use the 18 table-aligned contexts selected by the project. Table-aligned packages do not grant independent write access to protected child records. Do not add speculative empty packages or classes; the existing `.gitkeep` adapter directories are the only planned placeholders.
-
-## Layer responsibilities
-
-### Domain
-
-Domain contains:
-
-- aggregates that protect invariants and valid state transitions;
-- entities that exist only within an aggregate boundary;
-- immutable value objects and typed IDs;
-- events describing facts that already happened;
-- ports expressing what business logic needs from the outside;
-- domain exceptions.
-
-Domain must not import Spring, JPA, JSON, HTTP, or PostgreSQL. It does not know how objects are persisted or presented. Collections are defensively copied and exposed as immutable values. Generic setters are not allowed.
-
-### Application
-
-Application contains use cases. A use case loads data through ports, validates actors and references, invokes domain behavior, and coordinates one atomic unit of work.
-
-- `command`: immutable input for a state-changing operation;
-- `dto`: immutable response for external consumers;
-- `usecase`: orchestration of one user intention;
-- `exception`: application failures such as a missing reference.
-
-A use case does not know controllers, JPA entities, or Spring Data repositories. It does not expose aggregates for another layer to mutate.
-
-### Infrastructure
-
-Infrastructure contains replaceable technical details:
-
-- controllers and HTTP DTOs;
-- JPA entities and mappers;
-- domain-port implementations;
-- Spring configuration;
-- database and external-service integrations.
-
-Controllers stay thin. Persistence mappers call `restore` factories and must not emit creation events when reading existing data.
-
-## Naming conventions
-
-All repository-owned content is written in English.
-
-| Element | Convention | Example |
+| Capa | Contenido | Dependencias permitidas |
 | --- | --- | --- |
-| Root package | `com.toolrental.<module>.<context>` | `com.toolrental.application.category` |
-| Use case | intention + `UseCase` | `ConfirmReservationUseCase` |
-| Command | intention + `Command` | `RequestReservationCommand` |
-| Response | concept + `Response` | `ReservationResponse` |
-| Data port | concept + `Repository` | `ToolRepository` |
-| HTTP adapter | resource + `Controller` | `ReservationController` |
-| Configuration | context + `Configuration` | `ReservationBeanConfiguration` |
-| PostgreSQL table | plural `snake_case` | `equipment_units` |
-| PostgreSQL column | singular `snake_case` | `supplier_id` |
+| Domain | Agregados, entidades internas, objetos de valor, eventos, excepciones y puertos | Java |
+| Application | Comandos/respuestas inmutables, excepciones y coordinación de casos de uso | Domain y Java |
+| Infrastructure | REST, DTOs HTTP, JPA, mappers, adaptadores y configuración | Application, Domain y frameworks |
 
-Use natural English plurals. Examples: `category -> categories`, `country -> countries`, `person -> people`, `equipment_unit -> equipment_units`. Join tables combine plural concepts when that reads naturally, for example `user_roles`.
+Conserva tres módulos y los 18 contextos existentes. Las entidades hijas no ofrecen operaciones que evadan invariantes de reserva/factura. No crees clases vacías para completar un árbol.
 
-Use Java 21, immutability, composition, `final` classes when inheritance is not intended, records for data carriers, and explicit constructor dependencies. Google Java Format through Spotless defines Java formatting.
+## Convenciones
 
-## Decisions requiring special care
+Los nombres de archivos, paquetes, tipos, comentarios y mensajes del código permanecen en inglés. La documentación humana está en español. Paquete raíz: `com.toolrental`. Los nombres de tablas son plurales naturales en `snake_case`; columnas en singular. Java usa `PascalCase` para tipos y `camelCase` para miembros.
 
-### Transactions and concurrency
+| Responsabilidad | Ejemplo |
+| --- | --- |
+| Caso de uso | `ConfirmReservationUseCase` |
+| Entrada | `RequestReservationCommand` |
+| Salida | `ReservationResponse` |
+| Puerto | `ToolRepository` |
+| Controlador | `ReservationController` |
+| Configuración | `ReservationBeanConfiguration` |
 
-Availability lookup and confirmation persistence are one operation. `AtomicReservationManagement` exists to prevent two requests from confirming the same unit concurrently. A PostgreSQL adapter must lock or version explicitly and use a stable lock order. In-memory tests do not prove database concurrency.
+Los commits se escriben en inglés: `<type>: :<gitmoji>: <CamelCaseSummary>`. Ejemplo: `feat: :card_file_box: IntegrateCondeForwardMigrations`.
 
-### Money, dates, and time
+## Reglas técnicas
 
-- Represent amounts with `Money`, `BigDecimal`, and an explicit currency; never use `double`.
-- `ReservationPeriod` uses inclusive `LocalDate` boundaries. Any shared date overlaps.
-- Technical timestamps use `Instant` and an injected `Clock`.
-- Do not introduce currency conversion, timezone conversion, taxes, or implicit rounding without a documented business decision.
+- Protege invariantes dentro del agregado/objeto de valor; evita setters genéricos y colecciones mutables expuestas.
+- Usa identificadores tipados, `Money`/`BigDecimal`, moneda explícita y `LocalDate` inclusivas para reservas. Usa `Instant` y `Clock` para tiempos técnicos.
+- Mantén comprobación y confirmación de disponibilidad en una transacción; conserva el orden de bloqueos.
+- Restaura agregados sin emitir eventos nuevos. Aún no existe Outbox ni publicación externa.
+- Separa entidades JPA y mappers; no expongas Spring Data fuera de infraestructura.
+- Las interfaces Spring Data van en `repository`; el adaptador del puerto queda en su directorio padre `persistence`.
+- Obtén el actor de `Principal` y valida permisos en el caso de uso. JWT sigue pendiente.
+- Evoluciona PostgreSQL mediante nuevas versiones Flyway; nunca edites archivos ya aplicados. Consulta [migraciones](database-migrations.md).
 
-### Persistence
+## Flujo de implementación
 
-JPA entities are not domain objects. Keep them in infrastructure and map explicitly. Change the schema through Flyway and validate it at startup. Important uniqueness and reference rules must also exist in PostgreSQL.
+1. Describe intención y reglas de negocio.
+2. Identifica agregado responsable y límites transaccionales.
+3. Implementa comportamiento, objetos de valor y eventos en dominio.
+4. Añade puertos estrictamente necesarios y el caso de uso en aplicación.
+5. Incorpora REST/JPA y configuración sin filtrar detalles hacia dentro.
+6. Prueba reglas, errores, rollback y concurrencia cuando correspondan.
+7. Actualiza documentación y ejecuta `clean verify` con JDK 21.
 
-### Security
+## Revisión antes de integrar
 
-Ownership and role checks remain in use cases. The HTTP adapter obtains identity from an authenticated UUID Principal; JWT authentication will be added later. A freely supplied `actorId` request field is not authentication.
+Comprueba ubicación de tipos, dirección de dependencias, invariantes, inmutabilidad, referencias, permisos, claves y nombres SQL. Ejecuta [compilación y pruebas](build-and-test.md); no sustituyas persistencia real por dobles en memoria para acreditar concurrencia. Coordina versiones de migración con el otro desarrollador.
 
-### Events
+## Entorno local y editor
 
-Domain events record aggregate facts. No external publisher or Outbox exists yet. A future implementation must make aggregate persistence and event publication registration consistent.
+El perfil `local` usa `infrastructure/src/main/resources/application-local.yml`; las variables de entorno pueden reemplazar sus valores. Su pool predeterminado es 2/0. Nunca publiques contraseñas. El perfil `production` exige variables externas.
 
-## Feature workflow
+SQLSTATE 53300 significa que el rol agotó sus conexiones. Revisa sesiones de clientes como DBeaver y el límite del rol; no termines sesiones de otros proyectos. Reducir el pool no libera sesiones abiertas por otro proceso.
 
-1. Describe the intention and rules in business language.
-2. Identify the responsible aggregate.
-3. Add or modify value objects, behavior, and events in domain.
-4. Define only the external ports that are actually required.
-5. Add the application command, response, exceptions, and use case.
-6. Add infrastructure adapters without leaking HTTP/JPA types inward.
-7. Add unit, application, integration, and concurrency tests as applicable.
-8. Update documentation and run the complete verification.
+Java usa LF; `.cmd` usa CRLF. Para el error Spotless ejecuta `spotless:apply` y `spotless:check`. Si Maven compila pero el editor no presenta paquetes, reconstruye su índice Java. `catalog` e `identity` se distribuyeron entre los contextos actuales: consulta [el mapa de archivos](source-package-map.md).
 
-## Completion checklist
-
-- [ ] New types are in the correct module, context, and package.
-- [ ] Dependencies still point inward.
-- [ ] Business rules live in the correct aggregate/value object or are coordinated by the appropriate use case.
-- [ ] No mutable collection, JPA entity, or HTTP detail leaks inward.
-- [ ] Money, dates, time, authorization, and concurrency were handled explicitly when relevant.
-- [ ] PostgreSQL names use English plural `snake_case` tables and singular columns.
-- [ ] New behavior and important failure paths are tested.
-- [ ] Documentation matches the actual implementation status.
-- [ ] `mvnw clean verify` succeeds.
-
-ArchUnit checks dependency direction and core hierarchies. Spotless checks Java formatting during `verify`. These safeguards do not replace review of aggregate boundaries or transaction consistency.
-
-## Table-aligned contexts
-
-Use the 18 contexts listed in README. Port adapters belong directly in `adapters/out/persistence`; only Spring Data interfaces belong in its `repository` child. Preserve shared/composite keys instead of creating surrogate IDs. Reservation-item and invoice-item writes remain inside their owner operation. Run PostgreSQL integration tests as part of verification; an explicit isolated test database may replace Docker, never the database assertions.
-
-## Line endings and editor diagnostics
-
-Java source files use LF line endings on every operating system. `.gitattributes` enforces LF for Java checkouts, `.editorconfig` declares the editor convention, and the root Spotless configuration explicitly selects UNIX line endings. Windows `.cmd` scripts retain CRLF.
-
-If Spotless reports a diff containing only `\r\n` versus `\n`, run `mvnw.cmd spotless:apply` followed by `mvnw.cmd spotless:check`. This is a formatting failure, not a Java syntax error. If the command succeeds but the editor still shows old diagnostics, save the files and reload Maven projects; in VS Code, use `Java: Clean Java Language Server Workspace` if reloading does not clear them.
-
-The former `catalog` package was split into `category`, `tool`, `toolimage`, and `equipmentunit` under the existing three modules. Its classes were relocated to those contexts; inspect their new package paths instead of the old empty directory.
-
-## Connecting a local database
-
-The `local` profile reads `infrastructure/src/main/resources/application-local.yml`. Start the packaged JAR with `--spring.profiles.active=local`, or export `SPRING_PROFILES_ACTIVE=local`. Database environment variables referenced by that file override its default values.
-
-The local Hikari defaults are at most two connections and zero minimum idle connections; `DB_MAX_POOL_SIZE` and `DB_MIN_IDLE` may override them. The production profile retains the shared pool defaults unless explicitly overridden.
-
-If PostgreSQL reports too many connections for the role (SQLSTATE 53300), check that role's connection limit and active sessions. Disconnect unused sessions in database clients such as DBeaver, or have an administrator review the role limit. Lowering the application pool prevents additional pressure but cannot free connections already occupied by another client. Do not terminate another project's sessions to make startup succeed.
-
-Successful startup must establish the connection, apply/validate Flyway migrations, validate Hibernate mappings, and initialize the application. An open PostgreSQL port alone does not establish successful database integration.
+Un puerto PostgreSQL abierto no demuestra integración: se requiere conexión, migración/validación Flyway, validación Hibernate y arranque correcto.

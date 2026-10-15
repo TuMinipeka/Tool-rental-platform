@@ -1,51 +1,34 @@
-# Tool rental conceptual model
+# Modelo conceptual de alquiler de herramientas
 
-## Scope
+## Alcance y supuestos
 
-Source: [original assignment (Spanish)](../ejercicioDemo.md). This document identifies business concepts, attributes, relationships, and rules. The logical relational model appears in [Fourth normal form](fourth-normal-form.md), and implemented aggregate boundaries appear in [Backend architecture](backend-architecture.md).
+Fuente: [enunciado original](../ejercicioDemo.md). Se identifican entidades, atributos, relaciones y multiplicidades. El [modelo lógico 4FN](fourth-normal-form.md) y la [arquitectura](backend-architecture.md) explican su traducción a tablas y código. PostgreSQL sustituye MySQL por decisión autorizada.
 
-The base 18 entities now have table-aligned Java contexts, JPA mappings, application operations, and REST adapters. JWT, external payment processing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
+1. Un usuario puede tener varios roles. Cliente y proveedor son perfiles opcionales compatibles; administrador es un rol, no otra copia de usuario.
+2. Una herramienta representa la oferta de un proveedor y tiene una categoría principal. Una unidad representa el equipo físico con código de inventario único dentro de su proveedor.
+3. Las imágenes describen la herramienta; no dependen de una unidad física. Ambos conjuntos son independientes.
+4. Una reserva incluye una o más unidades distintas de un solo proveedor. Selecciones de varios proveedores requieren reservas separadas.
+5. Todas las líneas comparten fechas inclusivas y moneda. Del 14 al 15 se cobran dos días. La confirmación congela fechas, líneas y tarifas.
+6. Una reserva confirmada genera como máximo un alquiler: la reserva es la solicitud; el alquiler representa su ejecución.
+7. Cada unidad alquilada tiene como máximo una entrega y una devolución en ese alquiler. Una devolución puede tener varios reportes de daño.
+8. Una reserva puede registrar varios intentos o pagos parciales. No se almacenan datos de tarjeta.
+9. Un alquiler tiene como máximo una factura; sus datos emitidos son instantáneas históricas.
+10. Nombres, direcciones y tarifas no constituyen identidades estables.
 
-## Derived concepts
+Modificar estos supuestos exige revisar dependencias funcionales y multivaluadas. El modelo base no incluye protección, evidencias ni consentimientos futuros.
 
-| Requirement | Concepts |
-| --- | --- |
-| Supplier/customer registration and Admin/Supplier/Customer profiles | User, Role, Customer, Supplier |
-| Inventory, category, description, images, prices, condition | Tool, Category, ToolImage, EquipmentUnit |
-| Date selection and request acceptance/rejection | Reservation, ReservationItem |
-| Rental history, delivery, and return | Rental, UnitDelivery, UnitReturn |
-| Damage reporting | DamageReport |
-| Online payments and invoices | Payment, Invoice, InvoiceItem |
+## Entidades y atributos
 
-`UserRole` and `ReservationItem` are associative entities. Administrator is a role, not a second copy of User data.
+`?` indica atributo opcional. Se conservan nombres conceptuales en inglés para corresponder con el código; PostgreSQL utiliza `snake_case`.
 
-## Business assumptions
-
-1. One account may hold multiple roles. Customer and Supplier are optional, compatible User profiles. Removing a role must not invalidate historical operations.
-2. A Tool is one supplier's catalog offer in one primary Category. Each physical EquipmentUnit has an inventory code unique within its supplier.
-3. Tool images describe the offer, not a physical unit. Tool images and equipment units are independent sets. Damage or unit-specific images would require separate relationships.
-4. A Reservation contains one or more physical units from one supplier. A multi-supplier selection creates separate reservations.
-5. Reservation lines share one inclusive `[startDate, returnDate]` period and one currency. Both dates are billed. The rate is frozen on confirmation.
-6. A confirmed Reservation creates at most one Rental. Reservation is the request; Rental is its execution.
-7. Each rented unit has at most one delivery and one return in a Rental. A return may have several damage reports.
-8. A Reservation may have multiple payment attempts or partial payments. Card details are never stored.
-9. A Rental has at most one Invoice. Issuer, recipient, and invoice-item values are immutable historical snapshots.
-10. Internal identifiers are stable. Names, addresses, statuses, and prices are not entity identities.
-
-Changing these assumptions may change functional or multivalued dependencies and therefore requires a new normalization review.
-
-## Entities and attributes
-
-`?` marks an optional attribute. Names are conceptual camelCase names; physical PostgreSQL names use `snake_case`.
-
-| Entity | Identity | Main attributes |
+| Entidad | Identidad | Atributos principales |
 | --- | --- | --- |
-| User | userId; unique email | displayName, email, passwordHash, accountStatus, registeredAt |
-| Role | roleId; unique code | code (`ADMIN`, `SUPPLIER`, `CUSTOMER`), description |
-| UserRole | user + role | Role assignment without additional attributes |
+| User | userId; único email | displayName, email, passwordHash, accountStatus, registeredAt |
+| Role | roleId; único code | code (`ADMIN`, `SUPPLIER`, `CUSTOMER`), description |
+| UserRole | user + role | Asignación de rol sin atributos adicionales |
 | Customer | user | personType, documentType, documentNumber, billingName |
 | Supplier | user | documentType, documentNumber, businessName |
-| Category | categoryId; unique name | name, description? |
+| Category | categoryId; único name | name, description? |
 | Tool | toolId | supplier, category, name, description, currentDailyRate, rateCurrency, publicationStatus |
 | ToolImage | tool + URL | imageUrl |
 | EquipmentUnit | equipmentUnitId; supplier + inventoryCode | tool, inventoryCode, serialNumber?, currentCondition, operationalStatus |
@@ -54,37 +37,38 @@ Changing these assumptions may change functional or multivalued dependencies and
 | Rental | reservation | startedAt, rentalStatus |
 | UnitDelivery | reservation + equipmentUnit | scheduledAt, deliveredAt?, outboundCondition?, addressLine, city, region, country |
 | UnitReturn | reservation + equipmentUnit | receivedAt, inboundCondition, notes? |
-| DamageReport | damageReportId | affected return, reportedAt, description, reportStatus, assessedCost? |
+| DamageReport | damageReportId | devolución afectada, reportedAt, description, reportStatus, assessedCost? |
 | Payment | paymentId; processor + externalReference | reservation, processor, externalReference, amount, paymentStatus, recordedAt, confirmedAt? |
-| Invoice | invoiceId; unique reservation; unique number | rental, number, issuedAt, invoiceStatus, issued issuer/recipient names and documents |
+| Invoice | invoiceId; único reservation; único number | rental, number, issuedAt, invoiceStatus, nombres y documentos históricos de emisor/destinatario |
 | InvoiceItem | invoice + lineNumber | issuedDescription, quantity, issuedUnitPrice |
 
-Money values use exact decimals and explicit currencies. No implicit currency conversion is performed.
 
-## Relationships
+Los importes usan decimales exactos y moneda explícita. No hay conversión implícita de moneda.
 
-| Relationship | Cardinality |
+## Relaciones y multiplicidades
+
+| Relación | Multiplicidad |
 | --- | --- |
-| User — Role | N:M through UserRole |
-| User — Customer / Supplier | User has 0..1 of each profile; each profile belongs to one User |
-| Supplier — Tool | Supplier 0..N; Tool exactly 1 Supplier |
-| Category — Tool | Category 0..N; Tool exactly 1 Category |
-| Tool — ToolImage / EquipmentUnit | Tool 0..N of each; each child belongs to one Tool |
-| Customer — Reservation | Customer 0..N; Reservation exactly 1 Customer |
-| Reservation — EquipmentUnit | N:M through ReservationItem |
-| Reservation — Rental | Reservation 0..1; Rental exactly 1 Reservation |
-| ReservationItem — UnitDelivery | Item 0..1; delivery exactly 1 item and 1 rental |
-| UnitDelivery — UnitReturn | Delivery 0..1; return exactly 1 completed delivery |
-| UnitReturn — DamageReport | Return 0..N; report exactly 1 return |
-| Reservation — Payment | Reservation 0..N; payment exactly 1 reservation |
-| Rental — Invoice | Rental 0..1; invoice exactly 1 rental |
-| Invoice — InvoiceItem | Issued invoice 1..N; item exactly 1 invoice |
+| User — Role | N:M mediante UserRole; cada asociación tiene un usuario y un rol |
+| User — Customer / Supplier | Usuario 0..1 de cada perfil; cada perfil tiene exactamente un usuario |
+| Supplier — Tool | Proveedor 0..N herramientas; herramienta exactamente un proveedor |
+| Category — Tool | Categoría 0..N herramientas; herramienta exactamente una categoría |
+| Tool — ToolImage / EquipmentUnit | Herramienta 0..N de cada conjunto; cada elemento pertenece a una herramienta |
+| Customer — Reservation | Cliente 0..N reservas; reserva exactamente un cliente |
+| Reservation — EquipmentUnit | N:M mediante ReservationItem; reserva 1..N líneas |
+| Reservation — Rental | Reserva 0..1 alquiler; alquiler exactamente una reserva |
+| ReservationItem — UnitDelivery | Línea 0..1 entrega; entrega exactamente una línea y un alquiler |
+| UnitDelivery — UnitReturn | Entrega 0..1 devolución; devolución exige una entrega completada |
+| UnitReturn — DamageReport | Devolución 0..N reportes; reporte exactamente una devolución |
+| Reservation — Payment | Reserva 0..N pagos; pago exactamente una reserva |
+| Rental — Invoice | Alquiler 0..1 factura; factura exactamente un alquiler |
+| Invoice — InvoiceItem | Factura emitida 1..N líneas; línea exactamente una factura |
 
-## Editable conceptual diagram
+`UserRole` explicita la asociación N:M. No debe almacenarse una lista de roles en una columna ni duplicarse el usuario por rol. `ReservationItem` añade a la asociación una tarifa acordada propia del par reserva/unidad.
 
-The 18-entity baseline is available as an [editable Excalidraw scene](diagrams/conceptual-er-model.excalidraw), a [vector preview](diagrams/conceptual-er-model.svg), and a [PNG image](diagrams/conceptual-er-model.png). See the [notation and editing guide](diagrams/README.md).
+## Diagrama editable
 
-## Conceptual diagram
+[Excalidraw](diagrams/conceptual-er-model.excalidraw) · [SVG ampliable](diagrams/conceptual-er-model.svg) · [PNG](diagrams/conceptual-er-model.png) · [Guía de notación](diagrams/README.md)
 
 ```mermaid
 erDiagram
@@ -109,23 +93,19 @@ erDiagram
     INVOICE ||--|{ INVOICE_ITEM : details
 ```
 
-## Rules and derived information
 
-- `startDate <= returnDate`; monetary amounts are non-negative and payments are positive.
-- A unit cannot belong to two overlapping confirmed reservations. Inclusive boundaries mean a shared return/start date conflicts.
-- Availability is derived from blocking reservations, expiration policy, operational status, and rentals not yet returned. It is not a global boolean.
-- Every reservation item belongs to the same supplier. Tool ownership cannot change while obligations exist without an explicit historical ownership model.
-- Items, dates, currency, and rates freeze at confirmation.
-- Rental details derive from the confirmed reservation; they are not duplicated.
-- Historical actors, equipment, invoices, and payments are deactivated or retained rather than deleted.
-- Collected revenue comes from confirmed payments. Invoiced and collected totals are distinct metrics.
-- Derived totals should not be stored in the initial normalized model.
-- Supplier confirmation blocks units without prior payment. Payment becomes a delivery condition in a later phase.
+## Reglas adicionales a las cardinalidades
 
-## DDD mapping
+- La devolución nunca es anterior al inicio; los importes son no negativos y un pago es positivo.
+- Una unidad no puede estar en dos reservas confirmadas con fechas coincidentes, incluidos los extremos.
+- Las solicitudes pendientes no bloquean inventario. El proveedor confirma antes de gestionar el pago.
+- La disponibilidad es derivada, no un booleano global. La implementación actual valida solapamientos confirmados y estado operativo; la caducidad automática y obligaciones de alquiler no devuelto requieren revisión adicional antes de producción.
+- Las unidades de una reserva pertenecen al mismo proveedor. Cambiar titularidad durante obligaciones vigentes exige un modelo histórico explícito.
+- Los datos del alquiler derivan de su reserva confirmada. Tarifas y documentos emitidos preservan historia.
+- Los registros con historia se conservan o desactivan según su operación; no hay eliminación física indiscriminada.
+- Ingresos cobrados e importes facturados son métricas diferentes; el reporte comercial sigue pendiente.
+- Los totales derivados no se guardan como duplicados en el modelo inicial.
 
-The conceptual model does not imply that every record owns an independent transaction. The current implementation gives each base record a table-aligned Java context while coordinated use cases preserve reservation, rental and invoice transaction boundaries. Reservation-item and invoice-item writes remain owned by their parent workflows. JWT, external payment processing, tax/protection extensions and reporting remain pending.
+## Correspondencia con DDD y estado
 
-## Implementation mapping
-
-The project uses one package context per base table by explicit organizational decision. This does not change the conceptual relationships or allow child writes to bypass reservation/invoice transactions. See [architecture](backend-architecture.md) and the [embedded conceptual diagram](../README.md#conceptual-model). The base diagram excludes future protection, evidence and consent extensions.
+El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva y factura siguen coordinadas. Sus líneas no pueden eludir invariantes mediante escritura independiente. Las 18 tablas tienen mapeo JPA y operaciones del backend; JWT, pasarela, informes y recorridos de frontend siguen pendientes. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).
