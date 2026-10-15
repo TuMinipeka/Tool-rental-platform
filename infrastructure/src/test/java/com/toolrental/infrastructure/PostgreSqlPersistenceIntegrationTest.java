@@ -61,7 +61,7 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Container
   static final PostgreSQLContainer<?> POSTGRES =
-      new PostgreSQLContainer<>("postgres:18.6-alpine")
+      new PostgreSQLContainer<>("postgres:17.11-alpine")
           .withDatabaseName("tool_rental")
           .withUsername("tool_rental")
           .withPassword("tool_rental");
