@@ -1,74 +1,98 @@
-# Tool Rental Platform
+# Plataforma de alquiler de herramientas
 
-Backend for renting construction tools and equipment, built with Java 21, hexagonal architecture, and domain-driven design. The project keeps business rules independent from Spring, JPA, HTTP, and security concerns.
+Backend para alquilar herramientas y equipos de construcción, construido con Java 21, arquitectura hexagonal y diseño guiado por el dominio. Las reglas de negocio se mantienen independientes de Spring, JPA, HTTP y los detalles de seguridad.
 
-## Current status
+## Estado actual
 
-Implemented: a multi-module Maven structure, catalog and reservation aggregates, application use cases, domain ports, domain events, PostgreSQL/Flyway configuration, an executable 4NF schema, JPA mappings, and production persistence adapters. The application still has no HTTP server.
+Están implementados la estructura Maven multimódulo, los agregados de catálogo y reservas, los casos de uso, los puertos del dominio, los eventos, la persistencia JPA, PostgreSQL, Flyway y los adaptadores actuales. La base de datos local es reproducible y cuenta con pruebas reales de migraciones, mapeos, rollback y concurrencia.
 
-Pending: the remaining Phase 0 commercial decisions, PostgreSQL integration and concurrency validation, database provisioning, identity writes, REST/OpenAPI, JWT authorization, rental/payment/protection/invoice adapters, reporting, deployment, and the React frontend. See the [product roadmap](docs/pendientes.md) and [pending database work](docs/pendientes-base-datos.md).
+Continúan pendientes las decisiones comerciales de la Fase 0, las ampliaciones correspondientes del esquema, las escrituras de identidad, REST/OpenAPI, autorización JWT, los adaptadores restantes, reportes, despliegue y el frontend React. La aplicación todavía no ofrece un servidor HTTP. Consulta la [hoja de ruta](docs/pendientes.md) y el [trabajo pendiente de base de datos](docs/pendientes-base-datos.md).
 
-## Technology
+## Tecnologías
 
-| Component | Choice |
+| Componente | Elección |
 | --- | --- |
 | Java | 21 |
 | Spring Boot | 3.5.16 |
-| Build | Maven multi-module project; Maven Wrapper 3.9.9 |
-| Tests | JUnit 5, Spring Boot Test, ArchUnit |
-| Formatting | Spotless 2.43.0 with Google Java Format 1.27.0 |
-| Database | PostgreSQL, Spring Data JPA, Flyway |
-| HTTP server | Embedded Apache Tomcat through Spring Boot |
-| API | REST with OpenAPI and Swagger UI; confirmed but not implemented |
-| Frontend | React with Node.js tooling, HTML, and CSS; confirmed but not created |
+| Construcción | Maven multimódulo; Maven Wrapper 3.9.9 |
+| Pruebas | JUnit 5, Spring Boot Test, ArchUnit y Testcontainers |
+| Formato | Spotless 2.43.0 con Google Java Format 1.27.0 |
+| Base de datos | PostgreSQL 17.11, Spring Data JPA y Flyway |
+| API | REST con OpenAPI y Swagger UI; confirmada, no implementada |
+| Frontend | React con herramientas de Node.js; confirmado, no creado |
 
-The [original assignment (Spanish)](ejercicioDemo.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision.
+El [enunciado original](ejercicioDemo.md) solicitaba MySQL. PostgreSQL lo reemplaza por decisión explícita del proyecto.
 
-## Architecture
+## Arquitectura
 
 ```text
-domain/          # Aggregates, entities, value objects, events, and ports
-application/     # Commands, responses, exceptions, and use cases
-infrastructure/  # Spring Boot entry point, JPA adapters, and Flyway migrations
-docs/            # Conceptual model, 4NF analysis, architecture, and conventions
-pom.xml          # Maven reactor and centralized versions
+domain/          # Agregados, entidades, objetos de valor, eventos y puertos
+application/     # Comandos, respuestas, excepciones y casos de uso
+infrastructure/  # Spring Boot, adaptadores JPA y migraciones Flyway
+docs/            # Modelo, arquitectura, decisiones y trabajo pendiente
+pom.xml          # Reactor Maven y versiones centralizadas
 ```
 
-Dependencies point inward:
+Las dependencias apuntan hacia el dominio:
 
 ```text
 infrastructure -> application -> domain
 ```
 
-Root packages are `com.toolrental.domain`, `com.toolrental.application`, and `com.toolrental.infrastructure`. Code is grouped by the `catalog` and `reservation` business contexts, then by technical responsibility. A relational table does not automatically become a DDD aggregate.
+El código se organiza primero por los contextos de negocio `catalog` y `reservation`, y después por responsabilidad técnica. Una tabla relacional no se convierte automáticamente en un agregado DDD.
 
-All source identifiers are English. Java types use `PascalCase`, members use `camelCase`, packages use lowercase names, and PostgreSQL identifiers use plural `snake_case` table names with singular `snake_case` columns. Irregular plurals are written naturally, for example `country -> countries`.
+Los identificadores de código están en inglés. Los tipos Java usan `PascalCase`, sus miembros usan `camelCase`, los paquetes usan minúsculas y PostgreSQL usa tablas plurales y columnas singulares en `snake_case`.
 
-See [Backend architecture](docs/backend-architecture.md) and the [Development guide](docs/development-guide.md).
+Consulta la [arquitectura del backend](docs/backend-architecture.md) y la [guía de desarrollo](docs/development-guide.md).
 
-## Implemented business rules
+## Reglas de negocio implementadas
 
-- Aggregate roots: `Category`, `Tool`, `EquipmentUnit`, and `Reservation`.
-- Images belong to a tool offer; each equipment unit represents one physical asset.
-- A reservation contains distinct units from one supplier and uses one currency.
-- Start and return dates are inclusive. October 14–15 bills two days; October 14–14 bills one day. Sharing any date conflicts with a confirmed reservation for the same unit.
-- Pending requests do not block units. Confirmation revalidates the actor, active profiles, publication, operational status, currency, and availability inside one atomic port.
-- The current daily rate is frozen into reservation items at confirmation. Later catalog changes do not alter the agreed price.
-- Rejection accepts only pending reservations. Cancellation accepts pending or confirmed reservations. Terminal states reject further transitions.
-- Actor identifiers are application inputs for now; authentication has not been implemented.
+- Los agregados actuales son `Category`, `Tool`, `EquipmentUnit` y `Reservation`.
+- Las imágenes pertenecen a una oferta de herramienta; cada unidad de equipo representa un activo físico.
+- Una reserva contiene unidades distintas de un solo proveedor y usa una única moneda.
+- Las fechas inicial y final son inclusivas. Compartir cualquier fecha produce un conflicto para la misma unidad.
+- Las solicitudes pendientes no bloquean unidades. La confirmación vuelve a validar actor, perfiles activos, publicación, estado operativo, moneda y disponibilidad dentro de una frontera atómica.
+- La tarifa diaria vigente se congela en los elementos de la reserva al confirmarla.
+- El rechazo solo acepta reservas pendientes. La cancelación acepta reservas pendientes o confirmadas.
+- Los identificadores de actor todavía son entradas de aplicación; la autenticación no está implementada.
 
-## Java 21
+## Requisitos locales
 
-```powershell
-git clone https://github.com/TuMinipeka/Tool-rental-platform.git
-cd Tool-rental-platform
-java -version
-.\mvnw.cmd -version
+- JDK 21.
+- Docker con Docker Compose para PostgreSQL y las pruebas de integración.
+- Node.js se necesitará únicamente para el frontend cuando se cree.
+
+El Maven Wrapper descarga Maven, pero no instala Java.
+
+## Entorno local con Docker
+
+Primero crea el archivo local de variables. `.env` contiene valores propios del equipo y no se versiona; `.env.example` sí se mantiene en Git.
+
+Linux/macOS:
+
+```bash
+cp .env.example .env
+docker compose --env-file .env up --build
 ```
 
-Set `JAVA_HOME` to a local JDK 21 installation when the default Java version differs. The Maven Wrapper downloads Maven but does not install Java.
+PowerShell:
 
-## Build and run
+```powershell
+Copy-Item .env.example .env
+docker compose --env-file .env up --build
+```
+
+Cambia `POSTGRES_PASSWORD` y `DB_PASSWORD` por el mismo valor antes de levantar el entorno. Para iniciar únicamente PostgreSQL:
+
+```bash
+docker compose --env-file .env up -d postgres
+```
+
+El volumen `postgres_data` conserva la base entre reinicios. `docker compose down` detiene los servicios sin eliminar los datos; agregar `--volumes` también elimina la base local.
+
+El contenedor del backend usa una construcción por etapas con JDK 21 y una imagen de ejecución JRE 21 sin usuario privilegiado. Actualmente ejecuta Flyway y arranca la aplicación sin publicar un puerto HTTP, porque la API aún no existe.
+
+## Compilar y verificar
 
 Windows:
 
@@ -84,49 +108,40 @@ Linux/macOS:
 java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
 ```
 
-`verify` runs tests and validates Java formatting. Apply formatting with:
+`verify` ejecuta las pruebas y valida el formato Java. Con Docker disponible, Testcontainers crea PostgreSQL 17.11 y verifica las migraciones, JPA, repositorios, rollback y concurrencia. Aplica el formato cuando sea necesario con:
 
-```powershell
-.\mvnw.cmd spotless:apply
+```bash
+./mvnw spotless:apply
 ```
 
-The default `local` profile connects to `jdbc:postgresql://localhost:5432/tool_rental` with user and password `tool_rental`. Override any value through environment variables:
+El perfil predeterminado `local` conecta con `jdbc:postgresql://localhost:5432/tool_rental`. Sus valores pueden reemplazarse mediante `DB_URL`, `DB_USERNAME` y `DB_PASSWORD`. El perfil `production` exige esas tres variables.
 
-```powershell
-$env:SPRING_PROFILES_ACTIVE = 'local'
-$env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
-$env:DB_USERNAME = 'tool_rental'
-$env:DB_PASSWORD = 'change-me'
-```
+Flyway crea 18 tablas mediante migraciones ordenadas y aplica una migración adicional de compatibilidad con JPA. El perfil `local` también carga 18 migraciones de demostración con al menos cinco filas por tabla; `production` nunca incluye esos datos. Hibernate usa `ddl-auto: validate` y no crea ni modifica el esquema.
 
-The `production` profile requires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Flyway applies versioned migrations and Hibernate uses `ddl-auto: validate`; Hibernate never creates or updates the schema.
+Las tarifas demo y sus referencias públicas colombianas se registran en [Fuentes de datos](docs/data-sources.md).
 
-Flyway creates the schema through 18 ordered migrations, one per table. With the `local` profile it also loads 18 demonstration-data migrations, each containing at least five rows. The `production` profile only uses `db/migration` and never loads the demonstration dataset. The tool rates and their public Colombian references are recorded in [Data sources](docs/data-sources.md).
+## Documentación
 
-## Documentation
+1. [Enunciado original](ejercicioDemo.md)
+2. [Modelo conceptual](docs/conceptual-model.md)
+3. [Cuarta forma normal](docs/fourth-normal-form.md)
+4. [Arquitectura del backend](docs/backend-architecture.md)
+5. [Guía de desarrollo](docs/development-guide.md)
+6. [Estructura de infraestructura](infrastructure/STRUCTURE.md)
+7. [Trabajo pendiente de base de datos](docs/pendientes-base-datos.md)
+8. [Hoja de ruta](docs/pendientes.md)
+9. [Alcance del producto](docs/product-scope.md)
+10. [Borrador de términos y condiciones](docs/terms-and-conditions.md)
 
-1. [Original assignment (Spanish)](ejercicioDemo.md)
-2. [Conceptual model](docs/conceptual-model.md)
-3. [Fourth normal form](docs/fourth-normal-form.md)
-4. [Backend architecture](docs/backend-architecture.md)
-5. [Development guide](docs/development-guide.md)
-6. [Infrastructure structure](infrastructure/STRUCTURE.md)
-7. [Pending database work](docs/pendientes-base-datos.md)
-8. [Project roadmap and pending work](docs/pendientes.md)
-9. [Product scope](docs/product-scope.md)
-10. [Terms and Conditions draft](docs/terms-and-conditions.md)
+`AGENTS.md` registra reglas para el trabajo automatizado. ArchUnit protege la dirección de dependencias y las jerarquías principales; Spotless protege el formato Java.
 
-`AGENTS.md` records repository-wide rules for future automated work. ArchUnit protects dependency direction and key hierarchies; Spotless protects Java formatting.
+## Próxima entrega
 
-## Next delivery
-
-The team is finishing Phase 0 business rules, beginning with cancellation and no-show handling. The next database phase will provision PostgreSQL, validate Flyway and mappings, and extend the schema for the approved tax, split-payment, damage-protection, evidence, dispute, and legal-acceptance rules. REST/OpenAPI and JWT security follow before the React frontend integrates with the backend.
-
-The installed [database-normalization skill](.agents/skills/database-normalization/SKILL.md) supports the relational analysis. Its source and license are tracked by `skills-lock.json`.
+La base técnica de la Fase 1 está terminada para el modelo actual. La siguiente prioridad es cerrar las reglas comerciales de la Fase 0 que permiten ampliar el esquema sin inventar valores. REST/OpenAPI y JWT siguen antes de integrar el frontend con el backend.
 
 ## Convención de commits
 
-Todos los mensajes deben escribirse en inglés con Conventional Commits, un código Gitmoji y un resumen concatenado en estilo `CamelCase`:
+Todos los mensajes se escriben en inglés con Conventional Commits, un código Gitmoji y un resumen concatenado en estilo `CamelCase`:
 
 ```text
 <type>: :<gitmoji>: <CamelCaseSummary>
