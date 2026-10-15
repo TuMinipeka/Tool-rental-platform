@@ -10,7 +10,7 @@ Authentication/JWT, a payment gateway, tax calculations, protection/evidence/con
 
 ## Conceptual model
 
-![Conceptual entity–relationship model](docs/diagrams/conceptual-er-model.svg)
+![Conceptual entity-relationship model](docs/diagrams/conceptual-er-model.svg)
 
 [Editable Excalidraw diagram](docs/diagrams/conceptual-er-model.excalidraw) · [Conceptual model](docs/conceptual-model.md) · [Fourth normal form](docs/fourth-normal-form.md)
 
@@ -55,7 +55,7 @@ Each context follows `model/aggregate`, `model/valueobject`, `event`, `port/repo
 ## Protected business rules
 
 - An equipment unit is a physical asset; tool images are independent offer records.
-- Reservations contain distinct units from one supplier and one currency. Calendar dates are inclusive: October 14–15 bills two days; the same day bills one.
+- Reservations contain distinct units from one supplier and one currency. Calendar dates are inclusive: October 14â€“15 bills two days; the same day bills one.
 - Pending requests do not occupy inventory. Confirmation checks availability and saves frozen rates inside one transaction with ordered locks. Shared endpoints overlap.
 - Reservation-item writes belong to reservation operations. Read-only item endpoints cannot change confirmed rates.
 - Rejection accepts pending requests. Cancellation accepts pending/confirmed requests before a rental exists. Terminal states reject further changes.
@@ -114,6 +114,7 @@ The optional manual dataset is `infrastructure/src/main/resources/db/seed/demo-d
 - [Backend architecture](docs/backend-architecture.md)
 - [Development guide](docs/development-guide.md)
 - [Infrastructure structure](infrastructure/STRUCTURE.md)
+- [Source package map and relocated catalog/identity files](docs/source-package-map.md)
 - [REST API](docs/rest-api.md)
 - [Validation report](docs/validation-report.md)
 - [Database follow-up](docs/pendientes-base-datos.md)
