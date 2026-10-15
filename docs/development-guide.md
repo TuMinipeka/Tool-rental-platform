@@ -156,3 +156,11 @@ ArchUnit checks dependency direction and core hierarchies. Spotless checks Java 
 ## Table-aligned contexts
 
 Use the 18 contexts listed in README. Port adapters belong directly in `adapters/out/persistence`; only Spring Data interfaces belong in its `repository` child. Preserve shared/composite keys instead of creating surrogate IDs. Reservation-item and invoice-item writes remain inside their owner operation. Run PostgreSQL integration tests as part of verification; an explicit isolated test database may replace Docker, never the database assertions.
+
+## Line endings and editor diagnostics
+
+Java source files use LF line endings on every operating system. `.gitattributes` enforces LF for Java checkouts, `.editorconfig` declares the editor convention, and the root Spotless configuration explicitly selects UNIX line endings. Windows `.cmd` scripts retain CRLF.
+
+If Spotless reports a diff containing only `\r\n` versus `\n`, run `mvnw.cmd spotless:apply` followed by `mvnw.cmd spotless:check`. This is a formatting failure, not a Java syntax error. If the command succeeds but the editor still shows old diagnostics, save the files and reload Maven projects; in VS Code, use `Java: Clean Java Language Server Workspace` if reloading does not clear them.
+
+The former `catalog` package was split into `category`, `tool`, `toolimage`, and `equipmentunit` under the existing three modules. Its classes were relocated to those contexts; inspect their new package paths instead of the old empty directory.
