@@ -1,12 +1,8 @@
 package com.toolrental.infrastructure.tool.adapters.out.persistence.entity;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.LinkedHashSet;
@@ -35,16 +31,14 @@ public class ToolJpaEntity {
   @Column(name = "current_daily_rate", nullable = false, precision = 19, scale = 4)
   private BigDecimal currentDailyRate;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "rate_currency", nullable = false, length = 3)
   private String rateCurrency;
 
   @Column(name = "publication_status", nullable = false, length = 20)
   private String publicationStatus;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "tool_images", joinColumns = @JoinColumn(name = "tool_id"))
-  @Column(name = "image_url", nullable = false, length = 2048)
-  private Set<String> imageUrls = new LinkedHashSet<>();
+  @jakarta.persistence.Transient private Set<String> imageUrls = new LinkedHashSet<>();
 
   protected ToolJpaEntity() {}
 

@@ -1,18 +1,18 @@
 package com.toolrental.application.reservation.usecase;
 
 import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
-import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
-import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
 import com.toolrental.application.reservation.command.RequestReservationCommand;
 import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.application.reservation.exception.CustomerNotFoundApplicationException;
-import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
-import com.toolrental.domain.tool.port.repository.ToolRepository;
+import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
+import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
 import java.time.Clock;
 import java.util.Objects;
 
@@ -55,7 +55,7 @@ public final class RequestReservationUseCase {
                     throw new BusinessRuleException("Equipment unit is not rentable");
                   if (!participants.isSupplierActive(h.supplierId()))
                     throw new SupplierNotFoundApplicationException(h.supplierId());
-                  return new ReservationItem(id, h.supplierId(), h.dailyRate());
+                  return new ReservationLine(id, h.supplierId(), h.dailyRate());
                 })
             .toList();
     var reservation = Reservation.request(c.customerId(), c.period(), items, clock);

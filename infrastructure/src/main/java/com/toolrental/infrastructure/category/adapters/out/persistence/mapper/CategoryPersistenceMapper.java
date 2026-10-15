@@ -8,10 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class CategoryPersistenceMapper {
   public Category toDomain(CategoryJpaEntity entity) {
-    return Category.restore(new CategoryId(entity.getId()), entity.getName(), entity.getDescription());
+    return Category.restore(
+        new CategoryId(entity.getId()), entity.getName(), entity.getDescription());
   }
 
   public CategoryJpaEntity toEntity(Category aggregate) {
-    var entity = new CategoryJpaEntity(aggregate.id().value(), aggregate.name()); entity.preserveDescription(aggregate.description()); return entity;
+    var entity = new CategoryJpaEntity(aggregate.id().value(), aggregate.name());
+    entity.preserveDescription(aggregate.description());
+    return entity;
   }
 }

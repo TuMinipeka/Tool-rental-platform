@@ -1,12 +1,11 @@
 package com.toolrental.infrastructure.common.adapters.out.persistence;
+
+import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import com.toolrental.infrastructure.customer.adapters.out.persistence.repository.CustomerJpaRepository;
 import com.toolrental.infrastructure.supplier.adapters.out.persistence.repository.SupplierJpaRepository;
 import com.toolrental.infrastructure.user.adapters.out.persistence.repository.UserJpaRepository;
-
-
-import com.toolrental.domain.common.model.valueobject.CustomerId;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
-import com.toolrental.domain.common.port.ParticipantsPort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

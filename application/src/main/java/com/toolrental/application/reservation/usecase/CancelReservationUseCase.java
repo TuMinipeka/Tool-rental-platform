@@ -1,8 +1,7 @@
 package com.toolrental.application.reservation.usecase;
 
 import com.toolrental.application.reservation.dto.ReservationResponse;
-import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import java.time.Clock;
@@ -25,7 +24,8 @@ public final class CancelReservationUseCase {
             context -> {
               var r = context.reservation();
               if (!r.customerId().equals(actor) || !context.isCustomerActive(actor))
-                throw new BusinessRuleException("Customer is not authorized");
+                throw new com.toolrental.application.common.exception
+                    .AccessDeniedApplicationException();
               r.cancel(clock);
               return r;
             }));

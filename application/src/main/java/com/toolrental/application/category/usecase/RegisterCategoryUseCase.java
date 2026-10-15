@@ -18,8 +18,8 @@ public final class RegisterCategoryUseCase {
   }
 
   public CategoryResponse execute(RegisterCategoryCommand command) {
-    var category = Category.register(command.name(), clock);
-    if (repository.findAll().stream().anyMatch(c -> c.name().equals(category.name())))
+    var category = Category.register(command.name(), command.description(), clock);
+    if (repository.findAll().stream().anyMatch(c -> c.name().equalsIgnoreCase(category.name())))
       throw new BusinessRuleException("Category name already exists");
     repository.save(category);
     return CategoryResponse.from(category);

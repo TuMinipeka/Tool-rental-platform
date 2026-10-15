@@ -2,17 +2,17 @@ package com.toolrental.domain.reservation.model.aggregate;
 
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.model.AggregateRoot;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.reservation.event.ReservationCancelled;
 import com.toolrental.domain.reservation.event.ReservationConfirmed;
 import com.toolrental.domain.reservation.event.ReservationRejected;
 import com.toolrental.domain.reservation.event.ReservationRequested;
-import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashSet;
@@ -24,14 +24,14 @@ public final class Reservation extends AggregateRoot {
   private final ReservationId id;
   private final CustomerId customerId;
   private final ReservationPeriod period;
-  private final List<ReservationItem> items;
+  private final List<ReservationLine> items;
   private final Instant createdAt;
   private ReservationStatus status = ReservationStatus.PENDING;
   private ReservationConfirmed confirmation;
- private Instant expiresAt;
+  private Instant expiresAt;
 
   private Reservation(
-      CustomerId customer, ReservationPeriod period, List<ReservationItem> items, Clock clock) {
+      CustomerId customer, ReservationPeriod period, List<ReservationLine> items, Clock clock) {
     id = ReservationId.generate();
     customerId = Objects.requireNonNull(customer);
     this.period = Objects.requireNonNull(period);
@@ -39,7 +39,7 @@ public final class Reservation extends AggregateRoot {
     createdAt = Instant.now(clock);
   }
 
-  private static List<ReservationItem> validate(List<ReservationItem> items) {
+  private static List<ReservationLine> validate(List<ReservationLine> items) {
     var copy = List.copyOf(items);
     if (copy.isEmpty())
       throw new BusinessRuleException("A reservation requires at least one equipment unit");
@@ -57,23 +57,23 @@ public final class Reservation extends AggregateRoot {
   }
 
   public static Reservation request(
-      CustomerId customer, ReservationPeriod period, List<ReservationItem> items, Clock clock) {
+      CustomerId customer, ReservationPeriod period, List<ReservationLine> items, Clock clock) {
     var reservation = new Reservation(customer, period, items, clock);
     reservation.recordEvent(new ReservationRequested(reservation.id, reservation.createdAt));
     return reservation;
   }
 
   /** Returns a confirmed copy so the atomic port can replace the pending version on commit. */
-  public Reservation confirmWithRates(List<ReservationItem> currentRates, Clock clock) {
+  public Reservation confirmWithRates(List<ReservationLine> currentRates, Clock clock) {
     requirePending();
     var currentItems = validate(currentRates);
     var ids =
         items.stream()
-            .map(ReservationItem::equipmentUnitId)
+            .map(ReservationLine::equipmentUnitId)
             .collect(java.util.stream.Collectors.toSet());
     if (!ids.equals(
             currentItems.stream()
-                .map(ReservationItem::equipmentUnitId)
+                .map(ReservationLine::equipmentUnitId)
                 .collect(java.util.stream.Collectors.toSet()))
         || !supplierId().equals(currentItems.getFirst().supplierId()))
       throw new BusinessRuleException("Confirmation cannot change units or supplier");
@@ -91,7 +91,7 @@ public final class Reservation extends AggregateRoot {
 
   private Reservation(
       Reservation original,
-      List<ReservationItem> currentItems,
+      List<ReservationLine> currentItems,
       ReservationStatus status,
       ReservationConfirmed confirmation) {
     expiresAt = original.expiresAt;
@@ -113,7 +113,7 @@ public final class Reservation extends AggregateRoot {
       ReservationId id,
       CustomerId customer,
       ReservationPeriod period,
-      List<ReservationItem> items,
+      List<ReservationLine> items,
       Instant createdAt,
       ReservationStatus status,
       Instant confirmedAt) {
@@ -124,7 +124,7 @@ public final class Reservation extends AggregateRoot {
       ReservationId id,
       CustomerId customer,
       ReservationPeriod period,
-      List<ReservationItem> items,
+      List<ReservationLine> items,
       Instant createdAt,
       ReservationStatus status,
       Instant confirmedAt) {
@@ -143,10 +143,24 @@ public final class Reservation extends AggregateRoot {
     this.confirmation = confirmedAt == null ? null : new ReservationConfirmed(id, confirmedAt);
   }
 
-  public static Reservation restore(ReservationId id, CustomerId customer, ReservationPeriod period, List<ReservationItem> items, Instant createdAt, ReservationStatus status, Instant confirmedAt, Instant expiresAt) {
-    var result = new Reservation(id, customer, period, items, createdAt, status, confirmedAt); result.expiresAt = expiresAt; return result;
+  public static Reservation restore(
+      ReservationId id,
+      CustomerId customer,
+      ReservationPeriod period,
+      List<ReservationLine> items,
+      Instant createdAt,
+      ReservationStatus status,
+      Instant confirmedAt,
+      Instant expiresAt) {
+    var result = new Reservation(id, customer, period, items, createdAt, status, confirmedAt);
+    result.expiresAt = expiresAt;
+    return result;
   }
-  public Instant expiresAt() { return expiresAt; }
+
+  public Instant expiresAt() {
+    return expiresAt;
+  }
+
   public void reject(Clock clock) {
     requirePending();
     var event = new ReservationRejected(id, Instant.now(clock));
@@ -189,7 +203,7 @@ public final class Reservation extends AggregateRoot {
     return period;
   }
 
-  public List<ReservationItem> items() {
+  public List<ReservationLine> items() {
     return items;
   }
 

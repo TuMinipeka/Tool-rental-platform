@@ -31,4 +31,8 @@ public interface EquipmentUnitJpaRepository extends JpaRepository<EquipmentUnitJ
           + "and lower(equipmentUnit.inventoryCode) = lower(:inventoryCode)")
   long countBySupplierAndInventoryCode(
       @Param("supplierId") UUID supplierId, @Param("inventoryCode") String inventoryCode);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select unit from EquipmentUnitJpaEntity unit where unit.id=:id")
+  java.util.Optional<EquipmentUnitJpaEntity> findByIdForUpdate(@Param("id") UUID id);
 }

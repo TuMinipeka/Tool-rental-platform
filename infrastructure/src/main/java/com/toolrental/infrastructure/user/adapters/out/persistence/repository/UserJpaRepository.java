@@ -4,6 +4,7 @@ import com.toolrental.infrastructure.user.adapters.out.persistence.entity.UserJp
 import jakarta.persistence.LockModeType;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -11,9 +12,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
-  @Query(
-      "select account from UserJpaEntity account where account.id in :ids order by account.id")
+  @Query("select account from UserJpaEntity account where account.id in :ids order by account.id")
   List<UserJpaEntity> findAllByIdForUpdate(@Param("ids") Collection<UUID> ids);
 
   @Query(
@@ -31,4 +32,8 @@ public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
           """,
       nativeQuery = true)
   boolean hasActiveRole(@Param("userId") UUID userId, @Param("roleCode") String roleCode);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select row from UserJpaEntity row where row.id = :id")
+  Optional<UserJpaEntity> findLocked(@Param("id") UUID id);
 }

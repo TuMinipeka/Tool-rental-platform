@@ -1,18 +1,17 @@
 package com.toolrental.infrastructure.category.adapters.out.persistence;
-import com.toolrental.infrastructure.category.adapters.out.persistence.repository.CategoryJpaRepository;
-
 
 import com.toolrental.domain.category.model.aggregate.Category;
 import com.toolrental.domain.category.model.valueobject.CategoryId;
 import com.toolrental.domain.category.port.repository.CategoryRepository;
 import com.toolrental.infrastructure.category.adapters.out.persistence.mapper.CategoryPersistenceMapper;
+import com.toolrental.infrastructure.category.adapters.out.persistence.repository.CategoryJpaRepository;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional(readOnly = true)
+@Transactional
 public class CategoryPersistenceAdapter implements CategoryRepository {
   private final CategoryJpaRepository repository;
   private final CategoryPersistenceMapper mapper;
@@ -25,12 +24,17 @@ public class CategoryPersistenceAdapter implements CategoryRepository {
 
   @Override
   public Optional<Category> findById(CategoryId id) {
-    return repository.findById(id.value()).map(mapper::toDomain);
+    return repository.findByIdForUpdate(id.value()).map(mapper::toDomain);
   }
 
   @Override
   public List<Category> findAll() {
     return repository.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  public void delete(CategoryId id) {
+    repository.deleteById(id.value());
+    repository.flush();
   }
 
   @Override

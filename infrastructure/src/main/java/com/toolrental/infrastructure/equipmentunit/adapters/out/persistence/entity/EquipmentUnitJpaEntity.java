@@ -22,14 +22,28 @@ public class EquipmentUnitJpaEntity {
   @Column(name = "operational_status", nullable = false, length = 20)
   private String operationalStatus;
 
- @Column(name="serial_number", length=160)
- private String serialNumber;
- public String getSerialNumber() { return serialNumber; }
- public void preserveSerialNumber(String value) { serialNumber = value; }
- @Column(name="current_condition", length=40)
- private String currentCondition = "GOOD";
- public String getCurrentCondition() { return currentCondition; }
- public void preserveCurrentCondition(String value) { currentCondition = value; }
+  @Column(name = "serial_number", length = 160)
+  private String serialNumber;
+
+  public String getSerialNumber() {
+    return serialNumber;
+  }
+
+  public void preserveSerialNumber(String value) {
+    serialNumber = value;
+  }
+
+  @Column(name = "current_condition", length = 40)
+  private String currentCondition = "GOOD";
+
+  public String getCurrentCondition() {
+    return currentCondition;
+  }
+
+  public void preserveCurrentCondition(String value) {
+    currentCondition = value;
+  }
+
   protected EquipmentUnitJpaEntity() {}
 
   public EquipmentUnitJpaEntity(

@@ -1,0 +1,16 @@
+package com.toolrental.domain.user.port.repository;
+
+import com.toolrental.domain.user.model.aggregate.User;
+import com.toolrental.domain.user.model.valueobject.UserId;
+import java.util.List;
+import java.util.Optional;
+
+public interface UserRepository {
+  Optional<User> findById(UserId id);
+
+  List<User> findAll();
+
+  User save(User value);
+
+  void delete(UserId id);
+}

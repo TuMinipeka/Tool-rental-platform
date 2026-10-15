@@ -16,10 +16,17 @@ public class CategoryJpaEntity {
   @Column(name = "name", nullable = false, length = 120)
   private String name;
 
- @Column(name="description", length=500)
- private String description;
- public String getDescription() { return description; }
- public void preserveDescription(String value) { description = value; }
+  @Column(name = "description", length = 500)
+  private String description;
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void preserveDescription(String value) {
+    description = value;
+  }
+
   protected CategoryJpaEntity() {}
 
   public CategoryJpaEntity(UUID id, String name) {

@@ -1,29 +1,28 @@
 package com.toolrental.infrastructure.reservation.adapters.out.persistence;
-import com.toolrental.infrastructure.reservation.adapters.out.persistence.repository.ReservationJpaRepository;
 
-
-import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.tool.model.aggregate.Tool;
-import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.entity.EquipmentUnitJpaEntity;
-import com.toolrental.infrastructure.tool.adapters.out.persistence.entity.ToolJpaEntity;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.mapper.EquipmentUnitPersistenceMapper;
-import com.toolrental.infrastructure.tool.adapters.out.persistence.mapper.ToolPersistenceMapper;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.repository.EquipmentUnitJpaRepository;
-import com.toolrental.infrastructure.tool.adapters.out.persistence.repository.ToolJpaRepository;
-import com.toolrental.infrastructure.user.adapters.out.persistence.repository.UserJpaRepository;
 import com.toolrental.infrastructure.reservation.adapters.out.persistence.entity.ReservationJpaEntity;
 import com.toolrental.infrastructure.reservation.adapters.out.persistence.mapper.ReservationPersistenceMapper;
+import com.toolrental.infrastructure.reservation.adapters.out.persistence.repository.ReservationJpaRepository;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.entity.ToolJpaEntity;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.mapper.ToolPersistenceMapper;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.repository.ToolJpaRepository;
+import com.toolrental.infrastructure.user.adapters.out.persistence.repository.UserJpaRepository;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -39,7 +38,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReservationPersistenceAdapter
     implements ReservationRepository, AtomicReservationManagement {
+  @jakarta.persistence.PersistenceContext private jakarta.persistence.EntityManager entityManager;
   private final ReservationJpaRepository reservations;
+  private final com.toolrental.infrastructure.reservationitem.adapters.out.persistence.repository
+          .ReservationItemJpaRepository
+      items;
   private final EquipmentUnitJpaRepository equipmentUnits;
   private final ToolJpaRepository tools;
   private final UserJpaRepository accounts;
@@ -49,6 +52,9 @@ public class ReservationPersistenceAdapter
   private final ToolPersistenceMapper toolMapper;
 
   public ReservationPersistenceAdapter(
+      com.toolrental.infrastructure.reservationitem.adapters.out.persistence.repository
+              .ReservationItemJpaRepository
+          items,
       ReservationJpaRepository reservations,
       EquipmentUnitJpaRepository equipmentUnits,
       ToolJpaRepository tools,
@@ -58,6 +64,7 @@ public class ReservationPersistenceAdapter
       EquipmentUnitPersistenceMapper equipmentUnitMapper,
       ToolPersistenceMapper toolMapper) {
     this.reservations = reservations;
+    this.items = items;
     this.equipmentUnits = equipmentUnits;
     this.tools = tools;
     this.accounts = accounts;
@@ -70,13 +77,15 @@ public class ReservationPersistenceAdapter
   @Override
   @Transactional
   public void addRequest(Reservation reservation) {
-    reservations.saveAndFlush(reservationMapper.toEntity(reservation));
+    saveWithItems(reservation);
   }
 
   @Override
+  @Transactional
   public Optional<Reservation> findById(ReservationId id) {
     return reservations
-        .findById(id.value())
+        .findByIdForUpdate(id.value())
+        .map(this::hydrate)
         .map(entity -> reservationMapper.toDomain(entity, loadSupplierIds(entity)));
   }
 
@@ -86,8 +95,12 @@ public class ReservationPersistenceAdapter
     var reservationEntity =
         reservations
             .findByIdForUpdate(id.value())
-            .orElseThrow(() -> new BusinessRuleException("Reservation does not exist"));
+            .orElseThrow(
+                () ->
+                    new com.toolrental.application.reservation.exception
+                        .ReservationNotFoundApplicationException(id));
 
+    hydrate(reservationEntity);
     var equipmentUnitIds =
         reservationEntity.getItems().stream()
             .map(item -> item.getEquipmentUnitId())
@@ -122,8 +135,29 @@ public class ReservationPersistenceAdapter
         new PersistenceContext(
             reservation, equipmentUnitEntities, toolEntities, participants, reservations);
     var result = operation.apply(context);
-    reservations.saveAndFlush(reservationMapper.toEntity(result));
+    if (result.status()
+            == com.toolrental.domain.reservation.model.valueobject.ReservationStatus.CANCELLED
+        && entityManager
+                .createNativeQuery("select count(*) from rentals where reservation_id=:id")
+                .setParameter("id", id.value())
+                .getSingleResult()
+            instanceof Number count
+        && count.longValue() > 0)
+      throw new BusinessRuleException("A reservation with a rental cannot be cancelled");
+    saveWithItems(result);
     return result;
+  }
+
+  private ReservationJpaEntity hydrate(ReservationJpaEntity entity) {
+    entity.attachItems(new java.util.LinkedHashSet<>(items.findByIdReservationId(entity.getId())));
+    return entity;
+  }
+
+  private void saveWithItems(Reservation reservation) {
+    var entity = reservationMapper.toEntity(reservation);
+    reservations.saveAndFlush(entity);
+    items.saveAll(entity.getItems());
+    items.flush();
   }
 
   private Map<UUID, UUID> loadSupplierIds(ReservationJpaEntity reservation) {

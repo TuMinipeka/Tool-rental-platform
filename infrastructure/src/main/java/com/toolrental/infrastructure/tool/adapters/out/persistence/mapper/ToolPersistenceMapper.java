@@ -1,10 +1,10 @@
 package com.toolrental.infrastructure.tool.adapters.out.persistence.mapper;
 
-import com.toolrental.domain.tool.model.aggregate.Tool;
 import com.toolrental.domain.category.model.valueobject.CategoryId;
-import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.infrastructure.tool.adapters.out.persistence.entity.ToolJpaEntity;
 import java.net.URI;
 import java.util.Currency;
@@ -13,6 +13,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ToolPersistenceMapper {
+  private final com.toolrental.infrastructure.toolimage.adapters.out.persistence.repository
+          .ToolImageJpaRepository
+      images;
+
+  public ToolPersistenceMapper(
+      com.toolrental.infrastructure.toolimage.adapters.out.persistence.repository
+              .ToolImageJpaRepository
+          images) {
+    this.images = images;
+  }
+
   private static final String PUBLISHED = "PUBLISHED";
   private static final String UNPUBLISHED = "UNPUBLISHED";
 
@@ -24,7 +35,9 @@ public class ToolPersistenceMapper {
         entity.getName(),
         entity.getDescription(),
         new Money(entity.getCurrentDailyRate(), Currency.getInstance(entity.getRateCurrency())),
-        entity.getImageUrls().stream().map(URI::create).collect(Collectors.toUnmodifiableSet()),
+        images.findByIdToolId(entity.getId()).stream()
+            .map(image -> URI.create(image.getId().getImageUrl()))
+            .collect(Collectors.toUnmodifiableSet()),
         PUBLISHED.equals(entity.getPublicationStatus()));
   }
 

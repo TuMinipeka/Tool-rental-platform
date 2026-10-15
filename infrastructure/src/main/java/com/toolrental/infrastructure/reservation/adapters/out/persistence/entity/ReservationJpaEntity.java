@@ -1,12 +1,8 @@
 package com.toolrental.infrastructure.reservation.adapters.out.persistence.entity;
 
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -36,20 +32,30 @@ public class ReservationJpaEntity {
   @Column(name = "reservation_status", nullable = false, length = 20)
   private String reservationStatus;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "currency", nullable = false, length = 3, updatable = false)
   private String currency;
 
   @Column(name = "confirmed_at")
   private Instant confirmedAt;
 
-  @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "reservation_items", joinColumns = @JoinColumn(name = "reservation_id"))
-  private Set<ReservationItemJpaEmbeddable> items = new LinkedHashSet<>();
+  @jakarta.persistence.Transient
+  private Set<
+          com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity
+              .ReservationItemJpaEntity>
+      items = new LinkedHashSet<>();
 
- @Column(name="expires_at")
- private Instant expiresAt;
- public Instant getExpiresAt() { return expiresAt; }
- public void preserveExpiresAt(Instant value) { expiresAt = value; }
+  @Column(name = "expires_at")
+  private Instant expiresAt;
+
+  public Instant getExpiresAt() {
+    return expiresAt;
+  }
+
+  public void preserveExpiresAt(Instant value) {
+    expiresAt = value;
+  }
+
   protected ReservationJpaEntity() {}
 
   public ReservationJpaEntity(
@@ -61,7 +67,10 @@ public class ReservationJpaEntity {
       String reservationStatus,
       String currency,
       Instant confirmedAt,
-      Set<ReservationItemJpaEmbeddable> items) {
+      Set<
+              com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity
+                  .ReservationItemJpaEntity>
+          items) {
     this.id = id;
     this.customerId = customerId;
     this.createdAt = createdAt;
@@ -71,6 +80,14 @@ public class ReservationJpaEntity {
     this.currency = currency;
     this.confirmedAt = confirmedAt;
     this.items = new LinkedHashSet<>(items);
+  }
+
+  public void attachItems(
+      Set<
+              com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity
+                  .ReservationItemJpaEntity>
+          values) {
+    items = new LinkedHashSet<>(values);
   }
 
   public UUID getId() {
@@ -105,7 +122,10 @@ public class ReservationJpaEntity {
     return confirmedAt;
   }
 
-  public Set<ReservationItemJpaEmbeddable> getItems() {
+  public Set<
+          com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity
+              .ReservationItemJpaEntity>
+      getItems() {
     return Set.copyOf(items);
   }
 }

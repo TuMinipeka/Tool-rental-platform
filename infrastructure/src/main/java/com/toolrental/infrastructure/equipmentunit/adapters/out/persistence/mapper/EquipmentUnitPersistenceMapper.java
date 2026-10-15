@@ -14,14 +14,20 @@ public class EquipmentUnitPersistenceMapper {
         new EquipmentUnitId(entity.getId()),
         new ToolId(entity.getToolId()),
         entity.getInventoryCode(),
-        OperationalStatus.valueOf(entity.getOperationalStatus()), entity.getSerialNumber(), entity.getCurrentCondition());
+        OperationalStatus.valueOf(entity.getOperationalStatus()),
+        entity.getSerialNumber(),
+        entity.getCurrentCondition());
   }
 
   public EquipmentUnitJpaEntity toEntity(EquipmentUnit aggregate) {
-    var entity = new EquipmentUnitJpaEntity(
-        aggregate.id().value(),
-        aggregate.toolId().value(),
-        aggregate.inventoryCode(),
-        aggregate.status().name()); entity.preserveSerialNumber(aggregate.serialNumber()); entity.preserveCurrentCondition(aggregate.currentCondition()); return entity;
+    var entity =
+        new EquipmentUnitJpaEntity(
+            aggregate.id().value(),
+            aggregate.toolId().value(),
+            aggregate.inventoryCode(),
+            aggregate.status().name());
+    entity.preserveSerialNumber(aggregate.serialNumber());
+    entity.preserveCurrentCondition(aggregate.currentCondition());
+    return entity;
   }
 }

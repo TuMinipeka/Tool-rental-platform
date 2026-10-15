@@ -6,8 +6,14 @@ import com.toolrental.domain.equipmentunit.model.valueobject.OperationalStatus;
 import com.toolrental.domain.tool.model.valueobject.ToolId;
 
 public record EquipmentUnitResponse(
-    EquipmentUnitId id, ToolId toolId, String inventoryCode, OperationalStatus status) {
+    EquipmentUnitId id,
+    ToolId toolId,
+    String inventoryCode,
+    OperationalStatus status,
+    String serialNumber,
+    String currentCondition) {
   public static EquipmentUnitResponse from(EquipmentUnit c) {
-    return new EquipmentUnitResponse(c.id(), c.toolId(), c.inventoryCode(), c.status());
+    return new EquipmentUnitResponse(
+        c.id(), c.toolId(), c.inventoryCode(), c.status(), c.serialNumber(), c.currentCondition());
   }
 }

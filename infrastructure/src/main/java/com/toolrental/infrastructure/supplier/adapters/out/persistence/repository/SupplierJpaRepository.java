@@ -9,9 +9,13 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface SupplierJpaRepository
-    extends JpaRepository<SupplierJpaEntity, UUID> {
+public interface SupplierJpaRepository extends JpaRepository<SupplierJpaEntity, UUID> {
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select supplier from SupplierJpaEntity supplier where supplier.id = :id")
   Optional<SupplierJpaEntity> findByIdForUpdate(@Param("id") UUID id);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("select row from SupplierJpaEntity row where row.id = :id")
+  Optional<SupplierJpaEntity> findLocked(@Param("id") UUID id);
 }

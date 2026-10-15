@@ -10,5 +10,7 @@ public interface CategoryRepository {
 
   List<Category> findAll();
 
+  void delete(CategoryId id);
+
   void save(Category aggregate);
 }

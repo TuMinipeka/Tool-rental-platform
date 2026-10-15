@@ -1,16 +1,15 @@
 package com.toolrental.infrastructure.equipmentunit.adapters.out.persistence;
-import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.repository.EquipmentUnitJpaRepository;
-import com.toolrental.infrastructure.tool.adapters.out.persistence.repository.ToolJpaRepository;
 
-
+import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.equipmentunit.port.repository.AtomicEquipmentUnitRegistration;
 import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
-import com.toolrental.domain.common.exception.BusinessRuleException;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.mapper.EquipmentUnitPersistenceMapper;
+import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.repository.EquipmentUnitJpaRepository;
 import com.toolrental.infrastructure.supplier.adapters.out.persistence.repository.SupplierJpaRepository;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.repository.ToolJpaRepository;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional(readOnly = true)
+@Transactional
 public class EquipmentUnitPersistenceAdapter
     implements EquipmentUnitRepository, AtomicEquipmentUnitRegistration {
   private final EquipmentUnitJpaRepository equipmentUnits;
@@ -39,7 +38,7 @@ public class EquipmentUnitPersistenceAdapter
 
   @Override
   public Optional<EquipmentUnit> findById(EquipmentUnitId id) {
-    return equipmentUnits.findById(id.value()).map(mapper::toDomain);
+    return equipmentUnits.findByIdForUpdate(id.value()).map(mapper::toDomain);
   }
 
   @Override

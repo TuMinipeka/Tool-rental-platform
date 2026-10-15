@@ -1,10 +1,10 @@
 package com.toolrental.application.tool.dto;
 
-import com.toolrental.domain.tool.model.aggregate.Tool;
 import com.toolrental.domain.category.model.valueobject.CategoryId;
-import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import java.net.URI;
 import java.util.Set;
 

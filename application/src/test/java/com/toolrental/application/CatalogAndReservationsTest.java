@@ -3,15 +3,11 @@ package com.toolrental.application;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.toolrental.application.category.command.RegisterCategoryCommand;
-import com.toolrental.application.equipmentunit.command.RegisterEquipmentUnitCommand;
-import com.toolrental.application.tool.command.RegisterToolCommand;
 import com.toolrental.application.category.exception.CategoryNotFoundApplicationException;
-import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
-import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
-import com.toolrental.application.tool.usecase.QueryCatalogUseCase;
 import com.toolrental.application.category.usecase.RegisterCategoryUseCase;
+import com.toolrental.application.equipmentunit.command.RegisterEquipmentUnitCommand;
+import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
 import com.toolrental.application.equipmentunit.usecase.RegisterEquipmentUnitUseCase;
-import com.toolrental.application.tool.usecase.RegisterToolUseCase;
 import com.toolrental.application.reservation.command.RequestReservationCommand;
 import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.application.reservation.exception.CustomerNotFoundApplicationException;
@@ -19,15 +15,19 @@ import com.toolrental.application.reservation.usecase.CancelReservationUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.application.reservation.usecase.RejectReservationUseCase;
 import com.toolrental.application.reservation.usecase.RequestReservationUseCase;
+import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
+import com.toolrental.application.tool.command.RegisterToolCommand;
+import com.toolrental.application.tool.usecase.QueryCatalogUseCase;
+import com.toolrental.application.tool.usecase.RegisterToolUseCase;
 import com.toolrental.domain.category.model.valueobject.CategoryId;
-import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -208,8 +208,12 @@ class CatalogAndReservationsTest {
   @Test
   void rejectAndCancelValidateActorAndStatus() {
     var r = request(equipmentUnit);
-    assertThrows(BusinessRuleException.class, () -> confirm.execute(r.id(), SupplierId.generate()));
-    assertThrows(BusinessRuleException.class, () -> cancel.execute(r.id(), CustomerId.generate()));
+    assertThrows(
+        com.toolrental.application.common.exception.AccessDeniedApplicationException.class,
+        () -> confirm.execute(r.id(), SupplierId.generate()));
+    assertThrows(
+        com.toolrental.application.common.exception.AccessDeniedApplicationException.class,
+        () -> cancel.execute(r.id(), CustomerId.generate()));
     assertEquals(ReservationStatus.REJECTED, reject.execute(r.id(), supplier).status());
     assertThrows(BusinessRuleException.class, () -> cancel.execute(r.id(), customer));
     assertThrows(BusinessRuleException.class, () -> confirm.execute(r.id(), supplier));

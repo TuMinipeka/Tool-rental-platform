@@ -17,8 +17,8 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
 
   @Query(
       "select (count(reservation) > 0) from ReservationJpaEntity reservation "
-          + "join reservation.items item "
-          + "where item.equipmentUnitId = :equipmentUnitId "
+          + "join ReservationItemJpaEntity item on item.id.reservationId = reservation.id "
+          + "where item.id.equipmentUnitId = :equipmentUnitId "
           + "and reservation.id <> :excludedReservationId "
           + "and reservation.reservationStatus = 'CONFIRMED' "
           + "and reservation.startDate <= :returnDate "
