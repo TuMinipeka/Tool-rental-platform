@@ -1,35 +1,49 @@
-# Tool Rental Platform
+# Plataforma de alquiler de herramientas
 
-Java 21 backend for construction-equipment rentals, with three Maven modules, hexagonal architecture, PostgreSQL, Flyway, JPA, and REST. Business rules remain independent of Spring and persistence.
+Plataforma para alquilar herramientas y equipos de construcción, construida con Java 21, arquitectura hexagonal y diseño guiado por el dominio. Las reglas de negocio permanecen independientes de Spring, JPA, HTTP y los detalles de persistencia.
 
-## Current delivery
+## Estado actual
 
-The 18 existing database tables have corresponding domain, application, and infrastructure contexts. REST supports identity administration, catalog management, reservation transitions, rental execution, delivery/return records, damage assessment, manual payment records, and invoice snapshots.
+Las 18 tablas base cuentan con contextos de dominio, aplicación e infraestructura. El backend ofrece operaciones REST para identidad, catálogo, reservas, alquileres, entregas, devoluciones, daños, pagos manuales y facturas con instantáneas históricas. PostgreSQL, Flyway, JPA y las operaciones críticas de reserva y facturación se validan con pruebas de integración y concurrencia.
 
-Authentication/JWT, a payment gateway, tax calculations, protection/evidence/consent extensions, OpenAPI, and frontend integration remain future work. Existing product-scope decisions are preserved; this delivery does not implement their unresolved commercial calculations.
+También existe una base de frontend con React y JavaScript, todavía sin integrar con la API. Continúan pendientes JWT, OpenAPI/Swagger, la pasarela simulada de pagos, impuestos, protección, evidencias, consentimientos, reportes y los recorridos funcionales del frontend.
 
-## Conceptual model
+## Tecnologías
 
-![Conceptual entity-relationship model](docs/diagrams/conceptual-er-model.svg)
+| Componente | Elección |
+| --- | --- |
+| Backend | Java 21 y Spring Boot 3.5.16 |
+| Construcción | Maven multimódulo y Maven Wrapper 3.9.9 |
+| Arquitectura | Hexagonal y DDD |
+| Persistencia | PostgreSQL (Docker 17.11; validación local 18.6), Spring Data JPA, Hibernate y Flyway |
+| API | REST con validación y control de acceso mediante `Principal`; JWT y OpenAPI pendientes |
+| Pruebas | JUnit 5, Spring Boot Test, ArchUnit y Testcontainers |
+| Formato | Spotless 2.43.0 con Google Java Format 1.27.0 |
+| Frontend | React 19.3.1 con JavaScript y Vite 8.3.4 |
 
-[Editable Excalidraw diagram](docs/diagrams/conceptual-er-model.excalidraw) · [Conceptual model](docs/conceptual-model.md) · [Fourth normal form](docs/fourth-normal-form.md)
+El [enunciado original](ejercicioDemo.md) solicitaba MySQL. PostgreSQL lo reemplaza por decisión explícita del proyecto.
 
-The diagram retains the base 18 entities and their cardinalities. The [original assignment](ejercicioDemo.md) is preserved; PostgreSQL replaces its MySQL requirement by explicit project decision.
+## Modelo conceptual
 
-## Architecture
+![Modelo conceptual entidad-relación](docs/diagrams/conceptual-er-model.svg)
+
+Consulta el [archivo editable de Excalidraw](docs/diagrams/conceptual-er-model.excalidraw), el [modelo conceptual](docs/conceptual-model.md) y la [cuarta forma normal](docs/fourth-normal-form.md).
+
+## Arquitectura
 
 ```text
-domain/          # Aggregates, typed identities, invariants, events, and ports
-application/     # Immutable commands/responses and coordinated use cases
-infrastructure/  # REST, JPA entities/mappers/adapters, configuration, Flyway
-docs/            # Model, architecture, API, and delivery documentation
+domain/          # Agregados, objetos de valor, eventos y puertos
+application/     # Comandos, respuestas, excepciones y casos de uso
+infrastructure/  # REST, JPA, configuración y migraciones Flyway
+frontend/        # Aplicación React con JavaScript
+docs/            # Modelo, decisiones y trabajo pendiente
 ```
 
-Dependencies: `infrastructure -> application -> domain`; infrastructure also uses domain ports directly. Java release 21 and Spring Boot 3.5.16 remain centrally configured. Domain and application import only Java and the inner modules.
+La dirección de dependencias es `infrastructure -> application -> domain`. El dominio depende únicamente de Java y la aplicación solo conoce el dominio.
 
-One table per context is this project's organizational convention. It does not permit independent writes that bypass a reservation or invoice transaction. `common` contains shared contracts and is not a nineteenth business context.
+El proyecto usa un contexto por cada una de las 18 tablas existentes como convención organizativa. Esto no convierte automáticamente cada tabla en un agregado independiente ni permite escrituras que evadan las transacciones de reservas y facturas.
 
-| Table | Context | Domain type |
+| Tabla | Contexto | Tipo de dominio |
 | --- | --- | --- |
 | `users` | `user` | `User` |
 | `roles` | `role` | `Role` |
@@ -50,82 +64,105 @@ One table per context is this project's organizational convention. It does not p
 | `invoices` | `invoice` | `Invoice` |
 | `invoice_items` | `invoiceitem` | `InvoiceItem` |
 
-Each context follows `model/aggregate`, `model/valueobject`, `event`, `port/repository`; application uses `command`, `dto`, `exception`, `usecase`. Infrastructure places controllers/DTOs under `adapters/in/rest`, JPA entities/mappers/Spring Data interfaces under `adapters/out/persistence/{entity,mapper,repository}`, and port adapters directly under `adapters/out/persistence`.
+## Reglas implementadas destacadas
 
-## Protected business rules
+- Una unidad de equipo representa un activo físico; las imágenes pertenecen a la oferta de herramienta.
+- Una reserva contiene unidades distintas de un único proveedor y usa una sola moneda.
+- Las fechas son inclusivas y una fecha compartida produce conflicto para la misma unidad.
+- Las solicitudes pendientes no ocupan inventario. La confirmación bloquea y vuelve a validar disponibilidad antes de congelar las tarifas.
+- Las devoluciones requieren una entrega completada y el alquiler solo termina cuando regresan todas sus unidades.
+- Los pagos actuales son registros administrativos; no ejecutan cobros ni reembolsos externos.
+- Las facturas y sus líneas se crean atómicamente y conservan instantáneas históricas del cliente y proveedor.
+- Las contraseñas nuevas se almacenan con BCrypt y nunca se exponen en respuestas.
 
-- An equipment unit is a physical asset; tool images are independent offer records.
-- Reservations contain distinct units from one supplier and one currency. Calendar dates are inclusive: October 14â€“15 bills two days; the same day bills one.
-- Pending requests do not occupy inventory. Confirmation checks availability and saves frozen rates inside one transaction with ordered locks. Shared endpoints overlap.
-- Reservation-item writes belong to reservation operations. Read-only item endpoints cannot change confirmed rates.
-- Rejection accepts pending requests. Cancellation accepts pending/confirmed requests before a rental exists. Terminal states reject further changes.
-- Returns require completed delivery. Rental completion requires every reserved unit to have been returned. A delivered rental cannot be cancelled.
-- Payments are administrative records with positive amounts and explicit processor references. No external charge or refund is executed.
-- Invoice headers and lines are created atomically. Customer/supplier names and documents are historical snapshots; issued lines cannot be edited independently.
-- Identity profiles share their user key. Role assignments and other composite identities preserve the SQL keys. User responses never contain password hashes; new passwords use BCrypt.
+## Límite de autenticación
 
-## Authentication boundary
+Todas las rutas `/api/**` requieren un `Principal` autenticado cuyo nombre sea el UUID del usuario. JWT y el inicio de sesión aún no están implementados, por lo que una petición HTTP anónima recibe `401`. Los casos de uso validan usuario activo, roles, propiedad y participación; ningún `actorId` enviado por el cliente sustituye la identidad autenticada.
 
-All `/api/**` routes require an authenticated `Principal` whose name is a UUID user subject. No authentication mechanism is installed in this delivery, so ordinary anonymous requests receive **401**. Tests inject principals; a request body or custom header cannot substitute for authentication.
+Consulta [API REST](docs/rest-api.md) para ver las rutas y contratos disponibles.
 
-Use cases check active users, ownership, and administrator access. Listing administrative resources requires `ADMIN`; active users can browse categories and published tools. Individual records use their ownership rules. Role codes `ADMIN`, `SUPPLIER`, and `CUSTOMER` are seeded by Flyway. No administrator account or password is seeded automatically.
+## Entorno local con Docker
 
-See [REST API](docs/rest-api.md) for routes, request examples, and error codes.
+Requisitos: JDK 21, Docker con Docker Compose y Node.js 24 para trabajar directamente con el frontend.
 
-## Build and verification
+Crea el archivo local de variables y cambia `POSTGRES_PASSWORD` y `DB_PASSWORD` por el mismo valor:
 
-Requirements: JDK 21 and Docker with a running Linux engine for the default PostgreSQL Testcontainers suite.
+```bash
+cp .env.example .env
+docker compose --env-file .env up --build
+```
+
+En PowerShell usa `Copy-Item .env.example .env`. Para iniciar únicamente PostgreSQL:
+
+```bash
+docker compose --env-file .env up -d postgres
+```
+
+El backend se publica en el puerto `8080`. El frontend se construye con Node 24.22.0, se sirve con Nginx y queda disponible en `http://localhost:5173`. El volumen `postgres_data` conserva la base entre reinicios.
+
+Para trabajar solo en el frontend:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Compilar y verificar
+
+Linux/macOS:
+
+```bash
+./mvnw clean verify
+java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
+```
+
+Windows:
 
 ```powershell
-$env:JAVA_HOME = 'C:\path\to\jdk-21'
-& "$env:JAVA_HOME\bin\java.exe" -version
-.\mvnw.cmd -version
 .\mvnw.cmd clean verify
+java -jar infrastructure\target\infrastructure-0.1.0-SNAPSHOT.jar
 ```
 
-The `java` executable on PATH may still be Java 17. Maven uses `JAVA_HOME`; use that same JDK's executable to run the packaged JAR. Maven Wrapper installs Maven, not Java.
+`verify` ejecuta las pruebas y valida el formato Java. Con Docker, Testcontainers crea PostgreSQL 17.11 y verifica migraciones, mapeos, contratos HTTP, rollback y concurrencia. Aplica el formato cuando sea necesario con `./mvnw spotless:apply` o `.\mvnw.cmd spotless:apply`.
 
-If Docker is unavailable, run the same integration suite against an explicitly supplied PostgreSQL test database:
+El perfil `local` conecta de forma predeterminada con `jdbc:postgresql://localhost:5432/tool_rental`. `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` permiten reemplazar esos valores; el perfil `production` los exige.
 
-```powershell
-.\mvnw.cmd '-Dpostgres.test.url=jdbc:postgresql://127.0.0.1:55439/toolrental_validation' '-Dpostgres.test.username=postgres' clean verify
-```
+Flyway crea las 18 tablas mediante migraciones individuales, aplica las migraciones de compatibilidad y roles, y carga 18 migraciones de demostración únicamente con el perfil `local`. Cada tabla recibe al menos cinco filas de demostración. Hibernate usa `ddl-auto: validate` y nunca genera el esquema.
 
-Supply `-Dpostgres.test.password=...` when needed. Use a dedicated test database: the suite creates a unique schema and truncates its test records. It does not silently skip PostgreSQL tests when Docker is missing. Flyway/JPA startup, 18-table mapping completeness, HTTP contracts, snapshots, rollback, inclusive overlap, and concurrent confirmations are covered.
+Las tarifas demo y sus referencias públicas colombianas se registran en [Fuentes de datos](docs/data-sources.md).
 
-On Linux/macOS use `./mvnw`. Apply Java formatting with `mvnw.cmd spotless:apply` before verification.
+## Documentación
 
-## Run
+1. [Modelo conceptual](docs/conceptual-model.md)
+2. [Arquitectura del backend](docs/backend-architecture.md)
+3. [Guía de desarrollo](docs/development-guide.md)
+4. [API REST](docs/rest-api.md)
+5. [Reporte de validación](docs/validation-report.md)
+6. [Trabajo pendiente de base de datos](docs/pendientes-base-datos.md)
+7. [Hoja de ruta](docs/pendientes.md)
+8. [Alcance del producto](docs/product-scope.md)
+9. [Borrador de términos y condiciones](docs/terms-and-conditions.md)
 
-```powershell
-$env:SPRING_PROFILES_ACTIVE = 'local'
-$env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
-$env:DB_USERNAME = 'tool_rental'
-$env:DB_PASSWORD = 'change-me'
-& "$env:JAVA_HOME\bin\java.exe" -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
-```
+## Próxima entrega
 
-Spring Boot starts Tomcat on port 8080. `local` uses configurable development defaults; `production` requires database environment variables. Flyway owns schema changes and Hibernate runs `ddl-auto: validate`. V1/V2 remain unchanged; V3 adds the administrator role.
+La base técnica de datos, los contextos de backend y la API REST del modelo actual están implementados. La prioridad es cerrar las reglas comerciales de la Fase 0, implementar JWT y publicar el contrato OpenAPI antes de integrar los recorridos del frontend.
 
-The optional manual dataset is `infrastructure/src/main/resources/db/seed/demo-data.sql`. It is never loaded automatically and must not be used as production account provisioning.
+## Convención de commits
 
-## Documentation
-
-- [Backend architecture](docs/backend-architecture.md)
-- [Development guide](docs/development-guide.md)
-- [Infrastructure structure](infrastructure/STRUCTURE.md)
-- [Source package map and relocated catalog/identity files](docs/source-package-map.md)
-- [REST API](docs/rest-api.md)
-- [Validation report](docs/validation-report.md)
-- [Database follow-up](docs/pendientes-base-datos.md)
-- [Product scope](docs/product-scope.md) and [roadmap](docs/pendientes.md)
-
-## Commit convention
-
-Use English Conventional Commits with a Gitmoji shortcode and a compound English description:
+Todos los mensajes se escriben en inglés con Conventional Commits, un código Gitmoji y un resumen concatenado en `CamelCase`:
 
 ```text
-feat: :building_construction: AlignTableBoundedContexts
-feat: :sparkles: ImplementRemainingBoundedContexts
-feat: :memo: DocumentBoundedContextsAndConceptualDiagram
+<type>: :<gitmoji>: <CamelCaseSummary>
 ```
+
+Ejemplo: `feat: :card_file_box: AddImplementationMigrations`.
+
+## Estado de la conexión
+
+Con el backend iniciado, abre [http://localhost:8080](http://localhost:8080). La página verifica la base mediante una consulta real a `/status/database`, muestra la hora de comprobación y permite volver a consultar. Un fallo devuelve HTTP 503 y nunca se presenta como conexión exitosa. Las rutas de negocio `/api/**` mantienen su requisito de autenticación.
+
+- [Comparación y reporte del merge de developer/conde](docs/branch-merge-report.md)
+- [Mapa de paquetes y archivos reubicados](docs/source-package-map.md)
+
+Para pruebas sin Docker usa una base exclusiva y `mvnw.cmd '-Dpostgres.test.url=jdbc:postgresql://127.0.0.1:55439/toolrental_validation' clean verify`. Las pruebas crean esquemas separados; no utilices la base de trabajo como base de pruebas.

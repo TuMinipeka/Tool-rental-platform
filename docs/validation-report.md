@@ -1,27 +1,32 @@
-# Base-context validation report
+# Reporte de validación del merge y los contextos base
 
-Date: 2026-10-15. Implementation commit: `8f39123`.
+Fecha: 15 de octubre de 2026.
 
-## Verified environment
+## Entorno y resultado
 
-- JDK 21.0.12.1, Spring Boot 3.5.16, Maven Wrapper.
-- Real PostgreSQL 18.6 in an isolated temporary cluster bound to 127.0.0.1:55439. Existing development databases were not used.
-- Docker Desktop could not start its engine because of an internal socket access error. The Testcontainers startup path was not executed here; the same integration suite ran through its explicit PostgreSQL URL option. Default container tests target PostgreSQL 17, supported by the managed Flyway version.
-
-## Result
+JDK 21, Spring Boot 3.5.16 y PostgreSQL 18.6 en una instancia temporal aislada, separada de la base de trabajo. Las dos suites PostgreSQL crean esquemas distintos. La ruta predeterminada con Testcontainers se conserva; en esta ejecución se usó una URL explícita porque Docker Desktop no tiene un motor operativo.
 
 ```powershell
 .\mvnw.cmd '-Dpostgres.test.url=jdbc:postgresql://127.0.0.1:55439/toolrental_validation' clean verify
 ```
 
-**BUILD SUCCESS — 46 tests, 0 failures, 0 errors, 0 skipped.** Domain: 19; application: 13; infrastructure: 14, including 10 PostgreSQL/HTTP integration scenarios. Spotless verification passed.
+**BUILD SUCCESS: 58 pruebas, 0 fallos, 0 errores y 0 omitidas.**
 
-Coverage includes all 18 entity mappings and V1 columns; Flyway V1–V3 on a fresh schema; Hibernate validation; Principal/ownership errors; password hashing; composite/shared keys; category description and equipment serial/condition; reservation-expiry round trip; inclusive day conflicts; frozen rates; one winner under concurrent confirmations; release after cancellation; one winner under concurrent supplier-inventory registration; delivery/return ordering; rental completion; immutable invoice snapshots; and transaction rollback after a later invalid invoice line.
+- Dominio: 19 pruebas.
+- Aplicación: 13 pruebas.
+- Infraestructura: 26 pruebas, incluidas las siete pruebas PostgreSQL aportadas por Conde.
+- Spotless: aprobado.
+- Frontend integrado desde Conde: `npm ci`, `npm run lint` y `npm run build` correctos.
+- `docker compose config --quiet`: correcto; no acredita el arranque de los contenedores.
 
-The original assignment and applied V1/V2 migration files were checked unchanged. `git diff --check` passed.
+## Compatibilidad de datos
 
-## Packaged application
+Las migraciones V1–V3 se conservan byte por byte respecto a `developer/daniel` antes del merge. La propuesta de reemplazo V1–V21 de Conde se conserva como referencia fuera de las ubicaciones de Flyway. No se ejecutó `repair`, no se alteró el historial y no se recreó la base de trabajo.
 
-The packaged infrastructure JAR was started with JDK 21 against the temporary PostgreSQL instance on HTTP port 18081. Flyway, Hibernate, repository wiring and Tomcat initialized successfully. An anonymous request to `/api/categories` returned **401**, matching the agreed pre-JWT authentication boundary.
+La suite base valida tres migraciones sobre una base vacía. La suite demo aplica esas tres más las 18 migraciones demo, verifica 21 versiones, datos por tabla, rollback y concurrencia. El perfil `local` no carga ejemplos; `demo` requiere activación explícita.
 
-Temporary application/database processes were stopped after validation. The production deployment, default Docker startup path, JWT and payment-provider behavior are not established by these checks.
+## Página de conexión
+
+Las pruebas verifican la consulta real, cierre de recursos JDBC, HTTP 200 con conexión, HTTP 503 sin conexión y ausencia de detalles de credenciales. La prueba integrada confirma el acceso a la página y mantiene HTTP 401 para las rutas de negocio sin `Principal`.
+
+La comprobación del proceso final y del navegador se registra en [el reporte de integración](branch-merge-report.md).

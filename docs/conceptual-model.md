@@ -124,7 +124,7 @@ erDiagram
 
 ## DDD mapping
 
-The conceptual model does not imply one aggregate or JPA entity per row. The current implementation uses `Category`, `Tool`, `EquipmentUnit`, and `Reservation` as aggregate roots. `ReservationItem` belongs to `Reservation`, while tool images are values owned by `Tool`. Identity, rentals, payments, invoicing, and reporting remain pending.
+The conceptual model does not imply that every record owns an independent transaction. The current implementation gives each base record a table-aligned Java context while coordinated use cases preserve reservation, rental and invoice transaction boundaries. Reservation-item and invoice-item writes remain owned by their parent workflows. JWT, external payment processing, tax/protection extensions and reporting remain pending.
 
 ## Implementation mapping
 

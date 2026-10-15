@@ -40,7 +40,7 @@ Operational use cases lock referenced records inside their transaction. Returns 
 
 There is one JPA entity per table, no duplicated element-collection mapping, and scalar identity references between contexts. Composite keys use infrastructure-only `@EmbeddedId` types. Role IDs retain generated `smallint`; customer, supplier, and rental keys remain shared. Mappers preserve category description, equipment serial/condition, reservation expiry, and every other mapped column.
 
-Flyway V1/V2 are retained; V3 seeds `ADMIN`. Hibernate validates the schema instead of creating it. Local and production configuration filenames match their profile names.
+Flyway keeps one migration per base table. Later incremental migrations align currency mappings and seed `ADMIN` without rewriting applied history. Hibernate validates the schema instead of creating it. Local and production configuration filenames match their profile names.
 
 REST controllers map HTTP input to commands and delegate to application. `/api/**` requires an authenticated UUID Principal; no JWT or login endpoint exists yet. Anonymous callers receive 401; unauthorized active users receive 403; invalid contracts return 400, missing resources 404, and business/persistence conflicts 409. Raw database details and password hashes are never included in error or user responses.
 

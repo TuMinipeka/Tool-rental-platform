@@ -21,8 +21,12 @@ import org.junit.jupiter.api.Test;
 class MappingContractTest {
   @Test
   void everySchemaColumnHasExactlyOneOwningEntity() throws Exception {
-    String sql =
-        Files.readString(Path.of("src/main/resources/db/migration/V1__create_initial_schema.sql"));
+    var sql = new StringBuilder();
+    try (var migrations = Files.list(Path.of("src/main/resources/db/migration"))) {
+      for (var migration : migrations.filter(Files::isRegularFile).sorted().toList()) {
+        sql.append(Files.readString(migration)).append('\n');
+      }
+    }
     var tables = new LinkedHashMap<String, Set<String>>();
     var matcher = Pattern.compile("CREATE TABLE (\\w+) \\(([\\s\\S]*?)\\n\\);").matcher(sql);
     while (matcher.find()) {

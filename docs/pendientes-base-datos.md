@@ -1,68 +1,78 @@
-# Pending database work
+# Trabajo pendiente de base de datos
 
-## Current state
+## Estado actual
 
-The base 18 tables have complete JPA mappings, scalar references, shared/composite keys, application use cases, and REST adapters. Flyway V1/V2 are unchanged; V3 seeds ADMIN. The integration suite validates fresh migration, Hibernate schema validation, HTTP contracts, rate snapshots, invoice snapshots, rollback and concurrent confirmations against real PostgreSQL.
+La capa de persistencia incluye PostgreSQL 17.11, Spring Data JPA, Flyway, perfiles de entorno, una migración por cada una de las 18 tablas normalizadas, una migración de compatibilidad JPA, una migración para el rol administrador y 18 migraciones locales de demostración con un mínimo de cinco filas por tabla.
 
-Docker/Testcontainers is the default test path. An explicit dedicated PostgreSQL URL supports the same assertions without Docker. Operational environment provisioning, migration upgrades from representative production data, least-privilege database roles, backup/restore, retention, monitoring and timeout tuning remain pending.
+Las 18 tablas tienen mapeos JPA, referencias escalares, claves compartidas o compuestas, casos de uso y adaptadores REST. El entorno local se aprovisiona con Docker Compose. Testcontainers crea una base vacía y verifica las 21 migraciones en el escenario demo, `ddl-auto: validate`, contratos HTTP, datos demo, instantáneas históricas, rollback transaccional, unicidad concurrente de inventario y prevención de doble reserva.
 
-The manual demo dataset remains separate from Flyway and is not production account provisioning.
+La base de datos todavía no está lista para producción porque faltan reglas comerciales, validación de actualizaciones sobre datos persistentes, controles operativos y las ampliaciones descritas abajo.
 
-## Schema additions required by the approved product scope
+## Trabajo operativo prioritario
 
-These are design requirements, not implemented tables. They require versioned Flyway migrations after the remaining Phase 0 parameters are approved.
+- [x] Aprovisionar PostgreSQL local de forma reproducible.
+- [x] Aplicar Flyway desde una base de datos vacía y validar las migraciones actuales.
+- [x] Ejecutar e inspeccionar las migraciones de `db/demo` mediante el perfil adicional `demo`; producción no incluye esa ubicación.
+- [x] Agregar cobertura con Testcontainers para mapeos, repositorios, migraciones, rollback y bloqueos.
+- [x] Demostrar que las confirmaciones concurrentes no pueden reservar la misma unidad de equipo.
+- [x] Demostrar la unicidad de `inventory_code` por proveedor bajo escrituras concurrentes.
+- [ ] Aprovisionar los futuros entornos compartidos de integración, pruebas y producción.
+- [ ] Validar las actualizaciones incrementales entre versiones cuando exista un entorno persistente compartido.
+- Definir roles de base de datos con mínimo privilegio, límites del pool de conexiones, tiempos de espera, monitoreo, copias de seguridad, restauración y retención.
 
-### Pricing and taxes
+## Adiciones al esquema requeridas por el alcance aprobado del producto
 
-- Store a reservation pricing snapshot with rental subtotal, delivery charge, protection charge, discounts, taxable base, VAT rate, VAT amount, rounding, and final total.
-- Preserve the tax-rule or calculation-method version used for each transaction.
-- Preserve the equipment cost or other input required by the legally validated taxable-base calculation without allowing later catalog changes to rewrite historical totals.
-- Store invoice line tax detail instead of deriving historical tax from the current configuration.
+Estos son requisitos de diseño, no tablas implementadas. Requieren migraciones versionadas de Flyway después de aprobar los parámetros restantes de la Fase 0.
 
-### Optional Damage Protection Plan
+### Precios e impuestos
 
-- Version Protection Plan definitions separately from reservations.
-- Store the selected plan version, price, deductible, limit, accepted exclusions, and acceptance timestamp with each protected reservation.
-- Keep plan terms independent from damage reports. Combining multiple plan clauses and multiple damage reports in one row would create false cross-products and update anomalies; separate relations preserve the current 4NF direction.
+- Guardar una instantánea de precios de la reserva con subtotal del alquiler, cargo de entrega, cargo de protección, descuentos, base gravable, tarifa de IVA, valor del IVA, redondeo y total final.
+- Conservar la versión de la regla tributaria o del método de cálculo usada en cada transacción.
+- Conservar el costo del equipo u otra entrada requerida por el cálculo legalmente validado de la base gravable, sin permitir que cambios posteriores del catálogo reescriban totales históricos.
+- Guardar el detalle tributario por línea de factura en lugar de derivar impuestos históricos de la configuración actual.
 
-### Delivery, return, evidence, and disputes
+### Plan Opcional de Protección contra Daños
 
-- Support multiple evidence items per delivery, return, and damage report through separate evidence relations rather than URL lists or repeated columns.
-- Store content integrity metadata, media type, creation timestamp, author, and storage reference for each evidence item.
-- Add repair estimates, replacement-value snapshots, assessment decisions, customer notices, dispute records, administrator decisions, and adjustment history.
-- Ensure one loss is not charged as both full repair and full replacement.
+- Versionar las definiciones del Plan de Protección por separado de las reservas.
+- Guardar con cada reserva protegida la versión seleccionada del plan, precio, deducible, límite, exclusiones aceptadas y marca de tiempo de aceptación.
+- Mantener las condiciones del plan independientes de los reportes de daños. Combinar varias cláusulas del plan y varios reportes de daños en una fila crearía productos cruzados falsos y anomalías de actualización; las relaciones separadas conservan la orientación actual hacia 4FN.
 
-### Payments and refunds
+### Entrega, devolución, evidencias y disputas
 
-- Replace the current generic payment shape with an auditable payment-intent and transaction model that supports the 50/50 schedule, additional charges, refunds, idempotency keys, attempts, and failure reasons.
-- Store simulated method type, processor, card network, token, last four digits, and expiration metadata without storing a complete card number or CVV.
-- Preserve the relationship between every refund or adjustment and its original charge.
+- Admitir varios elementos de evidencia por entrega, devolución y reporte de daño mediante relaciones de evidencia separadas, no listas de URL ni columnas repetidas.
+- Guardar metadatos de integridad del contenido, tipo de medio, marca de tiempo de creación, autor y referencia de almacenamiento para cada evidencia.
+- Agregar estimaciones de reparación, instantáneas del valor de reposición, decisiones de valoración, avisos al cliente, registros de disputas, decisiones del administrador e historial de ajustes.
+- Garantizar que una misma pérdida no se cobre como reparación completa y también como reposición completa.
 
-### Legal documents and consent
+### Pagos y reembolsos
 
-- Version Terms and Conditions, privacy notices, and Protection Plan terms as immutable published documents.
-- Record each user's explicit acceptance by document version, purpose, timestamp, related transaction where applicable, and integrity reference.
-- Keep required transaction acceptance, personal-data authorization, optional marketing consent, and optional protection selection as independent facts. A combined consent row would force unrelated multi-valued facts into false combinations and undermine revocation history.
+- Reemplazar el modelo genérico actual de pago por un modelo auditable de intención y transacción que admita el esquema 50/50, cargos adicionales, reembolsos, claves de idempotencia, intentos y motivos de fallo.
+- Guardar el tipo de método simulado, procesador, red de tarjeta, token, últimos cuatro dígitos y metadatos de vencimiento sin almacenar el número completo de tarjeta ni el CVV.
+- Conservar la relación entre cada reembolso o ajuste y su cargo original.
 
-### Simulated invoices
+### Documentos legales y consentimiento
 
-- Add subtotal, taxable base, VAT, total, currency, and academic-document markers.
-- Keep supplier and customer identity snapshots so historical documents are not rewritten when profiles change.
-- Prevent simulated documents from being represented as DIAN-valid invoices.
+- Versionar los Términos y condiciones, avisos de privacidad y condiciones del Plan de Protección como documentos publicados inmutables.
+- Registrar la aceptación explícita de cada usuario con versión del documento, propósito, marca de tiempo, transacción relacionada cuando corresponda y referencia de integridad.
+- Mantener como hechos independientes la aceptación obligatoria de la transacción, la autorización de datos personales, el consentimiento opcional de marketing y la selección opcional de protección. Una fila de consentimiento combinada forzaría hechos multivaluados no relacionados a combinaciones falsas y perjudicaría el historial de revocación.
 
-## Capabilities that still lack persistence adapters
+### Facturas simuladas
 
-- User, role, customer, and supplier administration.
-- Rentals, deliveries, returns, and damage reports.
-- Protection definitions, selections, assessments, evidence, and disputes.
-- Payment intents, attempts, refunds, and adjustments.
-- Taxes, pricing snapshots, invoices, and invoice lines.
-- Legal-document publication and acceptance.
-- Durable event publication through an Outbox or another transactional mechanism.
-- Administrative reports and optimized operational queries.
+- Agregar subtotal, base gravable, IVA, total, moneda y marcadores de documento académico.
+- Conservar instantáneas de identidad del proveedor y del cliente para que los documentos históricos no se reescriban cuando cambien los perfiles.
+- Impedir que los documentos simulados se presenten como facturas válidas ante la DIAN.
 
-Existing tables for some of these capabilities preserve the earlier relational model, but they must not be presented as implemented functionality until their domain behavior, use cases, adapters, and updated constraints exist.
+## Capacidades de persistencia todavía pendientes
 
-## Completion criterion
+- Definiciones, selecciones y valoraciones de protección, evidencias y disputas.
+- Intenciones e intentos de pago mediante una pasarela, reembolsos y ajustes.
+- Impuestos e instantáneas completas del cálculo de precios.
+- Publicación y aceptación versionada de documentos legales.
+- Publicación durable de eventos mediante un Outbox u otro mecanismo transaccional.
+- Reportes administrativos y consultas operativas optimizadas.
 
-The database is ready only when a new PostgreSQL instance can apply every migration, start the application with `ddl-auto: validate`, pass the approved integration and concurrency scenarios, support the complete product contract, and use verified backup, restore, security, and deployment procedures.
+Los registros administrativos de pagos y las facturas base ya tienen dominio, casos de uso, persistencia y REST, pero no sustituyen las capacidades comerciales, tributarias o legales anteriores.
+
+## Criterio de finalización
+
+La base de datos estará lista únicamente cuando una instancia nueva de PostgreSQL pueda aplicar todas las migraciones, iniciar la aplicación con `ddl-auto: validate`, superar los escenarios aprobados de integración y concurrencia, soportar el contrato completo del producto y usar procedimientos verificados de copias de seguridad, restauración, seguridad y despliegue.

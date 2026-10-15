@@ -1,45 +1,65 @@
-# REST API
+# API REST
 
-All routes start with `/api` and require an authenticated Principal with a UUID name. Authentication itself is a later delivery; ordinary anonymous HTTP calls return 401. No `actorId` field or header grants access. HTTP tests inject Principals directly.
+Todas las rutas empiezan por `/api` y requieren un `Principal` autenticado cuyo nombre sea el UUID del usuario. El mecanismo de autenticación se implementará en una entrega posterior; por ahora, las peticiones anónimas reciben `401`. Ningún campo `actorId` ni encabezado personalizado sustituye la identidad autenticada.
 
-Administrative collection lists require administrator access. Active users can browse categories and published tools; suppliers can also see their own unpublished offers. Individual records enforce their owner/participant rules; payment and role administration require ADMIN. Tool operations require the supplier actor. Profiles require their corresponding role before creation. Passwords are accepted only for account creation, must contain at least 12 characters and at most 72 UTF-8 bytes, and are stored with BCrypt. No response includes hashes.
+Los listados administrativos requieren el rol `ADMIN`. Los usuarios activos pueden consultar categorías y herramientas publicadas; los proveedores también pueden ver sus propias ofertas sin publicar. Los recursos individuales validan propiedad o participación. La administración de pagos y roles requiere `ADMIN`, y las operaciones sobre herramientas requieren al proveedor propietario.
 
-## Routes
+Las contraseñas solo se reciben al crear una cuenta, deben tener entre 12 caracteres y 72 bytes UTF-8 y se almacenan con BCrypt. Ninguna respuesta expone el hash.
 
-| Resource | Operations |
+## Rutas
+
+| Recurso | Operaciones |
 | --- | --- |
-| `/categories` | POST, GET list, GET/PUT/DELETE `/{id}`; referenced categories cannot be deleted |
-| `/tools` | POST, GET list, GET/PUT `/{id}`, DELETE `/{id}` unpublishes |
-| `/equipment-units` | POST, GET list, GET/PUT `/{id}`; retirement is a terminal status |
-| `/reservations` | POST, GET `/{id}`, POST `/{id}/confirmation`, `/rejection`, `/cancellation` |
-| `/users` | POST, GET list, GET `/{id}`, PATCH `/{id}/status` |
-| `/roles` | POST, GET list, GET/PUT `/{id}` |
-| `/user-roles` | POST assignment, GET list, GET/DELETE `/entry?userId=...&roleId=...` |
-| `/customers`, `/suppliers` | POST, GET list, GET/PUT `/{userId}` |
-| `/tool-images` | POST, GET list, GET/DELETE `/entry?toolId=...&imageUrl=...` |
-| `/reservation-items` | GET list, GET `/entry?reservationId=...&equipmentUnitId=...` |
-| `/rentals` | POST with reservationId, GET list, GET `/{reservationId}`, PATCH `/{reservationId}/status` |
-| `/unit-deliveries` | POST, GET list, GET `/entry?reservationId=...&equipmentUnitId=...`, PATCH `/entry/completion` with those query parameters |
-| `/unit-returns` | POST, GET list, GET `/entry?reservationId=...&equipmentUnitId=...` |
-| `/damage-reports` | POST, GET list, GET `/{id}`, PATCH `/{id}/assessment`, PATCH `/{id}/status` |
-| `/payments` | POST manual record, GET list, GET `/{id}`, PATCH `/{id}/status` |
-| `/invoices` | POST header with lines, GET list, GET `/{id}`, PATCH `/{id}/status` |
-| `/invoice-items` | GET list, GET `/entry?invoiceId=...&lineNumber=...` |
+| `/categories` | POST, listado GET y GET/PUT/DELETE `/{id}`; una categoría referenciada no se elimina |
+| `/tools` | POST, listado GET, GET/PUT `/{id}` y DELETE `/{id}`, que retira la publicación |
+| `/equipment-units` | POST, listado GET y GET/PUT `/{id}`; el retiro es terminal |
+| `/reservations` | POST, GET `/{id}` y POST `/{id}/confirmation`, `/rejection`, `/cancellation` |
+| `/users` | POST, listado GET, GET `/{id}` y PATCH `/{id}/status` |
+| `/roles` | POST, listado GET y GET/PUT `/{id}` |
+| `/user-roles` | POST, listado GET y GET/DELETE `/entry?userId=...&roleId=...` |
+| `/customers`, `/suppliers` | POST, listado GET y GET/PUT `/{userId}` |
+| `/tool-images` | POST, listado GET y GET/DELETE `/entry?toolId=...&imageUrl=...` |
+| `/reservation-items` | Listado GET y GET `/entry?reservationId=...&equipmentUnitId=...` |
+| `/rentals` | POST con `reservationId`, listado GET, GET `/{reservationId}` y PATCH de estado |
+| `/unit-deliveries` | POST, listado GET, GET de `/entry` y PATCH `/entry/completion` |
+| `/unit-returns` | POST, listado GET y GET de `/entry` |
+| `/damage-reports` | POST, listado GET, GET `/{id}`, PATCH de valoración y PATCH de estado |
+| `/payments` | POST manual, listado GET, GET `/{id}` y PATCH de estado |
+| `/invoices` | POST con líneas, listado GET, GET `/{id}` y PATCH de estado |
+| `/invoice-items` | Listado GET y GET `/entry?invoiceId=...&lineNumber=...` |
 
-Composite keys use query parameters to avoid ambiguous path handling of image URLs. These queries identify a resource; they never identify the authenticated actor.
+Las claves compuestas usan parámetros de consulta para evitar rutas ambiguas, especialmente con las URL de imágenes. Estos parámetros identifican el recurso, nunca al actor autenticado.
 
-## Input examples
+## Ejemplos de entrada
 
-Reservation creation derives customer identity from Principal:
+La creación de una reserva obtiene el cliente desde el `Principal`:
 
 ```json
 {"startDate":"2026-10-20","returnDate":"2026-10-21","equipmentUnitIds":["00000000-0000-0000-0000-000000000001"]}
 ```
 
-A status operation accepts `{"status":"COMPLETED"}`. Valid transitions: user ACTIVE → SUSPENDED/DISABLED and SUSPENDED → ACTIVE/DISABLED; rental ACTIVE → COMPLETED/CANCELLED; payment PENDING → CONFIRMED/FAILED and CONFIRMED → REFUNDED; damage OPEN → ASSESSED/CLOSED and ASSESSED → CLOSED; invoice ISSUED → PAID/VOIDED. Damage assessment uses `{"cost":5}` and supplies the cost required for ASSESSED. Delivery completion uses `{"condition":"GOOD"}` and records server time.
+Una operación de estado acepta `{"status":"COMPLETED"}`. Las transiciones admitidas son:
 
-Invoice creation includes `reservationId`, `number`, and nonempty `lines` with `description`, `quantity`, `unitPrice`. Issuer/recipient snapshots come from profiles, not freely supplied names. All lines are saved in the header transaction. It records a base invoice; it does not implement fiscal numbering, tax calculations or gateway settlement.
+- usuario: `ACTIVE -> SUSPENDED/DISABLED` y `SUSPENDED -> ACTIVE/DISABLED`;
+- alquiler: `ACTIVE -> COMPLETED/CANCELLED`;
+- pago: `PENDING -> CONFIRMED/FAILED` y `CONFIRMED -> REFUNDED`;
+- daño: `OPEN -> ASSESSED/CLOSED` y `ASSESSED -> CLOSED`;
+- factura: `ISSUED -> PAID/VOIDED`.
 
-POST returns 201, successful GET/PUT/PATCH returns 200, supported DELETE returns 204. HTTP validation returns 400; missing Principal 401; denied ownership/role 403; missing resource 404; invariant/uniqueness/reference conflicts 409. Unsupported historical edit/delete operations return 405. Database messages are not exposed.
+La valoración de daños usa `{"cost":5}`. La finalización de una entrega usa `{"condition":"GOOD"}` y registra la hora del servidor.
 
-Application responses are immutable. Existing catalog/reservation responses retain typed ID objects (`{"value":"uuid"}`); the newly introduced table contexts expose named scalar key fields (`userId`, `invoiceId`, etc.). A future API version may standardize wire representation without changing domain identities.
+La creación de una factura incluye `reservationId`, `number` y una lista no vacía `lines`, cuyos elementos contienen `description`, `quantity` y `unitPrice`. Las instantáneas de emisor y destinatario provienen de sus perfiles. La operación guarda encabezado y líneas en una sola transacción; todavía no implementa numeración fiscal, impuestos ni cobro por pasarela.
+
+## Respuestas y errores
+
+- POST exitoso: `201`.
+- GET, PUT o PATCH exitoso: `200`.
+- DELETE admitido: `204`.
+- Contrato inválido: `400`.
+- Falta de identidad: `401`.
+- Acceso denegado: `403`.
+- Recurso inexistente: `404`.
+- Conflicto de regla, unicidad o referencia: `409`.
+- Operación histórica no permitida: `405`.
+
+Los mensajes internos de base de datos no se exponen. Las respuestas de aplicación son inmutables. Los recursos originales de catálogo y reserva conservan identificadores tipados con forma `{"value":"uuid"}`; los demás contextos exponen claves con nombre, como `userId` o `invoiceId`. Una futura versión de la API puede unificar esta representación.

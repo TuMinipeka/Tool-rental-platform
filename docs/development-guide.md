@@ -164,3 +164,13 @@ Java source files use LF line endings on every operating system. `.gitattributes
 If Spotless reports a diff containing only `\r\n` versus `\n`, run `mvnw.cmd spotless:apply` followed by `mvnw.cmd spotless:check`. This is a formatting failure, not a Java syntax error. If the command succeeds but the editor still shows old diagnostics, save the files and reload Maven projects; in VS Code, use `Java: Clean Java Language Server Workspace` if reloading does not clear them.
 
 The former `catalog` package was split into `category`, `tool`, `toolimage`, and `equipmentunit` under the existing three modules. Its classes were relocated to those contexts; inspect their new package paths instead of the old empty directory.
+
+## Connecting a local database
+
+The `local` profile reads `infrastructure/src/main/resources/application-local.yml`. Start the packaged JAR with `--spring.profiles.active=local`, or export `SPRING_PROFILES_ACTIVE=local`. Database environment variables referenced by that file override its default values.
+
+The local Hikari defaults are at most two connections and zero minimum idle connections; `DB_MAX_POOL_SIZE` and `DB_MIN_IDLE` may override them. The production profile retains the shared pool defaults unless explicitly overridden.
+
+If PostgreSQL reports too many connections for the role (SQLSTATE 53300), check that role's connection limit and active sessions. Disconnect unused sessions in database clients such as DBeaver, or have an administrator review the role limit. Lowering the application pool prevents additional pressure but cannot free connections already occupied by another client. Do not terminate another project's sessions to make startup succeed.
+
+Successful startup must establish the connection, apply/validate Flyway migrations, validate Hibernate mappings, and initialize the application. An open PostgreSQL port alone does not establish successful database integration.

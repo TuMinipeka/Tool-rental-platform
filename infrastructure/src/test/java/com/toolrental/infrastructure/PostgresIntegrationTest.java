@@ -662,4 +662,17 @@ class PostgresIntegrationTest {
                 Integer.class))
         .isEqualTo(1);
   }
+
+  @Test
+  void exposesLiveDatabaseStatusAndPageWithoutOpeningBusinessRoutes() throws Exception {
+    var status = call(null, get("/status/database"), null, 200);
+    assertThat(status.get("connected").asBoolean()).isTrue();
+    assertThat(status.has("password")).isFalse();
+    mvc.perform(get("/")).andExpect(status().isOk()).andExpect(forwardedUrl("index.html"));
+    mvc.perform(get("/index.html"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(org.hamcrest.Matchers.containsString("status-title")));
+    mvc.perform(get("/connection-status.js")).andExpect(status().isOk());
+    call(null, get("/api/users"), null, 401);
+  }
 }

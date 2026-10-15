@@ -1,30 +1,24 @@
-# Conceptual entity–relationship diagram
+# Diagrama conceptual entidad-relación
 
-This drawing represents the **18-entity baseline** in [conceptual-model.md](../conceptual-model.md). Protection, evidence, disputes, refunds, legal-document versions and consent extensions are intentionally outside this first diagram.
+El diagrama representa la base de 18 entidades descrita en el [modelo conceptual](../conceptual-model.md). Las extensiones de protección, evidencias, disputas, reembolsos, documentos legales y consentimientos quedan fuera de esta primera versión.
 
-## Files
+## Archivos
 
-- [Editable Excalidraw scene](conceptual-er-model.excalidraw): native grouped shapes, attributes, relationships and connectors.
-- [Vector preview](conceptual-er-model.svg): zoom without losing text quality.
-- [PNG preview](conceptual-er-model.png): convenient image preview.
-- [Verification record](conceptual-er-model.audit.json): counts, source fingerprint and MCP creation checkpoint.
+- [Escena editable de Excalidraw](conceptual-er-model.excalidraw): figuras, atributos, relaciones y conectores agrupados.
+- [Vista vectorial](conceptual-er-model.svg): permite ampliar sin perder calidad.
+- [Vista PNG](conceptual-er-model.png): previsualización rápida.
+- [Registro de verificación](conceptual-er-model.audit.json): conteos y huella de la fuente.
 
-![Conceptual ER diagram](conceptual-er-model.svg)
+![Diagrama conceptual ER](conceptual-er-model.svg)
 
-## Notation
+## Notación
 
-Rectangles represent business entities, with their attributes listed inside. Yellow diamonds represent relationships. Identifiers use `[ID]`; alternate identifiers use `[unique]`; `?` marks an optional attribute. This is a conceptual ER presentation with attribute lists, not strict Chen notation with one ellipse per attribute and not a physical SQL schema. No SQL column types or foreign keys are included.
+Los rectángulos representan entidades y enumeran sus atributos. Los rombos amarillos representan relaciones. `[ID]` identifica claves, `[unique]` identifica claves alternativas y `?` marca atributos opcionales. Es una representación conceptual con listas de atributos, no un esquema SQL físico.
 
-Multiplicities are written beside entity endpoints: `1`, `0..1`, `0..N` or `1..N`. Each endpoint counts how many instances of that entity can be associated with **one instance at the opposite endpoint**. For example, each Tool has one Supplier, and one Supplier can offer zero or many Tools.
+Las multiplicidades se muestran junto a cada extremo: `1`, `0..1`, `0..N` o `1..N`. `UserRole` y `ReservationItem` permanecen como entidades asociativas. `Customer` y `Supplier` son perfiles opcionales compatibles: un mismo `User` puede tener ambos.
 
-UserRole and ReservationItem remain associative entities. Customer and Supplier are optional overlapping profiles: one User can have both. A delivery is identified by its ReservationItem, and a return by its delivery; these express the same composite identity as reservation plus equipment unit in the source model. The diagram includes all 19 source relationships, including the separate link from Rental to UnitDelivery.
+El diagrama contiene 18 entidades, 19 relaciones y 38 conectores. También registra reglas que no se deducen únicamente de la cardinalidad: un proveedor por reserva, fechas inclusivas, independencia entre imágenes y unidades físicas, y congelación de tarifas y valores facturados.
 
-The lower legend records additional rules: one supplier per reservation, inclusive dates, independent tool images and equipment units, and frozen rates and invoice values. These conditions cannot all be inferred from multiplicity alone. Derived availability and totals are not new stored attributes.
+## Edición
 
-## Editing and MCP provenance
-
-The official Excalidraw MCP server was connected directly and its `read_me` and `create_view` tools were used. Endpoint: `https://mcp.excalidraw.com/mcp`. This does not imply a permanent Codex MCP installation or a public sharing link. The export that uploads the scene to generate a shared excalidraw.com link was not executed because automatic approval review requires explicit authorization for that additional publication.
-
-To edit locally, open Excalidraw and use **Open / Load from file** to select `conceptual-er-model.excalidraw`. The scene includes editable grouped entities and connectors. Keep the native file as the editable source and regenerate the preview after edits.
-
-Validation: 18 entities, 19 relationship diamonds and 38 entity–relationship connectors. The entity names and relationship pairs were compared automatically with the Mermaid diagram in the source document. Layout and text were also inspected in three image crops. No backend source or configuration files were modified.
+Abre Excalidraw, elige **Open / Load from file** y selecciona `conceptual-er-model.excalidraw`. Conserva ese archivo como fuente editable y regenera las vistas SVG y PNG después de cada cambio.
