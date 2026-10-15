@@ -4,7 +4,7 @@
 
 Source: [original assignment (Spanish)](../ejercicioDemo.md). This document identifies business concepts, attributes, relationships, and rules. The logical relational model appears in [Fourth normal form](fourth-normal-form.md), and implemented aggregate boundaries appear in [Backend architecture](backend-architecture.md).
 
-Catalog and reservation behavior currently exists in Java. SQL, JPA, JWT, rentals, payments, invoicing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
+The base 18 entities now have table-aligned Java contexts, JPA mappings, application operations, and REST adapters. JWT, external payment processing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
 
 ## Derived concepts
 
@@ -80,6 +80,10 @@ Money values use exact decimals and explicit currencies. No implicit currency co
 | Rental — Invoice | Rental 0..1; invoice exactly 1 rental |
 | Invoice — InvoiceItem | Issued invoice 1..N; item exactly 1 invoice |
 
+## Editable conceptual diagram
+
+The 18-entity baseline is available as an [editable Excalidraw scene](diagrams/conceptual-er-model.excalidraw), a [vector preview](diagrams/conceptual-er-model.svg), and a [PNG image](diagrams/conceptual-er-model.png). See the [notation and editing guide](diagrams/README.md).
+
 ## Conceptual diagram
 
 ```mermaid
@@ -120,4 +124,8 @@ erDiagram
 
 ## DDD mapping
 
-The conceptual model does not imply one aggregate or JPA entity per row. The current implementation uses `Category`, `Tool`, `EquipmentUnit`, and `Reservation` as aggregate roots. `ReservationItem` belongs to `Reservation`, while tool images are values owned by `Tool`. Identity, rentals, payments, invoicing, and reporting remain pending.
+The conceptual model does not imply that every record owns an independent transaction. The current implementation gives each base record a table-aligned Java context while coordinated use cases preserve reservation, rental and invoice transaction boundaries. Reservation-item and invoice-item writes remain owned by their parent workflows. JWT, external payment processing, tax/protection extensions and reporting remain pending.
+
+## Implementation mapping
+
+The project uses one package context per base table by explicit organizational decision. This does not change the conceptual relationships or allow child writes to bypass reservation/invoice transactions. See [architecture](backend-architecture.md) and the [embedded conceptual diagram](../README.md#conceptual-model). The base diagram excludes future protection, evidence and consent extensions.

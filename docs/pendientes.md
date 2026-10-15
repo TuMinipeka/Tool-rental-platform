@@ -4,6 +4,10 @@
 
 Este documento registra el orden de entrega acordado, las decisiones ya cerradas y las decisiones que todavía bloquean la implementación. Evita que una capa dependa de un contrato inestable.
 
+## Avance de los contextos base
+
+Las 18 tablas base ya tienen implementaciones de dominio, aplicación, JPA y REST. La entrega incorpora operaciones administrativas restringidas y conserva las fronteras atómicas de reservas y facturas. No implementa todavía el cobro 50/50, una pasarela simulada, protección, evidencias, consentimientos ni los cálculos tributarios pendientes. JWT y OpenAPI también continúan pendientes. Véanse [API REST](rest-api.md) y [Arquitectura del backend](backend-architecture.md).
+
 ## Decisiones de producto confirmadas
 
 - El producto completo incluye catálogo, inventario, reservas, alquileres, entregas, devoluciones, gestión de daños, pagos simulados, facturación simulada, administración y reportes.
@@ -23,14 +27,14 @@ Este documento registra el orden de entrega acordado, las decisiones ya cerradas
 | --- | --- | --- |
 | Lenguaje del backend | Java 21 | Configurado |
 | Framework del backend | Spring Boot 3.5.16 | Configurado |
-| Servidor de aplicaciones | Apache Tomcat embebido | Suministrado por Spring Boot; todavía no existe una API HTTP |
+| Servidor de aplicaciones | Apache Tomcat embebido | Adaptador REST en ejecución; requiere un `Principal` autenticado |
 | Construcción | Maven multimódulo | Configurado |
-| Arquitectura | Arquitectura hexagonal y DDD | Implementada para los contextos actuales |
+| Arquitectura | Arquitectura hexagonal y DDD | Implementada para los 18 contextos base |
 | Base de datos | PostgreSQL 17.11 | Entorno local reproducible y validado con Testcontainers |
-| Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para catálogo y reservas |
-| Migraciones | Flyway | 18 migraciones de tablas y una migración de compatibilidad JPA, validadas desde una base vacía |
+| Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para las 18 tablas base |
+| Migraciones | Flyway | Una migración por tabla, compatibilidad JPA y rol administrador; validadas desde una base vacía |
 | Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Validados en PostgreSQL |
-| API | REST con OpenAPI y Swagger UI | Confirmada, no implementada |
+| API | REST con OpenAPI y Swagger UI | REST implementada; OpenAPI y Swagger pendientes |
 | Frontend | React 19 con JavaScript, Vite, Node.js, HTML y CSS | Base creada; recorridos del producto pendientes |
 
 Node.js se usa únicamente para las herramientas del frontend. Java y Spring Boot siguen siendo la única pila del backend.
@@ -66,12 +70,12 @@ La parte verificable del criterio de salida ya se cumple: una base de datos nuev
 
 ## Fase 2: backend y contrato de API
 
-1. Completar los agregados y casos de uso aprobados.
-2. Implementar identidad, autenticación y autorización.
-3. Agregar Spring Web, validación de entradas y manejo uniforme de errores.
-4. Implementar la API REST completa.
-5. Publicar y aprobar el contrato OpenAPI mediante Swagger UI.
-6. Implementar adaptadores de pagos simulados, protección, impuestos, facturación, evidencias y disputas.
+- [x] Completar los agregados y casos de uso correspondientes a las 18 tablas base.
+- [ ] Implementar autenticación JWT; la autorización por rol y propiedad ya existe sobre `Principal`.
+- [x] Agregar Spring Web, validación de entradas y manejo uniforme de errores.
+- [x] Implementar la API REST del modelo base.
+- [ ] Publicar y aprobar el contrato OpenAPI mediante Swagger UI.
+- [ ] Implementar adaptadores completos de pagos simulados, protección, impuestos, facturación fiscal, evidencias y disputas.
 
 Criterio de salida: todos los recorridos aprobados funcionan con PostgreSQL y el contrato HTTP versionado es estable.
 

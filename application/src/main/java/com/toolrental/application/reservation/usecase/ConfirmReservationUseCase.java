@@ -2,10 +2,10 @@ package com.toolrental.application.reservation.usecase;
 
 import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.time.Clock;
 import java.util.Objects;
 
@@ -26,7 +26,8 @@ public final class ConfirmReservationUseCase {
             context -> {
               var r = context.reservation();
               if (!r.supplierId().equals(actor) || !context.isSupplierActive(actor))
-                throw new BusinessRuleException("Supplier is not authorized");
+                throw new com.toolrental.application.common.exception
+                    .AccessDeniedApplicationException();
               if (!context.isCustomerActive(r.customerId()))
                 throw new BusinessRuleException("Customer is inactive");
               var currentItems =
@@ -44,7 +45,7 @@ public final class ConfirmReservationUseCase {
                                   "Currency changed; request a new reservation");
                             if (context.isOccupied(equipmentUnit.id(), r.period()))
                               throw new BusinessRuleException("Equipment unit is unavailable");
-                            return new ReservationItem(equipmentUnit.id(), actor, tool.dailyRate());
+                            return new ReservationLine(equipmentUnit.id(), actor, tool.dailyRate());
                           })
                       .toList();
               return r.confirmWithRates(currentItems, clock);

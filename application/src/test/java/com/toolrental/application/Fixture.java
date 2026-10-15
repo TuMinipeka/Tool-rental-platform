@@ -1,28 +1,28 @@
 package com.toolrental.application;
 
-import com.toolrental.application.catalog.exception.EquipmentUnitNotFoundApplicationException;
-import com.toolrental.application.catalog.exception.ToolNotFoundApplicationException;
+import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
 import com.toolrental.application.reservation.exception.ReservationNotFoundApplicationException;
-import com.toolrental.domain.catalog.model.aggregate.Category;
-import com.toolrental.domain.catalog.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.catalog.model.aggregate.Tool;
-import com.toolrental.domain.catalog.model.valueobject.CategoryId;
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.catalog.model.valueobject.ToolId;
-import com.toolrental.domain.catalog.port.repository.AtomicEquipmentUnitRegistration;
-import com.toolrental.domain.catalog.port.repository.CategoryRepository;
-import com.toolrental.domain.catalog.port.repository.EquipmentUnitRepository;
-import com.toolrental.domain.catalog.port.repository.ToolRepository;
+import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
+import com.toolrental.domain.category.model.aggregate.Category;
+import com.toolrental.domain.category.model.valueobject.CategoryId;
+import com.toolrental.domain.category.port.repository.CategoryRepository;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.equipmentunit.port.repository.AtomicEquipmentUnitRegistration;
+import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +57,10 @@ final class Fixture {
 
         public List<Category> findAll() {
           return List.copyOf(categories.values());
+        }
+
+        public void delete(CategoryId id) {
+          categories.remove(id);
         }
 
         public void save(Category c) {

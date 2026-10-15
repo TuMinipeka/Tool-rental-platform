@@ -1,0 +1,54 @@
+package com.toolrental.infrastructure.tool.adapters.out.persistence;
+
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.mapper.ToolPersistenceMapper;
+import com.toolrental.infrastructure.tool.adapters.out.persistence.repository.ToolJpaRepository;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+@Transactional
+public class ToolPersistenceAdapter implements ToolRepository {
+  private final ToolJpaRepository repository;
+  private final com.toolrental.infrastructure.toolimage.adapters.out.persistence.repository
+          .ToolImageJpaRepository
+      images;
+  private final ToolPersistenceMapper mapper;
+
+  public ToolPersistenceAdapter(
+      ToolJpaRepository repository,
+      ToolPersistenceMapper mapper,
+      com.toolrental.infrastructure.toolimage.adapters.out.persistence.repository
+              .ToolImageJpaRepository
+          images) {
+    this.repository = repository;
+    this.images = images;
+    this.mapper = mapper;
+  }
+
+  @Override
+  public Optional<Tool> findById(ToolId id) {
+    return repository.findByIdForUpdate(id.value()).map(mapper::toDomain);
+  }
+
+  @Override
+  public List<Tool> findAll() {
+    return repository.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  @Override
+  @Transactional
+  public void save(Tool aggregate) {
+    repository.saveAndFlush(mapper.toEntity(aggregate));
+    for (var image : aggregate.imageUrls())
+      images.save(
+          new com.toolrental.infrastructure.toolimage.adapters.out.persistence.entity
+              .ToolImageJpaEntity(
+              new com.toolrental.infrastructure.toolimage.adapters.out.persistence.entity
+                  .ToolImageJpaId(aggregate.id().value(), image.toString())));
+  }
+}

@@ -2,22 +2,22 @@ package com.toolrental.domain.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.toolrental.domain.catalog.event.CategoryRegistered;
-import com.toolrental.domain.catalog.event.EquipmentUnitRegistered;
-import com.toolrental.domain.catalog.event.ToolRegistered;
-import com.toolrental.domain.catalog.model.aggregate.Category;
-import com.toolrental.domain.catalog.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.catalog.model.aggregate.Tool;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
+import com.toolrental.domain.category.event.CategoryRegistered;
+import com.toolrental.domain.category.model.aggregate.Category;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.event.EquipmentUnitRegistered;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
 import com.toolrental.domain.reservation.event.ReservationCancelled;
 import com.toolrental.domain.reservation.event.ReservationConfirmed;
 import com.toolrental.domain.reservation.event.ReservationRejected;
 import com.toolrental.domain.reservation.event.ReservationRequested;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.event.ToolRegistered;
+import com.toolrental.domain.tool.model.aggregate.Tool;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -185,7 +185,7 @@ class AggregateEventsTest {
     return Reservation.request(
         CustomerId.generate(),
         new ReservationPeriod(date, date),
-        List.of(new ReservationItem(equipmentUnit.id(), supplier, rate)),
+        List.of(new ReservationLine(equipmentUnit.id(), supplier, rate)),
         clock);
   }
 }

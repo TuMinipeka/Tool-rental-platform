@@ -1,10 +1,9 @@
 package com.toolrental.application.reservation.usecase;
 
 import com.toolrental.application.reservation.dto.ReservationResponse;
-import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.time.Clock;
 import java.util.Objects;
 
@@ -25,7 +24,8 @@ public final class RejectReservationUseCase {
             context -> {
               var r = context.reservation();
               if (!r.supplierId().equals(actor) || !context.isSupplierActive(actor))
-                throw new BusinessRuleException("Supplier is not authorized");
+                throw new com.toolrental.application.common.exception
+                    .AccessDeniedApplicationException();
               r.reject(clock);
               return r;
             }));

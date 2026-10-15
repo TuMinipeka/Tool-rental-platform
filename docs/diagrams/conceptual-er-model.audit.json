@@ -1,0 +1,19 @@
+{
+  "entities": 18,
+  "relationships": 19,
+  "elements": 318,
+  "canvas": [
+    1915,
+    4738
+  ],
+  "attributeEntries": 82,
+  "source": "docs/conceptual-model.md",
+  "sourceSha256": "a89e50b38ff765f13a0335f693d8ea1137ab6cc77e713b7dcbff90e05bac6d11",
+  "crossCheckedAgainstMermaid": true,
+  "mcpServer": "https://mcp.excalidraw.com/mcp",
+  "mcpTool": "create_view",
+  "checkpointId": "e606098e4e0f463691",
+  "sharedLinkExported": false,
+  "createdOn": "2026-10-15",
+  "checkpointReadVerified": true
+}

@@ -2,20 +2,20 @@ package com.toolrental.domain.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.toolrental.domain.catalog.model.aggregate.Category;
-import com.toolrental.domain.catalog.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.catalog.model.aggregate.Tool;
-import com.toolrental.domain.catalog.model.valueobject.CategoryId;
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.catalog.model.valueobject.ToolId;
+import com.toolrental.domain.category.model.aggregate.Category;
+import com.toolrental.domain.category.model.valueobject.CategoryId;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Clock;
@@ -39,8 +39,8 @@ class ReservationTest {
     return new Money(new BigDecimal(value), Currency.getInstance("COP"));
   }
 
-  private ReservationItem item() {
-    return new ReservationItem(equipmentUnit, supplier, money("10000"));
+  private ReservationLine item() {
+    return new ReservationLine(equipmentUnit, supplier, money("10000"));
   }
 
   private Reservation pending() {
@@ -81,12 +81,12 @@ class ReservationTest {
     assertThrows(
         BusinessRuleException.class,
         () -> Reservation.request(customer, p, List.of(item(), item()), clock));
-    var other = new ReservationItem(EquipmentUnitId.generate(), SupplierId.generate(), money("1"));
+    var other = new ReservationLine(EquipmentUnitId.generate(), SupplierId.generate(), money("1"));
     assertThrows(
         BusinessRuleException.class,
         () -> Reservation.request(customer, p, List.of(item(), other), clock));
     var usd =
-        new ReservationItem(
+        new ReservationLine(
             EquipmentUnitId.generate(),
             supplier,
             new Money(BigDecimal.ONE, Currency.getInstance("USD")));
@@ -99,7 +99,7 @@ class ReservationTest {
   void confirmationFreezesRatesWithoutChangingOriginalRequest() {
     var original = pending();
     var currentItems =
-        new ArrayList<>(List.of(new ReservationItem(equipmentUnit, supplier, money("15000"))));
+        new ArrayList<>(List.of(new ReservationLine(equipmentUnit, supplier, money("15000"))));
     var confirmed = original.confirmWithRates(currentItems, clock);
     currentItems.clear();
     assertEquals(ReservationStatus.PENDING, original.status());
@@ -117,20 +117,20 @@ class ReservationTest {
         BusinessRuleException.class,
         () ->
             r.confirmWithRates(
-                List.of(new ReservationItem(EquipmentUnitId.generate(), supplier, money("1"))),
+                List.of(new ReservationLine(EquipmentUnitId.generate(), supplier, money("1"))),
                 clock));
     assertThrows(
         BusinessRuleException.class,
         () ->
             r.confirmWithRates(
-                List.of(new ReservationItem(equipmentUnit, SupplierId.generate(), money("1"))),
+                List.of(new ReservationLine(equipmentUnit, SupplierId.generate(), money("1"))),
                 clock));
     assertThrows(
         BusinessRuleException.class,
         () ->
             r.confirmWithRates(
                 List.of(
-                    new ReservationItem(
+                    new ReservationLine(
                         equipmentUnit,
                         supplier,
                         new Money(BigDecimal.ONE, Currency.getInstance("USD")))),

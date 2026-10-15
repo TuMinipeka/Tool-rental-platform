@@ -1,16 +1,17 @@
 package com.toolrental.infrastructure.reservation.adapters.out.persistence.mapper;
 
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
-import com.toolrental.infrastructure.reservation.adapters.out.persistence.entity.ReservationItemJpaEmbeddable;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import com.toolrental.infrastructure.reservation.adapters.out.persistence.entity.ReservationJpaEntity;
+import com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity.ReservationItemJpaEntity;
+import com.toolrental.infrastructure.reservationitem.adapters.out.persistence.entity.ReservationItemJpaId;
 import java.util.Currency;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -27,7 +28,7 @@ public class ReservationPersistenceMapper {
         entity.getItems().stream()
             .map(
                 item ->
-                    new ReservationItem(
+                    new ReservationLine(
                         new EquipmentUnitId(item.getEquipmentUnitId()),
                         new SupplierId(
                             requireSupplier(item.getEquipmentUnitId(), supplierByEquipmentUnit)),
@@ -40,7 +41,8 @@ public class ReservationPersistenceMapper {
         items,
         entity.getCreatedAt(),
         ReservationStatus.valueOf(entity.getReservationStatus()),
-        entity.getConfirmedAt());
+        entity.getConfirmedAt(),
+        entity.getExpiresAt());
   }
 
   public ReservationJpaEntity toEntity(Reservation aggregate) {
@@ -48,19 +50,24 @@ public class ReservationPersistenceMapper {
         aggregate.items().stream()
             .map(
                 item ->
-                    new ReservationItemJpaEmbeddable(
-                        item.equipmentUnitId().value(), item.dailyRate().amount()))
+                    new ReservationItemJpaEntity(
+                        new ReservationItemJpaId(
+                            aggregate.id().value(), item.equipmentUnitId().value()),
+                        item.dailyRate().amount()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
-    return new ReservationJpaEntity(
-        aggregate.id().value(),
-        aggregate.customerId().value(),
-        aggregate.createdAt(),
-        aggregate.period().startDate(),
-        aggregate.period().returnDate(),
-        aggregate.status().name(),
-        aggregate.items().getFirst().dailyRate().currency().getCurrencyCode(),
-        aggregate.confirmation().map(event -> event.occurredOn()).orElse(null),
-        items);
+    var entity =
+        new ReservationJpaEntity(
+            aggregate.id().value(),
+            aggregate.customerId().value(),
+            aggregate.createdAt(),
+            aggregate.period().startDate(),
+            aggregate.period().returnDate(),
+            aggregate.status().name(),
+            aggregate.items().getFirst().dailyRate().currency().getCurrencyCode(),
+            aggregate.confirmation().map(event -> event.occurredOn()).orElse(null),
+            items);
+    entity.preserveExpiresAt(aggregate.expiresAt());
+    return entity;
   }
 
   private UUID requireSupplier(UUID equipmentUnitId, Map<UUID, UUID> supplierByEquipmentUnit) {

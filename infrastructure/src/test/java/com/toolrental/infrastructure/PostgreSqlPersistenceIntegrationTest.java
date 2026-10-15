@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
-import com.toolrental.domain.catalog.port.repository.CategoryRepository;
+import com.toolrental.domain.category.port.repository.CategoryRepository;
 import com.toolrental.domain.common.exception.BusinessRuleException;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -88,7 +88,7 @@ class PostgreSqlPersistenceIntegrationTest {
   @Test
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
     assertEquals("118", flyway.info().current().getVersion().getVersion());
-    assertEquals(37, flyway.info().applied().length);
+    assertEquals(39, flyway.info().applied().length);
     assertTrue(flyway.validateWithResult().validationSuccessful);
   }
 

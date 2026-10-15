@@ -2,9 +2,11 @@
 
 ## Estado actual
 
-La capa de persistencia incluye PostgreSQL 17.11, Spring Data JPA, Flyway, perfiles de entorno, 18 migraciones estructurales para las relaciones normalizadas, una migración de compatibilidad JPA, mapeos JPA, adaptadores para los puertos actuales y 18 migraciones locales de demostración con un mínimo de cinco filas por tabla.
+La capa de persistencia incluye PostgreSQL 17.11, Spring Data JPA, Flyway, perfiles de entorno, una migración por cada una de las 18 tablas normalizadas, una migración de compatibilidad JPA, una migración para el rol administrador y 18 migraciones locales de demostración con un mínimo de cinco filas por tabla.
 
-El entorno local se aprovisiona con Docker Compose. Testcontainers crea una base vacía y verifica las 37 migraciones, `ddl-auto: validate`, los datos demo, una restricción del motor, un adaptador JPA, rollback transaccional, unicidad concurrente de inventario y prevención de doble reserva. La base de datos todavía no está lista para producción porque faltan reglas del producto, controles operativos y capacidades de persistencia descritas abajo.
+Las 18 tablas tienen mapeos JPA, referencias escalares, claves compartidas o compuestas, casos de uso y adaptadores REST. El entorno local se aprovisiona con Docker Compose. Testcontainers crea una base vacía y verifica las 39 migraciones, `ddl-auto: validate`, contratos HTTP, datos demo, instantáneas históricas, rollback transaccional, unicidad concurrente de inventario y prevención de doble reserva.
+
+La base de datos todavía no está lista para producción porque faltan reglas comerciales, validación de actualizaciones sobre datos persistentes, controles operativos y las ampliaciones descritas abajo.
 
 ## Trabajo operativo prioritario
 
@@ -60,18 +62,16 @@ Estos son requisitos de diseño, no tablas implementadas. Requieren migraciones 
 - Conservar instantáneas de identidad del proveedor y del cliente para que los documentos históricos no se reescriban cuando cambien los perfiles.
 - Impedir que los documentos simulados se presenten como facturas válidas ante la DIAN.
 
-## Capacidades que todavía no tienen adaptadores de persistencia
+## Capacidades de persistencia todavía pendientes
 
-- Administración de usuarios, roles, clientes y proveedores.
-- Alquileres, entregas, devoluciones y reportes de daños.
 - Definiciones, selecciones y valoraciones de protección, evidencias y disputas.
-- Intenciones e intentos de pago, reembolsos y ajustes.
-- Impuestos, instantáneas de precios, facturas y líneas de factura.
-- Publicación y aceptación de documentos legales.
+- Intenciones e intentos de pago mediante una pasarela, reembolsos y ajustes.
+- Impuestos e instantáneas completas del cálculo de precios.
+- Publicación y aceptación versionada de documentos legales.
 - Publicación durable de eventos mediante un Outbox u otro mecanismo transaccional.
 - Reportes administrativos y consultas operativas optimizadas.
 
-Las tablas existentes para algunas de estas capacidades conservan el modelo relacional anterior, pero no deben presentarse como funcionalidad implementada hasta que existan su comportamiento de dominio, casos de uso, adaptadores y restricciones actualizadas.
+Los registros administrativos de pagos y las facturas base ya tienen dominio, casos de uso, persistencia y REST, pero no sustituyen las capacidades comerciales, tributarias o legales anteriores.
 
 ## Criterio de finalización
 

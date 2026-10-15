@@ -1,14 +1,14 @@
 package com.toolrental.domain.reservation.port.repository;
 
-import com.toolrental.domain.catalog.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.catalog.model.aggregate.Tool;
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.catalog.model.valueobject.ToolId;
-import com.toolrental.domain.common.model.valueobject.CustomerId;
-import com.toolrental.domain.common.model.valueobject.SupplierId;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import java.util.function.Function;
 
 /**

@@ -43,7 +43,7 @@ infrastructure/src/main/java/com/toolrental/infrastructure/
     config/
 ```
 
-Current contexts are `catalog` and `reservation`. Add a context only for a coherent business capability, never merely because a table exists. Do not add speculative empty packages or classes; the existing `.gitkeep` adapter directories are the only planned placeholders.
+Use the 18 table-aligned contexts selected by the project. Table-aligned packages do not grant independent write access to protected child records. Do not add speculative empty packages or classes; the existing `.gitkeep` adapter directories are the only planned placeholders.
 
 ## Layer responsibilities
 
@@ -89,7 +89,7 @@ All repository-owned content is written in English.
 
 | Element | Convention | Example |
 | --- | --- | --- |
-| Root package | `com.toolrental.<module>.<context>` | `com.toolrental.application.catalog` |
+| Root package | `com.toolrental.<module>.<context>` | `com.toolrental.application.category` |
 | Use case | intention + `UseCase` | `ConfirmReservationUseCase` |
 | Command | intention + `Command` | `RequestReservationCommand` |
 | Response | concept + `Response` | `ReservationResponse` |
@@ -122,7 +122,7 @@ JPA entities are not domain objects. Keep them in infrastructure and map explici
 
 ### Security
 
-Ownership and role checks remain in use cases. When JWT exists, the input adapter obtains identity from the authenticated principal. A freely supplied `actorId` request field is not authentication.
+Ownership and role checks remain in use cases. The HTTP adapter obtains identity from an authenticated UUID Principal; JWT authentication will be added later. A freely supplied `actorId` request field is not authentication.
 
 ### Events
 
@@ -152,3 +152,15 @@ Domain events record aggregate facts. No external publisher or Outbox exists yet
 - [ ] `mvnw clean verify` succeeds.
 
 ArchUnit checks dependency direction and core hierarchies. Spotless checks Java formatting during `verify`. These safeguards do not replace review of aggregate boundaries or transaction consistency.
+
+## Table-aligned contexts
+
+Use the 18 contexts listed in README. Port adapters belong directly in `adapters/out/persistence`; only Spring Data interfaces belong in its `repository` child. Preserve shared/composite keys instead of creating surrogate IDs. Reservation-item and invoice-item writes remain inside their owner operation. Run PostgreSQL integration tests as part of verification; an explicit isolated test database may replace Docker, never the database assertions.
+
+## Line endings and editor diagnostics
+
+Java source files use LF line endings on every operating system. `.gitattributes` enforces LF for Java checkouts, `.editorconfig` declares the editor convention, and the root Spotless configuration explicitly selects UNIX line endings. Windows `.cmd` scripts retain CRLF.
+
+If Spotless reports a diff containing only `\r\n` versus `\n`, run `mvnw.cmd spotless:apply` followed by `mvnw.cmd spotless:check`. This is a formatting failure, not a Java syntax error. If the command succeeds but the editor still shows old diagnostics, save the files and reload Maven projects; in VS Code, use `Java: Clean Java Language Server Workspace` if reloading does not clear them.
+
+The former `catalog` package was split into `category`, `tool`, `toolimage`, and `equipmentunit` under the existing three modules. Its classes were relocated to those contexts; inspect their new package paths instead of the old empty directory.
