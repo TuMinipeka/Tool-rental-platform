@@ -4,8 +4,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.toolrental.domain.catalog.port.repository.CategoryRepository;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +24,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -64,6 +75,10 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Autowired private JdbcTemplate jdbcTemplate;
 
+  @Autowired private CategoryRepository categoryRepository;
+
+  @Autowired private PlatformTransactionManager transactionManager;
+
   @Test
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
     assertEquals("118", flyway.info().current().getVersion().getVersion());
@@ -90,5 +105,109 @@ class PostgreSqlPersistenceIntegrationTest {
         () ->
             jdbcTemplate.update(
                 "INSERT INTO categories (category_id, name) VALUES (?, ?)", categoryId, "   "));
+  }
+
+  @Test
+  void readsMigratedDataThroughTheRepositoryAdapter() {
+    assertEquals(5, categoryRepository.findAll().size());
+  }
+
+  @Test
+  void rollsBackTheWholeTransactionWhenAnOperationFails() {
+    UUID categoryId = UUID.randomUUID();
+    var transaction = new TransactionTemplate(transactionManager);
+
+    assertThrows(
+        IllegalStateException.class,
+        () ->
+            transaction.executeWithoutResult(
+                status -> {
+                  jdbcTemplate.update(
+                      "INSERT INTO categories (category_id, name) VALUES (?, ?)",
+                      categoryId,
+                      "Rollback verification");
+                  throw new IllegalStateException("Force rollback");
+                }));
+
+    assertEquals(
+        0,
+        jdbcTemplate.queryForObject(
+            "SELECT count(*) FROM categories WHERE category_id = ?", Integer.class, categoryId));
+  }
+
+  @Test
+  void serializesConcurrentInventoryCodeWritesForTheSameSupplier() throws Exception {
+    String inventoryCode = "CONCURRENT-001";
+    var ready = new CountDownLatch(2);
+    var start = new CountDownLatch(1);
+    ExecutorService executor = Executors.newFixedThreadPool(2);
+
+    try {
+      List<Future<Boolean>> attempts =
+          List.of(
+              executor.submit(() -> insertEquipmentUnit(inventoryCode, ready, start)),
+              executor.submit(() -> insertEquipmentUnit(inventoryCode, ready, start)));
+
+      assertTrue(ready.await(10, TimeUnit.SECONDS));
+      start.countDown();
+
+      long successfulWrites =
+          attempts.stream()
+              .map(PostgreSqlPersistenceIntegrationTest::completedSuccessfully)
+              .filter(Boolean::booleanValue)
+              .count();
+
+      assertEquals(1, successfulWrites);
+      assertEquals(
+          1,
+          jdbcTemplate.queryForObject(
+              "SELECT count(*) FROM equipment_units WHERE inventory_code = ?",
+              Integer.class,
+              inventoryCode));
+    } finally {
+      executor.shutdownNow();
+      jdbcTemplate.update("DELETE FROM equipment_units WHERE inventory_code = ?", inventoryCode);
+    }
+  }
+
+  private static boolean insertEquipmentUnit(
+      String inventoryCode, CountDownLatch ready, CountDownLatch start) throws Exception {
+    try (Connection connection =
+        POSTGRES.createConnection("?ApplicationName=inventory-concurrency-test")) {
+      connection.setAutoCommit(false);
+      ready.countDown();
+      if (!start.await(10, TimeUnit.SECONDS)) {
+        throw new IllegalStateException("Concurrent inserts did not start in time");
+      }
+
+      try (PreparedStatement statement =
+          connection.prepareStatement(
+              """
+              INSERT INTO equipment_units (
+                  equipment_unit_id, tool_id, inventory_code,
+                  current_condition, operational_status
+              ) VALUES (?, '20000000-0000-0000-0000-000000000001', ?, 'GOOD', 'OPERATIONAL')
+              """)) {
+        statement.setObject(1, UUID.randomUUID());
+        statement.setString(2, inventoryCode);
+        statement.executeUpdate();
+        connection.commit();
+        return true;
+      } catch (SQLException exception) {
+        connection.rollback();
+        if ("23505".equals(exception.getSQLState())) {
+          return false;
+        }
+        throw exception;
+      }
+    }
+  }
+
+  private static boolean completedSuccessfully(Future<Boolean> attempt) {
+    try {
+      return attempt.get(15, TimeUnit.SECONDS);
+    } catch (Exception exception) {
+      throw new IllegalStateException("Concurrent insert did not complete", exception);
+    }
   }
 }
