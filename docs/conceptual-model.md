@@ -2,7 +2,7 @@
 
 ## Scope
 
-Source: [original assignment](../assignment.md). This document identifies business concepts, attributes, relationships, and rules. The logical relational model appears in [Fourth normal form](fourth-normal-form.md), and implemented aggregate boundaries appear in [Backend architecture](backend-architecture.md).
+Source: [original assignment (Spanish)](../ejercicioDemo.md). This document identifies business concepts, attributes, relationships, and rules. The logical relational model appears in [Fourth normal form](fourth-normal-form.md), and implemented aggregate boundaries appear in [Backend architecture](backend-architecture.md).
 
 Catalog and reservation behavior currently exists in Java. SQL, JPA, JWT, rentals, payments, invoicing, reporting, frontend, and deployment remain pending. PostgreSQL intentionally replaces the MySQL choice in the original brief.
 

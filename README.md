@@ -19,7 +19,7 @@ Pending: PostgreSQL/JPA adapters, Flyway migrations, REST API, JWT identity and 
 | Formatting | Spotless 2.43.0 with Google Java Format 1.27.0 |
 | Planned database | PostgreSQL |
 
-The [original assignment](assignment.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision; no JDBC driver or physical schema has been added yet.
+The [original assignment (Spanish)](ejercicioDemo.md) requested MySQL. PostgreSQL replaces that requirement by explicit project decision; no JDBC driver or physical schema has been added yet.
 
 ## Architecture
 
@@ -91,7 +91,7 @@ The application currently starts a Spring context and exits normally because it 
 
 ## Documentation
 
-1. [Original assignment](assignment.md)
+1. [Original assignment (Spanish)](ejercicioDemo.md)
 2. [Conceptual model](docs/conceptual-model.md)
 3. [Fourth normal form](docs/fourth-normal-form.md)
 4. [Backend architecture](docs/backend-architecture.md)
