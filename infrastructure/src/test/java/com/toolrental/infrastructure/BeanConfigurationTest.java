@@ -3,22 +3,24 @@ package com.toolrental.infrastructure;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import com.toolrental.application.catalog.usecase.QueryCatalogUseCase;
-import com.toolrental.application.catalog.usecase.RegisterCategoryUseCase;
-import com.toolrental.application.catalog.usecase.RegisterEquipmentUnitUseCase;
-import com.toolrental.application.catalog.usecase.RegisterToolUseCase;
+import com.toolrental.application.tool.usecase.QueryCatalogUseCase;
+import com.toolrental.application.category.usecase.RegisterCategoryUseCase;
+import com.toolrental.application.equipmentunit.usecase.RegisterEquipmentUnitUseCase;
+import com.toolrental.application.tool.usecase.RegisterToolUseCase;
 import com.toolrental.application.reservation.usecase.CancelReservationUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.application.reservation.usecase.RejectReservationUseCase;
 import com.toolrental.application.reservation.usecase.RequestReservationUseCase;
-import com.toolrental.domain.catalog.port.repository.AtomicEquipmentUnitRegistration;
-import com.toolrental.domain.catalog.port.repository.CategoryRepository;
-import com.toolrental.domain.catalog.port.repository.EquipmentUnitRepository;
-import com.toolrental.domain.catalog.port.repository.ToolRepository;
+import com.toolrental.domain.equipmentunit.port.repository.AtomicEquipmentUnitRegistration;
+import com.toolrental.domain.category.port.repository.CategoryRepository;
+import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
 import com.toolrental.domain.common.port.ParticipantsPort;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
-import com.toolrental.infrastructure.catalog.config.CatalogBeanConfiguration;
+import com.toolrental.infrastructure.category.config.CategoryBeanConfiguration;
+import com.toolrental.infrastructure.tool.config.ToolBeanConfiguration;
+import com.toolrental.infrastructure.equipmentunit.config.EquipmentUnitBeanConfiguration;
 import com.toolrental.infrastructure.reservation.config.ReservationBeanConfiguration;
 import java.time.Clock;
 import java.time.Instant;
@@ -30,7 +32,7 @@ class BeanConfigurationTest {
   private final ApplicationContextRunner runner =
       new ApplicationContextRunner()
           .withUserConfiguration(
-              CatalogBeanConfiguration.class, ReservationBeanConfiguration.class);
+              CategoryBeanConfiguration.class, ToolBeanConfiguration.class, EquipmentUnitBeanConfiguration.class, ReservationBeanConfiguration.class);
 
   @Test
   void withoutAdaptersOnlyConfiguresClock() {

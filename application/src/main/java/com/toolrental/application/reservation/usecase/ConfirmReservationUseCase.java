@@ -3,7 +3,7 @@ package com.toolrental.application.reservation.usecase;
 import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.model.valueobject.SupplierId;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
+import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import java.time.Clock;

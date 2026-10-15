@@ -9,8 +9,8 @@ These instructions apply to the entire repository. Read `docs/development-guide.
 - `domain` may depend only on Java. Do not add Spring, JPA, HTTP, JSON, or database details.
 - `application` may depend on `domain` and Java, never on `infrastructure` or frameworks.
 - Ports belong to the domain; adapters that implement them belong to infrastructure.
-- Organize code first by business context (`catalog`, `reservation`, and future contexts), then by technical responsibility.
-- Do not create one aggregate, repository, or use case per table. Business boundaries define aggregates.
+- Organize code first by the table-aligned context, then by technical responsibility.
+- Use one context per existing table as the project organizational convention. Cross-context invariants retain their atomic boundaries.
 
 ## Language and naming
 

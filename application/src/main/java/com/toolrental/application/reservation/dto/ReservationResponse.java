@@ -4,7 +4,7 @@ import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
+import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;

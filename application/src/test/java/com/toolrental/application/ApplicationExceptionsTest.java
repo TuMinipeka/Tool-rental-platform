@@ -2,16 +2,16 @@ package com.toolrental.application;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.toolrental.application.catalog.exception.CategoryNotFoundApplicationException;
-import com.toolrental.application.catalog.exception.EquipmentUnitNotFoundApplicationException;
-import com.toolrental.application.catalog.exception.SupplierNotFoundApplicationException;
-import com.toolrental.application.catalog.exception.ToolNotFoundApplicationException;
+import com.toolrental.application.category.exception.CategoryNotFoundApplicationException;
+import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
+import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
+import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
 import com.toolrental.application.common.exception.ApplicationException;
 import com.toolrental.application.reservation.exception.CustomerNotFoundApplicationException;
 import com.toolrental.application.reservation.exception.ReservationNotFoundApplicationException;
-import com.toolrental.domain.catalog.model.valueobject.CategoryId;
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.catalog.model.valueobject.ToolId;
+import com.toolrental.domain.category.model.valueobject.CategoryId;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;

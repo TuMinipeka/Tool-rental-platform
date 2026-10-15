@@ -1,11 +1,11 @@
 package com.toolrental.infrastructure.reservation.adapters.out.persistence.mapper;
 
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
+import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
@@ -40,7 +40,7 @@ public class ReservationPersistenceMapper {
         items,
         entity.getCreatedAt(),
         ReservationStatus.valueOf(entity.getReservationStatus()),
-        entity.getConfirmedAt());
+        entity.getConfirmedAt(), entity.getExpiresAt());
   }
 
   public ReservationJpaEntity toEntity(Reservation aggregate) {
@@ -51,7 +51,7 @@ public class ReservationPersistenceMapper {
                     new ReservationItemJpaEmbeddable(
                         item.equipmentUnitId().value(), item.dailyRate().amount()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
-    return new ReservationJpaEntity(
+    var entity = new ReservationJpaEntity(
         aggregate.id().value(),
         aggregate.customerId().value(),
         aggregate.createdAt(),
@@ -60,7 +60,7 @@ public class ReservationPersistenceMapper {
         aggregate.status().name(),
         aggregate.items().getFirst().dailyRate().currency().getCurrencyCode(),
         aggregate.confirmation().map(event -> event.occurredOn()).orElse(null),
-        items);
+        items); entity.preserveExpiresAt(aggregate.expiresAt()); return entity;
   }
 
   private UUID requireSupplier(UUID equipmentUnitId, Map<UUID, UUID> supplierByEquipmentUnit) {

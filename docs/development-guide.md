@@ -43,7 +43,7 @@ infrastructure/src/main/java/com/toolrental/infrastructure/
     config/
 ```
 
-Current contexts are `catalog` and `reservation`. Add a context only for a coherent business capability, never merely because a table exists. Do not add speculative empty packages or classes; the existing `.gitkeep` adapter directories are the only planned placeholders.
+Use the 18 table-aligned contexts selected by the project. Table-aligned packages do not grant independent write access to protected child records. Do not add speculative empty packages or classes; the existing `.gitkeep` adapter directories are the only planned placeholders.
 
 ## Layer responsibilities
 

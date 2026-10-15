@@ -9,7 +9,7 @@ import com.toolrental.domain.reservation.event.ReservationCancelled;
 import com.toolrental.domain.reservation.event.ReservationConfirmed;
 import com.toolrental.domain.reservation.event.ReservationRejected;
 import com.toolrental.domain.reservation.event.ReservationRequested;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
+import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
@@ -28,6 +28,7 @@ public final class Reservation extends AggregateRoot {
   private final Instant createdAt;
   private ReservationStatus status = ReservationStatus.PENDING;
   private ReservationConfirmed confirmation;
+ private Instant expiresAt;
 
   private Reservation(
       CustomerId customer, ReservationPeriod period, List<ReservationItem> items, Clock clock) {
@@ -93,6 +94,7 @@ public final class Reservation extends AggregateRoot {
       List<ReservationItem> currentItems,
       ReservationStatus status,
       ReservationConfirmed confirmation) {
+    expiresAt = original.expiresAt;
     id = original.id;
     customerId = original.customerId;
     period = original.period;
@@ -141,6 +143,10 @@ public final class Reservation extends AggregateRoot {
     this.confirmation = confirmedAt == null ? null : new ReservationConfirmed(id, confirmedAt);
   }
 
+  public static Reservation restore(ReservationId id, CustomerId customer, ReservationPeriod period, List<ReservationItem> items, Instant createdAt, ReservationStatus status, Instant confirmedAt, Instant expiresAt) {
+    var result = new Reservation(id, customer, period, items, createdAt, status, confirmedAt); result.expiresAt = expiresAt; return result;
+  }
+  public Instant expiresAt() { return expiresAt; }
   public void reject(Clock clock) {
     requirePending();
     var event = new ReservationRejected(id, Instant.now(clock));

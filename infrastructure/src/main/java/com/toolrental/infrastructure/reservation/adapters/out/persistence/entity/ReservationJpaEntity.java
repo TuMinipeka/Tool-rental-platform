@@ -46,6 +46,10 @@ public class ReservationJpaEntity {
   @CollectionTable(name = "reservation_items", joinColumns = @JoinColumn(name = "reservation_id"))
   private Set<ReservationItemJpaEmbeddable> items = new LinkedHashSet<>();
 
+ @Column(name="expires_at")
+ private Instant expiresAt;
+ public Instant getExpiresAt() { return expiresAt; }
+ public void preserveExpiresAt(Instant value) { expiresAt = value; }
   protected ReservationJpaEntity() {}
 
   public ReservationJpaEntity(

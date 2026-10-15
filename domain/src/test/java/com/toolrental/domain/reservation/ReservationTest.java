@@ -2,18 +2,18 @@ package com.toolrental.domain.reservation;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.toolrental.domain.catalog.model.aggregate.Category;
-import com.toolrental.domain.catalog.model.aggregate.EquipmentUnit;
-import com.toolrental.domain.catalog.model.aggregate.Tool;
-import com.toolrental.domain.catalog.model.valueobject.CategoryId;
-import com.toolrental.domain.catalog.model.valueobject.EquipmentUnitId;
-import com.toolrental.domain.catalog.model.valueobject.ToolId;
+import com.toolrental.domain.category.model.aggregate.Category;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.category.model.valueobject.CategoryId;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.model.valueobject.CustomerId;
 import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.common.model.valueobject.SupplierId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
-import com.toolrental.domain.reservation.model.entity.ReservationItem;
+import com.toolrental.domain.reservationitem.model.entity.ReservationItem;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import java.math.BigDecimal;
