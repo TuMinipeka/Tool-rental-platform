@@ -30,3 +30,9 @@ La suite base valida tres migraciones sobre una base vacía. La suite demo aplic
 Las pruebas verifican la consulta real, cierre de recursos JDBC, HTTP 200 con conexión, HTTP 503 sin conexión y ausencia de detalles de credenciales. La prueba integrada confirma el acceso a la página y mantiene HTTP 401 para las rutas de negocio sin `Principal`.
 
 La comprobación del proceso final y del navegador se registra en [el reporte de integración](branch-merge-report.md).
+
+## Comprobación final del navegador y de la base de trabajo
+
+El backend fusionado inició con el perfil `local` y la configuración privada original. La base conserva 18 tablas de dominio, V1–V3 y los roles iniciales. El endpoint de estado respondió 200 con conexión verificada; las rutas de negocio conservaron su respuesta 401 sin autenticación.
+
+Playwright confirmó la página en escritorio y móvil, el botón de actualización, ausencia de desbordamiento horizontal, estado de error ante una respuesta 503 simulada y recuperación al restaurar la consulta real. No se desconectó PostgreSQL para simular ese fallo.
