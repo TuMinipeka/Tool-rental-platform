@@ -2,7 +2,7 @@
 
 ## Estado actual
 
-La capa de persistencia ya incluye PostgreSQL, Spring Data JPA, Flyway, perfiles de configuración, migraciones para las 18 relaciones normalizadas, entidades JPA, mappers y adapters para los puertos actuales de catálogo, participantes y reservas.
+La capa de persistencia ya incluye PostgreSQL, Spring Data JPA, Flyway, perfiles de configuración, migraciones para las 18 relaciones normalizadas, entidades JPA, mappers, adapters para los puertos actuales y un script manual con datos demo para todas las tablas.
 
 La compilación Java fue validada sin ejecutar pruebas. La base todavía no puede considerarse terminada para producción porque falta comprobar el esquema y el comportamiento transaccional contra una instancia PostgreSQL real.
 
@@ -14,7 +14,7 @@ La compilación Java fue validada sin ejecutar pruebas. La base todavía no pued
 - Agregar pruebas concurrentes que demuestren que dos confirmaciones no pueden reservar la misma unidad.
 - Probar concurrentemente la unicidad de `inventory_code` dentro de cada proveedor.
 - Verificar rollback completo cuando una operación atómica falla después de adquirir bloqueos.
-- Crear fixtures controlados para usuarios, clientes, proveedores, categorías, herramientas y unidades.
+- Ejecutar y revisar `infrastructure/src/main/resources/db/seed/demo-data.sql` después de aplicar Flyway en el ambiente local.
 
 ## Capacidades todavía sin persistencia
 

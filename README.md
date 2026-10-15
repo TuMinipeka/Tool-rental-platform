@@ -98,6 +98,14 @@ $env:DB_PASSWORD = 'change-me'
 
 The `production` profile requires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Flyway applies versioned migrations and Hibernate uses `ddl-auto: validate`; Hibernate never creates or updates the schema.
 
+After Flyway initializes a local database, load the development dataset manually:
+
+```powershell
+psql -h localhost -U tool_rental -d tool_rental -f infrastructure/src/main/resources/db/seed/demo-data.sql
+```
+
+The seed script is intentionally outside `db/migration`; it must never populate production automatically.
+
 ## Documentation
 
 1. [Original assignment (Spanish)](ejercicioDemo.md)
@@ -107,6 +115,7 @@ The `production` profile requires `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`. Fl
 5. [Development guide](docs/development-guide.md)
 6. [Infrastructure structure](infrastructure/STRUCTURE.md)
 7. [Pending database work](docs/pendientes-base-datos.md)
+8. [Project roadmap and pending work (Spanish)](docs/pendientes.md)
 
 `AGENTS.md` records repository-wide rules for future automated work. ArchUnit protects dependency direction and key hierarchies; Spotless protects Java formatting.
 
