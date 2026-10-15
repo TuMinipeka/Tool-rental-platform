@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 
 class ArchitectureTest {
   @Test
-  void jerarquiasYPaquetesSiguenElContratoDeLaReferencia() {
-    var clases =
+  void hierarchiesAndPackagesFollowReferenceContract() {
+    var importedClasses =
         new ClassFileImporter()
             .withImportOption(new ImportOption.DoNotIncludeTests())
             .importPackages("com.toolrental");
@@ -24,36 +24,36 @@ class ArchitectureTest {
         .resideInAPackage("com.toolrental.application..exception")
         .should()
         .beAssignableTo(ApplicationException.class)
-        .check(clases);
+        .check(importedClasses);
     classes()
         .that()
         .resideInAPackage("com.toolrental.domain..exception")
         .should()
         .beAssignableTo(DomainException.class)
-        .check(clases);
+        .check(importedClasses);
     classes()
         .that()
         .resideInAPackage("com.toolrental.infrastructure..exception")
         .should()
         .beAssignableTo(InfrastructureException.class)
-        .check(clases);
+        .check(importedClasses);
     classes()
         .that()
         .resideInAPackage("com.toolrental.domain..model.aggregate")
         .should()
         .beAssignableTo(AggregateRoot.class)
-        .check(clases);
+        .check(importedClasses);
     classes()
         .that()
         .resideInAPackage("com.toolrental.domain..event")
         .should()
         .beAssignableTo(DomainEvent.class)
-        .check(clases);
+        .check(importedClasses);
   }
 
   @Test
-  void dependenciasApuntanHaciaElDominio() {
-    var clases =
+  void dependenciesPointTowardDomain() {
+    var importedClasses =
         new ClassFileImporter()
             .withImportOption(new ImportOption.DoNotIncludeTests())
             .importPackages("com.toolrental");
@@ -63,7 +63,7 @@ class ArchitectureTest {
         .should()
         .dependOnClassesThat()
         .resideOutsideOfPackages("com.toolrental.domain..", "java..")
-        .check(clases);
+        .check(importedClasses);
     noClasses()
         .that()
         .resideInAPackage("com.toolrental.application..")
@@ -71,6 +71,6 @@ class ArchitectureTest {
         .dependOnClassesThat()
         .resideOutsideOfPackages(
             "com.toolrental.application..", "com.toolrental.domain..", "java..")
-        .check(clases);
+        .check(importedClasses);
   }
 }

@@ -13,7 +13,7 @@ class ToolRentalApplicationTest {
   @Autowired private ApplicationContext context;
 
   @Test
-  void arrancaSinBaseDeDatosNiServidorWeb() {
+  void startsWithoutDatabaseOrWebServer() {
     assertTrue(context.getBeansOfType(DataSource.class).isEmpty());
     assertNotNull(context.getBean(ToolRentalApplication.class));
     assertFalse(context.getClass().getName().contains("WebServer"));

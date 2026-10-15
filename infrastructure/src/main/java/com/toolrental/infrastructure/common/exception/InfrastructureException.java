@@ -1,6 +1,6 @@
 package com.toolrental.infrastructure.common.exception;
 
-/** Base para fallos técnicos de los futuros adaptadores; no representa reglas del negocio. */
+/** Base type for technical adapter failures; it does not represent business rules. */
 public abstract class InfrastructureException extends RuntimeException {
   protected InfrastructureException(String message) {
     super(message);

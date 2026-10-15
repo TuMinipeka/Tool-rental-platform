@@ -1,56 +1,62 @@
-# Reglas de trabajo del repositorio
+# Repository working rules
 
-Estas instrucciones aplican a todo el repositorio. Antes de modificar código, leer
-`docs/guia-desarrollo.md` y `docs/arquitectura-backend.md`.
+These instructions apply to the entire repository. Read `docs/development-guide.md` and `docs/backend-architecture.md` before changing code.
 
-## Arquitectura obligatoria
+## Required architecture
 
-- Conservar los módulos Maven `domain`, `application` e `infrastructure`.
-- Mantener la dirección de dependencias `infrastructure -> application -> domain`.
-- `domain` solo puede depender de Java. No introducir Spring, JPA, HTTP ni detalles de base de datos.
-- `application` puede depender de `domain` y Java, nunca de `infrastructure` ni de frameworks.
-- Los puertos pertenecen al dominio; sus adaptadores pertenecen a infraestructura.
-- Organizar primero por contexto (`catalog`, `reservation` y los que se incorporen) y después por responsabilidad técnica.
-- No crear un agregado, repositorio o caso de uso por cada tabla. Los límites los define el negocio.
+- Keep the Maven modules `domain`, `application`, and `infrastructure`.
+- Preserve the dependency direction `infrastructure -> application -> domain`.
+- `domain` may depend only on Java. Do not add Spring, JPA, HTTP, JSON, or database details.
+- `application` may depend on `domain` and Java, never on `infrastructure` or frameworks.
+- Ports belong to the domain; adapters that implement them belong to infrastructure.
+- Organize code first by business context (`catalog`, `reservation`, and future contexts), then by technical responsibility.
+- Do not create one aggregate, repository, or use case per table. Business boundaries define aggregates.
 
-## Ubicación y nombres
+## Language and naming
+
+- Write filenames, source identifiers, comments, messages, test names, configuration keys, and documentation in English.
+- Keep the root package `com.toolrental`.
+- Use `PascalCase` for Java types, `camelCase` for members, and lowercase package names.
+- Use the established suffixes `UseCase`, `Command`, `Response`, `Repository`, `Controller`, and `Configuration`.
+- Use plural `snake_case` PostgreSQL table names and singular `snake_case` columns.
+- Use natural English plurals: `category -> categories`, `country -> countries`, `person -> people`. Do not append `s` mechanically when English requires another form.
+
+## Required locations
 
 ```text
-domain/<contexto>/model/{aggregate,entity,valueobject}
-domain/<contexto>/{event,port/repository}
-application/<contexto>/{command,dto,usecase,exception}
-infrastructure/<contexto>/adapters/in/rest/{controllers,dtos}
-infrastructure/<contexto>/adapters/out/persistence/{entity,mapper,repository}
-infrastructure/<contexto>/config
+domain/<context>/model/{aggregate,entity,valueobject}
+domain/<context>/{event,port/repository}
+application/<context>/{command,dto,usecase,exception}
+infrastructure/<context>/adapters/in/rest/{controllers,dtos}
+infrastructure/<context>/adapters/out/persistence/{entity,mapper,repository}
+infrastructure/<context>/config
 ```
 
-- Usar los sufijos `UseCase`, `Command`, `Response`, `Repository`, `Controller` y `Configuration` de forma consistente.
-- Mantener el paquete raíz `com.toolrental` y los nombres del negocio en español. Los nombres técnicos establecidos (`usecase`, `repository`, `mapper`) se conservan.
-- No añadir directorios, abstracciones o clases vacías salvo marcadores `.gitkeep` de una estructura ya acordada.
+Do not add speculative empty classes or abstractions. Empty adapter directories already agreed by the project may use `.gitkeep`.
 
-## Diseño y reglas de negocio
+## Domain and application design
 
-- Encapsular invariantes en agregados y value objects; no exponer setters genéricos ni colecciones mutables.
-- Usar IDs tipados, `BigDecimal` mediante `Dinero`, `LocalDate` para períodos e `Instant` con un `Clock` inyectado para marcas de tiempo.
-- Los casos de uso coordinan; no duplican reglas internas del agregado ni conocen HTTP/JPA.
-- Entradas y salidas de aplicación son objetos inmutables. No devolver entidades JPA ni agregados mutables por la API.
-- Toda operación que combine comprobar disponibilidad y guardar debe conservar un límite atómico. No separar esas acciones en llamadas vulnerables a concurrencia.
-- Las fábricas `restaurar` reconstruyen persistencia sin generar nuevos eventos de dominio.
-- El actor de una operación HTTP vendrá del principal autenticado; nunca se confiará en un ID de actor libre enviado en el cuerpo.
+- Put invariants in aggregates and value objects. Do not expose generic setters or mutable collections.
+- Use typed IDs, `Money`/`BigDecimal`, `LocalDate` for reservation dates, and `Instant` with an injected `Clock` for timestamps.
+- Use cases coordinate domain behavior and ports; they do not know HTTP or JPA.
+- Application inputs and outputs are immutable. Never expose JPA entities or mutable aggregates through the API.
+- Keep availability checks and reservation confirmation inside one atomic boundary.
+- `restore` factories rebuild persisted state without emitting new domain events.
+- An HTTP actor identifier must come from the authenticated principal, not from a freely supplied request-body field.
 
-## Infraestructura y persistencia
+## Infrastructure and database
 
-- Mantener separadas las entidades JPA, los mappers y los repositorios adaptadores.
-- Los cambios de esquema se realizan con migraciones Flyway versionadas; no usar generación destructiva de esquema.
-- Reforzar en PostgreSQL las invariantes que correspondan: claves, unicidad, referencias y control de concurrencia.
-- Los controladores deben ser delgados: validar el contrato HTTP, traducirlo a un comando, ejecutar un caso de uso y mapear la respuesta/error.
-- Registrar dependencias con configuración por contexto e inyección por constructor.
+- Keep JPA entities, mappers, and repository adapters separate.
+- Change the schema only through versioned Flyway migrations; do not use destructive schema generation.
+- Reinforce keys, uniqueness, references, and relevant invariants in PostgreSQL.
+- Keep controllers thin: validate the HTTP contract, create a command, invoke one use case, and map its result or error.
+- Use constructor injection and configuration grouped by business context.
 
-## Calidad y documentación
+## Quality and documentation
 
-- Por cada comportamiento nuevo, añadir pruebas en la capa que lo posee. Para persistencia o concurrencia, añadir pruebas de integración reales.
-- Antes de terminar ejecutar `mvnw.cmd clean verify` en Windows o `./mvnw clean verify` en Linux/macOS.
-- Aplicar formato con `mvnw.cmd spotless:apply` o `./mvnw spotless:apply` cuando sea necesario.
-- Actualizar la documentación si cambia una regla, contrato, estructura, tecnología o estado real de implementación. No documentar como terminado algo que aún sea una plantilla.
-- Conservar el formato de commits indicado en `README.md`.
-
+- Add tests in the layer that owns each new behavior. Persistence and concurrency require real integration tests.
+- Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS before completion.
+- Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.
+- Update documentation whenever a rule, contract, structure, technology, or implementation status changes.
+- Do not describe templates or planned work as implemented.
+- Use the English Conventional Commit format shown in `README.md`.
