@@ -10,15 +10,13 @@ import com.toolrental.domain.common.event.DomainEvent;
 import com.toolrental.domain.common.exception.DomainException;
 import com.toolrental.domain.common.model.AggregateRoot;
 import com.toolrental.infrastructure.common.exception.InfrastructureException;
+import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 class ArchitectureTest {
   @Test
   void hierarchiesAndPackagesFollowReferenceContract() {
-    var importedClasses =
-        new ClassFileImporter()
-            .withImportOption(new ImportOption.DoNotIncludeTests())
-            .importPackages("com.toolrental");
+    var importedClasses = importedProductionClasses();
     classes()
         .that()
         .resideInAPackage("com.toolrental.application..exception")
@@ -53,10 +51,7 @@ class ArchitectureTest {
 
   @Test
   void dependenciesPointTowardDomain() {
-    var importedClasses =
-        new ClassFileImporter()
-            .withImportOption(new ImportOption.DoNotIncludeTests())
-            .importPackages("com.toolrental");
+    var importedClasses = importedProductionClasses();
     noClasses()
         .that()
         .resideInAPackage("com.toolrental.domain..")
@@ -72,5 +67,14 @@ class ArchitectureTest {
         .resideOutsideOfPackages(
             "com.toolrental.application..", "com.toolrental.domain..", "java..")
         .check(importedClasses);
+  }
+
+  private com.tngtech.archunit.core.domain.JavaClasses importedProductionClasses() {
+    return new ClassFileImporter()
+        .withImportOption(new ImportOption.DoNotIncludeTests())
+        .importPaths(
+            Path.of("../domain/target/classes"),
+            Path.of("../application/target/classes"),
+            Path.of("target/classes"));
   }
 }

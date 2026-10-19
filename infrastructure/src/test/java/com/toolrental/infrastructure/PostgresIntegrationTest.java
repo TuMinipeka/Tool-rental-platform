@@ -7,16 +7,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.toolrental.application.common.exception.AvailabilityConflictApplicationException;
 import com.toolrental.application.reservation.command.RequestReservationCommand;
 import com.toolrental.application.reservation.usecase.CancelReservationUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.application.reservation.usecase.RequestReservationUseCase;
-import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.user.port.SecureTokenService;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -77,6 +78,7 @@ class PostgresIntegrationTest {
   @Autowired RequestReservationUseCase request;
   @Autowired ConfirmReservationUseCase confirm;
   @Autowired CancelReservationUseCase cancel;
+  @Autowired SecureTokenService tokenService;
   UUID admin, supplier, customer, category, tool, unit;
 
   @BeforeEach
@@ -139,19 +141,19 @@ class PostgresIntegrationTest {
   }
 
   @Test
-  void bootsWithAllEighteenMappingsAndFreshMigrations() {
-    assertThat(emf.getMetamodel().getEntities()).hasSize(18);
+  void bootsWithAllTwentyFiveMappingsAndFreshMigrations() {
+    assertThat(emf.getMetamodel().getEntities()).hasSize(25);
     assertThat(
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(25);
+        .isEqualTo(33);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
                 Integer.class,
                 schema))
-        .isEqualTo(18);
+        .isEqualTo(25);
   }
 
   @Test
@@ -204,27 +206,32 @@ class PostgresIntegrationTest {
     call(
         null, get("/api/reservations").header("Authorization", "Bearer " + accessToken), null, 200);
 
-    var recovery = call(null, post("/api/auth/password-recovery"), Map.of("email", email), 202);
-    String resetToken = recovery.get("recoveryToken").asText();
-    call(null, get("/api/reservations").header("Authorization", "Bearer " + resetToken), null, 401);
+    var recovery = call(null, post("/api/v1/auth/password-recovery"), Map.of("email", email), 202);
+    assertThat(recovery.has("recoveryToken")).isFalse();
+    String resetToken = "integration-reset-token";
+    db.update(
+        "insert into password_reset_tokens (password_reset_token_id,user_id,token_hash,created_at,expires_at) values (?,?,?,now(),now()+interval '15 minutes')",
+        UUID.randomUUID(),
+        UUID.fromString(registration.get("userId").asText()),
+        tokenService.hash(resetToken));
     call(
         null,
-        post("/api/auth/password-reset"),
+        post("/api/v1/auth/password-reset"),
         Map.of("token", resetToken, "newPassword", changedPassword),
         204);
-    call(null, post("/api/auth/login"), Map.of("email", email, "password", initialPassword), 401);
-    var changedLogin =
-        call(
-            null,
-            post("/api/auth/login"),
-            Map.of("email", email, "password", changedPassword),
-            200);
     call(
         null,
-        post("/api/auth/logout")
-            .header("Authorization", "Bearer " + changedLogin.get("accessToken").asText()),
+        get("/api/v1/reservations").header("Authorization", "Bearer " + accessToken),
         null,
-        204);
+        401);
+    call(
+        null,
+        post("/api/v1/auth/password-reset"),
+        Map.of("token", resetToken, "newPassword", changedPassword),
+        400);
+    call(null, post("/api/auth/login"), Map.of("email", email, "password", initialPassword), 401);
+    call(
+        null, post("/api/v1/auth/login"), Map.of("email", email, "password", changedPassword), 200);
 
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
@@ -359,9 +366,7 @@ class PostgresIntegrationTest {
                 .get("paymentId")
                 .asText())
         .isEqualTo(firstPayment.get("paymentId").asText());
-    call(supplier, post("/api/rentals"), Map.of("reservationId", rid), 201);
-    call(customer, post("/api/reservations/" + rid + "/cancellation"), null, 409);
-    call(supplier, patch("/api/rentals/" + rid + "/status"), Map.of("status", "COMPLETED"), 409);
+    call(supplier, post("/api/rentals"), Map.of("reservationId", rid), 409);
     call(
         supplier,
         post("/api/unit-deliveries"),
@@ -403,6 +408,14 @@ class PostgresIntegrationTest {
             .param("equipmentUnitId", unit.toString()),
         Map.of("condition", "GOOD"),
         200);
+    call(supplier, post("/api/rentals"), Map.of("reservationId", rid), 201);
+    call(
+        customer,
+        post("/api/reservations/" + rid + "/cancellation")
+            .header("Idempotency-Key", "after-rental"),
+        null,
+        409);
+    call(supplier, patch("/api/rentals/" + rid + "/status"), Map.of("status", "COMPLETED"), 409);
     call(
         supplier,
         post("/api/unit-returns"),
@@ -501,7 +514,36 @@ class PostgresIntegrationTest {
   void failedInvoiceLineRollsBackHeaderAndOtherLines() throws Exception {
     var id = pending();
     confirm.execute(id, new SupplierId(supplier));
-    call(supplier, post("/api/rentals"), Map.of("reservationId", id.value()), 201);
+    var rid = id.value();
+    call(
+        supplier,
+        post("/api/unit-deliveries"),
+        Map.of(
+            "reservationId",
+            rid,
+            "equipmentUnitId",
+            unit,
+            "scheduledAt",
+            Instant.now().minusSeconds(3600).toString(),
+            "outboundCondition",
+            "GOOD",
+            "addressLine",
+            "Street 1",
+            "city",
+            "Bogota",
+            "region",
+            "DC",
+            "country",
+            "CO"),
+        201);
+    call(
+        supplier,
+        patch("/api/unit-deliveries/entry/completion")
+            .param("reservationId", rid.toString())
+            .param("equipmentUnitId", unit.toString()),
+        Map.of("condition", "GOOD"),
+        200);
+    call(supplier, post("/api/rentals"), Map.of("reservationId", rid), 201);
     call(
         supplier,
         post("/api/invoices"),
@@ -540,7 +582,7 @@ class PostgresIntegrationTest {
                   try {
                     confirm.execute(id, new SupplierId(supplier));
                     return true;
-                  } catch (BusinessRuleException ex) {
+                  } catch (AvailabilityConflictApplicationException ex) {
                     return false;
                   }
                 }));
@@ -588,7 +630,7 @@ class PostgresIntegrationTest {
                     List.of(new EquipmentUnitId(unit))))
             .id();
     assertThatThrownBy(() -> confirm.execute(boundary, new SupplierId(supplier)))
-        .isInstanceOf(BusinessRuleException.class);
+        .isInstanceOf(AvailabilityConflictApplicationException.class);
     assertThat(
             db.queryForObject(
                 "select reservation_status from reservations where reservation_id=?",

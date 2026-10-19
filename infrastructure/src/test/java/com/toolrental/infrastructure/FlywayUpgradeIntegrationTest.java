@@ -33,10 +33,10 @@ class FlywayUpgradeIntegrationTest {
               .dataSource(url, user, password)
               .schemas(schema)
               .defaultSchema(schema)
-              .target("3")
+              .target("200")
               .cleanDisabled(true)
               .load();
-      assertThat(legacy.migrate().migrationsExecuted).isEqualTo(3);
+      assertThat(legacy.migrate().migrationsExecuted).isEqualTo(25);
       Map<String, Integer> originalChecksums = checksums(legacy);
       UUID id = UUID.randomUUID();
       try (var connection = DriverManager.getConnection(url, user, password)) {
@@ -57,8 +57,8 @@ class FlywayUpgradeIntegrationTest {
               .defaultSchema(schema)
               .cleanDisabled(true)
               .load();
-      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(22);
-      assertThat(upgraded.info().current().getVersion().getVersion()).isEqualTo("200");
+      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(8);
+      assertThat(upgraded.info().current().getVersion().getVersion()).isEqualTo("208");
       assertThat(checksums(upgraded)).containsAllEntriesOf(originalChecksums);
       assertThat(upgraded.validateWithResult().validationSuccessful).isTrue();
       assertThat(upgraded.migrate().migrationsExecuted).isZero();
@@ -88,7 +88,7 @@ class FlywayUpgradeIntegrationTest {
           query.setString(1, schema);
           try (var rows = query.executeQuery()) {
             rows.next();
-            assertThat(rows.getInt(1)).isEqualTo(18);
+            assertThat(rows.getInt(1)).isEqualTo(25);
           }
         }
       }

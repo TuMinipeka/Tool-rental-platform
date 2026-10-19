@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/invoice-items")
+@RequestMapping({"/api/v1/invoice-items", "/api/invoice-items"})
 public class InvoiceItemController {
   private final ManageInvoiceItemUseCase useCase;
 

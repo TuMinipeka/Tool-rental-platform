@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/tool-images")
+@RequestMapping({"/api/v1/tool-images", "/api/tool-images"})
 public class ToolImageController {
   private final ManageToolImageUseCase useCase;
 

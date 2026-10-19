@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping({"/api/v1/customers", "/api/customers"})
 public class CustomerController {
   private final ManageCustomerUseCase useCase;
 

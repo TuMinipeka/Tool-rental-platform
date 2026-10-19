@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping({"/api/v1/categories", "/api/categories"})
 public class CategoryController {
   private final ManageCategoryUseCase management;
 

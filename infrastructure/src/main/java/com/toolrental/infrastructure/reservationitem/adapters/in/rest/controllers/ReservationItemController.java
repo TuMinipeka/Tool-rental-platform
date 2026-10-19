@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/reservation-items")
+@RequestMapping({"/api/v1/reservation-items", "/api/reservation-items"})
 public class ReservationItemController {
   private final ManageReservationItemUseCase useCase;
 

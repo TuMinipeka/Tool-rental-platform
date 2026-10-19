@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/equipment-units")
+@RequestMapping({"/api/v1/equipment-units", "/api/equipment-units"})
 public class EquipmentUnitController {
   private final ManageEquipmentUnitUseCase management;
 

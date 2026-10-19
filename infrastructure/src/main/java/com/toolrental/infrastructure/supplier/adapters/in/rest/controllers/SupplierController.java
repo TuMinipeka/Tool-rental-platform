@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/suppliers")
+@RequestMapping({"/api/v1/suppliers", "/api/suppliers"})
 public class SupplierController {
   private final ManageSupplierUseCase useCase;
 

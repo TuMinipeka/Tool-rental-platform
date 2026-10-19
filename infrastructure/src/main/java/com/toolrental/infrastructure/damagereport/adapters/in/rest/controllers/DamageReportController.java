@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/damage-reports")
+@RequestMapping({"/api/v1/damage-reports", "/api/damage-reports"})
 public class DamageReportController {
   private final ManageDamageReportUseCase useCase;
 

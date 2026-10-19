@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/public/catalog")
+@RequestMapping({"/api/v1/public/catalog", "/api/public/catalog"})
 @SecurityRequirements
 public final class PublicCatalogController {
   private final BrowseCatalogUseCase catalog;

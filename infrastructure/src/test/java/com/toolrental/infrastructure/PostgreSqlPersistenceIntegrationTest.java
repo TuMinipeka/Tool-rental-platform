@@ -4,9 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.toolrental.application.common.exception.AvailabilityConflictApplicationException;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.domain.category.port.repository.CategoryRepository;
-import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.sql.Connection;
@@ -99,9 +99,9 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Test
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
-    assertEquals("200", flyway.info().current().getVersion().getVersion());
+    assertEquals("300", flyway.info().current().getVersion().getVersion());
     assertEquals(
-        43,
+        52,
         java.util.Arrays.stream(flyway.info().applied())
             .filter(info -> info.getVersion() != null)
             .count());
@@ -247,8 +247,11 @@ class PostgreSqlPersistenceIntegrationTest {
         """
         INSERT INTO reservations (
             reservation_id, customer_id, created_at, start_date, return_date,
-            reservation_status, currency
-        ) VALUES (?, ?, now(), DATE '2030-01-10', DATE '2030-01-12', 'PENDING', 'COP')
+            reservation_status, currency, scheduled_fulfillment_at, fulfillment_method,
+            cancellation_policy_id, delivery_fee, effective_return_date
+        ) VALUES (?, ?, now(), DATE '2030-01-10', DATE '2030-01-12', 'PENDING', 'COP',
+            TIMESTAMPTZ '2030-01-10 08:00:00-05', 'CUSTOMER_PICKUP',
+            '00000000-0000-0000-0000-000000000203', 0, DATE '2030-01-12')
         """,
         reservationId,
         customerId);
@@ -273,7 +276,7 @@ class PostgreSqlPersistenceIntegrationTest {
           new ReservationId(reservationId),
           new SupplierId(UUID.fromString("00000000-0000-0000-0000-000000000001")));
       return true;
-    } catch (BusinessRuleException exception) {
+    } catch (AvailabilityConflictApplicationException exception) {
       return false;
     }
   }

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/invoices")
+@RequestMapping({"/api/v1/invoices", "/api/invoices"})
 public class InvoiceController {
   private final ManageInvoiceUseCase useCase;
 

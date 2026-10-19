@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,5 +30,10 @@ public class OpenApiConfiguration {
                         .scheme("bearer")
                         .bearerFormat("JWT")))
         .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME));
+  }
+
+  @Bean
+  OpenApiCustomizer onlyVersionOnePaths() {
+    return openApi -> openApi.getPaths().keySet().removeIf(path -> !path.startsWith("/api/v1/"));
   }
 }

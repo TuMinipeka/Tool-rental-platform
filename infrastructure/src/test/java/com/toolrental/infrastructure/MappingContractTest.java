@@ -33,7 +33,7 @@ class MappingContractTest {
       var columns = new HashSet<String>();
       var rows =
           Pattern.compile(
-                  "(?m)^    (\\w+) (?:uuid|smallint|integer|varchar|char|numeric|timestamptz|date)")
+                  "(?m)^    (\\w+) (?:uuid|smallint|integer|boolean|varchar|char|numeric|timestamptz|date)")
               .matcher(matcher.group(2));
       while (rows.find()) columns.add(rows.group(1));
       tables.put(matcher.group(1), columns);
@@ -72,6 +72,6 @@ class MappingContractTest {
       }
       assertThat(columns).as(table).isEqualTo(tables.get(table));
     }
-    assertThat(owners).hasSize(18).containsExactlyInAnyOrderElementsOf(tables.keySet());
+    assertThat(owners).hasSize(25).containsExactlyInAnyOrderElementsOf(tables.keySet());
   }
 }

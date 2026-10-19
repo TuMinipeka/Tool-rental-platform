@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/tools")
+@RequestMapping({"/api/v1/tools", "/api/tools"})
 public class ToolController {
   private final ManageToolUseCase management;
 
