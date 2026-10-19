@@ -11,6 +11,7 @@ import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservation.model.valueobject.ReservationQuote;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
@@ -56,6 +57,17 @@ class ReservationTest {
             customer, new ReservationPeriod(date, date.plusDays(1)), List.of(item()), clock);
     assertEquals(money("20000"), r.total());
     assertEquals(clock.instant(), r.createdAt());
+  }
+
+  @Test
+  void calculatesApprovedFiftyFiftyRentalQuoteWithoutInventingTax() {
+    var quote =
+        ReservationQuote.calculate(
+            new ReservationPeriod(date, date.plusDays(1)), List.of(money("10000"), money("5000")));
+
+    assertEquals(money("30000"), quote.rentalSubtotal());
+    assertEquals(money("15000"), quote.firstPayment());
+    assertEquals(money("15000"), quote.remainingPayment());
   }
 
   @Test

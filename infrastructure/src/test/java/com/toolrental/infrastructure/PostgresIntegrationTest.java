@@ -1,6 +1,7 @@
 package com.toolrental.infrastructure;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -114,7 +115,8 @@ class PostgresIntegrationTest {
 
   JsonNode call(UUID actor, MockHttpServletRequestBuilder builder, Object body, int expected)
       throws Exception {
-    if (actor != null) builder.principal(() -> actor.toString());
+    if (actor != null)
+      builder.with(jwt().jwt(token -> token.subject(actor.toString()).claim("purpose", "access")));
     if (body != null)
       builder.contentType("application/json").content(json.writeValueAsString(body));
     String result =
@@ -143,7 +145,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(24);
+        .isEqualTo(25);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
@@ -159,10 +161,73 @@ class PostgresIntegrationTest {
     call(admin, post("/api/users"), Map.of(), 400);
     call(admin, get("/api/users/" + UUID.randomUUID()), null, 404);
     call(customer, get("/api/users/" + supplier), null, 403);
-    call(customer, get("/api/payments"), null, 403);
+    call(customer, get("/api/payments"), null, 200);
     call(customer, get("/api/categories"), null, 200);
     call(customer, get("/api/tools"), null, 200);
     call(customer, get("/api/tools/" + tool), null, 200);
+  }
+
+  @Test
+  void authenticationRecoveryPublicCatalogAndOpenApiUseThePublishedContracts() throws Exception {
+    String email = "new.customer@example.com";
+    String initialPassword = "InitialPass123!";
+    String changedPassword = "ChangedPass123!";
+    var registration =
+        call(
+            null,
+            post("/api/auth/register"),
+            Map.of(
+                "email",
+                email,
+                "displayName",
+                "New Customer",
+                "password",
+                initialPassword,
+                "personType",
+                "PERSON",
+                "documentType",
+                "ID",
+                "documentNumber",
+                "NEW-CUSTOMER-1",
+                "billingName",
+                "New Customer"),
+            201);
+    assertThat(registration.get("roles").toString()).contains("CUSTOMER");
+
+    var login =
+        call(
+            null,
+            post("/api/auth/login"),
+            Map.of("email", email, "password", initialPassword),
+            200);
+    String accessToken = login.get("accessToken").asText();
+    call(
+        null, get("/api/reservations").header("Authorization", "Bearer " + accessToken), null, 200);
+
+    var recovery = call(null, post("/api/auth/password-recovery"), Map.of("email", email), 202);
+    String resetToken = recovery.get("recoveryToken").asText();
+    call(null, get("/api/reservations").header("Authorization", "Bearer " + resetToken), null, 401);
+    call(
+        null,
+        post("/api/auth/password-reset"),
+        Map.of("token", resetToken, "newPassword", changedPassword),
+        204);
+    call(null, post("/api/auth/login"), Map.of("email", email, "password", initialPassword), 401);
+    var changedLogin =
+        call(
+            null,
+            post("/api/auth/login"),
+            Map.of("email", email, "password", changedPassword),
+            200);
+    call(
+        null,
+        post("/api/auth/logout")
+            .header("Authorization", "Bearer " + changedLogin.get("accessToken").asText()),
+        null,
+        204);
+
+    assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
+    assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
   }
 
   @Test
@@ -266,6 +331,34 @@ class PostgresIntegrationTest {
     var reservation = pending();
     confirm.execute(reservation, new SupplierId(supplier));
     UUID rid = reservation.value();
+    var firstPaymentRequest =
+        Map.of(
+            "reservationId",
+            rid,
+            "paymentStage",
+            "FIRST_HALF",
+            "paymentMethod",
+            "CREDIT_CARD",
+            "idempotencyKey",
+            "reservation-first-half",
+            "cardNetwork",
+            "VISA",
+            "cardLastFour",
+            "4242",
+            "cardExpiryMonth",
+            12,
+            "cardExpiryYear",
+            2030,
+            "simulationOutcome",
+            "APPROVE");
+    var firstPayment = call(customer, post("/api/payments/simulations"), firstPaymentRequest, 201);
+    assertThat(firstPayment.get("amount").decimalValue()).isEqualByComparingTo("10.0000");
+    assertThat(firstPayment.get("cardLastFour").asText()).isEqualTo("4242");
+    assertThat(
+            call(customer, post("/api/payments/simulations"), firstPaymentRequest, 201)
+                .get("paymentId")
+                .asText())
+        .isEqualTo(firstPayment.get("paymentId").asText());
     call(supplier, post("/api/rentals"), Map.of("reservationId", rid), 201);
     call(customer, post("/api/reservations/" + rid + "/cancellation"), null, 409);
     call(supplier, patch("/api/rentals/" + rid + "/status"), Map.of("status", "COMPLETED"), 409);
@@ -346,25 +439,23 @@ class PostgresIntegrationTest {
         patch("/api/damage-reports/" + damageId + "/status"),
         Map.of("status", "CLOSED"),
         200);
-    var payment =
+    var finalPayment =
         call(
-            admin,
-            post("/api/payments"),
+            customer,
+            post("/api/payments/simulations"),
             Map.of(
                 "reservationId",
                 rid,
-                "processor",
-                "MANUAL",
-                "externalReference",
-                "PAY-1",
-                "amount",
-                20),
+                "paymentStage",
+                "FINAL_HALF",
+                "paymentMethod",
+                "PAYPAL",
+                "idempotencyKey",
+                "reservation-final-half",
+                "simulationOutcome",
+                "APPROVE"),
             201);
-    call(
-        admin,
-        patch("/api/payments/" + payment.get("paymentId").asText() + "/status"),
-        Map.of("status", "CONFIRMED"),
-        200);
+    assertThat(finalPayment.get("amount").decimalValue()).isEqualByComparingTo("10.0000");
     var invoice =
         call(
             supplier,
@@ -632,7 +723,13 @@ class PostgresIntegrationTest {
                   gate.await(10, TimeUnit.SECONDS);
                   return mvc.perform(
                           post("/api/equipment-units")
-                              .principal(() -> supplier.toString())
+                              .with(
+                                  jwt()
+                                      .jwt(
+                                          token ->
+                                              token
+                                                  .subject(supplier.toString())
+                                                  .claim("purpose", "access")))
                               .contentType("application/json")
                               .content(
                                   json.writeValueAsString(

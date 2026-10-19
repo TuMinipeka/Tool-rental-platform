@@ -38,6 +38,16 @@ class MappingContractTest {
       while (rows.find()) columns.add(rows.group(1));
       tables.put(matcher.group(1), columns);
     }
+    var alterTableMatcher =
+        Pattern.compile("ALTER TABLE (\\w+)([\\s\\S]*?);", Pattern.CASE_INSENSITIVE).matcher(sql);
+    while (alterTableMatcher.find()) {
+      var addedColumnMatcher =
+          Pattern.compile("ADD COLUMN(?: IF NOT EXISTS)?\\s+(\\w+)", Pattern.CASE_INSENSITIVE)
+              .matcher(alterTableMatcher.group(2));
+      while (addedColumnMatcher.find()) {
+        tables.get(alterTableMatcher.group(1)).add(addedColumnMatcher.group(1));
+      }
+    }
     var classes =
         new ClassFileImporter()
             .withImportOption(new ImportOption.DoNotIncludeTests())
