@@ -108,4 +108,4 @@ erDiagram
 
 ## Correspondencia con DDD y estado
 
-El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva y factura siguen coordinadas. Sus líneas no pueden eludir invariantes mediante escritura independiente. Las 18 tablas tienen mapeo JPA y operaciones del backend; JWT, pasarela, informes y recorridos de frontend siguen pendientes. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).
+El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva y factura siguen coordinadas. Sus líneas no pueden eludir invariantes mediante escritura independiente. Las 18 tablas tienen mapeo JPA y operaciones del backend; JWT de acceso y pagos académicos 50/50 ya existen. Pasarela externa, informes y recorridos de frontend siguen pendientes. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).

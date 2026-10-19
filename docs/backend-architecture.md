@@ -46,12 +46,12 @@ Flyway conserva V1–V3 y ejecuta V4–V24 adaptadas del aporte de Conde. La dem
 
 ## REST y seguridad actual
 
-Controladores delgados convierten DTOs HTTP en comandos. `/api/**` requiere un `Principal` autenticado cuyo nombre sea un UUID. Los casos de uso verifican usuario activo, rol, propiedad y participación; no aceptan un `actorId` arbitrario como autenticación.
+Controladores delgados convierten DTOs HTTP en comandos. Las rutas privadas requieren un JWT Bearer cuyo `sub` es un UUID. Los casos de uso verifican usuario activo, rol, propiedad y participación; no aceptan un `actorId` arbitrario como autenticación. Registro, login, recuperación de contraseña y catálogo publicado tienen contratos públicos específicos.
 
-Todavía no hay login ni JWT. Las llamadas anónimas reciben 401; acceso denegado 403; contrato inválido 400; referencia inexistente 404; conflicto de negocio/persistencia 409. No se devuelven hashes o errores SQL internos. La página raíz y `/status/database` son públicos y solo muestran disponibilidad. Consulta [API REST](rest-api.md).
+El JWT HMAC expira en un periodo corto y no tiene renovación. Logout es stateless y la revocación persistente continúa pendiente. La recuperación devuelve el token firmado únicamente como mecanismo académico mientras no exista proveedor de correo. Las llamadas anónimas a rutas privadas reciben 401; acceso denegado 403; contrato inválido 400; referencia inexistente 404; conflicto de negocio/persistencia 409. No se devuelven hashes o errores SQL internos. La página raíz, `/status/database`, autenticación, catálogo publicado, OpenAPI y Swagger UI son públicos. Consulta [API REST](rest-api.md).
 
 ## Verificación y límites
 
 ArchUnit comprueba dependencias y jerarquías. Las pruebas contrastan columnas y propietarios JPA, arranque PostgreSQL, actualización de Flyway, contratos HTTP, rollback y concurrencia. Testcontainers es la ruta predeterminada; una base exclusiva de pruebas permite ejecutar las mismas comprobaciones sin Docker.
 
-No hay publicador externo de eventos ni Outbox. JWT, OpenAPI, frontend funcional y ampliaciones comerciales siguen pendientes. Consulta [preparación de producción](production-readiness.md).
+No hay publicador externo de eventos ni Outbox. OpenAPI y Swagger UI describen el contrato actual. Renovación/revocación persistente de JWT, frontend funcional, impuestos, protección y otras ampliaciones comerciales siguen pendientes. Consulta [preparación de producción](production-readiness.md).

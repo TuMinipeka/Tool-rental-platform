@@ -17,11 +17,11 @@ La referencia es el inicio del [enunciado original](../ejercicioDemo.md), que se
 
 | Área | Entregado | Pendiente |
 | --- | --- | --- |
-| Usuarios y roles | Perfiles, varios roles, BCrypt y permisos en casos de uso | JWT, login y alta inicial segura |
-| Catálogo | Categorías, herramientas, imágenes y unidades | Interfaz conectada |
+| Usuarios y roles | Registro de cliente, login, JWT de acceso, recuperación académica, BCrypt y permisos | Renovación, revocación persistente y entrega externa de recuperación |
+| Catálogo | Categorías, herramientas, imágenes, unidades, catálogo público y disponibilidad | Interfaz conectada |
 | Reservas | Solicitud, confirmación, rechazo/cancelación y concurrencia | Caducidad automática y pago como condición de entrega |
 | Operación | Alquiler, entrega, devolución y daños | Evidencias, disputas y ampliaciones comerciales |
-| Pagos | Registro administrativo y estados | Pasarela y reembolsos externos |
+| Pagos | Registro administrativo, simulación 50/50, tarjeta/PayPal e idempotencia | Impuestos, pasarela y reembolsos externos |
 | Facturación | Documento y líneas atómicos con instantáneas | Impuestos, numeración fiscal y reglas definitivas |
 | Paneles e informes | Base frontend | Paneles cliente/proveedor, estadísticas e informes |
 | Base de datos | 18 tablas, claves, índices, JPA y migraciones de ambos desarrolladores | Entorno productivo y separación de privilegios |

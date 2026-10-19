@@ -6,6 +6,7 @@ import com.toolrental.application.tool.usecase.BrowseCatalogUseCase;
 import com.toolrental.application.tool.usecase.CheckToolAvailabilityUseCase;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.tool.model.valueobject.ToolId;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/public/catalog")
+@SecurityRequirements
 public final class PublicCatalogController {
   private final BrowseCatalogUseCase catalog;
   private final CheckToolAvailabilityUseCase availability;

@@ -10,6 +10,7 @@ import com.toolrental.infrastructure.user.adapters.in.rest.dtos.AccountRegistrat
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.LoginRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.PasswordRecoveryRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.PasswordResetRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@SecurityRequirements
 public final class AuthenticationController {
   private final AuthenticateUserUseCase authentication;
   private final RegisterCustomerAccountUseCase registration;

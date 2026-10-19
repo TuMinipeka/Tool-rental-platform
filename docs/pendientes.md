@@ -6,7 +6,7 @@ Este documento registra el orden de entrega acordado, las decisiones ya cerradas
 
 ## Avance de los contextos base
 
-Las 18 tablas base ya tienen implementaciones de dominio, aplicación, JPA y REST. La entrega incorpora operaciones administrativas restringidas y conserva las fronteras atómicas de reservas y facturas. No implementa todavía el cobro 50/50, una pasarela simulada, protección, evidencias, consentimientos ni los cálculos tributarios pendientes. JWT y OpenAPI también continúan pendientes. Véanse [API REST](rest-api.md) y [Arquitectura del backend](backend-architecture.md).
+Las 18 tablas base ya tienen implementaciones de dominio, aplicación, JPA y REST. La entrega incorpora operaciones administrativas restringidas y conserva las fronteras atómicas de reservas y facturas. También incorpora JWT de acceso, registro de cliente, login, recuperación académica de contraseña, catálogo público, disponibilidad, cotización base, cobro simulado 50/50 y OpenAPI/Swagger. Continúan pendientes protección, evidencias, consentimientos, cálculos tributarios, renovación/revocación persistente de sesiones y pasarelas externas. Véanse [API REST](rest-api.md) y [Arquitectura del backend](backend-architecture.md).
 
 ## Decisiones de producto confirmadas
 
@@ -27,14 +27,14 @@ Las 18 tablas base ya tienen implementaciones de dominio, aplicación, JPA y RES
 | --- | --- | --- |
 | Lenguaje del backend | Java 21 | Configurado |
 | Framework del backend | Spring Boot 3.5.16 | Configurado |
-| Servidor de aplicaciones | Apache Tomcat embebido | Adaptador REST en ejecución; requiere un `Principal` autenticado |
+| Servidor de aplicaciones | Apache Tomcat embebido | Adaptador REST protegido con JWT Bearer |
 | Construcción | Maven multimódulo | Configurado |
 | Arquitectura | Arquitectura hexagonal y DDD | Implementada para los 18 contextos base |
 | Base de datos | PostgreSQL 17.11 | Entorno local reproducible y validado con Testcontainers |
 | Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para las 18 tablas base |
 | Migraciones | Flyway | Una migración por tabla, compatibilidad JPA y rol administrador; validadas desde una base vacía |
 | Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Validados en PostgreSQL |
-| API | REST con OpenAPI y Swagger UI | REST implementada; OpenAPI y Swagger pendientes |
+| API | REST con OpenAPI y Swagger UI | REST, documento OpenAPI y Swagger UI implementados; falta aprobación final del contrato |
 | Frontend | React 19 con JavaScript, Vite, Node.js, HTML y CSS | Base creada; recorridos del producto pendientes |
 
 Node.js se usa únicamente para las herramientas del frontend. Java y Spring Boot siguen siendo la única pila del backend.
@@ -50,7 +50,7 @@ Las siguientes decisiones de negocio deben aprobarse antes de implementarlas:
 5. Cálculo del valor de reposición y política de depreciación para equipos perdidos o irreparables.
 6. Identidad del futuro operador, canales de atención, detalles de la política de privacidad y periodos de retención.
 7. Gestión de estado, biblioteca de componentes y herramientas de pruebas del frontend. JavaScript ya fue elegido como lenguaje.
-8. Versionado de la API, formato de errores, renovación de JWT, recuperación de cuentas y revocación de sesiones.
+8. Versionado de la API, formato final de errores, entrega externa del enlace de recuperación, renovación de JWT y revocación persistente de sesiones.
 9. Proveedor de alojamiento, CI/CD, dominios, secretos, observabilidad, copias de seguridad y respuesta a incidentes.
 
 La Fase 0 termina cuando estas decisiones tengan criterios de aceptación y prioridad. Los wireframes pueden comenzar durante esta fase, pero la integración con la API espera un contrato OpenAPI aprobado.
@@ -63,7 +63,8 @@ Estado: la base técnica del modelo actual quedó terminada el 15 de octubre de 
 - [x] Aplicar las 18 migraciones de tablas y la migración de compatibilidad JPA sobre una base de datos vacía.
 - [x] Verificar que el perfil `local` aplique además las 18 migraciones de datos de demostración.
 - [x] Revisar claves, restricciones y consultas representativas contra el motor real.
-- [ ] Agregar migraciones para pagos fraccionados, impuestos, protección, documentos legales, evidencias y disputas. Requiere cerrar primero las reglas correspondientes de la Fase 0.
+- [x] Agregar la migración V200 para etapas 50/50, idempotencia y datos mínimos de medios de pago simulados.
+- [ ] Agregar migraciones para impuestos, protección, documentos legales, evidencias y disputas. Requiere cerrar primero las reglas correspondientes de la Fase 0.
 - [x] Agregar cobertura con Testcontainers para migraciones, mapeos JPA, repositorios, rollback, unicidad concurrente del inventario y doble confirmación de reservas.
 
 La parte verificable del criterio de salida ya se cumple: una base de datos nueva se crea de forma repetible y la aplicación valida sus mapeos. La Fase 1 completa se cerrará cuando las decisiones de la Fase 0 permitan demostrar que el esquema soporta todo el contrato del producto. Véase [Trabajo pendiente de base de datos](pendientes-base-datos.md).
@@ -71,11 +72,14 @@ La parte verificable del criterio de salida ya se cumple: una base de datos nuev
 ## Fase 2: backend y contrato de API
 
 - [x] Completar los agregados y casos de uso correspondientes a las 18 tablas base.
-- [ ] Implementar autenticación JWT; la autorización por rol y propiedad ya existe sobre `Principal`.
+- [x] Implementar registro de cliente, login y JWT de acceso; la autorización por rol y propiedad usa el `Principal` derivado del token.
+- [ ] Implementar renovación, revocación persistente y entrega segura del enlace de recuperación.
 - [x] Agregar Spring Web, validación de entradas y manejo uniforme de errores.
 - [x] Implementar la API REST del modelo base.
-- [ ] Publicar y aprobar el contrato OpenAPI mediante Swagger UI.
-- [ ] Implementar adaptadores completos de pagos simulados, protección, impuestos, facturación fiscal, evidencias y disputas.
+- [x] Publicar el contrato actual mediante OpenAPI y Swagger UI.
+- [x] Implementar cotización del alquiler y pagos simulados 50/50 con tarjeta o PayPal e idempotencia.
+- [ ] Aprobar y versionar el contrato OpenAPI.
+- [ ] Implementar protección, impuestos, facturación fiscal, evidencias, disputas y reembolsos automatizados.
 
 Criterio de salida: todos los recorridos aprobados funcionan con PostgreSQL y el contrato HTTP versionado es estable.
 
