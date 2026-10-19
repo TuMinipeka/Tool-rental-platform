@@ -4,6 +4,7 @@ import '@fontsource-variable/archivo'
 import '@fontsource-variable/public-sans'
 import App from './App.jsx'
 import './styles.css'
+import './premium.css'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
