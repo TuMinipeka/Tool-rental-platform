@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
@@ -33,7 +34,7 @@ public final class JwtAuthenticationTokenProvider implements AuthenticationToken
 
   public JwtAuthenticationTokenProvider(
       JwtEncoder encoder,
-      JwtDecoder decoder,
+      @Qualifier("passwordResetJwtDecoder") JwtDecoder decoder,
       @Value("${auth.jwt.access-ttl:PT15M}") Duration accessTtl,
       @Value("${auth.jwt.password-reset-ttl:PT15M}") Duration resetTtl) {
     this.encoder = encoder;

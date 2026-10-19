@@ -4,13 +4,17 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.JwtClaimValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
@@ -26,8 +30,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration(proxyBeanMethods = false)
 public class SecurityConfiguration {
   @Bean
+  @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
   SecurityFilterChain securityFilterChain(
-      HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+      HttpSecurity http,
+      JwtAuthenticationConverter jwtAuthenticationConverter,
+      @Qualifier("accessJwtDecoder") JwtDecoder accessJwtDecoder)
+      throws Exception {
     return http.csrf(csrf -> csrf.disable())
         .cors(cors -> {})
         .sessionManagement(
@@ -53,7 +61,10 @@ public class SecurityConfiguration {
                     .authenticated())
         .oauth2ResourceServer(
             resource ->
-                resource.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter)))
+                resource.jwt(
+                    jwt ->
+                        jwt.decoder(accessJwtDecoder)
+                            .jwtAuthenticationConverter(jwtAuthenticationConverter)))
         .build();
   }
 
@@ -64,12 +75,24 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  JwtDecoder jwtDecoder(@Value("${auth.jwt.secret}") String secret) {
+  JwtDecoder accessJwtDecoder(@Value("${auth.jwt.secret}") String secret) {
+    return jwtDecoder(secret, "access");
+  }
+
+  @Bean
+  JwtDecoder passwordResetJwtDecoder(@Value("${auth.jwt.secret}") String secret) {
+    return jwtDecoder(secret, "password-reset");
+  }
+
+  private JwtDecoder jwtDecoder(String secret, String purpose) {
     requireStrongSecret(secret);
     var key =
         new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), MacAlgorithm.HS256.getName());
     var decoder = NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build();
-    decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer("tool-rental-platform"));
+    decoder.setJwtValidator(
+        new DelegatingOAuth2TokenValidator<>(
+            JwtValidators.createDefaultWithIssuer("tool-rental-platform"),
+            new JwtClaimValidator<String>("purpose", purpose::equals)));
     return decoder;
   }
 

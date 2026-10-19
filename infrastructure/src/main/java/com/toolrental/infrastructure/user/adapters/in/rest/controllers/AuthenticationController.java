@@ -6,10 +6,12 @@ import com.toolrental.application.user.dto.PasswordRecoveryResponse;
 import com.toolrental.application.user.usecase.AuthenticateUserUseCase;
 import com.toolrental.application.user.usecase.RecoverPasswordUseCase;
 import com.toolrental.application.user.usecase.RegisterCustomerAccountUseCase;
+import com.toolrental.infrastructure.common.config.OpenApiConfiguration;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.AccountRegistrationRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.LoginRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.PasswordRecoveryRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.PasswordResetRequest;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -69,6 +71,7 @@ public final class AuthenticationController {
   }
 
   @PostMapping("/logout")
+  @SecurityRequirement(name = OpenApiConfiguration.BEARER_SCHEME)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void logout() {
     // Access tokens are stateless and expire quickly; the client discards the token.
