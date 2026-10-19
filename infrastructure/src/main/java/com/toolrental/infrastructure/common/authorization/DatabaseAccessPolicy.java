@@ -34,4 +34,8 @@ public class DatabaseAccessPolicy implements AccessPolicy {
     if (!actor.equals(owner) && !users.hasActiveRole(actor, "ADMIN"))
       throw new AccessDeniedApplicationException();
   }
+
+  public boolean isAdministrator(UUID actor) {
+    return actor != null && users.hasActiveRole(actor, "ADMIN");
+  }
 }

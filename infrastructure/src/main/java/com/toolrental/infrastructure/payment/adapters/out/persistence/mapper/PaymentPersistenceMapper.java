@@ -22,7 +22,14 @@ public class PaymentPersistenceMapper {
         row.getAmount(),
         row.getPaymentStatus(),
         row.getRecordedAt(),
-        row.getConfirmedAt());
+        row.getConfirmedAt(),
+        row.getPaymentMethod(),
+        row.getPaymentStage(),
+        row.getIdempotencyKey(),
+        row.getCardNetwork(),
+        row.getCardLastFour(),
+        row.getCardExpiryMonth(),
+        row.getCardExpiryYear());
   }
 
   public PaymentJpaEntity toEntity(Payment value) {
@@ -34,6 +41,13 @@ public class PaymentPersistenceMapper {
         value.amount(),
         value.paymentStatus(),
         value.recordedAt(),
-        value.confirmedAt());
+        value.confirmedAt(),
+        value.paymentMethod(),
+        value.paymentStage(),
+        value.idempotencyKey(),
+        value.cardNetwork(),
+        value.cardLastFour(),
+        value.cardExpiryMonth(),
+        value.cardExpiryYear());
   }
 }
