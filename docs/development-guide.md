@@ -56,6 +56,8 @@ Comprueba ubicación de tipos, dirección de dependencias, invariantes, inmutabi
 
 ## Entorno local y editor
 
+La skill de diseño de interfaces `emil-design-eng` está instalada para Codex en `.agents/skills/emil-design-eng/SKILL.md`, con su origen fijado en `skills-lock.json`. Úsala en tareas de diseño, interacción y animación del frontend; no cambia las reglas del backend ni instala dependencias de ejecución.
+
 El perfil `local` usa `infrastructure/src/main/resources/application-local.yml`; las variables de entorno pueden reemplazar sus valores. Su pool predeterminado es 2/0. Nunca publiques contraseñas. El perfil `production` exige variables externas.
 
 SQLSTATE 53300 significa que el rol agotó sus conexiones. Revisa sesiones de clientes como DBeaver y el límite del rol; no termines sesiones de otros proyectos. Reducir el pool no libera sesiones abiertas por otro proceso.

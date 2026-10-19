@@ -55,6 +55,7 @@ Do not add speculative empty classes or abstractions. Empty adapter directories 
 
 ## Quality and documentation
 
+- For frontend interface design, interaction, and motion work, consult `.agents/skills/emil-design-eng/SKILL.md` and apply the guidance relevant to the task.
 - Add tests in the layer that owns each new behavior. Persistence and concurrency require real integration tests.
 - Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS before completion.
 - Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.
