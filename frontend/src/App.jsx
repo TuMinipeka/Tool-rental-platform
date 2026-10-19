@@ -1,101 +1,153 @@
-const journeys = [
-  {
-    number: '01',
-    title: 'Explora el catálogo',
-    description: 'Encuentra equipos por categoría y conoce su tarifa diaria.',
-  },
-  {
-    number: '02',
-    title: 'Solicita una reserva',
-    description: 'Selecciona fechas y unidades disponibles de un proveedor.',
-  },
-  {
-    number: '03',
-    title: 'Recibe y devuelve',
-    description: 'Conserva el seguimiento de entrega, devolución y estado.',
-  },
+import { useEffect, useMemo, useState } from 'react'
+import { api, normalizeCatalogTool, readSession, saveSession } from './api.js'
+
+const tools = [
+  { id:'rotomartillo', name:'Rotomartillo SDS Max 1.500 W', category:'Demolición', price:85000, deposit:180000, location:'Chapinero, Bogotá', rating:4.9, reviews:38, stock:3, color:'orange', accent:'Trabajo pesado', description:'Potencia profesional para perforación y demolición de concreto. Incluye maletín, cincel y empuñadura auxiliar.' },
+  { id:'mezcladora', name:'Mezcladora de concreto 160 L', category:'Concreto', price:120000, deposit:250000, location:'Puente Aranda, Bogotá', rating:4.8, reviews:24, stock:2, color:'yellow', accent:'Alta demanda', description:'Mezcladora portátil con motor eléctrico y tambor basculante para obras, remodelaciones y acabados.' },
+  { id:'cortadora', name:'Cortadora de baldosa 1.200 mm', category:'Corte', price:62000, deposit:130000, location:'Suba, Bogotá', rating:4.7, reviews:19, stock:4, color:'blue', accent:'Corte preciso', description:'Guía reforzada y rodel de tungsteno para cortes rectos limpios en cerámica y porcelanato.' },
+  { id:'hidrolavadora', name:'Hidrolavadora profesional 2.200 PSI', category:'Limpieza', price:74000, deposit:150000, location:'Teusaquillo, Bogotá', rating:4.9, reviews:41, stock:5, color:'green', accent:'Favorita', description:'Equipo compacto de alta presión con manguera de ocho metros y boquillas intercambiables.' },
+  { id:'generador', name:'Generador eléctrico 3.2 kW', category:'Energía', price:145000, deposit:320000, location:'Engativá, Bogotá', rating:4.6, reviews:15, stock:2, color:'red', accent:'Obra continua', description:'Generador a gasolina con regulación automática de voltaje para equipos y herramientas de obra.' },
+  { id:'escalera', name:'Escalera multipropósito 4 × 4', category:'Altura', price:48000, deposit:100000, location:'Usaquén, Bogotá', rating:4.8, reviews:32, stock:6, color:'silver', accent:'Versátil', description:'Escalera articulada en aluminio con seguros reforzados y múltiples configuraciones de trabajo.' },
 ]
+const categories = ['Todas','Demolición','Concreto','Corte','Limpieza','Energía','Altura']
+const money = new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})
+const defaultStartDate = '2026-10-20'
+const defaultReturnDate = '2026-10-23'
 
-function App() {
-  return (
-    <main>
-      <nav className="navigation" aria-label="Navegación principal">
-        <a className="brand" href="#inicio" aria-label="Tool Rental, inicio">
-          <span className="brand-mark" aria-hidden="true">
-            TR
-          </span>
-          <span>Tool Rental</span>
-        </a>
-        <a className="nav-link" href="#estado">
-          Estado del proyecto
-        </a>
-      </nav>
-
-      <section className="hero" id="inicio">
-        <div className="hero-copy">
-          <p className="eyebrow">Herramientas listas para el trabajo real</p>
-          <h1>El equipo correcto, justo cuando lo necesitas.</h1>
-          <p className="hero-description">
-            Una plataforma para conectar clientes y proveedores de herramientas de
-            construcción con reservas claras y trazables.
-          </p>
-          <div className="hero-actions">
-            <a className="primary-action" href="#recorrido">
-              Conocer el recorrido
-            </a>
-            <span className="availability">Experiencia inicial en construcción</span>
-          </div>
-        </div>
-
-        <aside className="status-card" id="estado" aria-labelledby="status-title">
-          <div className="status-heading">
-            <span className="status-dot" aria-hidden="true" />
-            <span>Base técnica disponible</span>
-          </div>
-          <h2 id="status-title">Preparada para crecer sobre una base confiable.</h2>
-          <dl>
-            <div>
-              <dt>Backend</dt>
-              <dd>Java 21 + Spring Boot</dd>
-            </div>
-            <div>
-              <dt>Datos</dt>
-              <dd>PostgreSQL + Flyway</dd>
-            </div>
-            <div>
-              <dt>Interfaz</dt>
-              <dd>React + JavaScript</dd>
-            </div>
-          </dl>
-          <p>
-            La API y los recorridos completos se habilitarán cuando sus contratos estén
-            aprobados.
-          </p>
-        </aside>
-      </section>
-
-      <section className="journey" id="recorrido" aria-labelledby="journey-title">
-        <div className="section-heading">
-          <p className="eyebrow">Recorrido previsto</p>
-          <h2 id="journey-title">Del catálogo a la devolución.</h2>
-        </div>
-        <div className="journey-grid">
-          {journeys.map((journey) => (
-            <article className="journey-card" key={journey.number}>
-              <span>{journey.number}</span>
-              <h3>{journey.title}</h3>
-              <p>{journey.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <footer>
-        <span>Tool Rental Platform</span>
-        <span>Implementación académica · Colombia</span>
-      </footer>
-    </main>
-  )
+function Icon({name,size=20}) {
+  const paths = {
+    arrow:<><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>, search:<><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
+    user:<><circle cx="12" cy="8" r="4"/><path d="M4 21c.6-4 3.3-6 8-6s7.4 2 8 6"/></>, calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></>,
+    pin:<><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></>, heart:<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5a5.5 5.5 0 0 0 1.1-8.9Z"/>,
+    check:<path d="m5 12 4 4L19 6"/>, shield:<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>, menu:<><path d="M4 7h16M4 12h16M4 17h16"/></>, close:<><path d="m6 6 12 12M18 6 6 18"/></>,
+    card:<><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></>, paypal:<><path d="M9 19H5l3-14h6c4 0 6 2 5 5-.7 3.6-3 5-7 5H9.8L9 19Z"/><path d="m11 14-1 6h4l.6-3h2.2c2.8 0 4.6-1.2 5.2-4"/></>,
+    grid:<><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></>, box:<><path d="m3 7 9 5 9-5M3 7l9-5 9 5v10l-9 5-9-5Z"/><path d="M12 12v10"/></>,
+    logout:<><path d="M10 17l5-5-5-5M15 12H3"/><path d="M14 3h7v18h-7"/></>, chevron:<path d="m9 18 6-6-6-6"/>,
+  }
+  return <svg className="icon" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name]}</svg>
 }
+function navigate(path){window.history.pushState({},'',path);window.dispatchEvent(new PopStateEvent('popstate'));window.scrollTo({top:0,behavior:'smooth'})}
+function Brand(){return <button className="brand" onClick={()=>navigate('/')} aria-label="Ir al inicio"><span className="brand-symbol"><i/><i/><i/></span><span>tool<em>rental</em></span></button>}
+function ToolVisual({tool,compact=false}){return <div className={`tool-visual tool-${tool.color} ${compact?'compact':''}`}>{tool.imageUrl?<img src={tool.imageUrl} alt=""/>:<><div className="visual-grid"/><div className="tool-silhouette" aria-hidden="true"><span/><span/><span/></div></>}<b>{tool.category}</b><small>TR—{tool.id.slice(0,3).toUpperCase()}</small></div>}
 
+function Header({session,onOpenAuth}){
+  const [open,setOpen]=useState(false); const go=(path)=>{setOpen(false);navigate(path)}
+  return <header className="site-header"><div className="nav-shell"><Brand/><nav id="main-navigation" className={`nav-links ${open?'open':''}`}><button onClick={()=>go('/catalogo')}>Catálogo</button><button onClick={()=>go('/como-funciona')}>Cómo funciona</button><button onClick={()=>go('/nosotros')}>Sobre nosotros</button>{session&&<button onClick={()=>go('/cuenta')}>Mis alquileres</button>}</nav><div className="nav-actions"><button className="location-action"><Icon name="pin" size={17}/> Bogotá</button>{session?<button className="avatar-button" onClick={()=>navigate('/cuenta')} aria-label="Abrir mi cuenta">AM</button>:<button className="login-action" onClick={onOpenAuth}><Icon name="user" size={18}/> Ingresar</button>}<button className="menu-action" onClick={()=>setOpen(!open)} aria-label={open?'Cerrar menú':'Abrir menú'} aria-expanded={open} aria-controls="main-navigation"><Icon name={open?'close':'menu'}/></button></div></div></header>
+}
+function Footer(){return <footer className="site-footer"><div className="footer-lead"><Brand/><h2>Tu proyecto empieza con la herramienta correcta.</h2><button className="button button-lime" onClick={()=>navigate('/catalogo')}>Explorar catálogo <Icon name="arrow"/></button></div><div className="footer-links"><div><strong>Plataforma</strong><button onClick={()=>navigate('/catalogo')}>Catálogo</button><button onClick={()=>navigate('/como-funciona')}>Cómo funciona</button><button onClick={()=>navigate('/cuenta')}>Mi cuenta</button></div><div><strong>Compañía</strong><button onClick={()=>navigate('/nosotros')}>Sobre nosotros</button><button onClick={()=>navigate('/informacion/contacto')}>Contacto</button><button onClick={()=>navigate('/informacion/faq')}>Preguntas frecuentes</button></div><div><strong>Legal</strong><button onClick={()=>navigate('/informacion/terminos')}>Términos y condiciones</button><button onClick={()=>navigate('/informacion/privacidad')}>Privacidad</button></div></div><div className="footer-bottom"><span>© 2026 Tool Rental · Proyecto académico</span><span>Hecho para construir en Colombia</span></div></footer>}
+
+function SearchBar(){const [term,setTerm]=useState('');return <form className="search-bar" onSubmit={e=>{e.preventDefault();navigate(`/catalogo${term?`?q=${encodeURIComponent(term)}`:''}`)}}><div><Icon name="search"/><label htmlFor="home-search">¿Qué necesitas?</label><input id="home-search" value={term} onChange={e=>setTerm(e.target.value)} placeholder="Ej. taladro, mezcladora..."/></div><i/><div className="search-location"><Icon name="pin"/><span><small>Ubicación</small>Bogotá, Colombia</span></div><button aria-label="Buscar"><Icon name="arrow"/></button></form>}
+function HomePage({catalogTools,dataMode}){return <>
+  <section className="home-hero"><div className="hero-content page-shell"><p className="kicker"><span/> Equipos profesionales, sin comprarlos</p><h1>Haz más.<br/><em>Compra menos.</em></h1><p className="hero-subtitle">Alquila herramientas verificadas cerca de ti. Reserva en minutos y paga solo por los días que las necesitas.</p><SearchBar/><div className="trust-row"><span><Icon name="check" size={17}/> Proveedores verificados</span><span><Icon name="shield" size={17}/> Reservas trazables</span><span><Icon name="calendar" size={17}/> Disponibilidad clara</span></div></div><div className="hero-machine"><i/><i/><b/><span/><small/></div><div className="scroll-note">DESLIZA PARA EXPLORAR ↓</div></section>
+  <section className="category-section page-shell"><div className="section-title-row"><div><p className="kicker dark"><span/> Encuentra lo que buscas</p><h2>Herramientas para cada proyecto.</h2></div><button className="text-link" onClick={()=>navigate('/catalogo')}>Ver todo el catálogo <Icon name="arrow"/></button></div><div className="category-tiles">{categories.slice(1).map((c,i)=><button key={c} onClick={()=>navigate(`/catalogo?categoria=${c}`)}><span className={`category-icon category-${i+1}`}><i/><b/></span><strong>{c}</strong><small>{[24,12,31,18,9,15][i]} equipos</small><Icon name="arrow"/></button>)}</div></section>
+  <section className="featured-section"><div className="page-shell"><div className="section-title-row"><div><p className="kicker dark"><span/> Selección destacada</p><h2>Listas para trabajar.</h2></div><p className="section-copy">Equipos publicados por proveedores activos y disponibles para reservar.</p></div>{dataMode==='demo'&&<div className="data-notice" role="status">Contenido demostrativo: precios, ubicación, disponibilidad, reseñas e ilustraciones son provisionales.</div>}<div className="tool-grid">{catalogTools.slice(0,4).map(t=><ToolCard key={t.id} tool={t}/>)}</div></div></section>
+  <section className="steps-section page-shell"><div className="steps-intro"><p className="kicker dark"><span/> Fácil de principio a fin</p><h2>Tu obra no espera.<br/>Nosotros tampoco.</h2><p>Un proceso simple y trazable para que puedas concentrarte en el trabajo.</p></div><div className="steps-list">{[['01','Encuentra','Busca por categoría, ubicación y disponibilidad.'],['02','Reserva','Elige fechas y solicita la unidad que necesitas.'],['03','Construye','Recibe, usa y devuelve con seguimiento del estado.']].map(x=><article key={x[0]}><span>{x[0]}</span><div><h3>{x[1]}</h3><p>{x[2]}</p></div></article>)}</div></section>
+  <section className="supplier-cta"><div className="page-shell"><p className="kicker"><span/> Para proveedores</p><h2>Tu equipo puede<br/>seguir produciendo.</h2><p>Publica tus herramientas, administra unidades y recibe solicitudes desde un solo lugar.</p><button className="button button-light" onClick={()=>navigate('/panel/proveedor')}>Conocer el panel <Icon name="arrow"/></button></div><div className="cta-orbit"><span>PROVEEDOR</span><b>+24%</b><small>utilización demo</small></div></section>
+  </>}
+function ToolCard({tool}){const openTool=()=>navigate(`/herramienta/${tool.id}`);return <article className="tool-card" role="link" tabIndex="0" aria-label={`Ver ${tool.name}`} onClick={openTool} onKeyDown={event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openTool()}}}><div className="tool-card-media"><ToolVisual tool={tool} compact/><button className="heart-button" onClick={e=>e.stopPropagation()} aria-label={`Guardar ${tool.name}`}><Icon name="heart" size={18}/></button><span className="tool-tag">{tool.accent}</span></div><div className="tool-card-body"><p>{tool.category}</p><h3>{tool.name}</h3><div className="tool-meta"><span><Icon name="pin" size={15}/>{tool.location.split(',')[0]}</span><span>★ {tool.rating} <small>({tool.reviews})</small></span></div><div className="tool-price"><strong>{money.format(tool.price)}</strong><span>/ día</span></div></div></article>}
+
+function CatalogPage({catalogTools,dataMode}){const params=new URLSearchParams(window.location.search);const [query,setQuery]=useState(params.get('q')||'');const [category,setCategory]=useState(params.get('categoria')||'Todas');const [sort,setSort]=useState('Recomendados');const availableCategories=['Todas',...new Set(catalogTools.map(t=>t.category))];const visible=useMemo(()=>catalogTools.filter(t=>(category==='Todas'||t.category===category)&&`${t.name} ${t.category}`.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>sort==='Menor precio'?a.price-b.price:sort==='Mejor valorados'?(b.rating||0)-(a.rating||0):0),[catalogTools,query,category,sort]);return <main className="catalog-page page-shell page-top"><div className="catalog-heading"><div><p className="breadcrumb">Inicio / <strong>Catálogo</strong></p><h1>Encuentra tu próxima herramienta.</h1><p>{visible.length} equipos {dataMode==='api'?'publicados':'demostrativos'} disponibles en Bogotá.</p></div><div className="catalog-stat"><strong>{availableCategories.length-1}</strong><span>categorías<br/>para explorar</span></div></div>{dataMode==='demo'&&<div className="data-notice" role="status">Vista demostrativa: inicia el backend para consultar el catálogo real.</div>}<div className="catalog-search"><Icon name="search"/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Buscar herramienta o categoría"/><button>Buscar</button></div><div className="category-pills">{availableCategories.map(c=><button key={c} className={category===c?'active':''} onClick={()=>setCategory(c)}>{c}</button>)}</div><div className="catalog-toolbar"><span>{visible.length} resultados</span><label>Ordenar por <select value={sort} onChange={e=>setSort(e.target.value)}><option>Recomendados</option><option>Menor precio</option><option>Mejor valorados</option></select></label></div>{visible.length?<div className="tool-grid catalog-grid">{visible.map(t=><ToolCard key={t.id} tool={t}/>)}</div>:<EmptyState title="No encontramos coincidencias" text="Prueba otra palabra o elimina los filtros." action={()=>{setQuery('');setCategory('Todas')}}/>}</main>}
+function DateField({label,value,onChange,min}){return <label className="date-field"><span>{label}</span><div><Icon name="calendar" size={18}/><input type="date" value={value} min={min} onChange={e=>onChange(e.target.value)}/></div></label>}
+function getDays(start,end){if(!start||!end)return 1;return Math.max(1,Math.round((new Date(`${end}T12:00:00`)-new Date(`${start}T12:00:00`))/86400000)+1)}
+function ToolDetailPage({id,onReserve,catalogTools}){const tool=catalogTools.find(t=>t.id===id)||catalogTools[0]||tools[0];const [startDate,setStartDate]=useState(defaultStartDate);const [returnDate,setReturnDate]=useState(defaultReturnDate);const days=getDays(startDate,returnDate);return <main className="detail-page page-shell page-top"><button className="back-link" onClick={()=>navigate('/catalogo')}>← Volver al catálogo</button><div className="detail-layout"><div className="detail-main"><ToolVisual tool={tool}/><div className="detail-title"><div><p>{tool.category} · <span className="available-dot"/> Disponible</p><h1>{tool.name}</h1><span className="detail-location"><Icon name="pin" size={16}/>{tool.location}{tool.rating?` · ★ ${tool.rating} (${tool.reviews} reseñas)`:''}</span></div><button className="heart-button detail-heart"><Icon name="heart"/></button></div><div className="detail-description"><h2>Acerca de este equipo</h2><p>{tool.description}</p><div className="features"><span><Icon name="check"/>Equipo verificado</span><span><Icon name="shield"/>Reserva trazable</span><span><Icon name="box"/>Entrega coordinada</span></div></div><div className="provider-card"><span className="provider-avatar">TR</span><div><small>Proveedor</small><strong>Proveedor verificado</strong><p>Identidad protegida hasta completar la reserva</p></div><button>Ver condiciones</button></div></div><aside className="booking-card"><div className="booking-price"><strong>{money.format(tool.price)}</strong><span>/ día</span></div><div className="availability-badge"><span/><strong>{tool.stock} unidades operativas</strong> registradas</div><DateField label="Fecha de inicio" value={startDate} min={defaultStartDate} onChange={v=>{setStartDate(v);if(v>returnDate)setReturnDate(v)}}/><DateField label="Fecha de devolución" value={returnDate} min={startDate} onChange={setReturnDate}/><div className="booking-summary"><span>{money.format(tool.price)} × {days} días</span><strong>{money.format(tool.price*days)}</strong><span>Impuestos y entrega</span><strong>Pendientes</strong></div><div className="booking-total"><span>Subtotal estimado</span><strong>{money.format(tool.price*days)}</strong></div><button className="button button-dark wide" onClick={()=>onReserve({tool,startDate,returnDate,days})}>Comprobar disponibilidad <Icon name="arrow"/></button><small className="booking-note">Aún no se realizará ningún cobro.</small></aside></div></main>}
+
+function QuotePage({reservation,session,onContinue}){if(!reservation)return <EmptyState title="Tu cotización está vacía" text="Selecciona primero una herramienta y las fechas de uso." action={()=>navigate('/catalogo')} actionText="Explorar catálogo"/>;const subtotal=reservation.tool.price*reservation.days;return <main className="checkout-page page-shell page-top"><div className="checkout-steps"><span className="done">1</span><i/><span className="active">2</span><i/><span>3</span><small>Herramienta</small><small>Cotización</small><small>Pago</small></div><div className="checkout-layout"><section><p className="kicker dark"><span/> Revisa antes de continuar</p><h1>Tu cotización.</h1><div className="quote-tool"><ToolVisual tool={reservation.tool} compact/><div><small>{reservation.tool.category}</small><h3>{reservation.tool.name}</h3><p><Icon name="calendar" size={17}/>{reservation.startDate} → {reservation.returnDate}</p><p><Icon name="pin" size={17}/>{reservation.tool.location}</p></div></div><div className="notice-card"><Icon name="shield"/><div><strong>Precio base, sin cálculo tributario definitivo</strong><p>La plataforma todavía no aplica impuestos, protección ni costos de entrega pendientes de definición comercial.</p></div></div>{!session&&<div className="auth-nudge"><h3>Ingresa para crear la reserva</h3><p>Conservaremos esta cotización mientras completas el acceso.</p></div>}</section><aside className="price-card"><h2>Resumen</h2><div><span>Tarifa diaria</span><strong>{money.format(reservation.tool.price)}</strong><span>Días facturables</span><strong>{reservation.days}</strong><span>Subtotal alquiler</span><strong>{money.format(subtotal)}</strong></div><div className="split-payment"><small>Pago dividido</small><p><span>Ahora · 50%</span><strong>{money.format(subtotal/2)}</strong></p><p><span>Después de devolución · 50%</span><strong>{money.format(subtotal/2)}</strong></p></div><div className="price-total"><span>Total estimado</span><strong>{money.format(subtotal)}</strong></div><button className="button button-dark wide" onClick={onContinue}>{session?'Crear reserva':'Ingresar y continuar'} <Icon name="arrow"/></button><button className="button button-ghost wide" onClick={()=>navigate(`/herramienta/${reservation.tool.id}`)}>Editar fechas</button></aside></div></main>}
+
+function PaymentPage({reservation,onPaid}){const [method,setMethod]=useState('CREDIT_CARD');const [network,setNetwork]=useState('VISA');const [lastFour,setLastFour]=useState('');const [expiry,setExpiry]=useState('');const amount=reservation?reservation.tool.price*reservation.days/2:0;const approve=()=>{const [year,month]=expiry.split('-');onPaid({paymentMethod:method,cardNetwork:method==='PAYPAL'?null:network,cardLastFour:method==='PAYPAL'?null:lastFour,cardExpiryMonth:month?Number(month):null,cardExpiryYear:year?Number(year):null})};return <main className="payment-page page-shell page-top"><div className="payment-heading"><h1>Pago simulado.</h1><p>Confirma la primera mitad para completar la solicitud.</p></div><div className="simulation-banner"><span>DEMO</span><div><strong>Esta operación es una simulación académica</strong><p>No se realiza un cobro real ni se conecta con una pasarela de pagos.</p></div></div>{reservation?.apiError&&<div className="form-error" role="alert">{reservation.apiError}</div>}<div className="payment-layout"><section className="payment-form"><h2>Elige cómo simular el pago</h2><div className="payment-methods"><button className={method!=='PAYPAL'?'active':''} onClick={()=>setMethod('CREDIT_CARD')}><Icon name="card"/><span><strong>Tarjeta</strong><small>Crédito o débito</small></span></button><button className={method==='PAYPAL'?'active':''} onClick={()=>setMethod('PAYPAL')}><Icon name="paypal"/><span><strong>PayPal</strong><small>Cuenta simulada</small></span></button></div>{method!=='PAYPAL'?<><div className="network-choice"><button className={network==='VISA'?'active':''} onClick={()=>setNetwork('VISA')}><b>VISA</b></button><button className={network==='MASTERCARD'?'active':''} onClick={()=>setNetwork('MASTERCARD')}><i/><i/><b>mastercard</b></button></div><div className="safe-fields"><label><span>Últimos 4 dígitos</span><input value={lastFour} onChange={e=>setLastFour(e.target.value.replace(/\D/g,'').slice(0,4))} inputMode="numeric" placeholder="1234"/></label><label><span>Vencimiento</span><input value={expiry} onChange={e=>setExpiry(e.target.value)} type="month"/></label></div><div className="privacy-callout"><Icon name="shield"/><p><strong>Nunca solicitamos el número completo ni el CVV.</strong><br/>Solo se envían al backend la red, vencimiento y últimos cuatro dígitos.</p></div></>:<div className="paypal-demo"><Icon name="paypal" size={36}/><div><strong>Cuenta PayPal de demostración</strong><p>No necesitas credenciales. La aprobación se simula dentro del proyecto.</p></div></div>}</section><aside className="payment-summary"><span>Primera mitad · 50%</span><strong>{money.format(amount)}</strong><p>{reservation?.tool.name||'Herramienta seleccionada'}</p><dl><div><dt>Periodo</dt><dd>{reservation?.days||1} días</dd></div><div><dt>Método</dt><dd>{method==='PAYPAL'?'PayPal':`${network} simulada`}</dd></div></dl><button className="button button-lime wide" disabled={method!=='PAYPAL'&&(lastFour.length!==4||!expiry)} onClick={approve}>Simular aprobación <Icon name="arrow"/></button><small>Al continuar aceptas los términos del entorno académico.</small></aside></div></main>}
+function SuccessPage({reservation}){return <main className="success-page page-shell page-top"><div className="success-mark"><Icon name="check" size={42}/></div><p className="kicker dark"><span/> Reserva creada</p><h1>Todo listo para<br/>tu próximo proyecto.</h1><p>La simulación fue aprobada. Podrás seguir la confirmación del proveedor desde tus reservas.</p><div className="success-ticket"><div><small>Código</small><strong>TR-26019</strong></div><div><small>Equipo</small><strong>{reservation?.tool.name||tools[0].name}</strong></div><div><small>Estado</small><strong>Pendiente de confirmación</strong></div></div><div className="success-actions"><button className="button button-dark" onClick={()=>navigate('/cuenta')}>Ver mis reservas <Icon name="arrow"/></button><button className="button button-ghost" onClick={()=>navigate('/catalogo')}>Seguir explorando</button></div></main>}
+
+function AuthModal({onClose,onLogin}){
+  const [mode,setMode]=useState('login'),[sent,setSent]=useState(false),[error,setError]=useState(''),[busy,setBusy]=useState(false)
+  const authenticate=async data=>{setBusy(true);setError('');try{const result=mode==='register'?await api.register(data):await api.login(data.email,data.password);onLogin(result)}catch(reason){setError(reason.message)}finally{setBusy(false)}}
+  const recover=async event=>{event.preventDefault();setBusy(true);setError('');try{const result=await api.recoverPassword(new FormData(event.currentTarget).get('email'));setSent(result||{accepted:true})}catch(reason){setError(reason.message)}finally{setBusy(false)}}
+  return <div className="modal-backdrop" onMouseDown={event=>event.target===event.currentTarget&&onClose()}><section className="auth-modal" role="dialog" aria-modal="true" aria-live="polite"><button className="modal-close" onClick={onClose}><Icon name="close"/></button><Brand/>{error&&<div className="form-error" role="alert">{error}<button onClick={()=>onLogin()}>Usar modo demostrativo</button></div>}{mode==='login'&&<><h2>Ingresa a tu cuenta.</h2><AuthFields submitText="Ingresar" onSubmit={authenticate} busy={busy}/><p className="form-switch"><button onClick={()=>setMode('recovery')}>¿Olvidaste tu contraseña?</button></p><div className="modal-separator"><span>o</span></div><p className="form-switch">¿Aún no tienes cuenta? <button onClick={()=>setMode('register')}>Regístrate</button></p></>}{mode==='register'&&<><h2>Crea tu cuenta.</h2><AuthFields register submitText="Crear cuenta" onSubmit={authenticate} busy={busy}/><p className="legal-copy">Al registrarte aceptas los términos y la política de privacidad.</p><p className="form-switch">¿Ya tienes cuenta? <button onClick={()=>setMode('login')}>Ingresa</button></p></>}{mode==='recovery'&&<><h2>Restablece tu contraseña.</h2>{sent?<div className="recovery-success"><Icon name="check"/><strong>Solicitud aceptada</strong><p>{sent.recoveryToken?'El backend devolvió un token académico. El envío real por correo sigue pendiente.':'Si la cuenta existe, se generó una solicitud de recuperación.'}</p>{sent.recoveryToken&&<code>{sent.recoveryToken}</code>}<button className="button button-dark wide" onClick={()=>setMode('login')}>Volver al ingreso</button></div>:<form onSubmit={recover}><label className="form-field"><span>Correo electrónico</span><input name="email" type="email" required placeholder="tu@correo.com"/></label><button className="button button-dark wide" disabled={busy}>{busy?'Conectando…':'Solicitar recuperación'} <Icon name="arrow"/></button></form>}<p className="form-switch"><button onClick={()=>setMode('login')}>← Volver</button></p></>}</section></div>
+}
+function AuthFields({register=false,submitText,onSubmit,busy}){const submit=event=>{event.preventDefault();const data=Object.fromEntries(new FormData(event.currentTarget));onSubmit(register?{email:data.email,displayName:data.displayName,password:data.password,personType:'NATURAL_PERSON',documentType:data.documentType,documentNumber:data.documentNumber,billingName:data.displayName}:data)};return <form onSubmit={submit}>{register&&<><label className="form-field"><span>Nombre completo</span><input name="displayName" required placeholder="Andrea Moreno"/></label><div className="two-fields"><label className="form-field"><span>Tipo de documento</span><select name="documentType" defaultValue="CC"><option>CC</option><option>CE</option><option>PASSPORT</option></select></label><label className="form-field"><span>Número</span><input name="documentNumber" required/></label></div></>}<label className="form-field"><span>Correo electrónico</span><input name="email" type="email" required placeholder="tu@correo.com"/></label><label className="form-field"><span>Contraseña</span><input name="password" type="password" required minLength="12"/><small>Mínimo 12 caracteres</small></label><button className="button button-dark wide" disabled={busy}>{busy?'Conectando…':submitText} <Icon name="arrow"/></button></form>}
+
+function DashboardSidebar({role,onLogout}){const provider=role==='provider',admin=role==='admin';return <aside className="dashboard-sidebar"><div><p>ESPACIO DE TRABAJO</p><strong>{provider?'Construcciones Fortaleza':admin?'Administración':'Cuenta personal'}</strong></div><nav><button className="active"><Icon name="grid"/>Resumen</button><button><Icon name="calendar"/>{provider?'Reservas':'Mis reservas'}</button><button><Icon name="box"/>{provider?'Herramientas':admin?'Categorías':'Alquileres'}</button><button><Icon name="card"/>{admin?'Pagos':'Facturas'}</button><button><Icon name="user"/>{admin?'Usuarios y roles':'Perfil'}</button></nav>{onLogout&&<button className="sidebar-logout" onClick={onLogout}><Icon name="logout"/>Cerrar sesión</button>}</aside>}
+function Metric({label,value,trend}){return <article className="metric-card"><span>{label}</span><strong>{value}</strong><p>{trend}</p></article>}
+function AccountPage({session,onLogout}){if(!session)return <EmptyState title="Ingresa para ver tu cuenta" text="Consulta aquí tus reservas, alquileres, facturas y perfil." action={()=>window.dispatchEvent(new Event('open-auth'))} actionText="Ingresar"/>;return <main className="dashboard page-shell page-top"><DashboardSidebar role="customer" onLogout={onLogout}/><section className="dashboard-content"><div className="dashboard-heading"><div><p>19 DE OCTUBRE DE 2026</p><h1>Hola, Andrea.</h1><span>Este es el estado de tus alquileres.</span></div><button className="button button-dark" onClick={()=>navigate('/catalogo')}>Nueva reserva <Icon name="arrow"/></button></div><div className="metric-grid"><Metric label="Reservas activas" value="2" trend="Una requiere tu atención"/><Metric label="Alquileres completados" value="08" trend="Historial disponible"/><Metric label="Facturas" value="06" trend="Todas al día"/></div><div className="dashboard-panel"><div className="panel-heading"><div><h2>Actividad reciente</h2><p>Reservas y alquileres en curso.</p></div><button>Ver historial</button></div>{tools.slice(0,2).map((t,i)=><div className="activity-row" key={t.id}><ToolVisual tool={t} compact/><div><span className={`status-pill ${i?'green':'amber'}`}>{i?'En alquiler':'Pendiente'}</span><h3>{t.name}</h3><p>{i?'Devuelve antes del 22 oct':'20–23 oct · 4 días'}</p></div><div className="activity-price"><strong>{money.format(t.price*4)}</strong><button onClick={()=>!i&&navigate('/pago')}>{i?'Ver detalle':'Completar pago'} <Icon name="chevron"/></button></div></div>)}</div></section></main>}
+function BusinessDashboard({role}){const provider=role==='provider';const rows=provider?tools.slice(0,3).map((t,i)=>[`TR-${1200+i}`,t.name,`${i+1} unidad solicitada`,'Pendiente']):[['USR-0148','Laura Méndez','CUSTOMER','Activo'],['PAY-0064','Pago primera mitad','VISA •••• 4242','Confirmado'],['INV-0039','Factura simulada','COP 340.000','Emitida']];return <main className="dashboard page-shell page-top"><DashboardSidebar role={role}/><section className="dashboard-content"><div className="dashboard-heading"><div><p>{provider?'PANEL DEL PROVEEDOR':'PANEL ADMINISTRATIVO'}</p><h1>{provider?'Inventario en movimiento.':'Control de la plataforma.'}</h1><span>{provider?'Administra publicaciones, unidades y solicitudes.':'Vista demostrativa de usuarios, roles y operaciones.'}</span></div><button className="button button-dark">{provider?'Publicar herramienta +':'Exportar resumen'}</button></div><div className="metric-grid"><Metric label={provider?'Herramientas publicadas':'Usuarios activos'} value={provider?'12':'148'} trend={provider?'9 con disponibilidad':'12 este mes'}/><Metric label={provider?'Unidades activas':'Pagos simulados'} value={provider?'28':'64'} trend={provider?'4 en alquiler':'COP 8,4 M registrados'}/><Metric label={provider?'Solicitudes nuevas':'Facturas emitidas'} value={provider?'05':'39'} trend={provider?'Requieren revisión':'Documentos académicos'}/></div><div className="dashboard-panel"><div className="panel-heading"><div><h2>{provider?'Solicitudes por confirmar':'Supervisión reciente'}</h2><p>{provider?'La disponibilidad se valida de nuevo al confirmar.':'Operaciones que requieren seguimiento.'}</p></div><button>Ver todas</button></div>{rows.map(r=><div className="inventory-row" key={r[0]}><span>{r[0]}</span><strong>{r[1]}</strong><small>{r[2]}</small><span className={`status-pill ${r[3]==='Pendiente'?'amber':'green'}`}>{r[3]}</span><button>Revisar <Icon name="chevron"/></button></div>)}</div></section></main>}
+
+function InfoPage({type}){const content={nosotros:['Sobre nosotros','Herramientas que trabajan más. Personas que compran menos.','Tool Rental conecta la capacidad disponible de proveedores con personas y equipos que necesitan construir. La plataforma académica busca hacer cada reserva clara, trazable y responsable.'],'como-funciona':['Cómo funciona','Del catálogo a la devolución, sin perder el hilo.','Explora equipos publicados, verifica fechas, solicita una reserva y sigue cada etapa de entrega, uso y devolución desde tu cuenta.'],terminos:['Términos y condiciones','Un acuerdo claro para una experiencia responsable.','Este contenido es un borrador académico sujeto a revisión jurídica y comercial. Las condiciones definitivas de cancelación, mora, protección y entrega todavía deben aprobarse.'],privacidad:['Privacidad','Tus datos deben tener un propósito, no una sorpresa.','La política definitiva está pendiente. El producto no debe almacenar números completos de tarjeta ni CVV y debe conservar consentimientos versionados.'],faq:['Preguntas frecuentes','Respuestas para empezar con confianza.','La disponibilidad se confirma al aprobar la reserva. Los pagos actuales son simulados y las condiciones de entrega se coordinan con el proveedor.'],contacto:['Contacto','Hablemos de tu próximo proyecto.','Este canal es demostrativo. Los datos definitivos del operador y los tiempos de atención deben definirse antes de un lanzamiento comercial.']};const [title,headline,description]=content[type]||content.nosotros;const cards=type==='faq'?[['¿Cómo reservo?','Elige una herramienta, define fechas y solicita la reserva.'],['¿Cuándo pago?','La simulación divide el pago: 50% al confirmar y 50% al finalizar.'],['¿Existe protección?','El plan opcional aún no tiene valores ni condiciones aprobadas.']]:[['01','Claridad primero','Mostramos precios base y límites actuales sin presentar decisiones pendientes como definitivas.'],['02','Uso responsable','Cada equipo representa el trabajo de un proveedor y la seguridad de quien lo utiliza.'],['03','Trazabilidad','Reservas, entregas, devoluciones y documentos conservan su historia.']];return <main className="info-page"><div className="page-shell"><p className="kicker"><span/> {title}</p><h1>{headline}</h1><p>{description}</p><div className="info-grid">{cards.map(x=><article key={x[0]}><span>{x[0]}</span><h2>{x[1]}</h2><p>{x[2]}</p></article>)}</div></div></main>}
+function ErrorPage({code='404'}){return <main className="error-page"><span>{code}</span><p className="kicker dark"><i/> Algo no salió como esperábamos</p><h1>{code==='403'?'Este espacio no está disponible para tu rol.':'Parece que esta herramienta cambió de lugar.'}</h1><button className="button button-dark" onClick={()=>navigate('/')}>Volver al inicio <Icon name="arrow"/></button></main>}
+function EmptyState({title,text,action,actionText='Limpiar filtros'}){return <main className="empty-state page-shell page-top"><span className="empty-icon"><Icon name="search" size={40}/></span><h1>{title}</h1><p>{text}</p><button className="button button-dark" onClick={action}>{actionText} <Icon name="arrow"/></button></main>}
+
+function App(){
+  const [path,setPath]=useState(window.location.pathname)
+  const [session,setSession]=useState(readSession())
+  const [authOpen,setAuthOpen]=useState(false)
+  const [reservation,setReservation]=useState(null)
+  const [catalogTools,setCatalogTools]=useState(tools)
+  const [dataMode,setDataMode]=useState('demo')
+
+  useEffect(()=>{
+    const update=()=>setPath(window.location.pathname)
+    const open=()=>setAuthOpen(true)
+    window.addEventListener('popstate',update)
+    window.addEventListener('open-auth',open)
+    api.listCatalog().then(items=>{
+      if(items.length){setCatalogTools(items.map(normalizeCatalogTool));setDataMode('api')}
+    }).catch(()=>setDataMode('demo'))
+    return()=>{window.removeEventListener('popstate',update);window.removeEventListener('open-auth',open)}
+  },[])
+
+  const reserve=async selection=>{
+    if(selection.tool.source==='api'){
+      try{
+        const availability=await api.getAvailability(selection.tool.id,selection.startDate,selection.returnDate)
+        selection={...selection,equipmentUnitIds:availability.availableEquipmentUnitIds}
+      }catch(error){selection={...selection,availabilityError:error.message}}
+    }
+    setReservation(selection)
+    navigate('/cotizacion')
+  }
+  const login=authenticated=>{
+    const activeSession=authenticated?.accessToken?authenticated:{name:'Andrea Moreno',roles:['CUSTOMER'],demo:true}
+    saveSession(activeSession)
+    setSession(activeSession)
+    setAuthOpen(false)
+  }
+  const logout=async()=>{
+    if(!session?.demo) await api.logout().catch(()=>null)
+    saveSession(null);setSession(null);navigate('/')
+  }
+  const continueQuote=async()=>{
+    if(!session){setAuthOpen(true);return}
+    if(reservation?.tool.source==='api'&&reservation.equipmentUnitIds?.length){
+      try{
+        const quote=await api.quoteReservation(reservation.startDate,reservation.returnDate,[reservation.equipmentUnitIds[0]])
+        const created=await api.createReservation(reservation.startDate,reservation.returnDate,[reservation.equipmentUnitIds[0]])
+        setReservation(current=>({...current,quote,reservationId:created.id?.value||created.id}))
+      }catch(error){setReservation(current=>({...current,apiError:error.message}))}
+    }
+    navigate('/pago')
+  }
+  const pay=async payment=>{
+    if(reservation?.reservationId&&!session?.demo){
+      try{
+        await api.simulatePayment({reservationId:reservation.reservationId,paymentStage:'FIRST_HALF',idempotencyKey:crypto.randomUUID(),simulationOutcome:'APPROVE',...payment})
+      }catch(error){setReservation(current=>({...current,apiError:error.message}));return}
+    }
+    navigate('/reserva-confirmada')
+  }
+
+  let page
+  if(path==='/')page=<HomePage catalogTools={catalogTools} dataMode={dataMode}/>
+  else if(path==='/catalogo')page=<CatalogPage catalogTools={catalogTools} dataMode={dataMode}/>
+  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools}/>
+  else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
+  else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
+  else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
+  else if(path==='/cuenta')page=<AccountPage session={session} onLogout={logout}/>
+  else if(path==='/panel/proveedor')page=<BusinessDashboard role="provider"/>
+  else if(path==='/panel/admin')page=<BusinessDashboard role="admin"/>
+  else if(path==='/nosotros')page=<InfoPage type="nosotros"/>
+  else if(path==='/como-funciona')page=<InfoPage type="como-funciona"/>
+  else if(path.startsWith('/informacion/'))page=<InfoPage type={path.split('/').pop()}/>
+  else if(path==='/403')page=<ErrorPage code="403"/>
+  else page=<ErrorPage/>
+  const minimal=['/pago','/reserva-confirmada'].includes(path)
+  return <div className="app">{!minimal&&<Header session={session} onOpenAuth={()=>setAuthOpen(true)}/>}<div className="page-content">{page}</div>{!minimal&&!path.startsWith('/panel/')&&path!=='/cuenta'&&<Footer/>}{authOpen&&<AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/>}</div>
+}
 export default App

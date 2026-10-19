@@ -18,3 +18,4 @@ frontend/dist/
 
 # Browser verification artifacts
 .playwright-cli/
+.impeccable/review/

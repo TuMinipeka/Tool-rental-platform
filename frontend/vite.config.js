@@ -9,6 +9,12 @@ export default defineConfig(({ mode }) => {
     server: {
       host: true,
       port: Number(env.FRONTEND_PORT || 5173),
+      proxy: env.VITE_API_BASE_URL
+        ? undefined
+        : {
+            '/api': { target: 'http://localhost:8080', changeOrigin: true },
+            '/status': { target: 'http://localhost:8080', changeOrigin: true },
+          },
     },
   }
 })
