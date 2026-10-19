@@ -10,4 +10,6 @@ public interface AccessPolicy {
   void requireOwnerOrAdministrator(UUID actor, UUID owner);
 
   void requireRole(UUID actor, String role);
+
+  boolean isAdministrator(UUID actor);
 }

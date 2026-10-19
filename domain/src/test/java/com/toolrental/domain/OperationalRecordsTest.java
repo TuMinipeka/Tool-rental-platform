@@ -69,4 +69,48 @@ class OperationalRecordsTest {
     assertEquals(confirmed.confirmedAt(), refunded.confirmedAt());
     assertThrows(BusinessRuleException.class, () -> refunded.transition("CONFIRMED", clock));
   }
+
+  @Test
+  void simulatedCardPaymentStoresOnlyApprovedMetadata() {
+    var payment =
+        Payment.simulate(
+            PaymentId.generate(),
+            ReservationId.generate(),
+            "SIMULATED_CARD",
+            "sim-reference",
+            BigDecimal.TEN,
+            "CONFIRMED",
+            clock.instant(),
+            "CREDIT_CARD",
+            "FIRST_HALF",
+            "checkout-1",
+            "VISA",
+            "4242",
+            (short) 12,
+            (short) 2030,
+            clock);
+
+    assertEquals("4242", payment.cardLastFour());
+    assertEquals("VISA", payment.cardNetwork());
+    assertEquals("CONFIRMED", payment.paymentStatus());
+    assertThrows(
+        BusinessRuleException.class,
+        () ->
+            Payment.simulate(
+                PaymentId.generate(),
+                ReservationId.generate(),
+                "SIMULATED_PAYPAL",
+                "sim-paypal",
+                BigDecimal.TEN,
+                "CONFIRMED",
+                clock.instant(),
+                "PAYPAL",
+                "FIRST_HALF",
+                "checkout-2",
+                "MASTERCARD",
+                "1111",
+                (short) 1,
+                (short) 2030,
+                clock));
+  }
 }

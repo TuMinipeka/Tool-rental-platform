@@ -36,6 +36,27 @@ public class PaymentJpaEntity {
   @Column(name = "confirmed_at", nullable = true)
   private Instant confirmedAt;
 
+  @Column(name = "payment_method", nullable = false, length = 30)
+  private String paymentMethod;
+
+  @Column(name = "payment_stage", nullable = false, length = 30)
+  private String paymentStage;
+
+  @Column(name = "idempotency_key", nullable = false, length = 200)
+  private String idempotencyKey;
+
+  @Column(name = "card_network", length = 20)
+  private String cardNetwork;
+
+  @Column(name = "card_last_four", length = 4)
+  private String cardLastFour;
+
+  @Column(name = "card_expiry_month")
+  private Short cardExpiryMonth;
+
+  @Column(name = "card_expiry_year")
+  private Short cardExpiryYear;
+
   protected PaymentJpaEntity() {}
 
   public PaymentJpaEntity(
@@ -46,7 +67,14 @@ public class PaymentJpaEntity {
       BigDecimal amount,
       String paymentStatus,
       Instant recordedAt,
-      Instant confirmedAt) {
+      Instant confirmedAt,
+      String paymentMethod,
+      String paymentStage,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear) {
     this.id = id;
     this.reservationId = reservationId;
     this.processor = processor;
@@ -55,6 +83,13 @@ public class PaymentJpaEntity {
     this.paymentStatus = paymentStatus;
     this.recordedAt = recordedAt;
     this.confirmedAt = confirmedAt;
+    this.paymentMethod = paymentMethod;
+    this.paymentStage = paymentStage;
+    this.idempotencyKey = idempotencyKey;
+    this.cardNetwork = cardNetwork;
+    this.cardLastFour = cardLastFour;
+    this.cardExpiryMonth = cardExpiryMonth;
+    this.cardExpiryYear = cardExpiryYear;
   }
 
   public UUID getId() {
@@ -87,5 +122,33 @@ public class PaymentJpaEntity {
 
   public Instant getConfirmedAt() {
     return confirmedAt;
+  }
+
+  public String getPaymentMethod() {
+    return paymentMethod;
+  }
+
+  public String getPaymentStage() {
+    return paymentStage;
+  }
+
+  public String getIdempotencyKey() {
+    return idempotencyKey;
+  }
+
+  public String getCardNetwork() {
+    return cardNetwork;
+  }
+
+  public String getCardLastFour() {
+    return cardLastFour;
+  }
+
+  public Short getCardExpiryMonth() {
+    return cardExpiryMonth;
+  }
+
+  public Short getCardExpiryYear() {
+    return cardExpiryYear;
   }
 }

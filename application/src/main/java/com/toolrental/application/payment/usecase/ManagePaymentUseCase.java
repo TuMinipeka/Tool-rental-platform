@@ -52,8 +52,12 @@ public final class ManagePaymentUseCase {
   public List<PaymentResponse> list(UUID actor) {
     return work.execute(
         () -> {
-          access.requireAdministrator(actor);
-          return repository.findAll().stream().map(PaymentResponse::from).toList();
+          access.requireActive(actor);
+          var values =
+              access.isAdministrator(actor)
+                  ? repository.findAll()
+                  : repository.findByParticipant(actor);
+          return values.stream().map(PaymentResponse::from).toList();
         });
   }
 

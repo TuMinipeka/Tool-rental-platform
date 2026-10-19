@@ -4,15 +4,15 @@ El proyecto tiene persistencia y operaciones verificadas en PostgreSQL. Antes de
 
 | Área | Base existente | Condición pendiente |
 | --- | --- | --- |
-| Identidad | BCrypt, roles y `Principal` obligatorio | JWT, login, expiración y alta inicial segura |
+| Identidad | BCrypt, roles, registro de cliente, login y JWT de acceso con expiración | Renovación, revocación persistente y recuperación por canal externo |
 | Autorización | Propiedad y participación en casos de uso | Pruebas completas con autenticación real |
 | Migraciones | Historial inmutable y pruebas de actualización | Ensayo en copia, ventana de cambio y rol migrador separado |
 | Secretos | Variables requeridas en perfil `production` | Excluir credenciales privadas de artefactos, gestor de secretos y rotación |
 | Datos | Claves, restricciones y transacciones | Respaldo automático y restauración ensayada |
 | Plataforma | JAR y usuario de contenedor sin privilegios | Imágenes revisadas, TLS/proxy, recursos y motor Docker probado |
 | Observabilidad | Consulta JDBC y logs | Métricas, alertas, auditoría y acceso al estado público |
-| API | DTOs y errores HTTP | OpenAPI y revisión de exposición/límites |
-| Finanzas | Registro manual e historia | Impuestos, pasarela y conciliación/reembolsos |
+| API | DTOs, errores HTTP, OpenAPI y Swagger UI | Versionado aprobado y revisión de exposición/límites |
+| Finanzas | Registro, historia y pagos académicos 50/50 idempotentes | Impuestos, pasarela y conciliación/reembolsos externos |
 | Producto | Dominio y backend base | Frontend integrado y términos revisados |
 | Entrega | Pruebas reproducibles | CI, revisión de dependencias y recuperación |
 

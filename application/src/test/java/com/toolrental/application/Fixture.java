@@ -101,6 +101,18 @@ final class Fixture {
           return Optional.ofNullable(reservations.get(id));
         }
 
+        public List<Reservation> findByCustomer(CustomerId customerId) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.customerId().equals(customerId))
+              .toList();
+        }
+
+        public List<Reservation> findBySupplier(SupplierId supplierId) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.supplierId().equals(supplierId))
+              .toList();
+        }
+
         public void addRequest(Reservation r) {
           if (r.status() != ReservationStatus.PENDING || reservations.containsKey(r.id()))
             throw new BusinessRuleException("Invalid reservation request");

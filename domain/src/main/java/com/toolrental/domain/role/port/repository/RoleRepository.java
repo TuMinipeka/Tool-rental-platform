@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface RoleRepository {
   Optional<Role> findById(RoleId id);
 
+  Optional<Role> findByCode(String code);
+
   List<Role> findAll();
 
   Role save(Role value);

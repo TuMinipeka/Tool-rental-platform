@@ -5,6 +5,8 @@ import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.equipmentunit.port.repository.AtomicEquipmentUnitRegistration;
 import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
+import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservation.port.repository.AvailabilityRepository;
 import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.mapper.EquipmentUnitPersistenceMapper;
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.repository.EquipmentUnitJpaRepository;
@@ -19,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 @Transactional
 public class EquipmentUnitPersistenceAdapter
-    implements EquipmentUnitRepository, AtomicEquipmentUnitRegistration {
+    implements EquipmentUnitRepository, AtomicEquipmentUnitRegistration, AvailabilityRepository {
   private final EquipmentUnitJpaRepository equipmentUnits;
   private final ToolJpaRepository tools;
   private final SupplierJpaRepository suppliers;
@@ -44,6 +46,15 @@ public class EquipmentUnitPersistenceAdapter
   @Override
   public List<EquipmentUnit> findAll() {
     return equipmentUnits.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  @Override
+  public List<EquipmentUnit> findAvailableUnits(ToolId toolId, ReservationPeriod period) {
+    return equipmentUnits
+        .findAvailableByToolAndPeriod(toolId.value(), period.startDate(), period.returnDate())
+        .stream()
+        .map(mapper::toDomain)
+        .toList();
   }
 
   @Override

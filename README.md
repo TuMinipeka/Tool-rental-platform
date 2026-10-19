@@ -18,8 +18,8 @@ Gestionar el catálogo de proveedores, reservar equipos físicos y registrar el 
 | --- | --- | --- |
 | Dominio y aplicación | Catálogo, identidad y operaciones de los 18 contextos | Reglas comerciales pendientes registradas explícitamente |
 | Persistencia | JPA, Flyway, restricciones y confirmación concurrente en PostgreSQL | Sin generación automática de esquema |
-| REST | Contratos, validación, permisos y errores HTTP | Falta implementar autenticación JWT; las peticiones anónimas reciben 401 |
-| Facturación y pagos | Facturas con instantáneas; pagos administrativos | Sin pasarela, liquidación fiscal ni reembolso externo |
+| REST | Contratos, validación, JWT, permisos, OpenAPI y errores HTTP | Falta renovación/revocación persistente y aprobación del versionado |
+| Facturación y pagos | Facturas con instantáneas y pagos simulados 50/50 | Sin pasarela externa, liquidación fiscal ni reembolso automatizado |
 | Web | Estado real de conexión en 8080 y base React separada | Recorridos de negocio del frontend pendientes |
 | Operación | JAR, Dockerfiles, Compose y guías | Preparación de producción en curso |
 

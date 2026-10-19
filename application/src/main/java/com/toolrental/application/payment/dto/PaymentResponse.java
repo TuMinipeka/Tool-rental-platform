@@ -13,7 +13,13 @@ public record PaymentResponse(
     BigDecimal amount,
     String paymentStatus,
     Instant recordedAt,
-    Instant confirmedAt) {
+    Instant confirmedAt,
+    String paymentMethod,
+    String paymentStage,
+    String cardNetwork,
+    String cardLastFour,
+    Short cardExpiryMonth,
+    Short cardExpiryYear) {
   public static PaymentResponse from(Payment value) {
     return new PaymentResponse(
         value.id().value(),
@@ -23,6 +29,12 @@ public record PaymentResponse(
         value.amount(),
         value.paymentStatus(),
         value.recordedAt(),
-        value.confirmedAt());
+        value.confirmedAt(),
+        value.paymentMethod(),
+        value.paymentStage(),
+        value.cardNetwork(),
+        value.cardLastFour(),
+        value.cardExpiryMonth(),
+        value.cardExpiryYear());
   }
 }

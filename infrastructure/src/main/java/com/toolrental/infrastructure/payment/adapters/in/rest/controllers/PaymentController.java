@@ -1,12 +1,15 @@
 package com.toolrental.infrastructure.payment.adapters.in.rest.controllers;
 
 import com.toolrental.application.payment.command.RegisterPaymentCommand;
+import com.toolrental.application.payment.command.SimulatePaymentCommand;
 import com.toolrental.application.payment.dto.PaymentResponse;
 import com.toolrental.application.payment.usecase.ManagePaymentUseCase;
+import com.toolrental.application.payment.usecase.SimulatePaymentUseCase;
 import com.toolrental.domain.payment.model.valueobject.PaymentId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.infrastructure.common.web.Actor;
 import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.PaymentRequest;
+import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.SimulatedPaymentRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -25,9 +28,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/payments")
 public class PaymentController {
   private final ManagePaymentUseCase useCase;
+  private final SimulatePaymentUseCase simulation;
 
-  public PaymentController(ManagePaymentUseCase useCase) {
+  public PaymentController(ManagePaymentUseCase useCase, SimulatePaymentUseCase simulation) {
     this.useCase = useCase;
+    this.simulation = simulation;
+  }
+
+  @PostMapping("/simulations")
+  @ResponseStatus(HttpStatus.CREATED)
+  public PaymentResponse simulate(
+      Principal principal, @Valid @RequestBody SimulatedPaymentRequest request) {
+    return simulation.execute(
+        Actor.id(principal),
+        new SimulatePaymentCommand(
+            new ReservationId(request.reservationId()),
+            request.paymentStage(),
+            request.paymentMethod(),
+            request.idempotencyKey(),
+            request.cardNetwork(),
+            request.cardLastFour(),
+            request.cardExpiryMonth(),
+            request.cardExpiryYear(),
+            request.simulationOutcome()));
   }
 
   @GetMapping

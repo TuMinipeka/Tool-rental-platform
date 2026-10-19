@@ -46,16 +46,16 @@ V22 conserva el ajuste a `varchar(3)`, V23 conserva la inserción idempotente de
 
 | Ubicación | Versiones | Activación |
 | --- | --- | --- |
-| `classpath:db/migration` | V1–V24, 24 versiones | Normal, local y producción |
+| `classpath:db/migration` | V1–V24 y V200, 25 versiones | Normal, local y producción |
 | `classpath:db/demo` | V101–V118, 18 versiones | Perfil adicional `demo` exclusivamente |
 
-La demostración aplica 42 versiones numeradas. Su versión más alta es 118; la historia normal termina en 24. Demo debe usar una base exclusiva.
+La demostración aplica las versiones normales y V101–V118. V200 amplía pagos simulados después del rango reservado de demo. Demo debe usar una base exclusiva.
 
 ## Historial y próximas migraciones
 
 No edites archivos publicados/aplicados, no reutilices versiones y no ejecutes `repair` para encubrir diferencias. Flyway valida historial, deshabilita baseline automático y `clean`. Hibernate utiliza `validate`.
 
-Coordina una secuencia global entre desarrolladores. Como demo reserva V101–V118, la próxima evolución compartida debe usar una versión superior a 118, por ejemplo V200, para aplicarse también en bases demo sin habilitar ejecución fuera de orden. Evita crear V25 después de aplicar V118 en un entorno demo.
+Coordina una secuencia global entre desarrolladores. Como demo reserva V101–V118, las evoluciones compartidas usan versiones superiores a 118. V200 agrega método, etapa, idempotencia y datos mínimos de tarjeta simulada a pagos. La siguiente versión compartida debe ser mayor que V200.
 
 Una base con **los V1–V21 originales de Conde** constituye otro historial: se valida la base vacía y la línea V1–V3 de Daniel, no una conversión automática de aquella. No arranques estos scripts sobre ese historial ni uses `repair`: conserva respaldo, compara esquema y diseña una transición revisada.
 

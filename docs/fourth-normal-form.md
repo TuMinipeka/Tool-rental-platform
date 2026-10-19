@@ -215,7 +215,7 @@ Las 18 relaciones cumplen 4FN bajo las dependencias documentadas. Las pruebas Po
 | Inventario único por proveedor | Trigger y bloqueo asesor; no unicidad global falsa |
 | Un proveedor por reserva | Coordinación y comprobación de referencias |
 | Solapamientos confirmados | Bloqueos ordenados y comprobación/guardado atómicos |
-| Roles, perfiles y propiedad | Aplicación; autenticación JWT pendiente |
+| Roles, perfiles y propiedad | Aplicación y JWT de acceso; renovación/revocación persistente pendiente |
 | Devolución posterior a entrega | Transiciones y validación operativa |
 | Tarifas y facturas históricas | Política de escritura y transacciones |
 | Referencia única de pago | Restricción `(processor, external_reference)`; reintentos externos pendientes |

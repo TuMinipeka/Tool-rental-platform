@@ -25,6 +25,10 @@ public class RolePersistenceAdapter implements RoleRepository {
     return rows.findLocked(mapper.key(id)).map(mapper::toDomain);
   }
 
+  public Optional<Role> findByCode(String code) {
+    return rows.findByCode(code).map(mapper::toDomain);
+  }
+
   public List<Role> findAll() {
     return rows.findAll().stream().map(mapper::toDomain).toList();
   }

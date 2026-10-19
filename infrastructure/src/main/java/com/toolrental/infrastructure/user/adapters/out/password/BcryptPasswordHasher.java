@@ -17,4 +17,9 @@ public class BcryptPasswordHasher implements PasswordHasher {
           "Password must contain at least 12 characters and at most 72 UTF-8 bytes");
     return encoder.encode(password);
   }
+
+  public boolean matches(String password, String passwordHash) {
+    if (password == null || passwordHash == null || !passwordHash.startsWith("$2")) return false;
+    return encoder.matches(password, passwordHash);
+  }
 }

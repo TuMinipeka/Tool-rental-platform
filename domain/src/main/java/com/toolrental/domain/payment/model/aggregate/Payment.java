@@ -20,6 +20,13 @@ public final class Payment extends AggregateRoot {
   private final String paymentStatus;
   private final Instant recordedAt;
   private final Instant confirmedAt;
+  private final String paymentMethod;
+  private final String paymentStage;
+  private final String idempotencyKey;
+  private final String cardNetwork;
+  private final String cardLastFour;
+  private final Short cardExpiryMonth;
+  private final Short cardExpiryYear;
 
   private Payment(
       PaymentId id,
@@ -29,7 +36,14 @@ public final class Payment extends AggregateRoot {
       BigDecimal amount,
       String paymentStatus,
       Instant recordedAt,
-      Instant confirmedAt) {
+      Instant confirmedAt,
+      String paymentMethod,
+      String paymentStage,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear) {
     Objects.requireNonNull(id);
     Objects.requireNonNull(reservationId, "reservationId is required");
     Objects.requireNonNull(processor, "processor is required");
@@ -51,6 +65,28 @@ public final class Payment extends AggregateRoot {
     if (("CONFIRMED".equals(paymentStatus) || "REFUNDED".equals(paymentStatus))
         && confirmedAt == null)
       throw new BusinessRuleException("Confirmed payment requires confirmation time");
+    if (!Set.of("ADMINISTRATIVE", "CREDIT_CARD", "DEBIT_CARD", "PAYPAL").contains(paymentMethod))
+      throw new BusinessRuleException("Invalid payment method");
+    if (!Set.of("ADMINISTRATIVE", "FIRST_HALF", "FINAL_HALF", "ADJUSTMENT").contains(paymentStage))
+      throw new BusinessRuleException("Invalid payment stage");
+    if (idempotencyKey == null || idempotencyKey.isBlank() || idempotencyKey.length() > 200)
+      throw new BusinessRuleException("Invalid idempotency key");
+    var cardPayment = Set.of("CREDIT_CARD", "DEBIT_CARD").contains(paymentMethod);
+    if (cardPayment) {
+      if (!Set.of("VISA", "MASTERCARD").contains(cardNetwork)
+          || cardLastFour == null
+          || !cardLastFour.matches("[0-9]{4}")
+          || cardExpiryMonth == null
+          || cardExpiryMonth < 1
+          || cardExpiryMonth > 12
+          || cardExpiryYear == null)
+        throw new BusinessRuleException("Invalid simulated card details");
+    } else if (cardNetwork != null
+        || cardLastFour != null
+        || cardExpiryMonth != null
+        || cardExpiryYear != null) {
+      throw new BusinessRuleException("Non-card payment cannot include card details");
+    }
     this.id = id;
     this.reservationId = reservationId;
     this.processor = processor;
@@ -59,6 +95,13 @@ public final class Payment extends AggregateRoot {
     this.paymentStatus = paymentStatus;
     this.recordedAt = recordedAt;
     this.confirmedAt = confirmedAt;
+    this.paymentMethod = paymentMethod;
+    this.paymentStage = paymentStage;
+    this.idempotencyKey = idempotencyKey;
+    this.cardNetwork = cardNetwork;
+    this.cardLastFour = cardLastFour;
+    this.cardExpiryMonth = cardExpiryMonth;
+    this.cardExpiryYear = cardExpiryYear;
   }
 
   public static Payment restore(
@@ -69,7 +112,14 @@ public final class Payment extends AggregateRoot {
       BigDecimal amount,
       String paymentStatus,
       Instant recordedAt,
-      Instant confirmedAt) {
+      Instant confirmedAt,
+      String paymentMethod,
+      String paymentStage,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear) {
     return new Payment(
         id,
         reservationId,
@@ -78,7 +128,14 @@ public final class Payment extends AggregateRoot {
         amount,
         paymentStatus,
         recordedAt,
-        confirmedAt);
+        confirmedAt,
+        paymentMethod,
+        paymentStage,
+        idempotencyKey,
+        cardNetwork,
+        cardLastFour,
+        cardExpiryMonth,
+        cardExpiryYear);
   }
 
   public static Payment register(
@@ -100,7 +157,52 @@ public final class Payment extends AggregateRoot {
             amount,
             paymentStatus,
             recordedAt,
-            confirmedAt);
+            confirmedAt,
+            "ADMINISTRATIVE",
+            "ADMINISTRATIVE",
+            processor + ":" + externalReference,
+            null,
+            null,
+            null,
+            null);
+    result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
+    return result;
+  }
+
+  public static Payment simulate(
+      PaymentId id,
+      ReservationId reservationId,
+      String processor,
+      String externalReference,
+      BigDecimal amount,
+      String paymentStatus,
+      Instant recordedAt,
+      String paymentMethod,
+      String paymentStage,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear,
+      Clock clock) {
+    var confirmedAt = "CONFIRMED".equals(paymentStatus) ? Instant.now(clock) : null;
+    var result =
+        new Payment(
+            id,
+            reservationId,
+            processor,
+            externalReference,
+            amount,
+            paymentStatus,
+            recordedAt,
+            confirmedAt,
+            paymentMethod,
+            paymentStage,
+            idempotencyKey,
+            cardNetwork,
+            cardLastFour,
+            cardExpiryMonth,
+            cardExpiryYear);
     result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
     return result;
   }
@@ -137,6 +239,34 @@ public final class Payment extends AggregateRoot {
     return confirmedAt;
   }
 
+  public String paymentMethod() {
+    return paymentMethod;
+  }
+
+  public String paymentStage() {
+    return paymentStage;
+  }
+
+  public String idempotencyKey() {
+    return idempotencyKey;
+  }
+
+  public String cardNetwork() {
+    return cardNetwork;
+  }
+
+  public String cardLastFour() {
+    return cardLastFour;
+  }
+
+  public Short cardExpiryMonth() {
+    return cardExpiryMonth;
+  }
+
+  public Short cardExpiryYear() {
+    return cardExpiryYear;
+  }
+
   public Payment transition(String next, Clock clock) {
     if (!(("PENDING".equals(paymentStatus) && Set.of("CONFIRMED", "FAILED").contains(next))
         || ("CONFIRMED".equals(paymentStatus) && Set.of("REFUNDED").contains(next))))
@@ -150,7 +280,14 @@ public final class Payment extends AggregateRoot {
             amount,
             next,
             recordedAt,
-            ("CONFIRMED".equals(next) ? Instant.now(clock) : confirmedAt));
+            ("CONFIRMED".equals(next) ? Instant.now(clock) : confirmedAt),
+            paymentMethod,
+            paymentStage,
+            idempotencyKey,
+            cardNetwork,
+            cardLastFour,
+            cardExpiryMonth,
+            cardExpiryYear);
     result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
     return result;
   }
