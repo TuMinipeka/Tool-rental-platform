@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/quotes/reservations")
+@RequestMapping({"/api/v1/quotes/reservations", "/api/quotes/reservations"})
 public final class ReservationQuoteController {
   private final QuoteReservationUseCase quote;
 
@@ -30,6 +30,8 @@ public final class ReservationQuoteController {
         Actor.id(principal),
         new QuoteReservationCommand(
             new ReservationPeriod(request.startDate(), request.returnDate()),
-            request.equipmentUnitIds().stream().map(EquipmentUnitId::new).toList()));
+            request.equipmentUnitIds().stream().map(EquipmentUnitId::new).toList(),
+            request.fulfillmentMethod(),
+            request.deliveryCountryCode()));
   }
 }

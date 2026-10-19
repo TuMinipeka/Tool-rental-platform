@@ -1,5 +1,6 @@
 package com.toolrental.application.reservation.usecase;
 
+import com.toolrental.application.common.exception.AvailabilityConflictApplicationException;
 import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
@@ -44,7 +45,7 @@ public final class ConfirmReservationUseCase {
                               throw new BusinessRuleException(
                                   "Currency changed; request a new reservation");
                             if (context.isOccupied(equipmentUnit.id(), r.period()))
-                              throw new BusinessRuleException("Equipment unit is unavailable");
+                              throw new AvailabilityConflictApplicationException();
                             return new ReservationLine(equipmentUnit.id(), actor, tool.dailyRate());
                           })
                       .toList();

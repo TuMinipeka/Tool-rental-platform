@@ -6,4 +6,8 @@ public interface RentalLifecycle {
   boolean allUnitsReturned(ReservationId id);
 
   boolean hasDelivery(ReservationId id);
+
+  boolean allUnitsDelivered(ReservationId id);
+
+  boolean hasFailedDelivery(ReservationId id, String failureType);
 }

@@ -13,6 +13,8 @@ import org.springframework.data.repository.query.Param;
 public interface PaymentJpaRepository extends JpaRepository<PaymentJpaEntity, UUID> {
   Optional<PaymentJpaEntity> findByIdempotencyKey(String idempotencyKey);
 
+  List<PaymentJpaEntity> findByReservationIdOrderByRecordedAt(UUID reservationId);
+
   boolean existsByReservationIdAndPaymentStageAndPaymentStatus(
       UUID reservationId, String paymentStage, String paymentStatus);
 

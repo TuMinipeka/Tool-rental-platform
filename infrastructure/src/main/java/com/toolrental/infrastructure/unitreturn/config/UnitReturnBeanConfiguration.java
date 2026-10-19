@@ -21,8 +21,9 @@ public class UnitReturnBeanConfiguration {
       WorkflowReferences references,
       Clock clock,
       UnitDeliveryRepository deliveries,
-      RentalRepository rentals) {
+      RentalRepository rentals,
+      com.toolrental.domain.payment.port.repository.PaymentRepository payments) {
     return new ManageUnitReturnUseCase(
-        repository, work, access, references, clock, deliveries, rentals);
+        repository, work, access, references, clock, deliveries, rentals, payments);
   }
 }

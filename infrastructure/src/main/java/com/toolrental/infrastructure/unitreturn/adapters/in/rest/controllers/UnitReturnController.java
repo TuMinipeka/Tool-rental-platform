@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/unit-returns")
+@RequestMapping({"/api/v1/unit-returns", "/api/unit-returns"})
 public class UnitReturnController {
   private final ManageUnitReturnUseCase useCase;
 

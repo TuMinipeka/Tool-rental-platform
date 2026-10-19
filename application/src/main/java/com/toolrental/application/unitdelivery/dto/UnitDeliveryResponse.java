@@ -13,7 +13,12 @@ public record UnitDeliveryResponse(
     String addressLine,
     String city,
     String region,
-    String country) {
+    String country,
+    String fulfillmentMethod,
+    String deliveryStatus,
+    String failureType,
+    String failureReason,
+    Instant failedAt) {
   public static UnitDeliveryResponse from(UnitDelivery value) {
     return new UnitDeliveryResponse(
         value.id().reservationId().value(),
@@ -24,6 +29,11 @@ public record UnitDeliveryResponse(
         value.addressLine(),
         value.city(),
         value.region(),
-        value.country());
+        value.country(),
+        value.fulfillmentMethod(),
+        value.deliveryStatus(),
+        value.failureType(),
+        value.failureReason(),
+        value.failedAt());
   }
 }

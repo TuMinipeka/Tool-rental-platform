@@ -29,4 +29,27 @@ public class RentalLifecycleAdapter implements RentalLifecycle {
             id.value(),
             id.value()));
   }
+
+  public boolean allUnitsDelivered(ReservationId id) {
+    return Boolean.TRUE.equals(
+        db.queryForObject(
+            "select exists(select 1 from reservation_items where reservation_id=?) "
+                + "and not exists(select 1 from reservation_items i where i.reservation_id=? "
+                + "and not exists(select 1 from unit_deliveries d where "
+                + "d.reservation_id=i.reservation_id and d.equipment_unit_id=i.equipment_unit_id "
+                + "and d.delivery_status='COMPLETED'))",
+            Boolean.class,
+            id.value(),
+            id.value()));
+  }
+
+  public boolean hasFailedDelivery(ReservationId id, String failureType) {
+    return Boolean.TRUE.equals(
+        db.queryForObject(
+            "select exists(select 1 from unit_deliveries where reservation_id=? "
+                + "and delivery_status='FAILED' and failure_type=?)",
+            Boolean.class,
+            id.value(),
+            failureType));
+  }
 }

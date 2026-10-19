@@ -57,6 +57,12 @@ public class PaymentJpaEntity {
   @Column(name = "card_expiry_year")
   private Short cardExpiryYear;
 
+  @Column(name = "adjustment_type", length = 30)
+  private String adjustmentType;
+
+  @Column(name = "adjustment_reference")
+  private UUID adjustmentReference;
+
   protected PaymentJpaEntity() {}
 
   public PaymentJpaEntity(
@@ -74,7 +80,9 @@ public class PaymentJpaEntity {
       String cardNetwork,
       String cardLastFour,
       Short cardExpiryMonth,
-      Short cardExpiryYear) {
+      Short cardExpiryYear,
+      String adjustmentType,
+      UUID adjustmentReference) {
     this.id = id;
     this.reservationId = reservationId;
     this.processor = processor;
@@ -90,6 +98,8 @@ public class PaymentJpaEntity {
     this.cardLastFour = cardLastFour;
     this.cardExpiryMonth = cardExpiryMonth;
     this.cardExpiryYear = cardExpiryYear;
+    this.adjustmentType = adjustmentType;
+    this.adjustmentReference = adjustmentReference;
   }
 
   public UUID getId() {
@@ -150,5 +160,13 @@ public class PaymentJpaEntity {
 
   public Short getCardExpiryYear() {
     return cardExpiryYear;
+  }
+
+  public String getAdjustmentType() {
+    return adjustmentType;
+  }
+
+  public UUID getAdjustmentReference() {
+    return adjustmentReference;
   }
 }

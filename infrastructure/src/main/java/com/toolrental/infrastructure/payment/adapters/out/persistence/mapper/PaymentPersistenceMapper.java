@@ -29,7 +29,9 @@ public class PaymentPersistenceMapper {
         row.getCardNetwork(),
         row.getCardLastFour(),
         row.getCardExpiryMonth(),
-        row.getCardExpiryYear());
+        row.getCardExpiryYear(),
+        row.getAdjustmentType(),
+        row.getAdjustmentReference());
   }
 
   public PaymentJpaEntity toEntity(Payment value) {
@@ -48,6 +50,8 @@ public class PaymentPersistenceMapper {
         value.cardNetwork(),
         value.cardLastFour(),
         value.cardExpiryMonth(),
-        value.cardExpiryYear());
+        value.cardExpiryYear(),
+        value.adjustmentType(),
+        value.adjustmentReference());
   }
 }

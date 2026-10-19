@@ -13,6 +13,9 @@ public interface PaymentRepository {
 
   List<Payment> findByParticipant(UUID participantId);
 
+  List<Payment> findByReservation(
+      com.toolrental.domain.reservation.model.valueobject.ReservationId reservationId);
+
   Optional<Payment> findByIdempotencyKey(String idempotencyKey);
 
   boolean hasConfirmedStage(

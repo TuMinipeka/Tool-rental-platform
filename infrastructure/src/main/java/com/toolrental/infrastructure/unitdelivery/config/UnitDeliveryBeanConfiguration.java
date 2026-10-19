@@ -4,7 +4,6 @@ import com.toolrental.application.common.service.WorkflowReferences;
 import com.toolrental.application.unitdelivery.usecase.ManageUnitDeliveryUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
-import com.toolrental.domain.rental.port.repository.RentalRepository;
 import com.toolrental.domain.unitdelivery.port.repository.UnitDeliveryRepository;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +17,7 @@ public class UnitDeliveryBeanConfiguration {
       UnitOfWork work,
       AccessPolicy access,
       WorkflowReferences references,
-      Clock clock,
-      RentalRepository rentals) {
-    return new ManageUnitDeliveryUseCase(repository, work, access, references, clock, rentals);
+      Clock clock) {
+    return new ManageUnitDeliveryUseCase(repository, work, access, references, clock);
   }
 }

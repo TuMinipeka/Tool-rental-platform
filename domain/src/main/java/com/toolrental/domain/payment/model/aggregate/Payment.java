@@ -27,6 +27,8 @@ public final class Payment extends AggregateRoot {
   private final String cardLastFour;
   private final Short cardExpiryMonth;
   private final Short cardExpiryYear;
+  private final String adjustmentType;
+  private final java.util.UUID adjustmentReference;
 
   private Payment(
       PaymentId id,
@@ -43,7 +45,9 @@ public final class Payment extends AggregateRoot {
       String cardNetwork,
       String cardLastFour,
       Short cardExpiryMonth,
-      Short cardExpiryYear) {
+      Short cardExpiryYear,
+      String adjustmentType,
+      java.util.UUID adjustmentReference) {
     Objects.requireNonNull(id);
     Objects.requireNonNull(reservationId, "reservationId is required");
     Objects.requireNonNull(processor, "processor is required");
@@ -102,6 +106,14 @@ public final class Payment extends AggregateRoot {
     this.cardLastFour = cardLastFour;
     this.cardExpiryMonth = cardExpiryMonth;
     this.cardExpiryYear = cardExpiryYear;
+    if ("ADJUSTMENT".equals(paymentStage)) {
+      if (adjustmentType == null || adjustmentType.isBlank() || adjustmentReference == null)
+        throw new BusinessRuleException("Adjustment payment requires a source");
+    } else if (adjustmentType != null || adjustmentReference != null) {
+      throw new BusinessRuleException("Non-adjustment payment cannot have an adjustment source");
+    }
+    this.adjustmentType = adjustmentType;
+    this.adjustmentReference = adjustmentReference;
   }
 
   public static Payment restore(
@@ -120,6 +132,44 @@ public final class Payment extends AggregateRoot {
       String cardLastFour,
       Short cardExpiryMonth,
       Short cardExpiryYear) {
+    return restore(
+        id,
+        reservationId,
+        processor,
+        externalReference,
+        amount,
+        paymentStatus,
+        recordedAt,
+        confirmedAt,
+        paymentMethod,
+        paymentStage,
+        idempotencyKey,
+        cardNetwork,
+        cardLastFour,
+        cardExpiryMonth,
+        cardExpiryYear,
+        null,
+        null);
+  }
+
+  public static Payment restore(
+      PaymentId id,
+      ReservationId reservationId,
+      String processor,
+      String externalReference,
+      BigDecimal amount,
+      String paymentStatus,
+      Instant recordedAt,
+      Instant confirmedAt,
+      String paymentMethod,
+      String paymentStage,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear,
+      String adjustmentType,
+      java.util.UUID adjustmentReference) {
     return new Payment(
         id,
         reservationId,
@@ -135,7 +185,9 @@ public final class Payment extends AggregateRoot {
         cardNetwork,
         cardLastFour,
         cardExpiryMonth,
-        cardExpiryYear);
+        cardExpiryYear,
+        adjustmentType,
+        adjustmentReference);
   }
 
   public static Payment register(
@@ -161,6 +213,8 @@ public final class Payment extends AggregateRoot {
             "ADMINISTRATIVE",
             "ADMINISTRATIVE",
             processor + ":" + externalReference,
+            null,
+            null,
             null,
             null,
             null,
@@ -202,7 +256,9 @@ public final class Payment extends AggregateRoot {
             cardNetwork,
             cardLastFour,
             cardExpiryMonth,
-            cardExpiryYear);
+            cardExpiryYear,
+            null,
+            null);
     result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
     return result;
   }
@@ -267,6 +323,46 @@ public final class Payment extends AggregateRoot {
     return cardExpiryYear;
   }
 
+  public String adjustmentType() {
+    return adjustmentType;
+  }
+
+  public java.util.UUID adjustmentReference() {
+    return adjustmentReference;
+  }
+
+  public static Payment adjustment(
+      PaymentId id,
+      ReservationId reservationId,
+      BigDecimal amount,
+      String adjustmentType,
+      java.util.UUID adjustmentReference,
+      String idempotencyKey,
+      Clock clock) {
+    var now = Instant.now(clock);
+    var result =
+        new Payment(
+            id,
+            reservationId,
+            "INTERNAL_ADJUSTMENT",
+            adjustmentReference.toString(),
+            amount,
+            "PENDING",
+            now,
+            null,
+            "ADMINISTRATIVE",
+            "ADJUSTMENT",
+            idempotencyKey,
+            null,
+            null,
+            null,
+            null,
+            adjustmentType,
+            adjustmentReference);
+    result.recordEvent(new PaymentChanged(id, now));
+    return result;
+  }
+
   public Payment transition(String next, Clock clock) {
     if (!(("PENDING".equals(paymentStatus) && Set.of("CONFIRMED", "FAILED").contains(next))
         || ("CONFIRMED".equals(paymentStatus) && Set.of("REFUNDED").contains(next))))
@@ -287,7 +383,9 @@ public final class Payment extends AggregateRoot {
             cardNetwork,
             cardLastFour,
             cardExpiryMonth,
-            cardExpiryYear);
+            cardExpiryYear,
+            adjustmentType,
+            adjustmentReference);
     result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
     return result;
   }

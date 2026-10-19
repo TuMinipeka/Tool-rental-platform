@@ -17,6 +17,11 @@ public final class UnitDelivery extends AggregateRoot {
   private final String city;
   private final String region;
   private final String country;
+  private final String fulfillmentMethod;
+  private final String deliveryStatus;
+  private final String failureType;
+  private final String failureReason;
+  private final Instant failedAt;
 
   private UnitDelivery(
       UnitDeliveryId id,
@@ -26,7 +31,12 @@ public final class UnitDelivery extends AggregateRoot {
       String addressLine,
       String city,
       String region,
-      String country) {
+      String country,
+      String fulfillmentMethod,
+      String deliveryStatus,
+      String failureType,
+      String failureReason,
+      Instant failedAt) {
     Objects.requireNonNull(id);
     Objects.requireNonNull(scheduledAt, "scheduledAt is required");
     if (outboundCondition != null
@@ -44,6 +54,8 @@ public final class UnitDelivery extends AggregateRoot {
     Objects.requireNonNull(country, "country is required");
     if (country != null && (country.isBlank() || country.length() > 120))
       throw new BusinessRuleException("Invalid country");
+    if (!"CO".equalsIgnoreCase(country) && !"COLOMBIA".equalsIgnoreCase(country))
+      throw new BusinessRuleException("Deliveries are restricted to Colombia");
     if (deliveredAt != null && (deliveredAt.isBefore(scheduledAt) || outboundCondition == null))
       throw new BusinessRuleException("Delivery requires valid time and condition");
     this.id = id;
@@ -54,6 +66,21 @@ public final class UnitDelivery extends AggregateRoot {
     this.city = city;
     this.region = region;
     this.country = country;
+    this.fulfillmentMethod = Objects.requireNonNull(fulfillmentMethod);
+    this.deliveryStatus = Objects.requireNonNull(deliveryStatus);
+    if (!java.util.Set.of("CUSTOMER_PICKUP", "SUPPLIER_DELIVERY").contains(fulfillmentMethod)
+        || !java.util.Set.of("SCHEDULED", "COMPLETED", "FAILED").contains(deliveryStatus))
+      throw new BusinessRuleException("Invalid delivery workflow state");
+    if ("FAILED".equals(deliveryStatus)
+        && (!java.util.Set.of("CUSTOMER_ABSENCE", "SUPPLIER_RESPONSIBILITY", "EXTERNAL_CAUSE")
+                .contains(failureType)
+            || failureReason == null
+            || failureReason.isBlank()
+            || failureReason.length() > 500
+            || failedAt == null)) throw new BusinessRuleException("Invalid delivery failure");
+    this.failureType = failureType;
+    this.failureReason = failureReason;
+    this.failedAt = failedAt;
   }
 
   public static UnitDelivery restore(
@@ -66,7 +93,49 @@ public final class UnitDelivery extends AggregateRoot {
       String region,
       String country) {
     return new UnitDelivery(
-        id, scheduledAt, deliveredAt, outboundCondition, addressLine, city, region, country);
+        id,
+        scheduledAt,
+        deliveredAt,
+        outboundCondition,
+        addressLine,
+        city,
+        region,
+        country,
+        "SUPPLIER_DELIVERY",
+        deliveredAt == null ? "SCHEDULED" : "COMPLETED",
+        null,
+        null,
+        null);
+  }
+
+  public static UnitDelivery restore(
+      UnitDeliveryId id,
+      Instant scheduledAt,
+      Instant deliveredAt,
+      String outboundCondition,
+      String addressLine,
+      String city,
+      String region,
+      String country,
+      String fulfillmentMethod,
+      String deliveryStatus,
+      String failureType,
+      String failureReason,
+      Instant failedAt) {
+    return new UnitDelivery(
+        id,
+        scheduledAt,
+        deliveredAt,
+        outboundCondition,
+        addressLine,
+        city,
+        region,
+        country,
+        fulfillmentMethod,
+        deliveryStatus,
+        failureType,
+        failureReason,
+        failedAt);
   }
 
   public static UnitDelivery register(
@@ -79,19 +148,92 @@ public final class UnitDelivery extends AggregateRoot {
       String region,
       String country,
       Clock clock) {
+    return register(
+        id,
+        scheduledAt,
+        deliveredAt,
+        outboundCondition,
+        addressLine,
+        city,
+        region,
+        country,
+        "SUPPLIER_DELIVERY",
+        clock);
+  }
+
+  public static UnitDelivery register(
+      UnitDeliveryId id,
+      Instant scheduledAt,
+      Instant deliveredAt,
+      String outboundCondition,
+      String addressLine,
+      String city,
+      String region,
+      String country,
+      String fulfillmentMethod,
+      Clock clock) {
     var result =
         new UnitDelivery(
-            id, scheduledAt, deliveredAt, outboundCondition, addressLine, city, region, country);
+            id,
+            scheduledAt,
+            deliveredAt,
+            outboundCondition,
+            addressLine,
+            city,
+            region,
+            country,
+            fulfillmentMethod,
+            deliveredAt == null ? "SCHEDULED" : "COMPLETED",
+            null,
+            null,
+            null);
     result.recordEvent(new UnitDeliveryChanged(id, Instant.now(clock)));
     return result;
   }
 
   public UnitDelivery complete(String condition, Clock clock) {
     if (deliveredAt != null) throw new BusinessRuleException("Delivery already completed");
+    if (!"SCHEDULED".equals(deliveryStatus))
+      throw new BusinessRuleException("Delivery is not scheduled");
     var result =
         new UnitDelivery(
-            id, scheduledAt, Instant.now(clock), condition, addressLine, city, region, country);
+            id,
+            scheduledAt,
+            Instant.now(clock),
+            condition,
+            addressLine,
+            city,
+            region,
+            country,
+            fulfillmentMethod,
+            "COMPLETED",
+            null,
+            null,
+            null);
     result.recordEvent(new UnitDeliveryChanged(id, Instant.now(clock)));
+    return result;
+  }
+
+  public UnitDelivery fail(String type, String reason, Clock clock) {
+    if (!"SCHEDULED".equals(deliveryStatus))
+      throw new BusinessRuleException("Delivery is not scheduled");
+    var now = Instant.now(clock);
+    var result =
+        new UnitDelivery(
+            id,
+            scheduledAt,
+            null,
+            null,
+            addressLine,
+            city,
+            region,
+            country,
+            fulfillmentMethod,
+            "FAILED",
+            type,
+            reason,
+            now);
+    result.recordEvent(new UnitDeliveryChanged(id, now));
     return result;
   }
 
@@ -125,5 +267,25 @@ public final class UnitDelivery extends AggregateRoot {
 
   public String country() {
     return country;
+  }
+
+  public String fulfillmentMethod() {
+    return fulfillmentMethod;
+  }
+
+  public String deliveryStatus() {
+    return deliveryStatus;
+  }
+
+  public String failureType() {
+    return failureType;
+  }
+
+  public String failureReason() {
+    return failureReason;
+  }
+
+  public Instant failedAt() {
+    return failedAt;
   }
 }

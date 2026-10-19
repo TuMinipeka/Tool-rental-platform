@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/payments")
+@RequestMapping({"/api/v1/payments", "/api/payments"})
 public class PaymentController {
   private final ManagePaymentUseCase useCase;
   private final SimulatePaymentUseCase simulation;

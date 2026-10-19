@@ -1,5 +1,6 @@
 package com.toolrental.application.payment.usecase;
 
+import com.toolrental.application.common.exception.IdempotencyConflictApplicationException;
 import com.toolrental.application.common.service.WorkflowReferences;
 import com.toolrental.application.payment.command.SimulatePaymentCommand;
 import com.toolrental.application.payment.dto.PaymentResponse;
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.YearMonth;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -46,10 +48,24 @@ public final class SimulatePaymentUseCase {
     return work.execute(
         () -> {
           access.requireRole(actor, "CUSTOMER");
+          var expectedStatus =
+              switch (command.simulationOutcome()) {
+                case "APPROVE" -> "CONFIRMED";
+                case "DECLINE" -> "FAILED";
+                default -> throw new BusinessRuleException("Invalid simulation outcome");
+              };
           var previous = payments.findByIdempotencyKey(command.idempotencyKey());
           if (previous.isPresent()) {
-            if (!previous.get().reservationId().equals(command.reservationId()))
-              throw new BusinessRuleException("Idempotency key belongs to another reservation");
+            var stored = previous.get();
+            if (!stored.reservationId().equals(command.reservationId())
+                || !stored.paymentStage().equals(command.paymentStage())
+                || !stored.paymentMethod().equals(command.paymentMethod())
+                || !Objects.equals(stored.cardNetwork(), command.cardNetwork())
+                || !Objects.equals(stored.cardLastFour(), command.cardLastFour())
+                || !Objects.equals(stored.cardExpiryMonth(), command.cardExpiryMonth())
+                || !Objects.equals(stored.cardExpiryYear(), command.cardExpiryYear())
+                || !stored.paymentStatus().equals(expectedStatus))
+              throw new IdempotencyConflictApplicationException();
             references.reservation(actor, previous.get().reservationId(), false);
             return PaymentResponse.from(previous.get());
           }
@@ -62,12 +78,7 @@ public final class SimulatePaymentUseCase {
 
           validateStage(command.paymentStage(), reservation.id());
           validateMethod(command);
-          var status =
-              switch (command.simulationOutcome()) {
-                case "APPROVE" -> "CONFIRMED";
-                case "DECLINE" -> "FAILED";
-                default -> throw new BusinessRuleException("Invalid simulation outcome");
-              };
+          var status = expectedStatus;
           var amount = reservation.total().amount().multiply(new BigDecimal("0.50"));
           var method = command.paymentMethod();
           var processor = "PAYPAL".equals(method) ? "SIMULATED_PAYPAL" : "SIMULATED_CARD";

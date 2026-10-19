@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
@@ -20,14 +21,32 @@ public class UnitReturnJpaEntity {
   @Column(name = "notes", nullable = true, length = 2000)
   private String notes;
 
+  @Column(name = "late_days", nullable = false)
+  private int lateDays;
+
+  @Column(name = "late_fee", nullable = false, precision = 19, scale = 4)
+  private BigDecimal lateFee;
+
+  @Column(name = "late_fee_currency", nullable = false, length = 3)
+  private String lateFeeCurrency;
+
   protected UnitReturnJpaEntity() {}
 
   public UnitReturnJpaEntity(
-      UnitReturnJpaId id, Instant receivedAt, String inboundCondition, String notes) {
+      UnitReturnJpaId id,
+      Instant receivedAt,
+      String inboundCondition,
+      String notes,
+      int lateDays,
+      BigDecimal lateFee,
+      String lateFeeCurrency) {
     this.id = id;
     this.receivedAt = receivedAt;
     this.inboundCondition = inboundCondition;
     this.notes = notes;
+    this.lateDays = lateDays;
+    this.lateFee = lateFee;
+    this.lateFeeCurrency = lateFeeCurrency;
   }
 
   public UnitReturnJpaId getId() {
@@ -44,5 +63,17 @@ public class UnitReturnJpaEntity {
 
   public String getNotes() {
     return notes;
+  }
+
+  public int getLateDays() {
+    return lateDays;
+  }
+
+  public BigDecimal getLateFee() {
+    return lateFee;
+  }
+
+  public String getLateFeeCurrency() {
+    return lateFeeCurrency;
   }
 }

@@ -7,8 +7,6 @@ import com.toolrental.application.unitdelivery.exception.UnitDeliveryNotFoundApp
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
-import com.toolrental.domain.rental.model.valueobject.RentalId;
-import com.toolrental.domain.rental.port.repository.RentalRepository;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import com.toolrental.domain.unitdelivery.model.aggregate.UnitDelivery;
 import com.toolrental.domain.unitdelivery.model.valueobject.UnitDeliveryId;
@@ -23,21 +21,18 @@ public final class ManageUnitDeliveryUseCase {
   private final AccessPolicy access;
   private final WorkflowReferences references;
   private final Clock clock;
-  private final RentalRepository rentals;
 
   public ManageUnitDeliveryUseCase(
       UnitDeliveryRepository repository,
       UnitOfWork work,
       AccessPolicy access,
       WorkflowReferences references,
-      Clock clock,
-      RentalRepository rentals) {
+      Clock clock) {
     this.repository = repository;
     this.work = work;
     this.access = access;
     this.references = references;
     this.clock = clock;
-    this.rentals = rentals;
   }
 
   private UnitDelivery load(UnitDeliveryId id) {
@@ -68,17 +63,6 @@ public final class ManageUnitDeliveryUseCase {
           WorkflowReferences.require(
               reservation.status() == ReservationStatus.CONFIRMED, "Reservation must be confirmed");
           references.item(reservation, command.id().equipmentUnitId());
-          var rental =
-              rentals
-                  .findById(new RentalId(reservation.id().value()))
-                  .orElseThrow(
-                      () ->
-                          new com.toolrental.application.common.exception
-                              .ReferenceNotFoundApplicationException("Rental"));
-          WorkflowReferences.require(
-              !"CANCELLED".equals(rental.rentalStatus()), "Rental is cancelled");
-          WorkflowReferences.require(
-              "ACTIVE".equals(rental.rentalStatus()), "Rental must be active");
           var id = command.id();
           if (repository.findById(id).isPresent())
             throw new BusinessRuleException("UnitDelivery already exists");
@@ -92,6 +76,7 @@ public final class ManageUnitDeliveryUseCase {
                   command.city(),
                   command.region(),
                   command.country(),
+                  reservation.fulfillmentMethod().name(),
                   clock);
           var saved = repository.save(value);
           return UnitDeliveryResponse.from(saved);
@@ -107,6 +92,15 @@ public final class ManageUnitDeliveryUseCase {
               reservation.status() == ReservationStatus.CONFIRMED,
               "Reservation must remain confirmed");
           return UnitDeliveryResponse.from(repository.save(value.complete(condition, clock)));
+        });
+  }
+
+  public UnitDeliveryResponse fail(UUID actor, UnitDeliveryId id, String type, String reason) {
+    return work.execute(
+        () -> {
+          var value = load(id);
+          references.reservation(actor, id.reservationId(), true);
+          return UnitDeliveryResponse.from(repository.save(value.fail(type, reason, clock)));
         });
   }
 }

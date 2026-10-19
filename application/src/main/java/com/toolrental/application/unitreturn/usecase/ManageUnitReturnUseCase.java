@@ -5,8 +5,12 @@ import com.toolrental.application.unitreturn.command.RegisterUnitReturnCommand;
 import com.toolrental.application.unitreturn.dto.UnitReturnResponse;
 import com.toolrental.application.unitreturn.exception.UnitReturnNotFoundApplicationException;
 import com.toolrental.domain.common.exception.BusinessRuleException;
+import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
+import com.toolrental.domain.payment.model.aggregate.Payment;
+import com.toolrental.domain.payment.model.valueobject.PaymentId;
+import com.toolrental.domain.payment.port.repository.PaymentRepository;
 import com.toolrental.domain.rental.model.valueobject.RentalId;
 import com.toolrental.domain.rental.port.repository.RentalRepository;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
@@ -15,8 +19,12 @@ import com.toolrental.domain.unitdelivery.port.repository.UnitDeliveryRepository
 import com.toolrental.domain.unitreturn.model.aggregate.UnitReturn;
 import com.toolrental.domain.unitreturn.model.valueobject.UnitReturnId;
 import com.toolrental.domain.unitreturn.port.repository.UnitReturnRepository;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +36,7 @@ public final class ManageUnitReturnUseCase {
   private final Clock clock;
   private final UnitDeliveryRepository deliveries;
   private final RentalRepository rentals;
+  private final PaymentRepository payments;
 
   public ManageUnitReturnUseCase(
       UnitReturnRepository repository,
@@ -36,7 +45,8 @@ public final class ManageUnitReturnUseCase {
       WorkflowReferences references,
       Clock clock,
       UnitDeliveryRepository deliveries,
-      RentalRepository rentals) {
+      RentalRepository rentals,
+      PaymentRepository payments) {
     this.repository = repository;
     this.work = work;
     this.access = access;
@@ -44,6 +54,7 @@ public final class ManageUnitReturnUseCase {
     this.clock = clock;
     this.deliveries = deliveries;
     this.rentals = rentals;
+    this.payments = payments;
   }
 
   private UnitReturn load(UnitReturnId id) {
@@ -99,10 +110,39 @@ public final class ManageUnitReturnUseCase {
           var id = command.id();
           if (repository.findById(id).isPresent())
             throw new BusinessRuleException("UnitReturn already exists");
+          var now = Instant.now(clock);
+          var receivedDate = LocalDate.ofInstant(now, ZoneId.of("America/Bogota"));
+          var lateDays =
+              receivedDate.isAfter(reservation.effectiveReturnDate())
+                  ? (int) ChronoUnit.DAYS.between(reservation.effectiveReturnDate(), receivedDate)
+                  : 0;
+          var dailyRate =
+              reservation.items().stream()
+                  .filter(item -> item.equipmentUnitId().equals(command.id().equipmentUnitId()))
+                  .findFirst()
+                  .orElseThrow()
+                  .dailyRate();
+          var lateFee =
+              lateDays == 0
+                  ? new Money(BigDecimal.ZERO, dailyRate.currency())
+                  : dailyRate.multiply(lateDays);
           var value =
               UnitReturn.register(
-                  id, Instant.now(clock), command.inboundCondition(), command.notes(), clock);
+                  id, now, command.inboundCondition(), command.notes(), lateDays, lateFee, clock);
           var saved = repository.save(value);
+          if (lateFee.amount().signum() > 0)
+            payments.save(
+                Payment.adjustment(
+                    PaymentId.generate(),
+                    reservation.id(),
+                    lateFee.amount(),
+                    "LATE_RETURN",
+                    command.id().equipmentUnitId().value(),
+                    "late-return:"
+                        + reservation.id().value()
+                        + ":"
+                        + command.id().equipmentUnitId().value(),
+                    clock));
           return UnitReturnResponse.from(saved);
         });
   }

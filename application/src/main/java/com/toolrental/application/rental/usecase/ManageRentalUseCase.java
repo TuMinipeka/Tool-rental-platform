@@ -71,6 +71,9 @@ public final class ManageRentalUseCase {
           var reservation = references.reservation(actor, command.reservationId(), true);
           WorkflowReferences.require(
               reservation.status() == ReservationStatus.CONFIRMED, "Reservation must be confirmed");
+          WorkflowReferences.require(
+              lifecycle.allUnitsDelivered(reservation.id()),
+              "All units must be delivered or collected before rental starts");
           var id = new RentalId(command.reservationId().value());
           if (repository.findById(id).isPresent())
             throw new BusinessRuleException("Rental already exists");

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/unit-deliveries")
+@RequestMapping({"/api/v1/unit-deliveries", "/api/unit-deliveries"})
 public class UnitDeliveryController {
   private final ManageUnitDeliveryUseCase useCase;
 
@@ -74,5 +74,20 @@ public class UnitDeliveryController {
         Actor.id(principal),
         new UnitDeliveryId(new ReservationId(reservationId), new EquipmentUnitId(equipmentUnitId)),
         request.condition());
+  }
+
+  @PatchMapping("/entry/failure")
+  public UnitDeliveryResponse fail(
+      Principal principal,
+      @RequestParam UUID reservationId,
+      @RequestParam UUID equipmentUnitId,
+      @Valid @RequestBody
+          com.toolrental.infrastructure.unitdelivery.adapters.in.rest.dtos.DeliveryFailureRequest
+              request) {
+    return useCase.fail(
+        Actor.id(principal),
+        new UnitDeliveryId(new ReservationId(reservationId), new EquipmentUnitId(equipmentUnitId)),
+        request.type(),
+        request.reason());
   }
 }

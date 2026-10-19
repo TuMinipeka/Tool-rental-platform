@@ -25,7 +25,12 @@ public class UnitDeliveryPersistenceMapper {
         row.getAddressLine(),
         row.getCity(),
         row.getRegion(),
-        row.getCountry());
+        row.getCountry(),
+        row.getFulfillmentMethod(),
+        row.getDeliveryStatus(),
+        row.getFailureType(),
+        row.getFailureReason(),
+        row.getFailedAt());
   }
 
   public UnitDeliveryJpaEntity toEntity(UnitDelivery value) {
@@ -37,6 +42,11 @@ public class UnitDeliveryPersistenceMapper {
         value.addressLine(),
         value.city(),
         value.region(),
-        value.country());
+        value.country(),
+        value.fulfillmentMethod(),
+        value.deliveryStatus(),
+        value.failureType(),
+        value.failureReason(),
+        value.failedAt());
   }
 }

@@ -32,6 +32,21 @@ public class UnitDeliveryJpaEntity {
   @Column(name = "country", nullable = false, length = 120)
   private String country;
 
+  @Column(name = "fulfillment_method", nullable = false, length = 30)
+  private String fulfillmentMethod;
+
+  @Column(name = "delivery_status", nullable = false, length = 20)
+  private String deliveryStatus;
+
+  @Column(name = "failure_type", length = 30)
+  private String failureType;
+
+  @Column(name = "failure_reason", length = 500)
+  private String failureReason;
+
+  @Column(name = "failed_at")
+  private Instant failedAt;
+
   protected UnitDeliveryJpaEntity() {}
 
   public UnitDeliveryJpaEntity(
@@ -42,7 +57,12 @@ public class UnitDeliveryJpaEntity {
       String addressLine,
       String city,
       String region,
-      String country) {
+      String country,
+      String fulfillmentMethod,
+      String deliveryStatus,
+      String failureType,
+      String failureReason,
+      Instant failedAt) {
     this.id = id;
     this.scheduledAt = scheduledAt;
     this.deliveredAt = deliveredAt;
@@ -51,6 +71,11 @@ public class UnitDeliveryJpaEntity {
     this.city = city;
     this.region = region;
     this.country = country;
+    this.fulfillmentMethod = fulfillmentMethod;
+    this.deliveryStatus = deliveryStatus;
+    this.failureType = failureType;
+    this.failureReason = failureReason;
+    this.failedAt = failedAt;
   }
 
   public UnitDeliveryJpaId getId() {
@@ -83,5 +108,25 @@ public class UnitDeliveryJpaEntity {
 
   public String getCountry() {
     return country;
+  }
+
+  public String getFulfillmentMethod() {
+    return fulfillmentMethod;
+  }
+
+  public String getDeliveryStatus() {
+    return deliveryStatus;
+  }
+
+  public String getFailureType() {
+    return failureType;
+  }
+
+  public String getFailureReason() {
+    return failureReason;
+  }
+
+  public Instant getFailedAt() {
+    return failedAt;
   }
 }

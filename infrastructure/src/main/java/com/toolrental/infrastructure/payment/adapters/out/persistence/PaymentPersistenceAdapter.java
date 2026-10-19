@@ -35,6 +35,12 @@ public class PaymentPersistenceAdapter implements PaymentRepository {
     return rows.findByParticipantId(participantId).stream().map(mapper::toDomain).toList();
   }
 
+  public List<Payment> findByReservation(ReservationId reservationId) {
+    return rows.findByReservationIdOrderByRecordedAt(reservationId.value()).stream()
+        .map(mapper::toDomain)
+        .toList();
+  }
+
   public Optional<Payment> findByIdempotencyKey(String idempotencyKey) {
     return rows.findByIdempotencyKey(idempotencyKey).map(mapper::toDomain);
   }

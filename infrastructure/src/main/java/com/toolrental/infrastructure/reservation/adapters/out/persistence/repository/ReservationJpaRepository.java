@@ -40,9 +40,9 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
           + "join ReservationItemJpaEntity item on item.id.reservationId = reservation.id "
           + "where item.id.equipmentUnitId = :equipmentUnitId "
           + "and reservation.id <> :excludedReservationId "
-          + "and reservation.reservationStatus = 'CONFIRMED' "
+          + "and reservation.reservationStatus in ('CONFIRMED', 'CANCELLATION_REVIEW') "
           + "and reservation.startDate <= :returnDate "
-          + "and reservation.returnDate >= :startDate")
+          + "and reservation.effectiveReturnDate >= :startDate")
   boolean existsConfirmedOverlap(
       @Param("equipmentUnitId") UUID equipmentUnitId,
       @Param("excludedReservationId") UUID excludedReservationId,

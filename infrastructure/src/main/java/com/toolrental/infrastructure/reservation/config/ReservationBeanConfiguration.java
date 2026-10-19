@@ -25,8 +25,12 @@ public class ReservationBeanConfiguration {
       ToolRepository tools,
       com.toolrental.domain.reservation.port.repository.AvailabilityRepository availability,
       com.toolrental.domain.common.port.AccessPolicy access,
-      com.toolrental.domain.common.port.UnitOfWork work) {
-    return new QuoteReservationUseCase(equipmentUnits, tools, availability, access, work);
+      com.toolrental.domain.common.port.UnitOfWork work,
+      com.toolrental.domain.cancellationpolicy.port.repository.CancellationPolicyRepository
+          policies,
+      com.toolrental.domain.deliveryrate.port.repository.DeliveryRateRepository deliveryRates) {
+    return new QuoteReservationUseCase(
+        equipmentUnits, tools, availability, access, work, policies, deliveryRates);
   }
 
   @Bean
@@ -35,8 +39,12 @@ public class ReservationBeanConfiguration {
       EquipmentUnitRepository equipmentUnits,
       ToolRepository tools,
       ParticipantsPort participants,
+      com.toolrental.domain.cancellationpolicy.port.repository.CancellationPolicyRepository
+          policies,
+      com.toolrental.domain.deliveryrate.port.repository.DeliveryRateRepository deliveryRates,
       Clock clock) {
-    return new RequestReservationUseCase(reservations, equipmentUnits, tools, participants, clock);
+    return new RequestReservationUseCase(
+        reservations, equipmentUnits, tools, participants, policies, deliveryRates, clock);
   }
 
   @Bean

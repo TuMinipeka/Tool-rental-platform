@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/rentals")
+@RequestMapping({"/api/v1/rentals", "/api/rentals"})
 public class RentalController {
   private final ManageRentalUseCase useCase;
 

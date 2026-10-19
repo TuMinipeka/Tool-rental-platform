@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.toolrental.application.category.command.RegisterCategoryCommand;
 import com.toolrental.application.category.exception.CategoryNotFoundApplicationException;
 import com.toolrental.application.category.usecase.RegisterCategoryUseCase;
+import com.toolrental.application.common.exception.AvailabilityConflictApplicationException;
 import com.toolrental.application.equipmentunit.command.RegisterEquipmentUnitCommand;
 import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
 import com.toolrental.application.equipmentunit.usecase.RegisterEquipmentUnitUseCase;
@@ -136,7 +137,9 @@ class CatalogAndReservationsTest {
     var first = request(equipmentUnit);
     var second = request(equipmentUnit);
     confirm.execute(first.id(), supplier);
-    assertThrows(BusinessRuleException.class, () -> confirm.execute(second.id(), supplier));
+    assertThrows(
+        AvailabilityConflictApplicationException.class,
+        () -> confirm.execute(second.id(), supplier));
     var persisted = f.reservations.get(second.id());
     assertEquals(ReservationStatus.PENDING, persisted.status());
     assertTrue(persisted.confirmation().isEmpty());
@@ -163,7 +166,9 @@ class CatalogAndReservationsTest {
                 customer,
                 new ReservationPeriod(date.plusDays(1), date.plusDays(2)),
                 List.of(equipmentUnit)));
-    assertThrows(BusinessRuleException.class, () -> confirm.execute(boundary.id(), supplier));
+    assertThrows(
+        AvailabilityConflictApplicationException.class,
+        () -> confirm.execute(boundary.id(), supplier));
     cancel.execute(first.id(), customer);
     assertEquals(ReservationStatus.CONFIRMED, confirm.execute(boundary.id(), supplier).status());
   }
@@ -185,7 +190,9 @@ class CatalogAndReservationsTest {
     var second = registerEquipmentUnit.execute(new RegisterEquipmentUnitCommand(tool, "T-02")).id();
     confirm.execute(request(second).id(), supplier);
     var multiple = request(equipmentUnit, second);
-    assertThrows(BusinessRuleException.class, () -> confirm.execute(multiple.id(), supplier));
+    assertThrows(
+        AvailabilityConflictApplicationException.class,
+        () -> confirm.execute(multiple.id(), supplier));
     assertEquals(ReservationStatus.PENDING, f.reservations.get(multiple.id()).status());
     assertTrue(f.reservations.get(multiple.id()).confirmation().isEmpty());
     assertDoesNotThrow(() -> confirm.execute(request(equipmentUnit).id(), supplier));

@@ -6,15 +6,23 @@ import com.toolrental.application.reservation.dto.ReservationResponse;
 import com.toolrental.application.reservation.exception.CustomerNotFoundApplicationException;
 import com.toolrental.application.supplier.exception.SupplierNotFoundApplicationException;
 import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
+import com.toolrental.domain.cancellationpolicy.model.valueobject.CancellationPolicyId;
+import com.toolrental.domain.cancellationpolicy.port.repository.CancellationPolicyRepository;
 import com.toolrental.domain.common.exception.BusinessRuleException;
+import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.deliveryrate.port.repository.DeliveryRateRepository;
 import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
+import com.toolrental.domain.reservation.model.valueobject.FulfillmentMethod;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
 import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.tool.port.repository.ToolRepository;
+import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.Currency;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class RequestReservationUseCase {
   private final ReservationRepository reservations;
@@ -22,6 +30,8 @@ public final class RequestReservationUseCase {
   private final ToolRepository tools;
   private final ParticipantsPort participants;
   private final Clock clock;
+  private final CancellationPolicyRepository policies;
+  private final DeliveryRateRepository deliveryRates;
 
   public RequestReservationUseCase(
       ReservationRepository r,
@@ -33,6 +43,25 @@ public final class RequestReservationUseCase {
     equipmentUnits = Objects.requireNonNull(u);
     tools = Objects.requireNonNull(h);
     participants = Objects.requireNonNull(p);
+    this.clock = Objects.requireNonNull(clock);
+    policies = null;
+    deliveryRates = null;
+  }
+
+  public RequestReservationUseCase(
+      ReservationRepository r,
+      EquipmentUnitRepository u,
+      ToolRepository h,
+      ParticipantsPort p,
+      CancellationPolicyRepository policies,
+      DeliveryRateRepository deliveryRates,
+      Clock clock) {
+    reservations = Objects.requireNonNull(r);
+    equipmentUnits = Objects.requireNonNull(u);
+    tools = Objects.requireNonNull(h);
+    participants = Objects.requireNonNull(p);
+    this.policies = Objects.requireNonNull(policies);
+    this.deliveryRates = Objects.requireNonNull(deliveryRates);
     this.clock = Objects.requireNonNull(clock);
   }
 
@@ -58,7 +87,37 @@ public final class RequestReservationUseCase {
                   return new ReservationLine(id, h.supplierId(), h.dailyRate());
                 })
             .toList();
-    var reservation = Reservation.request(c.customerId(), c.period(), items, clock);
+    var policyId =
+        policies == null
+            ? new CancellationPolicyId(UUID.fromString("00000000-0000-0000-0000-000000000203"))
+            : policies
+                .findActive()
+                .orElseThrow(() -> new BusinessRuleException("No active cancellation policy"))
+                .id();
+    var deliveryRate =
+        c.fulfillmentMethod() == FulfillmentMethod.SUPPLIER_DELIVERY
+            ? java.util.Optional.of(
+                Objects.requireNonNull(deliveryRates)
+                    .findActive()
+                    .orElseThrow(() -> new BusinessRuleException("No active delivery rate")))
+            : java.util.Optional
+                .<com.toolrental.domain.deliveryrate.model.aggregate.DeliveryRate>empty();
+    var deliveryFee =
+        deliveryRate
+            .map(com.toolrental.domain.deliveryrate.model.aggregate.DeliveryRate::price)
+            .orElse(new Money(BigDecimal.ZERO, Currency.getInstance("COP")));
+    var reservation =
+        Reservation.request(
+            c.customerId(),
+            c.period(),
+            items,
+            c.scheduledFulfillmentAt(),
+            c.fulfillmentMethod(),
+            c.deliveryAddress(),
+            deliveryRate.map(rate -> rate.id()).orElse(null),
+            policyId,
+            deliveryFee,
+            clock);
     reservations.addRequest(reservation);
     return ReservationResponse.from(reservation);
   }
