@@ -120,7 +120,7 @@ La página debe:
 - registrar versión aceptada, usuario, fecha, finalidad y transacción cuando corresponda;
 - separar la aceptación de términos del mercadeo opcional y la protección opcional.
 
-La página está especificada pero todavía no forma parte de los recorridos funcionales de la base React. Su implementación pertenece a la fase frontend después de estabilizar REST/OpenAPI.
+La ruta pública e imprimible ya forma parte de la base React y se enlaza desde el pie, registro, solicitud, pago y confirmación. El registro persistente de la versión aceptada continúa pendiente y no debe simularse solo en el cliente.
 
 ## Referencias legales y límite de lanzamiento
 

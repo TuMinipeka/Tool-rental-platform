@@ -236,6 +236,7 @@ class PostgresIntegrationTest {
         null, post("/api/v1/auth/login"), Map.of("email", email, "password", changedPassword), 200);
 
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
+    assertThat(call(null, get("/api/v1/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
   }
 

@@ -18,8 +18,10 @@
 4. Configurar SMTP productivo, reputación de dominio, plantillas y telemetría de entrega.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
 6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
-7. Construir los recorridos del frontend contra `/api/v1` y conservar access token solo en memoria.
+7. Completar los paneles y recorridos operativos del frontend para clientes, proveedores y administradores.
 
 ## Frontend
 
-El frontend permanece fuera de esta entrega. Debe consumir `GET /auth/csrf` antes de operaciones de cookie, usar `credentials: include`, enviar `X-XSRF-TOKEN`, reaccionar a 401/403/409/429 por `code` y nunca tomar decisiones de autorización por sí solo.
+La base React ya consume la API oficial `/api/v1`, conserva el access token solo en memoria, restaura la sesión mediante la cookie refresh, obtiene CSRF antes de renovar o cerrar sesión y usa `credentials: include`. El recorrido de solicitud ya captura recogida o entrega, hora programada y dirección colombiana, y espera la confirmación del proveedor antes de habilitar el pago simulado. También existe la ruta pública e imprimible `/terms-and-conditions`.
+
+Siguen pendientes los paneles funcionales contra datos reales, el registro persistente de aceptaciones legales, la selección del Plan Opcional de Protección por Daños y el tratamiento específico de 403, 409 y 429 por `code`. El frontend nunca debe tomar decisiones de autorización por sí solo.

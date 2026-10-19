@@ -60,7 +60,7 @@ npm run build
 npm run dev
 ```
 
-`npm ci` respeta el lockfile; `build` produce `frontend/dist`. Vite sirve desarrollo en 5173. Esta base todavía no integra los recorridos de negocio con REST.
+`npm ci` respeta el lockfile; `build` produce `frontend/dist`. Vite sirve desarrollo en 5173. La base consume `/api/v1`, mantiene el access token en memoria y usa la cookie refresh con CSRF; los paneles operativos completos continúan pendientes.
 
 ## Evidencia y límites
 

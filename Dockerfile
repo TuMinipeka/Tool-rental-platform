@@ -29,4 +29,4 @@ COPY --from=builder --chown=spring:spring /workspace/extracted/spring-boot-loade
 COPY --from=builder --chown=spring:spring /workspace/extracted/snapshot-dependencies/ ./
 COPY --from=builder --chown=spring:spring /workspace/extracted/application/ ./
 
-ENTRYPOINT ["java", "-jar", "application.jar"]
+ENTRYPOINT ["java", "-jar", "infrastructure-0.1.0-SNAPSHOT.jar"]
