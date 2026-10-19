@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "brand": "Tool Rental",
+  "direction": "Industrial calibration plate",
+  "conceptSeed": "seed:2752b7e7f23ae87d",
+  "colors": {
+    "trust": "#2354C6",
+    "action": "#F26A2E",
+    "availability": "#188A58",
+    "ink": "#17201D"
+  },
+  "typography": {
+    "display": "Archivo Variable",
+    "body": "Public Sans Variable"
+  },
+  "motion": {
+    "signature": "calibration-line",
+    "reducedMotion": true
+  }
+}
