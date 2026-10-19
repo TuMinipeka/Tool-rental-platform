@@ -1,6 +1,6 @@
 package com.toolrental.infrastructure.passwordreset.adapters.out.mail;
 
-import com.toolrental.domain.user.port.PasswordRecoveryNotifier;
+import com.toolrental.domain.passwordreset.port.PasswordRecoveryNotifier;
 import java.time.Instant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -22,6 +22,8 @@ Solo se crean carpetas con clases reales. Los adaptadores de persistencia están
 
 `usersession`, `passwordreset`, `cancellationpolicy`, `reservationtermination`, `deliveryrate`, `reservationextension`, `refund`.
 
+En estos contextos, la coordinación y los adaptadores ahora pertenecen a su paquete propietario: `RecoverPasswordUseCase` a `application.passwordreset`, los endpoints de recuperación a `infrastructure.passwordreset`, los de sesión a `infrastructure.usersession` y los de políticas/tarifas a sus contextos respectivos. Cada uno ensambla sus casos de uso desde `infrastructure/<context>/config`. Las rutas públicas conservan `/api/v1/auth` y `/api/v1/commercial-configuration`.
+
 `common` no representa una tabla. Reúne `AggregateRoot`, `DomainEvent`, `Money`, puertos transversales, Unit of Work, seguridad HTTP, transacciones y configuración compartida.
 
 Los nombres de paquetes y archivos están en inglés. Las relaciones entre contextos usan identificadores tipados en Domain y UUID escalares en JPA.

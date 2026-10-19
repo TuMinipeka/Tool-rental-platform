@@ -1,4 +1,4 @@
-package com.toolrental.domain.user.port;
+package com.toolrental.domain.passwordreset.port;
 
 import java.time.Instant;
 

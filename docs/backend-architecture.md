@@ -22,6 +22,8 @@ Los siete contextos críticos añadidos son:
 | `reservationextension` | Solicitud y resolución de una nueva fecha efectiva |
 | `refund` | Reembolso idempotente ligado al pago y a la terminación |
 
+Cada uno de los 25 contextos tiene paquetes en los tres módulos y una configuración propia en Infrastructure. `passwordreset` conserva sus casos de uso y DTO de aplicación en `application.passwordreset`; las rutas de recuperación y sesión están en controladores de sus respectivos contextos. Las políticas, tarifas, extensiones y reembolsos se ensamblan también desde su propia configuración. Los controladores pueden compartir una ruta funcional sin compartir el paquete de implementación.
+
 ## Consistencia
 
 - `AtomicReservationManagement` bloquea reserva y unidades en orden estable para confirmación y extensión.

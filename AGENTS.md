@@ -9,7 +9,7 @@ These instructions apply to the entire repository. Read `docs/development-guide.
 - `domain` may depend only on Java. Do not add Spring, JPA, HTTP, JSON, or database details.
 - `application` may depend on `domain` and Java, never on `infrastructure` or frameworks.
 - Ports belong to the domain; adapters that implement them belong to infrastructure.
-- Organize code first by the existing 18 table-aligned contexts, then by technical responsibility.
+- Organize code first by the existing 25 table-aligned contexts, then by technical responsibility.
 - Keep the project convention of one context per base table. Cross-context invariants retain their atomic transaction boundaries.
 
 ## Language and naming

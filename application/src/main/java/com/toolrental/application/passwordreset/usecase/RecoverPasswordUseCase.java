@@ -1,13 +1,13 @@
-package com.toolrental.application.user.usecase;
+package com.toolrental.application.passwordreset.usecase;
 
-import com.toolrental.application.user.dto.PasswordRecoveryResponse;
-import com.toolrental.application.user.exception.InvalidPasswordResetApplicationException;
+import com.toolrental.application.passwordreset.dto.PasswordRecoveryResponse;
+import com.toolrental.application.passwordreset.exception.InvalidPasswordResetApplicationException;
 import com.toolrental.domain.common.port.UnitOfWork;
 import com.toolrental.domain.passwordreset.model.aggregate.PasswordResetToken;
 import com.toolrental.domain.passwordreset.model.valueobject.PasswordResetTokenId;
+import com.toolrental.domain.passwordreset.port.PasswordRecoveryNotifier;
 import com.toolrental.domain.passwordreset.port.repository.PasswordResetTokenRepository;
 import com.toolrental.domain.user.port.PasswordHasher;
-import com.toolrental.domain.user.port.PasswordRecoveryNotifier;
 import com.toolrental.domain.user.port.SecureTokenService;
 import com.toolrental.domain.user.port.repository.UserRepository;
 import com.toolrental.domain.usersession.port.repository.UserSessionRepository;

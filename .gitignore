@@ -1,6 +1,7 @@
 # Archivos locales de editores y sistema
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .DS_Store
 Thumbs.db
 

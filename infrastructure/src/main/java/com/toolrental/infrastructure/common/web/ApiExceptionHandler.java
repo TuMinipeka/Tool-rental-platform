@@ -4,8 +4,8 @@ import com.toolrental.application.common.exception.AccessDeniedApplicationExcept
 import com.toolrental.application.common.exception.ApplicationException;
 import com.toolrental.application.common.exception.AvailabilityConflictApplicationException;
 import com.toolrental.application.common.exception.IdempotencyConflictApplicationException;
+import com.toolrental.application.passwordreset.exception.InvalidPasswordResetApplicationException;
 import com.toolrental.application.user.exception.AuthenticationFailedApplicationException;
-import com.toolrental.application.user.exception.InvalidPasswordResetApplicationException;
 import com.toolrental.application.usersession.exception.InvalidSessionApplicationException;
 import com.toolrental.application.usersession.exception.RefreshTokenReuseApplicationException;
 import com.toolrental.domain.common.exception.DomainException;

@@ -1,4 +1,4 @@
-package com.toolrental.infrastructure.user.adapters.in.rest.dtos;
+package com.toolrental.infrastructure.passwordreset.adapters.in.rest.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

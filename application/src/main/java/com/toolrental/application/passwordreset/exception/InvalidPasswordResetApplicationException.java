@@ -1,4 +1,4 @@
-package com.toolrental.application.user.exception;
+package com.toolrental.application.passwordreset.exception;
 
 import com.toolrental.application.common.exception.ApplicationException;
 

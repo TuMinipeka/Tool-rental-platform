@@ -62,4 +62,6 @@ SQLSTATE 53300 significa que el rol agotó sus conexiones. Revisa sesiones de cl
 
 Java usa LF; `.cmd` usa CRLF. Para el error Spotless ejecuta `spotless:apply` y `spotless:check`. Si Maven compila pero el editor no presenta paquetes, reconstruye su índice Java. `catalog` e `identity` se distribuyeron entre los contextos actuales: consulta [el mapa de archivos](source-package-map.md).
 
+Abre como carpeta de VS Code la raíz real `Tool-rental-platform`, que contiene el POM agregador. El archivo compartido `.vscode/settings.json` permite que la extensión Java actualice automáticamente la configuración Maven. Después ejecuta **Java: Clean Java Language Server Workspace** y vuelve a importar el proyecto si el editor conserva errores de imports que Maven no reproduce. Usa **Java: Configure Java Runtime** para asociar JavaSE-21 a tu JDK 21 local; no se versiona una ruta absoluta de otra máquina. La comprobación de paquetes y saltos de línea está en `ArchitectureTest`.
+
 Un puerto PostgreSQL abierto no demuestra integración: se requiere conexión, migración/validación Flyway, validación Hibernate y arranque correcto.
