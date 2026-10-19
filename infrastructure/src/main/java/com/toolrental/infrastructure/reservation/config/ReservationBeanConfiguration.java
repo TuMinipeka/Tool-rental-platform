@@ -2,6 +2,7 @@ package com.toolrental.infrastructure.reservation.config;
 
 import com.toolrental.application.reservation.usecase.CancelReservationUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
+import com.toolrental.application.reservation.usecase.QuoteReservationUseCase;
 import com.toolrental.application.reservation.usecase.RejectReservationUseCase;
 import com.toolrental.application.reservation.usecase.RequestReservationUseCase;
 import com.toolrental.domain.common.port.ParticipantsPort;
@@ -18,6 +19,16 @@ import org.springframework.context.annotation.Import;
 @Configuration(proxyBeanMethods = false)
 @Import(ClockConfiguration.class)
 public class ReservationBeanConfiguration {
+  @Bean
+  public QuoteReservationUseCase quoteReservationUseCase(
+      EquipmentUnitRepository equipmentUnits,
+      ToolRepository tools,
+      com.toolrental.domain.reservation.port.repository.AvailabilityRepository availability,
+      com.toolrental.domain.common.port.AccessPolicy access,
+      com.toolrental.domain.common.port.UnitOfWork work) {
+    return new QuoteReservationUseCase(equipmentUnits, tools, availability, access, work);
+  }
+
   @Bean
   public RequestReservationUseCase requestReservationUseCase(
       ReservationRepository reservations,
@@ -50,8 +61,10 @@ public class ReservationBeanConfiguration {
   public com.toolrental.application.reservation.usecase.QueryReservationUseCase
       queryReservationUseCase(
           com.toolrental.application.common.service.WorkflowReferences references,
-          com.toolrental.domain.common.port.UnitOfWork work) {
+          com.toolrental.domain.common.port.UnitOfWork work,
+          ReservationRepository reservations,
+          com.toolrental.domain.common.port.AccessPolicy access) {
     return new com.toolrental.application.reservation.usecase.QueryReservationUseCase(
-        references, work);
+        references, work, reservations, access);
   }
 }

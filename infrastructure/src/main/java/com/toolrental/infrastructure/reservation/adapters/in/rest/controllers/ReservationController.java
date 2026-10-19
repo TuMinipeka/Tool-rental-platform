@@ -16,6 +16,7 @@ import com.toolrental.infrastructure.common.web.Actor;
 import com.toolrental.infrastructure.reservation.adapters.in.rest.dtos.ReservationRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,6 +63,11 @@ public class ReservationController {
   @GetMapping("/{id}")
   public ReservationResponse find(Principal principal, @PathVariable UUID id) {
     return query.execute(Actor.id(principal), new ReservationId(id));
+  }
+
+  @GetMapping
+  public List<ReservationResponse> list(Principal principal) {
+    return query.list(Actor.id(principal));
   }
 
   @PostMapping("/{id}/confirmation")

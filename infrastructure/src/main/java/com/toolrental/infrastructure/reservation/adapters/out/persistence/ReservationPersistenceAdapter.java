@@ -90,6 +90,22 @@ public class ReservationPersistenceAdapter
   }
 
   @Override
+  public java.util.List<Reservation> findByCustomer(CustomerId customerId) {
+    return reservations.findByCustomerIdOrderByCreatedAtDesc(customerId.value()).stream()
+        .map(this::hydrate)
+        .map(entity -> reservationMapper.toDomain(entity, loadSupplierIds(entity)))
+        .toList();
+  }
+
+  @Override
+  public java.util.List<Reservation> findBySupplier(SupplierId supplierId) {
+    return reservations.findBySupplierId(supplierId.value()).stream()
+        .map(this::hydrate)
+        .map(entity -> reservationMapper.toDomain(entity, loadSupplierIds(entity)))
+        .toList();
+  }
+
+  @Override
   @Transactional
   public Reservation execute(ReservationId id, Function<Context, Reservation> operation) {
     var reservationEntity =

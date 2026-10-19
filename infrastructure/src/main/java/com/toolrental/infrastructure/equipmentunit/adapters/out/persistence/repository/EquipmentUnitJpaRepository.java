@@ -2,6 +2,7 @@ package com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.rep
 
 import com.toolrental.infrastructure.equipmentunit.adapters.out.persistence.entity.EquipmentUnitJpaEntity;
 import jakarta.persistence.LockModeType;
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,31 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface EquipmentUnitJpaRepository extends JpaRepository<EquipmentUnitJpaEntity, UUID> {
+  @Query(
+      value =
+          """
+          SELECT unit.*
+            FROM equipment_units unit
+           WHERE unit.tool_id = :toolId
+             AND unit.operational_status = 'OPERATIONAL'
+             AND NOT EXISTS (
+                 SELECT 1
+                   FROM reservation_items item
+                   JOIN reservations reservation
+                     ON reservation.reservation_id = item.reservation_id
+                  WHERE item.equipment_unit_id = unit.equipment_unit_id
+                    AND reservation.reservation_status = 'CONFIRMED'
+                    AND reservation.start_date <= :returnDate
+                    AND reservation.return_date >= :startDate
+             )
+           ORDER BY unit.inventory_code
+          """,
+      nativeQuery = true)
+  List<EquipmentUnitJpaEntity> findAvailableByToolAndPeriod(
+      @Param("toolId") UUID toolId,
+      @Param("startDate") LocalDate startDate,
+      @Param("returnDate") LocalDate returnDate);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(
       "select equipmentUnit from EquipmentUnitJpaEntity equipmentUnit "
