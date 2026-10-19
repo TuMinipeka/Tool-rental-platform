@@ -1,38 +1,23 @@
-# Reporte de validación de migraciones e integración
+# Reporte de validación
 
-Fecha: 18 de octubre de 2026. Rama: `developer/conde`.
+Fecha de actualización: 2026-10-19.
 
-## Resultado reproducible
+## Resultado verificado
 
-**BUILD SUCCESS: 62 pruebas, 0 fallos, 0 errores y 0 omitidas.**
+- Java 21 y compilación de los tres módulos.
+- Pruebas de Domain y Application exitosas.
+- Spotless aplicado; arquitectura hexagonal y mapeo de 25 entidades JPA comprobados mediante pruebas sin base de datos.
+- Configuración Compose válida mediante `docker compose config --quiet`.
+- El perfil PostgreSQL local respondió en una comprobación anterior de conectividad; no se ejecutaron las migraciones nuevas contra él.
+- Límites exactos de 48 horas, dos horas, precisión monetaria y margen de reutilización cubiertos por pruebas de dominio.
+- OpenAPI configurado para filtrar `/api/v1`; alias `/api` configurado con cabeceras de obsolescencia. Falta comprobar ambos contratos mediante HTTP con PostgreSQL activo.
 
-| Módulo | Pruebas | Resultado |
-| --- | ---: | --- |
-| Domain | 21 | Aprobado |
-| Application | 13 | Aprobado |
-| Infrastructure | 28 | Aprobado |
+## Validación pendiente por entorno
 
-```powershell
-$env:JAVA_HOME = 'C:\Program Files\Eclipse Adoptium\jdk-21.0.12.101-hotspot'
-./mvnw.cmd clean verify
-```
+`mvnw.cmd clean verify` terminó con error en 20 pruebas de infraestructura dependientes de Testcontainers: Docker Desktop no expuso el motor. Dominio (25 pruebas), Application (14 pruebas), compilación de Infrastructure y sus pruebas sin PostgreSQL pasaron. Se intentó previamente la suite Flyway sobre PostgreSQL local, pero el usuario de aplicación recibió SQLSTATE `42501` al crear un esquema aislado. No se modificó el esquema de trabajo.
 
-La ejecución utilizó JDK 21, Docker Desktop 29.8.2 y contenedores temporales PostgreSQL 17.11/17 administrados por Testcontainers. Cada suite trabajó con un esquema aislado. Spotless se ejecutó y pasó como parte de `verify`.
+Para completar la evidencia ejecuta `mvnw.cmd clean verify` con Docker activo o concede `CREATE` sobre una base exclusiva al usuario de pruebas. Deben pasar actualización V200→V208, instalación vacía, `ddl-auto: validate`, concurrencia e idempotencia. Las 25 tablas y los contratos HTTP no están aún validados contra PostgreSQL.
 
-## Qué se comprobó
+## Límites
 
-- Compilación y dirección de dependencias de los módulos `domain`, `application` e `infrastructure`.
-- Instalación vacía de las migraciones V1–V24 y V200, con 18 tablas de negocio y validación Hibernate.
-- Actualización V3 → V200 sin pérdida del registro previo ni modificación de checksums ya aplicados.
-- Carga demo aislada de 43 migraciones numeradas, con al menos cinco filas por tabla base.
-- Correspondencia entre columnas PostgreSQL y entidades JPA, incluidas las columnas de pago añadidas por `ALTER TABLE`.
-- Registro de cliente, login, JWT, cambio de contraseña, cierre de sesión sin estado y rechazo de un token de recuperación como credencial de acceso.
-- Catálogo público, listados por participante, disponibilidad, cotización de días inclusivos y publicación de OpenAPI.
-- Pagos simulados 50/50 con crédito Visa, PayPal, idempotencia y ausencia de PAN/CVV almacenados.
-- Confirmaciones concurrentes incompatibles, unicidad de inventario por proveedor, transacciones con rollback y restricciones de base de datos.
-
-## Alcance de la evidencia
-
-La validación acredita el backend y sus contratos actuales. Los pagos siguen siendo una simulación académica: no se contactó una pasarela real ni se enviaron correos. Tampoco se inventaron impuestos, precios de protección, deducibles ni reglas comerciales pendientes; la cotización informa expresamente que el cálculo tributario requiere validación legal.
-
-El frontend no fue modificado ni ejecutado en esta entrega. Sus pantallas deben integrarse con los contratos descritos en [API REST](rest-api.md) y con el esquema publicado en `/v3/api-docs` o `/swagger-ui.html`.
+La implementación de reembolso y pagos continúa siendo académica; no ejecuta transferencias reales. SMTP necesita credenciales y TLS de un proveedor en producción. La respuesta de estado JDBC acredita conectividad en ese momento, no respaldo, recuperación, alertas ni alta disponibilidad.

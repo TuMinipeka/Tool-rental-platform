@@ -120,7 +120,7 @@ La página debe:
 - registrar versión aceptada, usuario, fecha, finalidad y transacción cuando corresponda;
 - separar la aceptación de términos del mercadeo opcional y la protección opcional.
 
-La página está especificada pero no implementada porque el repositorio aún no contiene la aplicación React. Su implementación pertenece a la fase frontend después de estabilizar REST/OpenAPI.
+La página está especificada pero todavía no forma parte de los recorridos funcionales de la base React. Su implementación pertenece a la fase frontend después de estabilizar REST/OpenAPI.
 
 ## Referencias legales y límite de lanzamiento
 

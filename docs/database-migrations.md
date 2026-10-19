@@ -1,77 +1,43 @@
-# Migraciones de PostgreSQL y trazabilidad de Conde
+# Migraciones de base de datos
 
-## Decisión de integración
+## Secuencia vigente
 
-Conde es otro desarrollador del proyecto. Sus migraciones de `developer/conde`, revisión `ac149a1db7a95d3cc2bb4f313e063927fb7a0915`, forman parte del aporte integrado, junto a las pruebas, Docker y frontend. El primer merge las dejó archivadas: protegía el historial existente, pero no completaba la integración ejecutable. Esta entrega corrige esa decisión.
-
-En la base de Daniel ya estaban aplicadas V1–V3: V1 crea las 18 tablas, V2 carga los roles de cliente/proveedor y V3 añade ADMIN. Reemplazarlas por las V1–V21 originales de Conde produciría conflictos de versiones y checksums. Se conservan byte por byte y se incorporan los 21 scripts como versiones nuevas V4–V24.
-
-## Correspondencia de versiones
-
-| Procedencia | Archivo ejecutable actual |
+| Rango | Propósito |
 | --- | --- |
-| `V1` de Conde | [`V4__create_users_table.sql`](../infrastructure/src/main/resources/db/migration/V4__create_users_table.sql) |
-| `V2` de Conde | [`V5__create_roles_table.sql`](../infrastructure/src/main/resources/db/migration/V5__create_roles_table.sql) |
-| `V3` de Conde | [`V6__create_user_roles_table.sql`](../infrastructure/src/main/resources/db/migration/V6__create_user_roles_table.sql) |
-| `V4` de Conde | [`V7__create_customers_table.sql`](../infrastructure/src/main/resources/db/migration/V7__create_customers_table.sql) |
-| `V5` de Conde | [`V8__create_suppliers_table.sql`](../infrastructure/src/main/resources/db/migration/V8__create_suppliers_table.sql) |
-| `V6` de Conde | [`V9__create_categories_table.sql`](../infrastructure/src/main/resources/db/migration/V9__create_categories_table.sql) |
-| `V7` de Conde | [`V10__create_tools_table.sql`](../infrastructure/src/main/resources/db/migration/V10__create_tools_table.sql) |
-| `V8` de Conde | [`V11__create_tool_images_table.sql`](../infrastructure/src/main/resources/db/migration/V11__create_tool_images_table.sql) |
-| `V9` de Conde | [`V12__create_equipment_units_table.sql`](../infrastructure/src/main/resources/db/migration/V12__create_equipment_units_table.sql) |
-| `V10` de Conde | [`V13__create_reservations_table.sql`](../infrastructure/src/main/resources/db/migration/V13__create_reservations_table.sql) |
-| `V11` de Conde | [`V14__create_reservation_items_table.sql`](../infrastructure/src/main/resources/db/migration/V14__create_reservation_items_table.sql) |
-| `V12` de Conde | [`V15__create_rentals_table.sql`](../infrastructure/src/main/resources/db/migration/V15__create_rentals_table.sql) |
-| `V13` de Conde | [`V16__create_unit_deliveries_table.sql`](../infrastructure/src/main/resources/db/migration/V16__create_unit_deliveries_table.sql) |
-| `V14` de Conde | [`V17__create_unit_returns_table.sql`](../infrastructure/src/main/resources/db/migration/V17__create_unit_returns_table.sql) |
-| `V15` de Conde | [`V18__create_damage_reports_table.sql`](../infrastructure/src/main/resources/db/migration/V18__create_damage_reports_table.sql) |
-| `V16` de Conde | [`V19__create_payments_table.sql`](../infrastructure/src/main/resources/db/migration/V19__create_payments_table.sql) |
-| `V17` de Conde | [`V20__create_invoices_table.sql`](../infrastructure/src/main/resources/db/migration/V20__create_invoices_table.sql) |
-| `V18` de Conde | [`V21__create_invoice_items_table.sql`](../infrastructure/src/main/resources/db/migration/V21__create_invoice_items_table.sql) |
-| `V19` de Conde | [`V22__align_currency_columns_with_jpa.sql`](../infrastructure/src/main/resources/db/migration/V22__align_currency_columns_with_jpa.sql) |
-| `V20` de Conde | [`V23__seed_administrator_role.sql`](../infrastructure/src/main/resources/db/migration/V23__seed_administrator_role.sql) |
-| `V21` de Conde | [`V24__align_currency_columns_with_bounded_contexts.sql`](../infrastructure/src/main/resources/db/migration/V24__align_currency_columns_with_bounded_contexts.sql) |
+| V1–V3 | Modelo inicial, roles y administrador |
+| Historial anterior a V200 | Modelo base y alineaciones ya aplicadas; permanece inmutable |
+| V200 | Método, etapa e idempotencia de pagos académicos |
+| V201 | Sesiones de usuario y familias de refresh |
+| V202 | Tokens opacos de recuperación |
+| V203 | Política versionada de cancelación e inasistencia |
+| V204 | Terminaciones y revisión de retracto |
+| V205 | Tarifa global de entrega |
+| V206 | Extensiones de reserva |
+| V207 | Reembolsos idempotentes |
+| V208 | Modalidad, hora, dirección, fecha efectiva, fallos, mora y ajustes |
+| V101–V118 | Datos académicos base, solo perfil demo |
+| V300 | Tarifa académica de entrega, solo perfil demo |
 
-Cada archivo identifica su versión original y la revisión de Conde. Los originales archivados permanecen como evidencia, fuera del classpath de Flyway. **La implementación ejecutable está en `db/migration`, no en `docs`.**
+V1–V200 no se modifican. Las evoluciones compartidas continúan después de V208. Las migraciones demo tienen una ubicación separada (`db/demo`) y no se cargan en producción.
 
-## Adaptaciones necesarias
+## Reglas
 
-V4–V21 conservan las definiciones por tabla del aporte y añaden `IF NOT EXISTS` para reconocer el esquema creado por V1. También protegen los índices existentes. La función de unicidad de inventario utiliza `CREATE OR REPLACE`; su trigger se crea solo si no existe en la tabla del esquema actual.
+1. No edites ni renombres una versión aplicada.
+2. Agrega una migración hacia delante y coordina el número con el equipo.
+3. Mantén `ddl-auto: validate`.
+4. No uses `baseline-on-migrate` para esconder un historial incompatible.
+5. Valida instalación vacía y actualización desde V200 en PostgreSQL.
+6. Ejecuta datos demo únicamente en una base desechable.
 
-Esto no crea 18 tablas adicionales. En una instalación nueva V1 sigue creando el esquema completo; las siguientes versiones incorporan la secuencia compatible del trabajo de Conde. `IF NOT EXISTS` no repara diferencias arbitrarias: Hibernate y las pruebas validan columnas; una base incompatible requiere diagnóstico y una migración específica.
+## Pruebas
 
-V22 conserva el ajuste a `varchar(3)`, V23 conserva la inserción idempotente de ADMIN y V24 restablece `char(3)` conforme al mapeo JPA actual. Se conservan ambos ajustes para mantener la trazabilidad del aporte. Las conversiones pueden adquirir bloqueos fuertes sobre `tools` y `reservations`; limitan la espera de bloqueo a cinco segundos y deben ejecutarse en una ventana de cambio. Si expira la espera, resuelve las transacciones activas y vuelve a iniciar sin forzar el historial.
+`MappingContractTest` compara las 25 tablas y entidades JPA. `FlywayUpgradeIntegrationTest` conserva checksums y datos al actualizar desde V200 hasta V208. Las pruebas PostgreSQL verifican restricciones, rollback y confirmación concurrente. Testcontainers se usa por defecto; también puede suministrarse una base con permiso para crear esquemas:
 
-## Ubicaciones y perfiles
+```powershell
+.\mvnw.cmd clean verify `
+  -Dpostgres.test.url=jdbc:postgresql://localhost:5432/tool_rental_test `
+  -Dpostgres.test.username=test_owner `
+  -Dpostgres.test.password='<secret>'
+```
 
-| Ubicación | Versiones | Activación |
-| --- | --- | --- |
-| `classpath:db/migration` | V1–V24 y V200, 25 versiones | Normal, local y producción |
-| `classpath:db/demo` | V101–V118, 18 versiones | Perfil adicional `demo` exclusivamente |
-
-La demostración aplica las versiones normales y V101–V118. V200 amplía pagos simulados después del rango reservado de demo. Demo debe usar una base exclusiva.
-
-## Historial y próximas migraciones
-
-No edites archivos publicados/aplicados, no reutilices versiones y no ejecutes `repair` para encubrir diferencias. Flyway valida historial, deshabilita baseline automático y `clean`. Hibernate utiliza `validate`.
-
-Coordina una secuencia global entre desarrolladores. Como demo reserva V101–V118, las evoluciones compartidas usan versiones superiores a 118. V200 agrega método, etapa, idempotencia y datos mínimos de tarjeta simulada a pagos. La siguiente versión compartida debe ser mayor que V200.
-
-Una base con **los V1–V21 originales de Conde** constituye otro historial: se valida la base vacía y la línea V1–V3 de Daniel, no una conversión automática de aquella. No arranques estos scripts sobre ese historial ni uses `repair`: conserva respaldo, compara esquema y diseña una transición revisada.
-
-## Actualizar una base existente
-
-1. Verifica rama, artefacto, perfil y destino sin registrar credenciales.
-2. Genera copia privada con `pg_dump -Fc`; ensaya su restauración aislada antes de una publicación productiva.
-3. Revisa que el historial previo sea V1–V3, sin fallos ni checksums inesperados.
-4. Detén el backend anterior y evita escrituras durante la ventana de cambio.
-5. Arranca el nuevo artefacto: Flyway aplica V4–V24 y Hibernate valida.
-6. Comprueba 18 tablas de negocio, historial exitoso hasta V24, datos conservados y `/status/database` conectado.
-
-No se ejecuta demo durante la actualización. El respaldo contiene datos privados y no debe incluirse en Git.
-
-## Pruebas de compatibilidad
-
-`FlywayUpgradeIntegrationTest` migra hasta V3, inserta un registro previo y captura checksums; luego aplica 21 versiones, conserva registro y checksums, verifica 18 tablas y un solo trigger, y comprueba que repetir `migrate` ejecuta cero cambios. Las otras suites validan instalación vacía con 24 versiones y demo con 42, persistencia y concurrencia.
-
-Consulta [validación](validation-report.md) y [despliegue](deployment.md).
+El usuario de prueba necesita `CREATE` sobre la base para generar y eliminar esquemas aislados. El usuario de ejecución de producción debe tener privilegios menores y seguir una estrategia separada de migración.

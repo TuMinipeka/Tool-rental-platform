@@ -1,124 +1,25 @@
-# Hoja de ruta del proyecto y trabajo pendiente
+# Hoja de ruta
 
-## Propósito
+## Completado en backend crítico
 
-Este documento registra el orden de entrega acordado, las decisiones ya cerradas y las decisiones que todavía bloquean la implementación. Evita que una capa dependa de un contrato inestable.
+- 25 contextos con Domain, Application, JPA y REST.
+- Sesiones rotativas, revocación por familia/usuario y recuperación opaca por SMTP.
+- CORS con credenciales, CSRF, rate limit y `ProblemDetail`.
+- API oficial `/api/v1` y alias heredado marcado como obsoleto.
+- Cancelación, inasistencia, retracto administrativo y fallo del proveedor.
+- Recogida, entrega colombiana con tarifa versionada, extensiones y mora.
+- Reembolsos idempotentes registrados como pendientes y ajustes financieros pendientes.
 
-## Avance de los contextos base
+## Pendientes antes de producción
 
-Las 18 tablas base ya tienen implementaciones de dominio, aplicación, JPA y REST. La entrega incorpora operaciones administrativas restringidas y conserva las fronteras atómicas de reservas y facturas. También incorpora JWT de acceso, registro de cliente, login, recuperación académica de contraseña, catálogo público, disponibilidad, cotización base, cobro simulado 50/50 y OpenAPI/Swagger. Continúan pendientes protección, evidencias, consentimientos, cálculos tributarios, renovación/revocación persistente de sesiones y pasarelas externas. Véanse [API REST](rest-api.md) y [Arquitectura del backend](backend-architecture.md).
+1. Ejecutar la suite completa PostgreSQL/Testcontainers con Docker disponible.
+2. Integrar pasarela de pagos y reembolsos real con webhooks firmados.
+3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
+4. Configurar SMTP productivo, reputación de dominio, plantillas y telemetría de entrega.
+5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
+6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
+7. Construir los recorridos del frontend contra `/api/v1` y conservar access token solo en memoria.
 
-## Decisiones de producto confirmadas
+## Frontend
 
-- El producto completo incluye catálogo, inventario, reservas, alquileres, entregas, devoluciones, gestión de daños, pagos simulados, facturación simulada, administración y reportes.
-- Los roles iniciales son Cliente, Proveedor y Administrador. El Proveedor se encarga de las actividades de entrega y devolución.
-- Una reserva cobra el 50 % cuando el proveedor la confirma y el 50 % restante después de la devolución y finalización del alquiler.
-- Las tarjetas débito y crédito, PayPal, Visa y Mastercard son simulados. Visa y Mastercard son redes de tarjetas, no procesadores de pago independientes.
-- El Plan Opcional de Protección contra Daños es opcional, está desactivado de forma predeterminada y no se presenta como un seguro.
-- Los precios, deducibles, límites y exclusiones de la protección son parámetros comerciales versionados. No se describen como porcentajes exigidos por la legislación colombiana.
-- Los precios usan pesos colombianos. La referencia general del IVA es 19 %, mientras que la regla especial de base gravable para el alquiler de bienes muebles debe implementarse y validarse profesionalmente antes de un lanzamiento real.
-- El entorno actual emite documentos de simulación académica, no facturas válidas ante la DIAN.
-- El alcance aprobado y las salvaguardas legales se detallan en [Alcance del producto](product-scope.md).
-- La futura página pública de términos usa el borrador de [Términos y condiciones](terms-and-conditions.md).
-
-## Tecnología confirmada
-
-| Área | Tecnología | Estado actual |
-| --- | --- | --- |
-| Lenguaje del backend | Java 21 | Configurado |
-| Framework del backend | Spring Boot 3.5.16 | Configurado |
-| Servidor de aplicaciones | Apache Tomcat embebido | Adaptador REST protegido con JWT Bearer |
-| Construcción | Maven multimódulo | Configurado |
-| Arquitectura | Arquitectura hexagonal y DDD | Implementada para los 18 contextos base |
-| Base de datos | PostgreSQL 17.11 | Entorno local reproducible y validado con Testcontainers |
-| Persistencia | Spring Data JPA y Hibernate con `ddl-auto: validate` | Implementada para las 18 tablas base |
-| Migraciones | Flyway | Una migración por tabla, compatibilidad JPA y rol administrador; validadas desde una base vacía |
-| Datos de desarrollo | 18 migraciones locales, una por tabla y con mínimo cinco filas | Validados en PostgreSQL |
-| API | REST con OpenAPI y Swagger UI | REST, documento OpenAPI y Swagger UI implementados; falta aprobación final del contrato |
-| Frontend | React 19 con JavaScript, Vite, Node.js, HTML y CSS | Base creada; recorridos del producto pendientes |
-
-Node.js se usa únicamente para las herramientas del frontend. Java y Spring Boot siguen siendo la única pila del backend.
-
-## Decisiones restantes de la Fase 0
-
-Las siguientes decisiones de negocio deben aprobarse antes de implementarlas:
-
-1. Plazos y cargos de cancelación, manejo de inasistencia y relación con el derecho legal de retracto.
-2. Periodo de gracia para devoluciones tardías, aprobación de extensiones y cargos por mora.
-3. Modalidades de entrega y recogida, límites geográficos, tarifas y manejo de entregas fallidas.
-4. Precio inicial, deducible, límite monetario, exclusiones exactas y periodo de disputa del Plan de Protección. Estos valores deben identificarse como supuestos del proyecto hasta contar con una propuesta de un proveedor real.
-5. Cálculo del valor de reposición y política de depreciación para equipos perdidos o irreparables.
-6. Identidad del futuro operador, canales de atención, detalles de la política de privacidad y periodos de retención.
-7. Gestión de estado, biblioteca de componentes y herramientas de pruebas del frontend. JavaScript ya fue elegido como lenguaje.
-8. Versionado de la API, formato final de errores, entrega externa del enlace de recuperación, renovación de JWT y revocación persistente de sesiones.
-9. Proveedor de alojamiento, CI/CD, dominios, secretos, observabilidad, copias de seguridad y respuesta a incidentes.
-
-La Fase 0 termina cuando estas decisiones tengan criterios de aceptación y prioridad. Los wireframes pueden comenzar durante esta fase, pero la integración con la API espera un contrato OpenAPI aprobado.
-
-## Fase 1: base de datos ejecutable
-
-Estado: la base técnica del modelo actual quedó terminada el 15 de octubre de 2026. La ampliación del esquema para el contrato completo del producto continúa bloqueada por las decisiones comerciales y legales de la Fase 0.
-
-- [x] Aprovisionar PostgreSQL 17.11 local mediante Docker Compose y variables en `.env`.
-- [x] Aplicar las 18 migraciones de tablas y la migración de compatibilidad JPA sobre una base de datos vacía.
-- [x] Verificar que el perfil `local` aplique además las 18 migraciones de datos de demostración.
-- [x] Revisar claves, restricciones y consultas representativas contra el motor real.
-- [x] Agregar la migración V200 para etapas 50/50, idempotencia y datos mínimos de medios de pago simulados.
-- [ ] Agregar migraciones para impuestos, protección, documentos legales, evidencias y disputas. Requiere cerrar primero las reglas correspondientes de la Fase 0.
-- [x] Agregar cobertura con Testcontainers para migraciones, mapeos JPA, repositorios, rollback, unicidad concurrente del inventario y doble confirmación de reservas.
-
-La parte verificable del criterio de salida ya se cumple: una base de datos nueva se crea de forma repetible y la aplicación valida sus mapeos. La Fase 1 completa se cerrará cuando las decisiones de la Fase 0 permitan demostrar que el esquema soporta todo el contrato del producto. Véase [Trabajo pendiente de base de datos](pendientes-base-datos.md).
-
-## Fase 2: backend y contrato de API
-
-- [x] Completar los agregados y casos de uso correspondientes a las 18 tablas base.
-- [x] Implementar registro de cliente, login y JWT de acceso; la autorización por rol y propiedad usa el `Principal` derivado del token.
-- [ ] Implementar renovación, revocación persistente y entrega segura del enlace de recuperación.
-- [x] Agregar Spring Web, validación de entradas y manejo uniforme de errores.
-- [x] Implementar la API REST del modelo base.
-- [x] Publicar el contrato actual mediante OpenAPI y Swagger UI.
-- [x] Implementar cotización del alquiler y pagos simulados 50/50 con tarjeta o PayPal e idempotencia.
-- [ ] Aprobar y versionar el contrato OpenAPI.
-- [ ] Implementar protección, impuestos, facturación fiscal, evidencias, disputas y reembolsos automatizados.
-
-Criterio de salida: todos los recorridos aprobados funcionan con PostgreSQL y el contrato HTTP versionado es estable.
-
-## Fase 3: entorno de integración compartido
-
-Construir una imagen reproducible del backend y desplegar un entorno de desarrollo o pruebas con PostgreSQL, migraciones automáticas, secretos aislados, datos controlados, registros y comprobaciones de salud.
-
-Criterio de salida: el frontend y el trabajo de calidad pueden usar una API compartida sin depender del equipo de un desarrollador.
-
-## Fase 4: frontend
-
-- [x] Crear la base del proyecto React con JavaScript, Vite y herramientas de Node.js.
-- [ ] Establecer navegación, accesibilidad y estados de carga, vacío, éxito y error.
-- [ ] Implementar autenticación y navegación según el rol.
-- [ ] Implementar las pantallas de catálogo, disponibilidad, reservas, alquileres, pagos, devoluciones, revisión de daños, facturas y administración.
-- [ ] Implementar la página pública `/terms-and-conditions` y enlazarla desde el pie de página y todos los puntos de aceptación requeridos.
-- [ ] Integrar únicamente contra el contrato OpenAPI aprobado.
-
-Criterio de salida: los tres roles pueden completar sus recorridos aprobados mediante una interfaz adaptable.
-
-## Fase 5: validación de extremo a extremo y robustecimiento
-
-Las pruebas se agregan con cada comportamiento implementado; esta fase completa la validación transversal:
-
-- cobertura unitaria del dominio y la aplicación;
-- cobertura de migraciones, mapeos, rollback y concurrencia en PostgreSQL;
-- cobertura del contrato REST y de autorización;
-- cobertura de extremo a extremo de los recorridos críticos de cada rol;
-- escenarios de precios, IVA, pagos fraccionados, reembolsos y cálculo de daños;
-- validación de accesibilidad, seguridad, rendimiento, copias de seguridad y restauración.
-
-Criterio de salida: se cumplen los criterios de aceptación, no queda abierto ningún defecto crítico y los riesgos aceptados están documentados.
-
-## Fase 6: despliegue en producción
-
-Completar construcciones reproducibles, CI/CD, infraestructura administrada, TLS, dominios, secretos, acceso de mínimo privilegio, procedimientos de migración y rollback, monitoreo, alertas, copias de seguridad, ejercicios de restauración y un plan de respuesta a incidentes.
-
-Un lanzamiento comercial real requiere además revisión profesional colombiana en materia legal, tributaria, de privacidad y de seguridad. Hasta completar esa revisión y una integración con la DIAN, los despliegues seguirán siendo simulaciones académicas.
-
-## Próxima decisión inmediata
-
-Finalizar la Fase 0 una regla a la vez. La siguiente decisión recomendada es la política de cancelación e inasistencia, porque afecta los totales de las reservas, reembolsos, información al consumidor, transiciones de estado del backend, historial de la base de datos y textos del frontend.
+El frontend permanece fuera de esta entrega. Debe consumir `GET /auth/csrf` antes de operaciones de cookie, usar `credentials: include`, enviar `X-XSRF-TOKEN`, reaccionar a 401/403/409/429 por `code` y nunca tomar decisiones de autorización por sí solo.

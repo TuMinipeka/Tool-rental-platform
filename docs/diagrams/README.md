@@ -1,24 +1,20 @@
 # Diagrama conceptual entidad-relación
 
-El diagrama representa la base de 18 entidades descrita en el [modelo conceptual](../conceptual-model.md). Las extensiones de protección, evidencias, disputas, reembolsos, documentos legales y consentimientos quedan fuera de esta primera versión.
+El diagrama representa las 25 entidades descritas en el [modelo conceptual](../conceptual-model.md): el modelo base y siete ampliaciones críticas de seguridad y operación.
 
 ## Archivos
 
-- [Escena editable de Excalidraw](conceptual-er-model.excalidraw): figuras, atributos, relaciones y conectores agrupados.
-- [Vista vectorial](conceptual-er-model.svg): permite ampliar sin perder calidad.
-- [Vista PNG](conceptual-er-model.png): previsualización rápida.
-- [Registro de verificación](conceptual-er-model.audit.json): conteos y huella de la fuente.
+- [Escena editable de Excalidraw](conceptual-er-model.excalidraw).
+- [Vista vectorial](conceptual-er-model.svg).
+- [Vista PNG](conceptual-er-model.png).
+- [Auditoría](conceptual-er-model.audit.json) con conteos y huella de la fuente.
 
 ![Diagrama conceptual ER](conceptual-er-model.svg)
 
 ## Notación
 
-Los rectángulos representan entidades y enumeran sus atributos. Los rombos amarillos representan relaciones. `[ID]` identifica claves, `[unique]` identifica claves alternativas y `?` marca atributos opcionales. Es una representación conceptual con listas de atributos, no un esquema SQL físico.
+Los rectángulos representan entidades. `[ID]` identifica la identidad conceptual, `[unique]` una clave alternativa y `?` un dato opcional. Las multiplicidades usan `1`, `0..1`, `0..N` y `1..N`.
 
-Las multiplicidades se muestran junto a cada extremo: `1`, `0..1`, `0..N` o `1..N`. `UserRole` y `ReservationItem` permanecen como entidades asociativas. `Customer` y `Supplier` son perfiles opcionales compatibles: un mismo `User` puede tener ambos.
+La primera sección conserva el modelo base. El panel de ampliación conecta usuario con sesiones y recuperación, reserva con política, tarifa, terminación y extensión, y pagos con reembolsos. Es un modelo conceptual; tipos SQL, índices y restricciones físicas se documentan en las migraciones.
 
-El diagrama contiene 18 entidades, 19 relaciones y 38 conectores. También registra reglas que no se deducen únicamente de la cardinalidad: un proveedor por reserva, fechas inclusivas, independencia entre imágenes y unidades físicas, y congelación de tarifas y valores facturados.
-
-## Edición
-
-Abre Excalidraw, elige **Open / Load from file** y selecciona `conceptual-er-model.excalidraw`. Conserva ese archivo como fuente editable y regenera las vistas SVG y PNG después de cada cambio.
+Para editar, abre el archivo `.excalidraw` y vuelve a exportar SVG y PNG. Actualiza también la huella SHA-256 del modelo y los conteos de la auditoría.

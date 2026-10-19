@@ -1,27 +1,23 @@
 # Preparación para producción
 
-El proyecto tiene persistencia y operaciones verificadas en PostgreSQL. Antes de ofrecerlo públicamente deben cerrarse estas condiciones con evidencia del entorno destino.
-
-| Área | Base existente | Condición pendiente |
+| Área | Implementado | Cierre requerido |
 | --- | --- | --- |
-| Identidad | BCrypt, roles, registro de cliente, login y JWT de acceso con expiración | Renovación, revocación persistente y recuperación por canal externo |
-| Autorización | Propiedad y participación en casos de uso | Pruebas completas con autenticación real |
-| Migraciones | Historial inmutable y pruebas de actualización | Ensayo en copia, ventana de cambio y rol migrador separado |
-| Secretos | Variables requeridas en perfil `production` | Excluir credenciales privadas de artefactos, gestor de secretos y rotación |
-| Datos | Claves, restricciones y transacciones | Respaldo automático y restauración ensayada |
-| Plataforma | JAR y usuario de contenedor sin privilegios | Imágenes revisadas, TLS/proxy, recursos y motor Docker probado |
-| Observabilidad | Consulta JDBC y logs | Métricas, alertas, auditoría y acceso al estado público |
-| API | DTOs, errores HTTP, OpenAPI y Swagger UI | Versionado aprobado y revisión de exposición/límites |
-| Finanzas | Registro, historia y pagos académicos 50/50 idempotentes | Impuestos, pasarela y conciliación/reembolsos externos |
-| Producto | Dominio y backend base | Frontend integrado y términos revisados |
-| Entrega | Pruebas reproducibles | CI, revisión de dependencias y recuperación |
+| Identidad | BCrypt, JWT corto, sesiones rotativas y revocación | MFA opcional, alertas y revisión de claves |
+| Recuperación | Token opaco de un uso y SMTP/Mailpit | Proveedor SMTP, TLS, DKIM/SPF/DMARC y métricas |
+| HTTP | CORS explícito, CSRF, rate limit y ProblemDetail | Proxy confiable, límites distribuidos y WAF según riesgo |
+| Datos | Flyway aditivo, JPA validate y 25 tablas | Usuario migrador separado, backup y recuperación ensayada |
+| Negocio | Políticas versionadas, extensiones, mora y liquidación | Validación legal/fiscal y pasarela real |
+| Operación | Dockerfiles, Compose, health JDBC y documentación | CI/CD, métricas, trazas, alertas, SLO y runbooks |
 
-## Configuración privada y artefactos
+## Variables críticas
 
-`application-local.yml` contiene configuración de desarrollo. No publiques una copia con credenciales privadas dentro de un JAR, imagen o repositorio. Inyecta `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` para producción y verifica el contenido del artefacto y sus capas. Excluye el perfil `demo` de producción.
+Configura mediante un gestor de secretos: `JWT_SECRET`, credenciales PostgreSQL y SMTP. Define `CORS_ALLOWED_ORIGINS` sin comodines; el perfil de producción fuerza cookies seguras detrás de HTTPS. Producción no carga V300; la tarifa de entrega se crea mediante el endpoint administrativo.
 
-## Publicación controlada
+## Criterios de salida
 
-Verifica código y concurrencia; ensaya migración y recuperación aisladas; revisa autenticación/permisos; comprueba secretos e imagen; valida PostgreSQL y los recorridos de negocio. Mantén responsables y un procedimiento de recuperación. Una respuesta de `/status/database` acredita conectividad en ese momento, no todos estos controles.
-
-Los pendientes comerciales se mantienen en [la hoja de ruta](pendientes.md). Los términos actuales son un borrador y no una aprobación jurídica o comercial.
+- `mvnw.cmd clean verify` pasa con PostgreSQL real.
+- `docker compose config --quiet` y la imagen inmutable pasan escaneo.
+- La rotación concurrente, reutilización, revocación y CSRF tienen evidencia automatizada.
+- Se ensayan migración V200→V208, restauración de backup y rollback de aplicación.
+- Se verifican logs sin tokens ni credenciales.
+- Producto, legal y finanzas aprueban porcentajes, retracto, impuestos y textos.

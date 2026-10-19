@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1915" height="4738" viewBox="0 0 1915 4738">
+<svg xmlns="http://www.w3.org/2000/svg" width="1915" height="6400" viewBox="0 0 1915 6400">
 <rect width="100%" height="100%" fill="white"/>
 <text x="80" y="62.0" font-family="Arial, sans-serif" font-size="40" fill="#0f172a">Tool Rental Platform</text>
-<text x="80" y="103.0" font-family="Arial, sans-serif" font-size="23" fill="#475569">CONCEPTUAL ENTITY–RELATIONSHIP MODEL  /  BASELINE: 18 ENTITIES</text>
+<text x="80" y="103.0" font-family="Arial, sans-serif" font-size="23" fill="#475569">CONCEPTUAL ENTITY–RELATIONSHIP MODEL  /  25 ENTITIES</text>
 <text x="80" y="141.0" font-family="Arial, sans-serif" font-size="19" fill="#475569">Business attributes • relationship diamonds • endpoint multiplicities • no SQL types or foreign keys</text>
 <polyline points="1030.7,476.3 1021.6600000000001,484.93 1012.82,493.37 1004.24,501.57 995.96,509.47 988.0600000000001,517.01 980.59,524.15 973.6,530.82 967.1600000000001,536.97" fill="none" stroke="#475569" stroke-width="1.6"/>
 <polyline points="916.65,586.63 905.77,596.77 893.53,608.18 880.1899999999999,620.61 866.01,633.83 851.23,647.6 836.13,661.68 820.9499999999999,675.83 805.9399999999999,689.8199999999999" fill="none" stroke="#475569" stroke-width="1.6"/>
@@ -319,6 +319,32 @@
 <text x="105" y="4450.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">7. Minimum 1 item applies to a reservation with selected units and to an issued invoice.</text>
 <text x="105" y="4508.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">8. UnitDelivery is identified by its ReservationItem; UnitReturn by its delivery. The original composite identity is</text>
 <text x="105" y="4531.4" font-family="Arial, sans-serif" font-size="18" fill="#334155">preserved.</text>
-<text x="105" y="4566.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">9. Baseline only: 18 entities. Protection, evidence, disputes, refunds and consent extensions are excluded.</text>
-<text x="105" y="4634.0" font-family="Arial, sans-serif" font-size="16" fill="#475569">Source: docs/conceptual-model.md + docs/fourth-normal-form.md   |   15 October 2026</text>
+<text x="105" y="4566.0" font-family="Arial, sans-serif" font-size="18" fill="#334155">9. Critical extensions preserve session, policy, termination, delivery, extension and refund history.</text>
+<text x="105" y="4634.0" font-family="Arial, sans-serif" font-size="16" fill="#475569">Source: docs/conceptual-model.md + docs/fourth-normal-form.md   |   19 October 2026</text>
+<rect x="80" y="4780" width="1755" height="1510" rx="18" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+<text x="110" y="4835" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#0f172a">CRITICAL SECURITY AND RENTAL EXTENSIONS</text>
+<text x="110" y="4875" font-family="Arial, sans-serif" font-size="18" fill="#475569">Seven independent facts added in 4NF; lines show ownership or settlement and endpoint labels show multiplicity.</text>
+
+<line x1="350" y1="5050" x2="630" y2="5050" stroke="#475569" stroke-width="2"/><text x="430" y="5032" font-family="Arial" font-size="16">owns 1 — 0..N</text>
+<polyline points="230,4930 230,4900 1300,4900 1300,4930" fill="none" stroke="#475569" stroke-width="2"/><text x="690" y="4890" font-family="Arial" font-size="16">requests 1 — 0..N</text>
+<line x1="350" y1="5470" x2="630" y2="5890" stroke="#475569" stroke-width="2"/><text x="380" y="5680" font-family="Arial" font-size="16">applies 1 — 0..N</text>
+<line x1="760" y1="5590" x2="760" y2="5770" stroke="#475569" stroke-width="2"/><text x="775" y="5680" font-family="Arial" font-size="16">records 1 — 0..N</text>
+<line x1="890" y1="5470" x2="1170" y2="5470" stroke="#475569" stroke-width="2"/><text x="965" y="5452" font-family="Arial" font-size="16">settles 1 — 0..N</text>
+<line x1="350" y1="5890" x2="630" y2="5890" stroke="#475569" stroke-width="2"/><text x="425" y="5872" font-family="Arial" font-size="16">prices 1 — 0..N</text>
+<line x1="890" y1="5890" x2="1170" y2="5890" stroke="#475569" stroke-width="2"/><text x="960" y="5872" font-family="Arial" font-size="16">requests 1 — 0..N</text>
+<line x1="1430" y1="5470" x2="1490" y2="5470" stroke="#475569" stroke-width="2"/><text x="1430" y="5452" font-family="Arial" font-size="14">N — 1</text>
+
+<g font-family="Arial, sans-serif">
+  <rect x="110" y="4930" width="240" height="240" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><text x="130" y="4970" font-size="22" font-weight="700">USER</text><text x="130" y="5010" font-size="16">[ID] userId</text><text x="130" y="5040" font-size="16">email [unique]</text><text x="130" y="5070" font-size="16">accountStatus</text>
+  <rect x="630" y="4930" width="260" height="240" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="650" y="4970" font-size="22" font-weight="700">USER SESSION</text><text x="650" y="5010" font-size="16">[ID] sessionId</text><text x="650" y="5040" font-size="16">familyId · tokenHash</text><text x="650" y="5070" font-size="16">status · expiresAt</text><text x="650" y="5100" font-size="16">replacedBy?</text>
+  <rect x="1170" y="4930" width="260" height="240" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/><text x="1190" y="4970" font-size="22" font-weight="700">PASSWORD RESET</text><text x="1190" y="5010" font-size="16">[ID] resetTokenId</text><text x="1190" y="5040" font-size="16">tokenHash [unique]</text><text x="1190" y="5070" font-size="16">expiresAt · usedAt?</text>
+  <rect x="110" y="5350" width="240" height="240" rx="12" fill="#fef3c7" stroke="#d97706" stroke-width="2"/><text x="130" y="5390" font-size="22" font-weight="700">POLICY</text><text x="130" y="5430" font-size="16">[ID] policyId</text><text x="130" y="5460" font-size="16">version [unique]</text><text x="130" y="5490" font-size="16">48h · 25% · 50%</text><text x="130" y="5520" font-size="16">graceMinutes</text>
+  <rect x="630" y="5350" width="260" height="240" rx="12" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/><text x="650" y="5390" font-size="22" font-weight="700">TERMINATION</text><text x="650" y="5430" font-size="16">[ID] terminationId</text><text x="650" y="5460" font-size="16">type · status · reason?</text><text x="650" y="5490" font-size="16">fee · refund · outstanding</text><text x="650" y="5520" font-size="16">idempotencyKey</text>
+  <rect x="1170" y="5350" width="260" height="240" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/><text x="1190" y="5390" font-size="22" font-weight="700">REFUND</text><text x="1190" y="5430" font-size="16">[ID] refundId</text><text x="1190" y="5460" font-size="16">payment · termination?</text><text x="1190" y="5490" font-size="16">amount · status</text><text x="1190" y="5520" font-size="16">idempotencyKey</text>
+  <rect x="110" y="5770" width="240" height="240" rx="12" fill="#cffafe" stroke="#0891b2" stroke-width="2"/><text x="130" y="5810" font-size="22" font-weight="700">DELIVERY RATE</text><text x="130" y="5850" font-size="16">[ID] deliveryRateId</text><text x="130" y="5880" font-size="16">version · amount COP</text><text x="130" y="5910" font-size="16">active · effectiveAt</text>
+  <rect x="630" y="5770" width="260" height="240" rx="12" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text x="650" y="5810" font-size="22" font-weight="700">RESERVATION</text><text x="650" y="5850" font-size="16">scheduledFulfillmentAt</text><text x="650" y="5880" font-size="16">method · deliveryFee</text><text x="650" y="5910" font-size="16">effectiveReturnDate</text><text x="650" y="5940" font-size="16">policy · rate?</text>
+  <rect x="1170" y="5770" width="260" height="240" rx="12" fill="#e0e7ff" stroke="#4f46e5" stroke-width="2"/><text x="1190" y="5810" font-size="22" font-weight="700">EXTENSION</text><text x="1190" y="5850" font-size="16">[ID] extensionId</text><text x="1190" y="5880" font-size="16">requestedReturnDate</text><text x="1190" y="5910" font-size="16">status · additionalAmount</text><text x="1190" y="5940" font-size="16">idempotencyKey</text>
+  <rect x="1490" y="5350" width="250" height="240" rx="12" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/><text x="1510" y="5390" font-size="22" font-weight="700">PAYMENT</text><text x="1510" y="5430" font-size="16">[ID] paymentId</text><text x="1510" y="5460" font-size="16">stage · status · amount</text><text x="1510" y="5490" font-size="16">adjustmentType?</text><text x="1510" y="5520" font-size="16">adjustmentReference?</text>
+</g>
+<text x="110" y="6240" font-family="Arial, sans-serif" font-size="17" fill="#334155">Security facts are independent multivalued sets per User. Policies and rates are versioned; Reservation stores the applied identity and monetary snapshot.</text>
 </svg>

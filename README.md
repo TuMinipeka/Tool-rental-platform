@@ -1,154 +1,161 @@
 <div align="center">
 
-![Tool Rental Platform: plataforma de alquiler de herramientas](docs/assets/readme-banner.svg)
+![Tool Rental Platform](docs/assets/readme-banner.svg)
 
-**Backend modular con reglas de negocio independientes y persistencia verificable.**
+**Backend de alquiler de herramientas con arquitectura hexagonal, DDD y seguridad orientada a producción.**
 
-[Primeros pasos](#primeros-pasos) · [Arquitectura](#arquitectura) · [Modelo conceptual](#modelo-conceptual) · [Migraciones](#migraciones) · [Documentación](#documentación)
+[Inicio](#inicio-rápido) · [Arquitectura](#arquitectura) · [Seguridad](#seguridad) · [Negocio](#reglas-críticas-de-negocio) · [API](#api-rest) · [Documentación](#documentación)
 
 </div>
 
 ---
 
-## Propósito y estado
+## Estado actual
 
-Gestionar el catálogo de proveedores, reservar equipos físicos y registrar el ciclo de alquiler: entrega, devolución, daños, pagos y facturas. El backend conserva tres módulos Maven y 18 contextos organizados por tabla, con transacciones coordinadas para proteger las reglas entre contextos.
+El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módulos Maven conservan las dependencias hacia dentro: `infrastructure → application → domain`. El modelo contiene **25 tablas y 25 contextos organizativos**; las transacciones coordinan las reglas que atraviesan reservas, pagos, sesiones, devoluciones y reembolsos.
 
-| Área | Implementación actual | Límite de esta entrega |
+| Área | Implementado | Fuera de este alcance |
 | --- | --- | --- |
-| Dominio y aplicación | Catálogo, identidad y operaciones de los 18 contextos | Reglas comerciales pendientes registradas explícitamente |
-| Persistencia | JPA, Flyway, restricciones y confirmación concurrente en PostgreSQL | Sin generación automática de esquema |
-| REST | Contratos, validación, JWT, permisos, OpenAPI y errores HTTP | Falta renovación/revocación persistente y aprobación del versionado |
-| Facturación y pagos | Facturas con instantáneas y pagos simulados 50/50 | Sin pasarela externa, liquidación fiscal ni reembolso automatizado |
-| Web | Estado real de conexión en 8080 y base React separada | Recorridos de negocio del frontend pendientes |
-| Operación | JAR, Dockerfiles, Compose y guías | Preparación de producción en curso |
+| Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación, CSRF y recuperación opaca por correo | MFA y proveedores de identidad externos |
+| Reservas | Confirmación atómica, cancelación, inasistencia, retracto revisado, extensión y mora | Optimización logística avanzada |
+| Dinero | Tarifas congeladas, ajustes y reembolsos idempotentes | Pasarela real, impuestos definitivos y conciliación bancaria |
+| Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
+| Persistencia | JPA, PostgreSQL, Flyway V1–V208 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
-> [!IMPORTANT]
-> La autenticación todavía no emite ni verifica tokens. Antes de exponer el servicio revisa los [criterios de salida a producción](docs/production-readiness.md) y la [cobertura de la rúbrica](docs/requirements-coverage.md).
+El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
 
-## Tecnologías
+## Inicio rápido
 
-| Responsabilidad | Tecnología |
-| --- | --- |
-| Lenguaje y plataforma | Java 21 · Spring Boot 3.5.16 |
-| Construcción | Maven Wrapper 3.9.9 · reactor de tres módulos |
-| Datos | PostgreSQL · Spring Data JPA · Hibernate · Flyway |
-| Verificación | JUnit · Spring Boot Test · ArchUnit · Testcontainers · Spotless |
-| Interfaz separada | React · JavaScript · Vite · Nginx |
-
-PostgreSQL reemplaza a MySQL por decisión autorizada. El [enunciado original](ejercicioDemo.md) se conserva sin modificaciones.
-
-## Primeros pasos
-
-Necesitas JDK 21 y PostgreSQL. Las pruebas usan Docker/Testcontainers por defecto; también admiten una base PostgreSQL exclusiva para pruebas. Node.js 24 se necesita para desarrollar el frontend, no para ejecutar el JAR.
-
-### 1. Seleccionar JDK 21 y verificar
+Requisitos: JDK 21, PostgreSQL y Docker cuando se quiera ejecutar la suite Testcontainers.
 
 ```powershell
-$env:JAVA_HOME = 'C:\Users\danie\scoop\apps\temurin21-jdk\current'
-& "$env:JAVA_HOME/bin/java.exe" -version
+$env:JAVA_HOME = 'C:\ruta\al\jdk-21'
 .\mvnw.cmd -version
 .\mvnw.cmd clean verify
+docker compose config --quiet
+docker compose up --build
 ```
 
-Adapta la ruta del JDK a tu instalación. En este equipo `java` en el PATH todavía puede resolver Java 17: usa explícitamente el ejecutable de `JAVA_HOME`. En Linux/macOS utiliza `./mvnw`. La [guía de compilación](docs/build-and-test.md) explica la alternativa sin Docker y los fallos LF/CRLF.
+Compose levanta PostgreSQL, Mailpit, backend y frontend. Mailpit expone la bandeja de desarrollo en `http://localhost:8025`. El backend queda en `http://localhost:8080`; la página raíz ejecuta una consulta JDBC real y muestra si la conexión fue exitosa.
 
-### 2. Configurar y arrancar el backend
+Para ejecutar sin Compose:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE = 'production'
 $env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
 $env:DB_USERNAME = 'tool_rental'
-# Define DB_PASSWORD fuera del repositorio mediante tu gestor de secretos o entorno.
-& "$env:JAVA_HOME/bin/java.exe" -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
+$env:DB_PASSWORD = '<secret>'
+$env:JWT_SECRET = '<mínimo-32-bytes>'
+$env:SMTP_HOST = '<smtp-host>'
+$env:SMTP_PORT = '587'
+$env:SMTP_USERNAME = '<smtp-user>'
+$env:SMTP_PASSWORD = '<smtp-secret>'
+$env:PASSWORD_RECOVERY_SENDER = '<verified-sender>'
+$env:PASSWORD_RECOVERY_RESET_URL = 'https://app.example/password-reset'
+$env:CORS_ALLOWED_ORIGINS = 'https://app.example'
+.\mvnw.cmd -pl infrastructure -am spring-boot:run
 ```
 
-El perfil `production` exige las tres variables de conexión. También existe `local`, con configuración en `application-local.yml`; tus credenciales privadas no deben publicarse. No actives `demo` sobre datos reales.
-
-### 3. Comprobar la conexión
-
-Abre **[localhost:8080](http://localhost:8080)**. La página muestra «Conexión a la base de datos exitosa.» solo después de una consulta JDBC real. `GET /status/database` devuelve 200 o 503; las rutas `/api/**` mantienen su requisito de `Principal` autenticado.
-
-Para contenedores y frontend consulta [despliegue](docs/deployment.md) y [compilación](docs/build-and-test.md).
+No actives los perfiles `local,demo` sobre datos reales. Las credenciales se suministran mediante variables o un gestor de secretos.
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
-    HTTP[REST / infraestructura] --> APP[Casos de uso / application]
-    APP --> DOMAIN[Agregados y puertos / domain]
-    JPA[JPA / infraestructura] -. implementa puertos .-> DOMAIN
+    REST[REST / Infrastructure] --> APP[Use cases / Application]
+    APP --> DOMAIN[Aggregates and ports / Domain]
+    JPA[JPA adapters / Infrastructure] -. implements .-> DOMAIN
     JPA --> PG[(PostgreSQL)]
+    SMTP[SMTP / Mailpit] -. implements notification port .-> DOMAIN
 ```
 
-```text
-domain/          Agregados, objetos de valor, eventos y puertos
-application/     Comandos, respuestas, excepciones y casos de uso
-infrastructure/  REST, JPA, configuración Spring y migraciones
-frontend/        Base React independiente
-docs/            Modelo, normalización, operación y decisiones
-```
-
-Las dependencias Maven apuntan hacia dentro: `infrastructure → application → domain`. Una tabla por contexto es una convención de este proyecto; los detalles de reservas y facturas siguen sujetos a las transacciones de sus propietarios.
+Los módulos Domain y Application no importan Spring, Hibernate ni HTTP. Infrastructure contiene controladores, seguridad, entidades JPA, mappers, repositorios Spring Data y configuración.
 
 <details>
-<summary><strong>Ver los 18 contextos y sus tablas</strong></summary>
+<summary><strong>Ver los 25 contextos y tablas</strong></summary>
 
 | Contexto | Tabla | Contexto | Tabla |
 | --- | --- | --- | --- |
-| `user` | `users` | `reservation` | `reservations` |
-| `role` | `roles` | `reservationitem` | `reservation_items` |
-| `userrole` | `user_roles` | `rental` | `rentals` |
-| `customer` | `customers` | `unitdelivery` | `unit_deliveries` |
-| `supplier` | `suppliers` | `unitreturn` | `unit_returns` |
-| `category` | `categories` | `damagereport` | `damage_reports` |
-| `tool` | `tools` | `payment` | `payments` |
-| `toolimage` | `tool_images` | `invoice` | `invoices` |
-| `equipmentunit` | `equipment_units` | `invoiceitem` | `invoice_items` |
+| `user` | `users` | `role` | `roles` |
+| `userrole` | `user_roles` | `customer` | `customers` |
+| `supplier` | `suppliers` | `category` | `categories` |
+| `tool` | `tools` | `toolimage` | `tool_images` |
+| `equipmentunit` | `equipment_units` | `reservation` | `reservations` |
+| `reservationitem` | `reservation_items` | `rental` | `rentals` |
+| `unitdelivery` | `unit_deliveries` | `unitreturn` | `unit_returns` |
+| `damagereport` | `damage_reports` | `payment` | `payments` |
+| `invoice` | `invoices` | `invoiceitem` | `invoice_items` |
+| `usersession` | `user_sessions` | `passwordreset` | `password_reset_tokens` |
+| `cancellationpolicy` | `cancellation_policies` | `reservationtermination` | `reservation_terminations` |
+| `deliveryrate` | `delivery_rates` | `reservationextension` | `reservation_extensions` |
+| `refund` | `refunds` |  |  |
 
 </details>
 
-Consulta la [arquitectura detallada](docs/backend-architecture.md), el [mapa de paquetes](docs/source-package-map.md) y los [contratos REST](docs/rest-api.md).
+Consulta [arquitectura](docs/backend-architecture.md) y [mapa de paquetes](docs/source-package-map.md).
+
+## Seguridad
+
+- JWT de acceso con `sid` y vigencia predeterminada de 15 minutos. React debe conservarlo únicamente en memoria.
+- Refresh token opaco de 256 bits, guardado como hash, con vigencia de 30 días y rotación atómica.
+- La reutilización fuera del margen de 10 segundos compromete y revoca toda la familia.
+- El refresh vive en cookie `HttpOnly`, ruta `/api`, `SameSite=Lax` y `Secure` en producción.
+- Renovación y cierres de sesión exigen cookie CSRF y cabecera `X-XSRF-TOKEN`.
+- Cambio de contraseña, cambio de roles y desactivación revocan sesiones activas.
+- Recuperación con token opaco de un solo uso y 15 minutos. La respuesta pública siempre es genérica; el token solo viaja por el puerto SMTP.
+- CORS con credenciales acepta únicamente los orígenes configurados.
+- Los errores usan `application/problem+json` con `code`, `status`, `detail`, `instance` y `traceId`.
+
+## Reglas críticas de negocio
+
+- Una reserva pendiente se cancela sin cargo.
+- Una reserva confirmada cancelada con 48 horas exactas o más recibe reembolso completo; por debajo del límite se cobra 25 %.
+- La inasistencia puede declararse dos horas después de la hora programada y cobra 50 %.
+- El retracto queda en revisión administrativa. Aprobación: cancelación y reembolso completo. Rechazo: vuelve al estado confirmado.
+- Un alquiler ya iniciado bloquea cancelación comercial, inasistencia y retracto.
+- Los reembolsos se calculan a partir de pagos confirmados y se registran **pendientes**, con idempotencia; no se marcan como transferidos sin pasarela externa. Si el cargo supera lo pagado se crea un ajuste pendiente.
+- `CUSTOMER_PICKUP` cuesta cero. `SUPPLIER_DELIVERY` usa una tarifa COP global, versionada, y una dirección en Colombia.
+- Las extensiones conservan la fecha original, actualizan la fecha efectiva, comprueban disponibilidad y usan tarifas congeladas.
+- La mora se calcula por día calendario iniciado en la zona `America/Bogota` y se registra como ajuste.
+
+## API REST
+
+El contrato oficial empieza por `/api/v1`. El alias `/api` permanece temporalmente y responde con `Deprecation: true` y un enlace a la ruta sucesora. Swagger solo publica rutas versionadas.
+
+Rutas principales:
+
+- `GET /api/v1/auth/csrf`, `POST /auth/refresh`, `/logout` y `/logout-all`.
+- `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
+- `POST /api/v1/auth/password-recovery` y `/password-reset`.
+- `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.
+- `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
+- `GET|POST /api/v1/commercial-configuration/delivery-rates` y `/cancellation-policies` para administración.
+- `GET /api/v1/refunds/payments/{id}` y consulta normal de pagos para ajustes.
+
+La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en `http://localhost:8080/swagger-ui.html`. Consulta [contratos REST](docs/rest-api.md).
+
+## Migraciones y validación
+
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V208 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos y campos operativos. `db/demo/V300` carga únicamente la tarifa académica de demostración.
+
+Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 
 ## Modelo conceptual
 
-![Modelo conceptual: entidades, atributos, relaciones y multiplicidades](docs/diagrams/conceptual-er-model.svg)
+![Modelo conceptual de 25 contextos](docs/diagrams/conceptual-er-model.svg)
 
-[Ampliar SVG](docs/diagrams/conceptual-er-model.svg) · [Editar en Excalidraw](docs/diagrams/conceptual-er-model.excalidraw) · [Modelo explicado](docs/conceptual-model.md) · [Normalización hasta 4FN](docs/fourth-normal-form.md)
-
-Las reservas contienen unidades distintas de un proveedor y usan fechas inclusivas: del 14 al 15 son dos días. Las solicitudes pendientes no bloquean unidades; confirmar valida disponibilidad atómicamente y congela tarifas. Las facturas conservan sus datos históricos. Las imágenes de una herramienta y sus unidades físicas son conjuntos independientes.
-
-## Migraciones
-
-Las migraciones desarrolladas por **Conde** están integradas en Flyway como **V4–V24**, respetando V1–V3 ya aplicadas en la base de Daniel. Se conserva su procedencia y se adaptan las creaciones para reconocer objetos existentes. Esto mantiene el historial sin recrear las 18 tablas ni modificar checksums anteriores.
-
-| Ubicación | Contenido | Activación |
-| --- | --- | --- |
-| [`db/migration`](infrastructure/src/main/resources/db/migration) | 24 versiones estructurales y de roles | Todos los perfiles |
-| [`db/demo`](infrastructure/src/main/resources/db/demo) | 18 versiones V101–V118 con datos ficticios | Solo perfil adicional `demo` |
-
-Hibernate utiliza `ddl-auto: validate`; Flyway valida historial, no establece baselines automáticos y tiene `clean` deshabilitado. Consulta la [trazabilidad y el procedimiento de actualización](docs/database-migrations.md).
-
-## Validación
-
-La entrega se comprueba con PostgreSQL real: arranque desde cero, actualización desde V3 conservando datos/checksums, mapeo de 18 entidades, restricciones, rollback, tarifas congeladas y confirmaciones concurrentes. Los datos demo se prueban en un esquema separado.
-
-El [reporte de validación](docs/validation-report.md) registra resultados y límites. Verificar la configuración de Compose no equivale a haber ejecutado sus contenedores ni a validar producción.
+[Abrir SVG](docs/diagrams/conceptual-er-model.svg) · [Editar en Excalidraw](docs/diagrams/conceptual-er-model.excalidraw) · [Modelo explicado](docs/conceptual-model.md) · [Normalización 4FN](docs/fourth-normal-form.md)
 
 ## Documentación
 
-| Necesidad | Documento |
+| Tema | Documento |
 | --- | --- |
-| Compilar, probar y corregir formato | [Compilación y pruebas](docs/build-and-test.md) |
-| Ejecutar JAR o Docker | [Despliegue](docs/deployment.md) |
-| Evolucionar y respaldar datos | [Migraciones y aportes de Conde](docs/database-migrations.md) |
-| Revisar la rúbrica | [Matriz de cobertura](docs/requirements-coverage.md) |
-| Preparar producción | [Criterios de publicación](docs/production-readiness.md) |
-| Extender el backend | [Guía de desarrollo](docs/development-guide.md) |
-| Revisar negocio y alcance | [Alcance aprobado](docs/product-scope.md) · [Hoja de ruta](docs/pendientes.md) |
-| Consultar historial de integración | [Comparación de ramas](docs/branch-merge-report.md) |
-| Revisar datos y documentos pendientes | [Fuentes demo](docs/data-sources.md) · [Pendientes de datos](docs/pendientes-base-datos.md) · [Borrador de términos](docs/terms-and-conditions.md) |
+| Arquitectura y paquetes | [backend-architecture.md](docs/backend-architecture.md) · [source-package-map.md](docs/source-package-map.md) |
+| API y seguridad | [rest-api.md](docs/rest-api.md) · [production-readiness.md](docs/production-readiness.md) |
+| Modelo y datos | [conceptual-model.md](docs/conceptual-model.md) · [fourth-normal-form.md](docs/fourth-normal-form.md) · [data-sources.md](docs/data-sources.md) |
+| Alcance y cobertura | [product-scope.md](docs/product-scope.md) · [requirements-coverage.md](docs/requirements-coverage.md) · [pendientes.md](docs/pendientes.md) |
+| Operación | [deployment.md](docs/deployment.md) · [build-and-test.md](docs/build-and-test.md) · [database-migrations.md](docs/database-migrations.md) |
+| Condiciones | [terms-and-conditions.md](docs/terms-and-conditions.md) |
 
-La estructura documental utiliza las skills [create-readme](https://skills.sh/github/awesome-copilot/create-readme) y [readme-blueprint-generator](https://skills.sh/github/awesome-copilot/readme-blueprint-generator), instaladas en [`.agents/skills`](.agents/skills). El [registro de herramientas](docs/documentation-tooling.md) identifica su origen y aplicación.
-
-Los commits conservan el formato en inglés: `feat: :card_file_box: IntegrateCondeForwardMigrations`.
+Los nombres de código y commits se mantienen en inglés. La documentación para el equipo se conserva en español.

@@ -15,12 +15,16 @@ La entrega sigue en desarrollo. Revisa los [bloqueos de producción](production-
 | `DB_USERNAME`, `DB_PASSWORD` | Credenciales externas, nunca dentro del repositorio o una imagen publicada |
 | `DB_MAX_POOL_SIZE`, `DB_MIN_IDLE` | Tamaño máximo y conexiones ociosas mínimas del pool |
 | `DB_CONNECTION_TIMEOUT_MS` | Espera máxima de Hikari para obtener conexión |
+| `JWT_SECRET` | Secreto aleatorio de al menos 32 bytes para firmar access tokens |
+| `CORS_ALLOWED_ORIGINS` | Orígenes HTTPS explícitos autorizados a enviar credenciales |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Transporte SMTP de recuperación |
+| `PASSWORD_RECOVERY_SENDER`, `PASSWORD_RECOVERY_RESET_URL` | Remitente verificado y URL pública del frontend |
 
 Los valores compartidos del pool son 10/2; `local` usa 2/0 salvo sobrescritura. Dimensiona el total entre réplicas y clientes de administración según el límite del rol PostgreSQL.
 
 ## Ejecutar el JAR
 
-Completa [compilación y pruebas](build-and-test.md). Define `SPRING_PROFILES_ACTIVE=production`, `DB_URL`, `DB_USERNAME` y `DB_PASSWORD` mediante el entorno del proceso o tu gestor de secretos.
+Completa [compilación y pruebas](build-and-test.md). El perfil `production` exige las variables de base de datos, JWT, CORS, SMTP y recuperación de la tabla anterior; suminístralas mediante el entorno del proceso o tu gestor de secretos.
 
 ```powershell
 & "$env:JAVA_HOME/bin/java.exe" -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
@@ -59,7 +63,7 @@ La imagen backend ejecuta Java 21 con un usuario sin privilegios. La etapa de em
 
 ## Demostración aislada
 
-En una base vacía de demostración, activa `local,demo` y proporciona sus variables de conexión. Flyway ejecuta 24 versiones estructurales y 18 de datos, con al menos cinco registros por tabla. No habilites `demo` en producción o en la base de trabajo: incluye cuentas y operaciones ficticias. No se ofrece un inicio de sesión demo.
+En una base vacía de demostración, activa `local,demo` y proporciona sus variables de conexión. El historial actual contiene 33 migraciones estructurales y 19 migraciones de demostración. No habilites `demo` en producción o en la base de trabajo: incluye cuentas y operaciones ficticias. No se ofrece un inicio de sesión demo.
 
 ## Verificaciones posteriores al arranque
 
@@ -67,7 +71,7 @@ En una base vacía de demostración, activa `local,demo` y proporciona sus varia
 Invoke-RestMethod http://localhost:8080/status/database
 ```
 
-Debe responder `connected: true`. La página raíz presenta el resultado de una consulta real; si falla responde 503. Verifica también Flyway, Hibernate y 401 en `/api/categories` sin autenticación. El estado de conexión no sustituye métricas, alertas ni pruebas de negocio.
+Debe responder `connected: true`. La página raíz presenta el resultado de una consulta real; si falla responde 503. Verifica también Flyway, Hibernate y 401 en `/api/v1/categories` sin autenticación. El estado de conexión no sustituye métricas, alertas ni pruebas de negocio.
 
 ## Actualización, respaldo y recuperación
 

@@ -12,7 +12,7 @@ La estructura sigue la [arquitectura](backend-architecture.md). El [alcance apro
 | Application | Comandos/respuestas inmutables, excepciones y coordinación de casos de uso | Domain y Java |
 | Infrastructure | REST, DTOs HTTP, JPA, mappers, adaptadores y configuración | Application, Domain y frameworks |
 
-Conserva tres módulos y los 18 contextos existentes. Las entidades hijas no ofrecen operaciones que evadan invariantes de reserva/factura. No crees clases vacías para completar un árbol.
+Conserva tres módulos y los 25 contextos existentes. Las entidades hijas no ofrecen operaciones que evadan invariantes de reserva, terminación, extensión, reembolso o factura. No crees clases vacías para completar un árbol.
 
 ## Convenciones
 
@@ -37,7 +37,7 @@ Los commits se escriben en inglés: `<type>: :<gitmoji>: <CamelCaseSummary>`. Ej
 - Restaura agregados sin emitir eventos nuevos. Aún no existe Outbox ni publicación externa.
 - Separa entidades JPA y mappers; no expongas Spring Data fuera de infraestructura.
 - Las interfaces Spring Data van en `repository`; el adaptador del puerto queda en su directorio padre `persistence`.
-- Obtén el actor del `Principal` creado desde el `sub` del JWT y valida permisos en el caso de uso. La renovación y revocación persistente de sesiones siguen pendientes.
+- Obtén el actor del `Principal` creado desde el `sub` del JWT y valida permisos en el caso de uso. La sesión persistente asociada al `sid` debe continuar activa.
 - Evoluciona PostgreSQL mediante nuevas versiones Flyway; nunca edites archivos ya aplicados. Consulta [migraciones](database-migrations.md).
 
 ## Flujo de implementación

@@ -54,7 +54,7 @@ El cliente selecciona herramienta, fechas, opción de entrega y Plan de Protecci
 
 En la entrega, las partes reciben un registro de unidad, fecha, condición, accesorios y evidencias fotográficas disponibles. En la devolución, el proveedor registra la condición de entrada y la compara con la entrega. El cliente puede revisar y controvertir una diferencia material mediante el canal documentado.
 
-La ventana detallada y cualquier cargo lícito de cancelación siguen pendientes de aprobación en fase 0. La interfaz debe informar la política vigente antes de enviar una reserva; no puede cobrarse una tarifa no informada.
+La política académica versionada permite cancelar una solicitud pendiente sin cargo. Una reserva confirmada cancelada con al menos 48 horas de anticipación genera reembolso completo; con menos anticipación aplica un cargo del 25% del total. La inasistencia declarada dos horas después de la hora programada aplica un cargo del 50%. No se admite cancelación comercial después de iniciar la entrega o el alquiler. La interfaz debe informar la versión vigente antes de reservar; un despliegue comercial requiere revisión legal de estos porcentajes.
 
 ## 6. Precios, IVA y facturas
 
@@ -101,7 +101,9 @@ El cliente recibe notificación y una oportunidad razonable de disputar la valor
 
 Las reglas contractuales de cancelación deben mostrarse antes de reservar y no pueden eliminar derechos obligatorios del consumidor.
 
-Cuando se cumplan las condiciones legales de las transacciones a distancia, el consumidor puede ejercer el derecho de retracto dentro del término establecido por el artículo 47 de la Ley 1480 de 2011. Su aplicación depende, entre otros factores, de si el servicio comenzó y de las excepciones legales. El flujo de producción debe evaluar esas condiciones en lugar de prometer retracto en todos los casos.
+Cuando se cumplan las condiciones legales de las transacciones a distancia, el consumidor puede ejercer el derecho de retracto dentro del término establecido por el artículo 47 de la Ley 1480 de 2011. La solicitud queda en revisión administrativa sin penalidad; al aprobarla se cancela y reembolsa completamente y al rechazarla se restaura el estado previo. Este flujo conserva la decisión humana porque la aplicación depende, entre otros factores, de si el servicio comenzó y de las excepciones legales.
+
+Antes de operar con dinero real, el equipo debe revisar también la modificación del plazo y medio de devolución para comercio electrónico introducida por la [Ley 2439 de 2024](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=257116). El registro `PENDING` de reembolso es una obligación operativa pendiente, no prueba de devolución al consumidor.
 
 La reversión de pagos electrónicos solo procede en los casos y mediante el procedimiento del artículo 51 de la Ley 1480 de 2011 y el Decreto 587 de 2016. La plataforma de producción debe proporcionar los canales legalmente exigidos de reclamación y notificación. El ambiente académico solo simula el flujo resultante.
 

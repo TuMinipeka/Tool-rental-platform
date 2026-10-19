@@ -1,19 +1,14 @@
 {
-  "entities": 18,
-  "relationships": 19,
-  "elements": 318,
-  "canvas": [
-    1915,
-    4738
-  ],
-  "attributeEntries": 82,
+  "entities": 25,
+  "baseRelationships": 19,
+  "criticalExtensionRelationships": 7,
+  "elements": 332,
+  "canvas": [1915, 6400],
   "source": "docs/conceptual-model.md",
-  "sourceSha256": "a89e50b38ff765f13a0335f693d8ea1137ab6cc77e713b7dcbff90e05bac6d11",
+  "sourceSha256": "ac3d777784dbd603f0bfd089230491d41dcf03d26dd87dd812732ec1c5534bfa",
   "crossCheckedAgainstMermaid": true,
-  "mcpServer": "https://mcp.excalidraw.com/mcp",
-  "mcpTool": "create_view",
-  "checkpointId": "e606098e4e0f463691",
-  "sharedLinkExported": false,
+  "editableSource": "docs/diagrams/conceptual-er-model.excalidraw",
   "createdOn": "2026-10-15",
-  "checkpointReadVerified": true
+  "updatedOn": "2026-10-19",
+  "notes": "The original base scene is preserved and seven critical entities were added. SVG and PNG include the relationship extension panel."
 }

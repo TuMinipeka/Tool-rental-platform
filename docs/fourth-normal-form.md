@@ -64,7 +64,7 @@ También se separan roles de perfiles y líneas de reserva de pagos. Una asociac
 
 ## Esquema lógico resultante
 
-PK: clave primaria; AK: clave candidata alternativa; FK: referencia; `?`: opcional. Tablas en inglés plural y `snake_case`; columnas en singular. El [historial Flyway](database-migrations.md) implementa estas 18 relaciones, sin confundir cantidad de tablas con cantidad de migraciones.
+PK: clave primaria; AK: clave candidata alternativa; FK: referencia; `?`: opcional. Tablas en inglés plural y `snake_case`; columnas en singular. El [historial Flyway](database-migrations.md) implementa 25 relaciones, sin confundir cantidad de tablas con cantidad de migraciones.
 
 ```text
 users(
@@ -179,6 +179,48 @@ invoice_items(
   line_number PK,
   issued_description, quantity, issued_unit_price
 )
+
+user_sessions(
+  session_id PK, family_id, user_id FK -> users,
+  refresh_token_hash AK, session_status, created_at, expires_at,
+  rotated_at?, revoked_at?, replaced_by_session_id?, client_label?
+)
+
+password_reset_tokens(
+  password_reset_token_id PK, user_id FK -> users,
+  token_hash AK, created_at, expires_at, used_at?, revoked_at?
+)
+
+cancellation_policies(
+  cancellation_policy_id PK, policy_version AK, cutoff_hours,
+  late_cancellation_rate, no_show_rate, no_show_grace_minutes,
+  active, effective_at
+)
+
+reservation_terminations(
+  reservation_termination_id PK, reservation_id FK -> reservations,
+  termination_type, termination_status, requested_by, requested_at,
+  resolved_by?, resolved_at?, reason?, fee_amount, refund_amount,
+  outstanding_amount, currency, idempotency_key AK
+)
+
+delivery_rates(
+  delivery_rate_id PK, rate_version AK, amount, currency,
+  active, effective_at
+)
+
+reservation_extensions(
+  reservation_extension_id PK, reservation_id FK -> reservations,
+  requested_by, requested_return_date, extension_status, requested_at,
+  resolved_by?, resolved_at?, additional_amount, currency, idempotency_key AK
+)
+
+refunds(
+  refund_id PK, payment_id FK -> payments,
+  reservation_termination_id? FK -> reservation_terminations,
+  amount, currency, refund_status, idempotency_key AK,
+  recorded_at, confirmed_at?
+)
 ```
 
 ## Auditoría de dependencias
@@ -203,9 +245,16 @@ invoice_items(
 | `payments` | `payment_id`; `(processor, external_reference) -> demás atributos` | Un intento de pago; 4FN. |
 | `invoices` | `invoice_id`; `reservation_id`; `number -> demás atributos` | Documento histórico inmutable; 4FN. |
 | `invoice_items` | `(invoice_id, line_number) -> demás atributos` | Una línea emitida; 4FN. |
+| `user_sessions` | `session_id`; `refresh_token_hash -> demás atributos` | Una sesión rotatoria; familias y usuarios pueden tener conjuntos independientes. |
+| `password_reset_tokens` | `password_reset_token_id`; `token_hash -> demás atributos` | Una credencial temporal de un uso; separada de sesiones. |
+| `cancellation_policies` | `cancellation_policy_id`; `policy_version -> demás atributos` | Una versión inmutable de política. |
+| `reservation_terminations` | `reservation_termination_id`; `idempotency_key -> demás atributos` | Una solicitud o liquidación independiente. |
+| `delivery_rates` | `delivery_rate_id`; `rate_version -> demás atributos` | Una versión de tarifa global. |
+| `reservation_extensions` | `reservation_extension_id`; `idempotency_key -> demás atributos` | Una solicitud de extensión independiente. |
+| `refunds` | `refund_id`; `idempotency_key -> demás atributos` | Un reembolso trazable a un pago. |
 
 
-Las 18 relaciones cumplen 4FN bajo las dependencias documentadas. Las pruebas PostgreSQL validan restricciones y mapeos físicos; no sustituyen la revisión de supuestos de normalización.
+Las 25 relaciones cumplen 4FN bajo las dependencias documentadas. Las pruebas PostgreSQL validan restricciones y mapeos físicos; no sustituyen la revisión de supuestos de normalización.
 
 ## Reglas que requieren algo más que normalización
 
@@ -215,7 +264,7 @@ Las 18 relaciones cumplen 4FN bajo las dependencias documentadas. Las pruebas Po
 | Inventario único por proveedor | Trigger y bloqueo asesor; no unicidad global falsa |
 | Un proveedor por reserva | Coordinación y comprobación de referencias |
 | Solapamientos confirmados | Bloqueos ordenados y comprobación/guardado atómicos |
-| Roles, perfiles y propiedad | Aplicación y JWT de acceso; renovación/revocación persistente pendiente |
+| Roles, perfiles y propiedad | Aplicación, JWT de acceso, sesiones rotativas y revocación persistente |
 | Devolución posterior a entrega | Transiciones y validación operativa |
 | Tarifas y facturas históricas | Política de escritura y transacciones |
 | Referencia única de pago | Restricción `(processor, external_reference)`; reintentos externos pendientes |

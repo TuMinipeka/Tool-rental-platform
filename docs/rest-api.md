@@ -1,80 +1,82 @@
-# API REST
+# Contrato REST
 
-Las rutas privadas empiezan por `/api` y requieren un JWT Bearer cuyo `sub` es el UUID del usuario. Ningún campo `actorId` ni encabezado personalizado sustituye la identidad autenticada. `/api/auth/**` y `/api/public/**` son públicos, excepto `/api/auth/logout`, que exige un token válido.
+## Convenciones
 
-Los listados administrativos requieren el rol `ADMIN`. Los usuarios activos pueden consultar categorías y herramientas publicadas; el catálogo público expone exclusivamente ofertas publicadas. Los proveedores también pueden ver sus propias ofertas sin publicar. Los recursos individuales validan propiedad o participación. La administración de roles requiere `ADMIN`, y las operaciones sobre herramientas requieren al proveedor propietario.
+La API oficial usa `/api/v1`. El alias `/api` es temporal y responde con `Deprecation: true` y `Link` hacia la ruta sucesora. OpenAPI muestra solo `/api/v1`.
 
-Las contraseñas solo se reciben al crear una cuenta, deben tener entre 12 caracteres y 72 bytes UTF-8 y se almacenan con BCrypt. Ninguna respuesta expone el hash.
+Las rutas privadas requieren `Authorization: Bearer <access-token>`. La identidad procede del `Principal`; ningún `actorId` de entrada la sustituye. Las mutaciones idempotentes reciben `Idempotency-Key`.
 
-Swagger UI está disponible en `/swagger-ui.html` y el documento OpenAPI en `/v3/api-docs`. El botón `Authorize` acepta el JWT emitido por login o registro.
-
-## Rutas
-
-| Recurso | Operaciones |
-| --- | --- |
-| `/auth` | POST `/register`, `/login`, `/password-recovery`, `/password-reset` y `/logout` |
-| `/public/catalog` | Listado GET, GET `/{id}` y disponibilidad GET `/{id}/availability` |
-| `/categories` | POST, listado GET y GET/PUT/DELETE `/{id}`; una categoría referenciada no se elimina |
-| `/tools` | POST, listado GET, GET/PUT `/{id}` y DELETE `/{id}`, que retira la publicación |
-| `/equipment-units` | POST, listado GET y GET/PUT `/{id}`; el retiro es terminal |
-| `/reservations` | POST, listado del actor GET, GET `/{id}` y POST `/{id}/confirmation`, `/rejection`, `/cancellation` |
-| `/quotes/reservations` | POST para subtotal, días facturables y división 50/50 sin inventar IVA |
-| `/users` | POST, listado GET, GET `/{id}` y PATCH `/{id}/status` |
-| `/roles` | POST, listado GET y GET/PUT `/{id}` |
-| `/user-roles` | POST, listado GET y GET/DELETE `/entry?userId=...&roleId=...` |
-| `/customers`, `/suppliers` | POST, listado GET y GET/PUT `/{userId}` |
-| `/tool-images` | POST, listado GET y GET/DELETE `/entry?toolId=...&imageUrl=...` |
-| `/reservation-items` | Listado GET y GET `/entry?reservationId=...&equipmentUnitId=...` |
-| `/rentals` | POST con `reservationId`, listado GET, GET `/{reservationId}` y PATCH de estado |
-| `/unit-deliveries` | POST, listado GET, GET de `/entry` y PATCH `/entry/completion` |
-| `/unit-returns` | POST, listado GET y GET de `/entry` |
-| `/damage-reports` | POST, listado GET, GET `/{id}`, PATCH de valoración y PATCH de estado |
-| `/payments` | POST manual administrativo, POST `/simulations`, listado por participación GET, GET `/{id}` y PATCH administrativo de estado |
-| `/invoices` | POST con líneas, listado GET, GET `/{id}` y PATCH de estado |
-| `/invoice-items` | Listado GET y GET `/entry?invoiceId=...&lineNumber=...` |
-
-Las claves compuestas usan parámetros de consulta para evitar rutas ambiguas, especialmente con las URL de imágenes. Estos parámetros identifican el recurso, nunca al actor autenticado.
-
-## Autenticación y recuperación
-
-El registro público crea una cuenta y un perfil `CUSTOMER`, asigna el rol y devuelve un JWT de acceso. Login usa correo y contraseña. El token dura 15 minutos por defecto; `JWT_ACCESS_TTL` puede cambiar la duración. No hay token de renovación porque su contrato continúa pendiente.
-
-Logout es stateless: responde `204` y el cliente elimina el JWT. No existe todavía una lista persistente de revocación, por lo que el token conserva validez hasta expirar. La recuperación emite un token firmado de demostración ligado al hash actual; cambiar la contraseña lo invalida. Mientras no exista un proveedor de correo, el entorno académico devuelve ese token en la respuesta. Esto no es un flujo apto para producción.
-
-## Ejemplos de entrada
-
-La creación de una reserva obtiene el cliente desde el `Principal`:
+Los errores tienen `Content-Type: application/problem+json`:
 
 ```json
-{"startDate":"2026-10-20","returnDate":"2026-10-21","equipmentUnitIds":["00000000-0000-0000-0000-000000000001"]}
+{
+  "type": "about:blank",
+  "title": "Conflict",
+  "status": 409,
+  "detail": "Equipment unit is unavailable for the requested period",
+  "instance": "/api/v1/reservation-extensions/...",
+  "code": "AVAILABILITY_CONFLICT",
+  "traceId": "..."
+}
 ```
 
-La cotización usa las mismas fechas y unidades. Calcula días inclusivos, subtotal de alquiler y dos mitades. `taxCalculationStatus` permanece en `PENDING_LEGAL_VALIDATION`; no representa un total fiscal.
+| Estado | Uso |
+| --- | --- |
+| 400 | JSON, parámetros o token de recuperación inválidos |
+| 401 | Credencial ausente, JWT inválido o sesión revocada |
+| 403 | Rol o propiedad insuficiente, incluido CSRF |
+| 404 | Recurso inexistente |
+| 409 | Regla de negocio, disponibilidad, reutilización o idempotencia |
+| 429 | Límite de autenticación excedido |
 
-El pago simulado recibe `paymentStage` (`FIRST_HALF` o `FINAL_HALF`), `paymentMethod` (`CREDIT_CARD`, `DEBIT_CARD` o `PAYPAL`), una clave de idempotencia y `simulationOutcome` (`APPROVE` o `DECLINE`). Para tarjeta solo recibe red, últimos cuatro dígitos y expiración; nunca número completo ni CVV. El segundo 50 % exige primer pago confirmado y alquiler completado.
+Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLICT`, `REFRESH_TOKEN_REUSED`, `CSRF_VALIDATION_FAILED` y `RATE_LIMIT_EXCEEDED`.
 
-Una operación de estado acepta `{"status":"COMPLETED"}`. Las transiciones admitidas son:
+## Autenticación y sesiones
 
-- usuario: `ACTIVE -> SUSPENDED/DISABLED` y `SUSPENDED -> ACTIVE/DISABLED`;
-- alquiler: `ACTIVE -> COMPLETED/CANCELLED`;
-- pago: `PENDING -> CONFIRMED/FAILED` y `CONFIRMED -> REFUNDED`;
-- daño: `OPEN -> ASSESSED/CLOSED` y `ASSESSED -> CLOSED`;
-- factura: `ISSUED -> PAID/VOIDED`.
+| Método | Ruta | Acceso |
+| --- | --- | --- |
+| POST | `/api/v1/auth/register` | Público; devuelve access JSON y refresh cookie |
+| POST | `/api/v1/auth/login` | Público; devuelve access JSON y refresh cookie |
+| GET | `/api/v1/auth/csrf` | Público; inicializa cookie CSRF |
+| POST | `/api/v1/auth/refresh` | Refresh cookie + `X-XSRF-TOKEN` |
+| POST | `/api/v1/auth/logout` | Refresh cookie + `X-XSRF-TOKEN` |
+| POST | `/api/v1/auth/logout-all` | Bearer + `X-XSRF-TOKEN` |
+| GET | `/api/v1/auth/sessions` | Bearer |
+| DELETE | `/api/v1/auth/sessions/{id}` | Bearer |
+| POST | `/api/v1/auth/password-recovery` | Público; respuesta 202 genérica |
+| POST | `/api/v1/auth/password-reset` | Público; token opaco y nueva contraseña |
 
-La valoración de daños usa `{"cost":5}`. La finalización de una entrega usa `{"condition":"GOOD"}` y registra la hora del servidor.
+El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La recuperación nunca devuelve el token: el puerto SMTP entrega el enlace; Mailpit lo captura en desarrollo.
 
-La creación de una factura incluye `reservationId`, `number` y una lista no vacía `lines`, cuyos elementos contienen `description`, `quantity` y `unitPrice`. Las instantáneas de emisor y destinatario provienen de sus perfiles. La operación guarda encabezado y líneas en una sola transacción; todavía no implementa numeración fiscal ni impuestos. Los pagos son una simulación académica, no una pasarela externa.
+## Reservas y cotización
 
-## Respuestas y errores
+`POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La respuesta conserva modalidad, desglose, política, fecha efectiva y acciones permitidas.
 
-- POST exitoso: `201`.
-- GET, PUT o PATCH exitoso: `200`.
-- DELETE admitido: `204`.
-- Contrato inválido: `400`.
-- Falta de identidad: `401`.
-- Acceso denegado: `403`.
-- Recurso inexistente: `404`.
-- Conflicto de regla, unicidad o referencia: `409`.
-- Operación histórica no permitida: `405`.
+## Terminaciones
 
-Los mensajes internos de base de datos no se exponen. Las respuestas de aplicación son inmutables. Los recursos originales de catálogo y reserva conservan identificadores tipados con forma `{"value":"uuid"}`; los demás contextos exponen claves con nombre, como `userId` o `invoiceId`. Una futura versión de la API puede unificar esta representación.
+Todas las operaciones directas requieren `Idempotency-Key`:
+
+- `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`
+- `POST /api/v1/reservation-terminations/reservations/{id}/no-show`
+- `POST /api/v1/reservation-terminations/reservations/{id}/supplier-failure`
+- `POST /api/v1/reservation-terminations/reservations/{id}/withdrawal`
+- `POST /api/v1/reservation-terminations/reservations/{id}/external-review`
+- `POST /api/v1/reservation-terminations/{id}/approval`
+- `POST /api/v1/reservation-terminations/{id}/rejection`
+- `GET /api/v1/reservation-terminations`
+
+## Extensiones, entrega y devolución
+
+- `POST /api/v1/reservation-extensions/reservations/{id}` solicita una fecha con idempotencia.
+- `POST /api/v1/reservation-extensions/{id}/approval|rejection` resuelve como proveedor.
+- `GET /api/v1/reservation-extensions/reservations/{id}` consulta el historial.
+- `PATCH /api/v1/unit-deliveries/entry/failure` registra causa del cliente, proveedor o externa.
+- La programación y entrega de todas las unidades preceden al inicio del alquiler. Una falla del proveedor permite liquidación completa antes de iniciarlo; una causa externa abre revisión administrativa.
+- Las devoluciones incluyen `lateDays` y `lateFee` calculados con zona `America/Bogota`.
+
+## Configuración y finanzas
+
+- `GET|POST /api/v1/commercial-configuration/delivery-rates` administra la tarifa COP global.
+- `GET|POST /api/v1/commercial-configuration/cancellation-policies` versiona la política.
+- `GET /api/v1/refunds/payments/{id}` consulta reembolsos.
+- Los endpoints existentes de pagos muestran ajustes `PENDING` de terminación, extensión o mora.
