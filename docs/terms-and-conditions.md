@@ -1,166 +1,166 @@
-# Terms and Conditions
+# Términos y Condiciones
 
-> Status: draft for an academic simulation. This document is not approved for a real commercial launch.
+> Estado: borrador para simulación académica. Este documento no está aprobado para un lanzamiento comercial real.
 
-| Field | Value |
+| Campo | Valor |
 | --- | --- |
-| Document version | `0.1-draft` |
-| Publication date | Not published |
-| Effective date | Not applicable until publication |
-| Platform operator | `[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]` |
-| Tax identifier | `[NIT_OR_NOT_APPLICABLE]` |
-| Address | `[PHYSICAL_ADDRESS]` |
-| Customer-service email | `[SUPPORT_EMAIL]` |
-| Customer-service telephone | `[SUPPORT_PHONE]` |
-| Jurisdiction | Colombia |
+| Versión del documento | `0.1-draft` |
+| Fecha de publicación | No publicado |
+| Fecha de entrada en vigencia | No aplica hasta su publicación |
+| Operador de la plataforma | `[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]` |
+| Identificación tributaria | `[NIT_OR_NOT_APPLICABLE]` |
+| Dirección | `[PHYSICAL_ADDRESS]` |
+| Correo de atención | `[SUPPORT_EMAIL]` |
+| Teléfono de atención | `[SUPPORT_PHONE]` |
+| Jurisdicción | Colombia |
 
-The placeholders above must be replaced and the complete document must receive Colombian legal and tax review before any real transaction is enabled.
+Los marcadores anteriores deben reemplazarse y el documento completo debe recibir revisión legal y tributaria colombiana antes de habilitar transacciones reales.
 
-## 1. Scope and acceptance
+## 1. Alcance y aceptación
 
-These Terms and Conditions govern access to and use of Tool Rental Platform by customers, suppliers, and administrators. They also govern catalog browsing, reservations, rentals, deliveries, returns, optional damage protection, damage assessments, simulated payments, refunds, and simulated invoices.
+Estos Términos y Condiciones regulan el acceso y uso de Tool Rental Platform por clientes, proveedores y administradores. También regulan la consulta del catálogo, reservas, alquileres, entregas, devoluciones, protección opcional por daños, valoraciones, pagos simulados, reembolsos y facturas simuladas.
 
-The current environment is a university-project simulation. It does not process real money, issue tax-valid invoices, sell insurance, or represent an affiliation with PayPal, Visa, or Mastercard. A future production environment must publish its own approved version of these terms before accepting real transactions.
+El ambiente actual es una simulación de un proyecto universitario. No procesa dinero real, no emite facturas válidas ante la DIAN, no vende seguros ni representa una afiliación con PayPal, Visa o Mastercard. Un futuro ambiente de producción deberá publicar su propia versión aprobada antes de aceptar transacciones reales.
 
-When acceptance is required, the platform will show the applicable version before confirmation and will request an explicit action. Silence, inactivity, or a preselected checkbox does not constitute acceptance. The platform retains consultable evidence of the version, actor, timestamp, and transaction associated with acceptance.
+Cuando se requiera aceptación, la plataforma mostrará la versión aplicable antes de confirmar y solicitará una acción explícita. El silencio, la inactividad o una casilla preseleccionada no constituyen aceptación. La plataforma conserva evidencia consultable de la versión, actor, fecha y transacción asociada.
 
-## 2. Definitions
+## 2. Definiciones
 
-- **Platform:** the Tool Rental Platform application.
-- **Operator:** the person or legal entity identified at the beginning of this document.
-- **Customer:** a user who requests and receives a tool rental.
-- **Supplier:** a user who publishes and rents tools through the platform.
-- **Equipment unit:** one individually identified physical tool or piece of equipment.
-- **Reservation:** a customer's request for specified equipment units and dates.
-- **Rental:** the period beginning when confirmed equipment is delivered or collected and ending when its return is accepted.
-- **Protection Plan:** the optional contractual damage-protection feature described below. It is not insurance or an insurance policy.
-- **Simulation:** a feature that reproduces expected commercial behavior without moving real money or creating a tax-valid document.
+- **Plataforma:** la aplicación Tool Rental Platform.
+- **Operador:** la persona natural o jurídica identificada al inicio de este documento.
+- **Cliente:** usuario que solicita y recibe el alquiler de una herramienta.
+- **Proveedor:** usuario que publica y alquila herramientas mediante la plataforma.
+- **Unidad de equipo:** herramienta o equipo físico identificado individualmente.
+- **Reserva:** solicitud del cliente para unidades y fechas determinadas.
+- **Alquiler:** periodo que comienza al entregar o recoger el equipo confirmado y termina cuando se acepta su devolución.
+- **Plan de Protección:** protección contractual opcional por daños descrita más adelante. No es un seguro ni una póliza.
+- **Simulación:** funcionalidad que reproduce un comportamiento comercial esperado sin mover dinero real ni crear un documento válido ante la DIAN.
 
-## 3. Accounts and roles
+## 3. Cuentas y roles
 
-Users must provide accurate information, protect their credentials, and use only the permissions assigned to their role. A customer may not act as a supplier unless the platform has approved the corresponding profile. Suppliers are responsible for the accuracy, condition, legal availability, and lawful publication of their tools.
+Los usuarios deben suministrar información correcta, proteger sus credenciales y usar únicamente los permisos asignados a su rol. Un cliente no puede actuar como proveedor sin que la plataforma apruebe el perfil correspondiente. Los proveedores son responsables de la exactitud, condición, disponibilidad legal y publicación lícita de sus herramientas.
 
-The platform may suspend an account to protect users, investigate misuse, comply with law, or preserve system security. An affected user must have access to the applicable complaint or review channel unless disclosure would compromise a lawful investigation.
+La plataforma puede suspender una cuenta para proteger usuarios, investigar usos indebidos, cumplir la ley o preservar la seguridad. El usuario afectado debe disponer del canal aplicable de reclamación o revisión, salvo que la información comprometa una investigación legal.
 
-## 4. Catalog and availability
+## 4. Catálogo y disponibilidad
 
-Each offer must identify the tool, essential characteristics, daily rate, currency, supplier, availability, delivery conditions, and relevant restrictions. Images must reasonably represent the offered tool but do not replace the written condition checklist for an individual equipment unit.
+Cada oferta debe identificar la herramienta, características esenciales, tarifa diaria, moneda, proveedor, disponibilidad, condiciones de entrega y restricciones relevantes. Las imágenes deben representar razonablemente la herramienta, pero no sustituyen la lista escrita de condición de una unidad específica.
 
-Availability shown before confirmation is informative. A reservation becomes binding within the simulation only after the supplier confirms it and the platform atomically verifies that the equipment units remain available.
+La disponibilidad mostrada antes de confirmar es informativa. Una reserva solo se vuelve vinculante dentro de la simulación cuando el proveedor la confirma y la plataforma verifica atómicamente que las unidades siguen disponibles.
 
-## 5. Reservation and rental lifecycle
+## 5. Ciclo de reserva y alquiler
 
-The customer selects the tool, dates, delivery option, and optional Protection Plan before reviewing the complete order summary. The supplier may confirm or reject a pending request according to availability and published conditions.
+El cliente selecciona herramienta, fechas, opción de entrega y Plan de Protección opcional antes de revisar el resumen completo. El proveedor puede confirmar o rechazar una solicitud pendiente según disponibilidad y condiciones publicadas.
 
-At delivery, the parties receive a record of the equipment unit, date, condition, accessories, and available photographic evidence. At return, the supplier records the inbound condition and compares it with the delivery record. The customer may review and challenge a material discrepancy through the documented dispute channel.
+En la entrega, las partes reciben un registro de unidad, fecha, condición, accesorios y evidencias fotográficas disponibles. En la devolución, el proveedor registra la condición de entrada y la compara con la entrega. El cliente puede revisar y controvertir una diferencia material mediante el canal documentado.
 
-The detailed cancellation window and any lawful cancellation charge remain pending Phase 0 approval. The interface must disclose the active cancellation policy before a customer submits a reservation; no undisclosed cancellation fee may be charged.
+La ventana detallada y cualquier cargo lícito de cancelación siguen pendientes de aprobación en fase 0. La interfaz debe informar la política vigente antes de enviar una reserva; no puede cobrarse una tarifa no informada.
 
-## 6. Prices, VAT, and invoices
+## 6. Precios, IVA y facturas
 
-Prices are displayed in Colombian pesos (`COP`) unless the platform expressly supports another currency. Before confirmation, the platform itemizes the rental amount, delivery charges, optional Protection Plan, discounts, taxable base, VAT, adjustments, and total.
+Los precios se muestran en pesos colombianos (`COP`) salvo que se admita expresamente otra moneda. Antes de confirmar, la plataforma discrimina alquiler, entrega, Plan de Protección opcional, descuentos, base gravable, IVA, ajustes y total.
 
-The general VAT reference used by the project is 19%. Rental of tangible movable property has a special taxable-base rule under article 1.3.1.7.1 of Decree 1625 of 2016. A real deployment must validate the applicable base, exclusions, responsibility for VAT, timing, and electronic-invoicing duties with a Colombian tax professional.
+La referencia general de IVA utilizada por el proyecto es 19%. El arrendamiento de bienes corporales muebles tiene una regla especial de base gravable en el artículo 1.3.1.7.1 del Decreto 1625 de 2016. Un despliegue real debe validar con un profesional tributario colombiano la base aplicable, exclusiones, responsabilidad frente al IVA, causación y obligaciones de facturación electrónica.
 
-Documents generated by the current environment are simulations and must display `Academic simulation - not a tax-valid DIAN invoice`. They do not replace a legally required invoice or equivalent document.
+Los documentos del ambiente actual son simulaciones y deben mostrar `Simulación académica - documento no válido como factura ante la DIAN`. No sustituyen una factura o documento equivalente legalmente exigido.
 
-## 7. Simulated payments
+## 7. Pagos simulados
 
-The platform simulates debit card, credit card, and PayPal payments. Visa and Mastercard may be displayed as simulated card networks. The project has no affiliation with those brands and does not transmit a real payment.
+La plataforma simula pagos con tarjeta débito, tarjeta crédito y PayPal. Visa y Mastercard pueden mostrarse como redes simuladas. El proyecto no está afiliado a esas marcas ni transmite pagos reales.
 
-The payment schedule is:
+El esquema de cobro es:
 
-1. 50% of the displayed reservation total when the supplier confirms the reservation.
-2. The remaining 50% when the rental is completed and the return is accepted.
-3. Separately itemized adjustments for approved extensions, damage, loss, refunds, or corrections.
+1. 50% del total mostrado cuando el proveedor confirma la reserva.
+2. 50% restante cuando termina el alquiler y se acepta la devolución.
+3. Ajustes discriminados por extensiones aprobadas, daños, pérdidas, reembolsos o correcciones.
 
-The platform does not store complete card numbers or CVV values. It uses simulated tokens and limited display metadata such as network, last four digits, and expiration.
+La plataforma no guarda números completos de tarjeta ni CVV. Utiliza tokens simulados y metadatos limitados como red, últimos cuatro dígitos y expiración.
 
-## 8. Optional Damage Protection Plan
+## 8. Plan Opcional de Protección por Daños
 
-The Protection Plan is optional, is not selected by default, and is not an insurance product. Its price, deductible, limit, covered events, exclusions, and effective period are shown before the customer accepts it.
+El Plan de Protección es opcional, no está seleccionado por defecto y no es un producto de seguros. Su precio, deducible, límite, eventos cubiertos, exclusiones y vigencia se muestran antes de que el cliente lo acepte.
 
-There is no universal statutory percentage for a tool-rental protection plan. The accepted commercial values are displayed for the specific reservation and preserved with that reservation. Later configuration changes do not alter previously accepted terms.
+No existe un porcentaje legal universal para un plan de protección de herramientas. Los valores comerciales aceptados se muestran para la reserva específica y se conservan con ella. Los cambios posteriores de configuración no modifican condiciones ya aceptadas.
 
-Unless the accepted plan states otherwise, protection applies only to documented accidental damage occurring during the rental and ordinary authorized use. Clearly disclosed exclusions may include intentional damage, fraud, theft or loss that was not reported as required, prohibited use, unauthorized transfer, unapproved repairs, and failure to follow safety or operating instructions.
+Salvo que el plan aceptado indique otra cosa, la protección aplica únicamente a daños accidentales documentados durante el alquiler y el uso ordinario autorizado. Las exclusiones informadas claramente pueden incluir daño intencional, fraude, hurto o pérdida no reportada, uso prohibido, transferencia no autorizada, reparaciones no aprobadas e incumplimiento de instrucciones de seguridad u operación.
 
-Protection does not prevent the customer from inspecting the evidence, requesting the itemized calculation, or disputing an assessment.
+La protección no impide inspeccionar evidencias, solicitar el cálculo discriminado ni disputar la valoración.
 
-## 9. Damage, total loss, and additional charges
+## 9. Daños, pérdida total y cargos adicionales
 
-An additional damage charge requires a return record, a description of the difference from the outbound condition, supporting evidence, and an itemized assessment.
+Un cargo adicional por daños exige registro de devolución, descripción de la diferencia frente a la condición de salida, evidencias y valoración discriminada.
 
-- Without the Protection Plan, the charge is the documented repair cost and cannot exceed the documented replacement value for the same loss.
-- With the Protection Plan, covered damage is limited to the accepted deductible or participation amount, subject to the accepted limit and exclusions.
-- If the unit is irreparable or not returned, the assessment uses the replacement-value snapshot disclosed for the rental, with any applicable protection and previous payment credited.
-- The platform must not collect both full repair and full replacement for the same damage.
+- Sin el Plan de Protección, el cargo corresponde al costo documentado de reparación y no puede superar el valor documentado de reposición por la misma pérdida.
+- Con el Plan de Protección, el daño cubierto se limita al deducible o participación aceptada, sujeto al límite y exclusiones.
+- Si la unidad es irreparable o no se devuelve, se utiliza la instantánea del valor de reposición informada para el alquiler, aplicando la protección y pagos previos correspondientes.
+- La plataforma no puede cobrar reparación completa y reposición completa por el mismo daño.
 
-The customer receives notice and a reasonable opportunity to dispute the assessment before a simulated additional charge is finalized. Escalated disputes are reviewed by an administrator and leave an audit trail.
+El cliente recibe notificación y una oportunidad razonable de disputar la valoración antes de finalizar un cargo simulado adicional. Las disputas escaladas son revisadas por un administrador y dejan trazabilidad.
 
-## 10. Cancellation, withdrawal, refunds, and payment reversal
+## 10. Cancelación, retracto, reembolsos y reversión
 
-Contractual cancellation rules must be shown before reservation and cannot remove mandatory consumer rights.
+Las reglas contractuales de cancelación deben mostrarse antes de reservar y no pueden eliminar derechos obligatorios del consumidor.
 
-Where the legal conditions for distance transactions are met, the consumer may exercise the right of withdrawal within the period established by article 47 of Law 1480 of 2011. The applicability of that right depends on matters including whether the service has begun and the statutory exceptions. The production flow must evaluate those conditions instead of promising withdrawal in every case.
+Cuando se cumplan las condiciones legales de las transacciones a distancia, el consumidor puede ejercer el derecho de retracto dentro del término establecido por el artículo 47 de la Ley 1480 de 2011. Su aplicación depende, entre otros factores, de si el servicio comenzó y de las excepciones legales. El flujo de producción debe evaluar esas condiciones en lugar de prometer retracto en todos los casos.
 
-Electronic payment reversal is available only in the cases and through the procedure established by article 51 of Law 1480 of 2011 and Decree 587 of 2016. The production platform must provide the legally required complaint and notification channels. The academic environment only simulates the resulting workflow.
+La reversión de pagos electrónicos solo procede en los casos y mediante el procedimiento del artículo 51 de la Ley 1480 de 2011 y el Decreto 587 de 2016. La plataforma de producción debe proporcionar los canales legalmente exigidos de reclamación y notificación. El ambiente académico solo simula el flujo resultante.
 
-Approved refunds return through the corresponding simulated transaction and remain traceable to the original payment.
+Los reembolsos aprobados se realizan mediante la transacción simulada correspondiente y conservan trazabilidad hacia el pago original.
 
-## 11. Personal data and communications
+## 11. Datos personales y comunicaciones
 
-Personal-data processing must follow the published privacy policy and the authorization provided by each data subject. Users may exercise the rights to know, update, rectify, access, and, where legally applicable, delete their data or revoke authorization.
+El tratamiento de datos debe seguir la política de privacidad publicada y la autorización de cada titular. Los usuarios pueden ejercer sus derechos a conocer, actualizar, rectificar y acceder, y cuando corresponda legalmente, suprimir datos o revocar la autorización.
 
-Acceptance of these terms, authorization to process data, authorization for optional marketing, and selection of the Protection Plan are separate decisions. The platform must not bundle optional marketing consent into a required transaction acceptance.
+La aceptación de estos términos, la autorización de datos, el mercadeo opcional y la selección del Plan de Protección son decisiones separadas. La plataforma no debe agrupar el consentimiento opcional de mercadeo con una aceptación transaccional obligatoria.
 
-The production operator must identify the data controller, purposes, processors, retention rules, security measures, international transfers or transmissions, and channels for consultations and claims before collecting real personal data.
+Antes de recopilar datos reales, el operador de producción debe identificar responsable, finalidades, encargados, retención, medidas de seguridad, transferencias o transmisiones internacionales y canales para consultas y reclamos.
 
-## 12. Acceptable use and safety
+## 12. Uso aceptable y seguridad
 
-Users may not use the platform for fraud, impersonation, unlawful listings, interference with availability, attacks on the service, or unauthorized access. Customers must use tools according to manufacturer instructions, safety requirements, lawful purposes, and supplier restrictions. Suppliers must not publish stolen, unsafe, recalled, or legally restricted equipment.
+Los usuarios no pueden usar la plataforma para fraude, suplantación, publicaciones ilícitas, interferencia con disponibilidad, ataques al servicio o acceso no autorizado. Los clientes deben usar las herramientas según instrucciones del fabricante, requisitos de seguridad, fines lícitos y restricciones del proveedor. Los proveedores no pueden publicar equipos hurtados, inseguros, retirados del mercado o restringidos legalmente.
 
-## 13. Intellectual property and third-party names
+## 13. Propiedad intelectual y nombres de terceros
 
-The platform software, original content, and branding are protected according to their applicable licenses and ownership. Supplier-provided content remains subject to the supplier's rights and the license needed to display it for the service.
+El software, contenido original y marca de la plataforma están protegidos según sus licencias y propiedad aplicables. El contenido suministrado por proveedores permanece sujeto a sus derechos y a la licencia necesaria para mostrarlo en el servicio.
 
-PayPal, Visa, and Mastercard names and marks belong to their respective owners. Their appearance in the academic simulation describes a simulated payment option and does not imply sponsorship, certification, or integration.
+Los nombres y marcas PayPal, Visa y Mastercard pertenecen a sus respectivos titulares. Su aparición en la simulación describe una opción de pago simulada y no implica patrocinio, certificación ni integración.
 
-## 14. Availability and liability
+## 14. Disponibilidad y responsabilidad
 
-The academic project may be unavailable, reset, or modified and is not offered with a production service-level commitment. Nothing in these terms excludes liability or consumer rights that Colombian law does not allow the operator to exclude.
+El proyecto académico puede quedar indisponible, reiniciarse o modificarse y no ofrece un compromiso de nivel de servicio de producción. Nada en estos términos excluye responsabilidades ni derechos del consumidor que la ley colombiana no permita excluir.
 
-A production version must replace this clause with a legally reviewed allocation of responsibility appropriate to the operator, suppliers, customers, and any real payment or logistics provider.
+Una versión de producción debe reemplazar esta cláusula por una distribución de responsabilidades revisada legalmente y adecuada al operador, proveedores, clientes y cualquier proveedor real de pagos o logística.
 
-## 15. Complaints, disputes, and authority link
+## 15. Reclamos, disputas y enlace a la autoridad
 
-Questions, complaints, withdrawal requests, cancellation requests, data-protection requests, and damage disputes must be accepted through the customer-service channels identified at the beginning of this document. The production version must state response procedures and legally applicable deadlines.
+Preguntas, reclamos, solicitudes de retracto o cancelación, peticiones de datos y disputas de daños deben recibirse mediante los canales de atención identificados al inicio. La versión de producción debe indicar procedimientos de respuesta y términos legales aplicables.
 
-Consumers may visit the [Superintendence of Industry and Commerce](https://www.sic.gov.co/), Colombia's consumer-protection authority. The ecommerce interface must expose this as a visible, easily identifiable link.
+Los consumidores pueden visitar la [Superintendencia de Industria y Comercio](https://www.sic.gov.co/), autoridad colombiana de protección al consumidor. La interfaz de comercio electrónico debe exponer este enlace de forma visible y fácilmente identificable.
 
-## 16. Changes and version history
+## 16. Cambios e historial de versiones
 
-Material changes create a new document version. The platform preserves previous versions and their acceptance records. A change does not retroactively modify the price, protection conditions, or other transaction terms already accepted for a reservation.
+Los cambios materiales crean una nueva versión. La plataforma conserva versiones anteriores y sus registros de aceptación. Un cambio no modifica retroactivamente precio, protección ni otras condiciones ya aceptadas para una reserva.
 
-| Version | Status | Summary |
+| Versión | Estado | Resumen |
 | --- | --- | --- |
-| `0.1-draft` | Academic draft | Initial scope for reservations, simulated payments, VAT, optional damage protection, damage handling, data protection, and consumer channels. |
+| `0.1-draft` | Borrador académico | Alcance inicial de reservas, pagos simulados, IVA, protección opcional, daños, datos personales y canales del consumidor. |
 
-## Official references
+## Referencias oficiales
 
-- [Law 1480 of 2011](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306)
-- [Decree 587 of 2016](https://www1.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=69037)
-- [Law 1581 of 2012](https://sedeelectronica.sic.gov.co/transparencia/normativa/ley-estatutaria-1581-de-2012)
-- [Law 527 of 1999](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4276)
-- [Decree 1625 of 2016](https://normograma.dian.gov.co/dian/compilacion/docs/pdf/decreto_1625_2016.pdf)
-- [Authorized insurers and insurance intermediaries](https://www.superfinanciera.gov.co/publicaciones/15491/industrias-supervisadasindustria-aseguradorainformacion-general-aseguradoras-e-intermediarios-de-seguros-15491/)
+- [Ley 1480 de 2011](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=44306)
+- [Decreto 587 de 2016](https://www1.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=69037)
+- [Ley 1581 de 2012](https://sedeelectronica.sic.gov.co/transparencia/normativa/ley-estatutaria-1581-de-2012)
+- [Ley 527 de 1999](https://www.funcionpublica.gov.co/eva/gestornormativo/norma.php?i=4276)
+- [Decreto 1625 de 2016](https://normograma.dian.gov.co/dian/compilacion/docs/pdf/decreto_1625_2016.pdf)
+- [Aseguradoras e intermediarios autorizados](https://www.superfinanciera.gov.co/publicaciones/15491/industrias-supervisadasindustria-aseguradorainformacion-general-aseguradoras-e-intermediarios-de-seguros-15491/)
 
-## Frontend publication contract
+## Contrato de publicación frontend
 
-This section guides implementation and is not part of the customer-facing legal copy.
+Esta sección orienta la implementación y no forma parte del texto legal visible para el cliente.
 
-- Public route: `/terms-and-conditions`.
-- Required links: global footer, registration, checkout, reservation confirmation, and Protection Plan selection.
-- Required metadata: version, publication date, effective date, operator, and contact channels.
-- Required acceptance record: document version, user, timestamp, purpose, related reservation when applicable, and an integrity reference to the published content.
-- Accessibility: semantic headings, keyboard access, readable contrast, responsive layout, and a printable presentation.
-- Localization: the initial customer-facing locale is `es-CO`; this English repository source must receive an approved Spanish legal translation before a real Colombian launch.
+- Ruta pública: `/terms-and-conditions`.
+- Enlaces obligatorios: pie global, registro, checkout, confirmación de reserva y selección del Plan de Protección.
+- Metadatos obligatorios: versión, publicación, vigencia, operador y canales de contacto.
+- Registro de aceptación: versión, usuario, fecha, finalidad, reserva relacionada cuando aplique y referencia de integridad del contenido.
+- Accesibilidad: encabezados semánticos, teclado, contraste legible, diseño adaptable y presentación imprimible.
+- Localización: el idioma inicial visible para clientes es `es-CO`; cualquier versión en otro idioma debe corresponder a una traducción legal aprobada.
