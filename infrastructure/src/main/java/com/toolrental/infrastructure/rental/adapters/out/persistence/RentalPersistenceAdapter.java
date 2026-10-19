@@ -7,6 +7,7 @@ import com.toolrental.infrastructure.rental.adapters.out.persistence.mapper.Rent
 import com.toolrental.infrastructure.rental.adapters.out.persistence.repository.RentalJpaRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,10 @@ public class RentalPersistenceAdapter implements RentalRepository {
 
   public List<Rental> findAll() {
     return rows.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  public List<Rental> findByParticipant(UUID participantId) {
+    return rows.findByParticipantId(participantId).stream().map(mapper::toDomain).toList();
   }
 
   public Rental save(Rental value) {

@@ -7,6 +7,7 @@ import com.toolrental.infrastructure.invoice.adapters.out.persistence.mapper.Inv
 import com.toolrental.infrastructure.invoice.adapters.out.persistence.repository.InvoiceJpaRepository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,10 @@ public class InvoicePersistenceAdapter implements InvoiceRepository {
 
   public List<Invoice> findAll() {
     return rows.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  public List<Invoice> findByParticipant(UUID participantId) {
+    return rows.findByParticipantId(participantId).stream().map(mapper::toDomain).toList();
   }
 
   public Invoice save(Invoice value) {

@@ -71,8 +71,12 @@ public final class ManageInvoiceUseCase {
   public List<InvoiceResponse> list(UUID actor) {
     return work.execute(
         () -> {
-          access.requireAdministrator(actor);
-          return repository.findAll().stream().map(InvoiceResponse::from).toList();
+          access.requireActive(actor);
+          var values =
+              access.isAdministrator(actor)
+                  ? repository.findAll()
+                  : repository.findByParticipant(actor);
+          return values.stream().map(InvoiceResponse::from).toList();
         });
   }
 
