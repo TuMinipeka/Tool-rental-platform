@@ -33,12 +33,24 @@ services:
       DB_MAX_POOL_SIZE: ${DB_MAX_POOL_SIZE:-10}
       DB_MIN_IDLE: ${DB_MIN_IDLE:-2}
       DB_CONNECTION_TIMEOUT_MS: ${DB_CONNECTION_TIMEOUT_MS:-30000}
+      PASSWORD_RECOVERY_DELIVERY: smtp
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
     depends_on:
       postgres:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     restart: "no"
+
+  mailpit:
+    image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.27}
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+    restart: unless-stopped
 
   frontend:
     build:

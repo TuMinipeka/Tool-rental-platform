@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/user-roles")
+@RequestMapping({"/api/v1/user-roles", "/api/user-roles"})
 public class UserRoleController {
   private final ManageUserRoleUseCase useCase;
 

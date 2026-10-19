@@ -11,6 +11,7 @@ import com.toolrental.domain.user.model.aggregate.User;
 import com.toolrental.domain.user.model.valueobject.UserId;
 import com.toolrental.domain.user.port.PasswordHasher;
 import com.toolrental.domain.user.port.repository.UserRepository;
+import com.toolrental.domain.usersession.port.repository.UserSessionRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -23,6 +24,7 @@ public final class ManageUserUseCase {
   private final WorkflowReferences references;
   private final Clock clock;
   private final PasswordHasher hasher;
+  private final UserSessionRepository sessions;
 
   public ManageUserUseCase(
       UserRepository repository,
@@ -30,13 +32,15 @@ public final class ManageUserUseCase {
       AccessPolicy access,
       WorkflowReferences references,
       Clock clock,
-      PasswordHasher hasher) {
+      PasswordHasher hasher,
+      UserSessionRepository sessions) {
     this.repository = repository;
     this.work = work;
     this.access = access;
     this.references = references;
     this.clock = clock;
     this.hasher = hasher;
+    this.sessions = sessions;
   }
 
   private User load(UserId id) {
@@ -86,7 +90,9 @@ public final class ManageUserUseCase {
         () -> {
           var value = load(id);
           access.requireAdministrator(actor);
-          return UserResponse.from(repository.save(value.transition(next, clock)));
+          var changed = repository.save(value.transition(next, clock));
+          if (!"ACTIVE".equals(next)) sessions.revokeAllForUser(changed.id(), Instant.now(clock));
+          return UserResponse.from(changed);
         });
   }
 }

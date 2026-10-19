@@ -8,11 +8,14 @@ import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
 import com.toolrental.domain.role.port.repository.RoleRepository;
+import com.toolrental.domain.user.model.valueobject.UserId;
 import com.toolrental.domain.user.port.repository.UserRepository;
 import com.toolrental.domain.userrole.model.aggregate.UserRole;
 import com.toolrental.domain.userrole.model.valueobject.UserRoleId;
 import com.toolrental.domain.userrole.port.repository.UserRoleRepository;
+import com.toolrental.domain.usersession.port.repository.UserSessionRepository;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,6 +27,7 @@ public final class ManageUserRoleUseCase {
   private final Clock clock;
   private final UserRepository users;
   private final RoleRepository roles;
+  private final UserSessionRepository sessions;
 
   public ManageUserRoleUseCase(
       UserRoleRepository repository,
@@ -32,7 +36,8 @@ public final class ManageUserRoleUseCase {
       WorkflowReferences references,
       Clock clock,
       UserRepository users,
-      RoleRepository roles) {
+      RoleRepository roles,
+      UserSessionRepository sessions) {
     this.repository = repository;
     this.work = work;
     this.access = access;
@@ -40,6 +45,7 @@ public final class ManageUserRoleUseCase {
     this.clock = clock;
     this.users = users;
     this.roles = roles;
+    this.sessions = sessions;
   }
 
   private UserRole load(UserRoleId id) {
@@ -74,6 +80,7 @@ public final class ManageUserRoleUseCase {
             throw new BusinessRuleException("UserRole already exists");
           var value = UserRole.register(id, clock);
           var saved = repository.save(value);
+          sessions.revokeAllForUser(command.id().userId(), Instant.now(clock));
           return UserRoleResponse.from(saved);
         });
   }
@@ -84,6 +91,7 @@ public final class ManageUserRoleUseCase {
           var value = load(id);
           access.requireAdministrator(actor);
           repository.delete(id);
+          sessions.revokeAllForUser(new UserId(id.userId().value()), Instant.now(clock));
           return null;
         });
   }
