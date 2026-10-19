@@ -2,6 +2,8 @@ package com.toolrental.infrastructure.common.web;
 
 import com.toolrental.application.common.exception.AccessDeniedApplicationException;
 import com.toolrental.application.common.exception.ApplicationException;
+import com.toolrental.application.user.exception.AuthenticationFailedApplicationException;
+import com.toolrental.application.user.exception.InvalidPasswordResetApplicationException;
 import com.toolrental.domain.common.exception.DomainException;
 import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,6 +15,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+  @ExceptionHandler(AuthenticationFailedApplicationException.class)
+  ResponseEntity<Map<String, String>> unauthorized(AuthenticationFailedApplicationException ex) {
+    return error(401, ex.getMessage());
+  }
+
+  @ExceptionHandler(InvalidPasswordResetApplicationException.class)
+  ResponseEntity<Map<String, String>> invalidReset(InvalidPasswordResetApplicationException ex) {
+    return error(400, ex.getMessage());
+  }
+
   @ExceptionHandler(AccessDeniedApplicationException.class)
   ResponseEntity<Map<String, String>> forbidden(AccessDeniedApplicationException ex) {
     return error(403, "Access denied");

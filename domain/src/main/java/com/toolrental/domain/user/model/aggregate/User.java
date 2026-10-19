@@ -104,4 +104,10 @@ public final class User extends AggregateRoot {
     result.recordEvent(new UserChanged(id, Instant.now(clock)));
     return result;
   }
+
+  public User changePassword(String newPasswordHash, Clock clock) {
+    var result = new User(id, email, displayName, newPasswordHash, accountStatus, registeredAt);
+    result.recordEvent(new UserChanged(id, Instant.now(clock)));
+    return result;
+  }
 }

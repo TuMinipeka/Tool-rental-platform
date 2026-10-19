@@ -25,6 +25,10 @@ public class UserPersistenceAdapter implements UserRepository {
     return rows.findLocked(mapper.key(id)).map(mapper::toDomain);
   }
 
+  public Optional<User> findByEmail(String email) {
+    return rows.findByEmailIgnoreCase(email).map(mapper::toDomain);
+  }
+
   public List<User> findAll() {
     return rows.findAll().stream().map(mapper::toDomain).toList();
   }

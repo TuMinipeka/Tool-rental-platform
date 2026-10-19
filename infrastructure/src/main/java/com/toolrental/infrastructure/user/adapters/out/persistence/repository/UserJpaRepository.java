@@ -13,6 +13,9 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserJpaRepository extends JpaRepository<UserJpaEntity, UUID> {
 
+  @Query("select account from UserJpaEntity account where lower(account.email) = lower(:email)")
+  Optional<UserJpaEntity> findByEmailIgnoreCase(@Param("email") String email);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select account from UserJpaEntity account where account.id in :ids order by account.id")
   List<UserJpaEntity> findAllByIdForUpdate(@Param("ids") Collection<UUID> ids);
