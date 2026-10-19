@@ -76,6 +76,7 @@ public class ReservationJpaEntity {
   @Column(name = "delivery_region", length = 120)
   private String deliveryRegion;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "delivery_country_code", length = 2)
   private String deliveryCountryCode;
 

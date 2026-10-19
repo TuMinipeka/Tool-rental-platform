@@ -17,6 +17,7 @@ public class PasswordResetTokenJpaEntity {
   @Column(name = "user_id", nullable = false, updatable = false)
   private UUID userId;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "token_hash", nullable = false, length = 64, updatable = false)
   private String tokenHash;
 

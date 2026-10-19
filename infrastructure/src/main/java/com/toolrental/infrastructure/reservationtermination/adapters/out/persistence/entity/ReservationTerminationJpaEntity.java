@@ -48,6 +48,7 @@ public class ReservationTerminationJpaEntity {
   @Column(name = "outstanding_amount", nullable = false, precision = 19, scale = 4)
   private BigDecimal outstanding;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "currency", nullable = false, length = 3)
   private String currency;
 

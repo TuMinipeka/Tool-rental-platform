@@ -27,6 +27,7 @@ public class UnitReturnJpaEntity {
   @Column(name = "late_fee", nullable = false, precision = 19, scale = 4)
   private BigDecimal lateFee;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "late_fee_currency", nullable = false, length = 3)
   private String lateFeeCurrency;
 

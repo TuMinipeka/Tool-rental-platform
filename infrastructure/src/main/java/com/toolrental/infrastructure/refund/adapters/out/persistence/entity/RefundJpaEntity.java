@@ -24,6 +24,7 @@ public class RefundJpaEntity {
   @Column(name = "amount", nullable = false, precision = 19, scale = 4)
   private BigDecimal amount;
 
+  @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.CHAR)
   @Column(name = "currency", nullable = false, length = 3)
   private String currency;
 
