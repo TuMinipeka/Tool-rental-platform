@@ -21,6 +21,7 @@ import com.toolrental.domain.user.port.SecureTokenService;
 import jakarta.persistence.EntityManagerFactory;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,11 +132,12 @@ class PostgresIntegrationTest {
   }
 
   ReservationId pending() {
+    var start = LocalDate.now(ZoneId.of("America/Bogota")).plusDays(1);
     return request
         .execute(
             new RequestReservationCommand(
                 new CustomerId(customer),
-                new ReservationPeriod(LocalDate.of(2026, 10, 20), LocalDate.of(2026, 10, 21)),
+                new ReservationPeriod(start, start.plusDays(1)),
                 List.of(new EquipmentUnitId(unit))))
         .id();
   }
@@ -621,12 +623,17 @@ class PostgresIntegrationTest {
   void inclusiveBoundaryConflictAndSupplierInventoryUniquenessAreEnforced() throws Exception {
     var first = pending();
     confirm.execute(first, new SupplierId(supplier));
+    var inclusiveReturn =
+        db.queryForObject(
+            "select return_date from reservations where reservation_id=?",
+            LocalDate.class,
+            first.value());
     var boundary =
         request
             .execute(
                 new RequestReservationCommand(
                     new CustomerId(customer),
-                    new ReservationPeriod(LocalDate.of(2026, 10, 21), LocalDate.of(2026, 10, 21)),
+                    new ReservationPeriod(inclusiveReturn, inclusiveReturn),
                     List.of(new EquipmentUnitId(unit))))
             .id();
     assertThatThrownBy(() -> confirm.execute(boundary, new SupplierId(supplier)))
