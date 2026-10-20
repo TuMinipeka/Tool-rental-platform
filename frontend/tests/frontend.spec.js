@@ -5,15 +5,16 @@ import { catalog, mockApi } from './fixtures.js'
 test.beforeEach(async ({ page }) => { await mockApi(page) })
 
 async function login(page) {
-  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
-  const dialog = page.getByRole('dialog')
-  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
-  await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
-  await dialog.getByRole('button', { name: 'Ingresar', exact: true }).click()
-  await expect(dialog).toHaveCount(0)
+  const returnTo = new URL(page.url()).pathname
+  await page.goto('/login?returnTo=' + encodeURIComponent(returnTo))
+  await page.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
+  await page.getByLabel(/^Contraseña/).fill('qa-password-123456')
+  await page.locator('form').getByRole('button', { name: 'Ingresar', exact: true }).click()
+  await expect(page).toHaveURL(new RegExp(returnTo + '$'))
+  await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 }
 
-for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/no-existe']) {
+for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/no-existe']) {
   test(`renders ${path} without runtime errors or horizontal overflow`, async ({ page }) => {
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
@@ -35,7 +36,26 @@ test('search keeps municipality and filters the catalog', async ({ page }) => {
   await expect(page.getByRole('main')).toHaveCount(1)
   await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeVisible()
   await page.getByRole('button', { name: 'Limpiar filtros' }).click()
-  await expect(page.locator('.tool-card')).toHaveCount(catalog.length)
+  await expect(page.locator('.tool-card')).toHaveCount(10)
+})
+
+test('catalog pagination, municipality, and price filters retain their contracts', async ({ page }, testInfo) => {
+  await page.goto('/catalogo')
+  const firstName = await page.locator('.tool-title-link').first().textContent()
+  const pagination = page.getByRole('navigation', { name: 'Paginación' })
+  await pagination.getByRole('button', { name: '→', exact: true }).click()
+  await expect(page.locator('.tool-title-link').first()).not.toHaveText(firstName)
+  await expect(page.locator('.tool-card')).toHaveCount(10)
+  if (testInfo.project.name === 'desktop') {
+    await page.getByRole('combobox', { name: 'Ubicación', exact: true }).selectOption('Girón')
+    await expect(page).toHaveURL(/municipio=Gir/)
+    const price = page.getByRole('slider', { name: 'Precio diario máximo' })
+    await price.focus()
+    await price.press('Home')
+    await expect(page.locator('.tool-card')).toHaveCount(0)
+    await page.getByRole('button', { name: 'Limpiar filtros' }).click()
+    await expect(page.locator('.tool-card')).toHaveCount(10)
+  }
 })
 
 test('mobile menu remains keyboard accessible and closes after navigation', async ({ page }, testInfo) => {
@@ -58,32 +78,25 @@ test('featured carousel retains next and previous pages', async ({ page }) => {
   await expect(page.locator('.featured-tool-card h3').first()).toHaveText(first)
 })
 
-test('dialog traps focus, supports Escape, and returns focus to its trigger', async ({ page }) => {
+test('authentication uses the shared login and registration routes', async ({ page }) => {
   await page.goto('/')
-  const trigger = page.getByRole('button', { name: 'Ingresar', exact: true })
-  await trigger.click()
-  const dialog = page.getByRole('dialog')
-  await expect(dialog).toHaveAttribute('aria-labelledby', 'auth-title')
-  const first = dialog.getByRole('button', { name: 'Cerrar acceso' })
-  await first.focus()
-  await page.keyboard.press('Shift+Tab')
-  await expect(dialog.getByRole('button', { name: 'Regístrate' })).toBeFocused()
-  await page.keyboard.press('Tab')
-  await expect(first).toBeFocused()
-  await page.keyboard.press('Escape')
-  await expect(dialog).toHaveCount(0)
-  await expect(trigger).toBeFocused()
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  await expect(page).toHaveURL(/\/login$/)
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Crear cuenta', exact: true }).click()
+  await expect(page).toHaveURL(/\/registro\?returnTo=/)
+  await expect(page.getByRole('heading', { name: 'Crea tu cuenta' })).toBeVisible()
 })
 
 test('login and password recovery keep their working contracts', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
-  const dialog = page.getByRole('dialog')
+  const dialog = page.getByRole('main')
   await dialog.getByRole('button', { name: '¿Olvidaste tu contraseña?' }).click()
   await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
   await dialog.getByRole('button', { name: 'Solicitar recuperación' }).click()
-  await expect(dialog.getByText('Solicitud aceptada')).toBeVisible()
-  await dialog.getByRole('button', { name: 'Volver al ingreso' }).click()
+  await expect(dialog.getByText('Solicitud recibida')).toBeVisible()
+  await dialog.getByRole('button', { name: /Volver al ingreso/ }).click()
   await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
   await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
   await dialog.getByRole('button', { name: 'Ingresar', exact: true }).click()
@@ -108,21 +121,23 @@ test('reservation dates stay inclusive and checkout keeps logistics', async ({ p
 test('catalog failures retain the explicitly identified demo experience', async ({ page }) => {
   await mockApi(page, { unavailable: true })
   await page.goto('/catalogo')
-  await expect(page.locator('.data-notice')).toContainText(/demostrativ|muestra/i)
+  await expect(page.locator('.catalog-demo-label')).toContainText(/demostrativ|muestra/i)
   await expect(page.locator('.tool-card').first()).toBeVisible()
 })
 
 test('registration still sends customer profile fields', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
-  const dialog = page.getByRole('dialog')
-  await dialog.getByRole('button', { name: 'Regístrate' }).click()
+  const dialog = page.getByRole('main')
+  await dialog.getByRole('button', { name: 'Crear cuenta', exact: true }).click()
   await page.waitForTimeout(900)
   expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()).violations).toEqual([])
   await dialog.getByLabel('Nombre completo').fill('QA Customer')
-  await dialog.getByLabel('Número', { exact: true }).fill('12345678')
+  await dialog.getByLabel('Número de documento', { exact: true }).fill('12345678')
   await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
   await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
+  await dialog.getByLabel(/^Confirmar contraseña/).fill('qa-password-123456')
+  await dialog.getByRole('checkbox').check()
   const submission = page.waitForRequest(request => request.url().endsWith('/auth/register'))
   await dialog.getByRole('button', { name: 'Crear cuenta' }).click()
   expect((await submission).postDataJSON()).toMatchObject({ personType: 'NATURAL_PERSON', documentType: 'CC', documentNumber: '12345678', displayName: 'QA Customer' })
@@ -171,7 +186,7 @@ test('public pages and authentication pass automated accessibility checks', asyn
   }
   await page.goto('/')
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
-  await expect(page.getByRole('dialog')).toBeVisible()
+  await expect(page).toHaveURL(/\/login$/)
   await page.waitForTimeout(900)
   const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()
   expect(audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) }))).toEqual([])
@@ -258,7 +273,7 @@ test('card motion preserves mouse feedback, touch scrolling, and keyboard naviga
     await page.mouse.move(2, 2)
     await expect.poll(() => card.evaluate(node => node.style.transform)).toBe('')
   }
-  await card.focus()
+  await card.locator('.tool-title-link').focus()
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/herramienta\//)
 })

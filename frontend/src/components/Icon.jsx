@@ -1,4 +1,5 @@
 const paths = {
+    eye:<><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"/><circle cx="12" cy="12" r="2.5"/></>,
     arrow:<><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></>, search:<><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
     user:<><circle cx="12" cy="8" r="4"/><path d="M4 21c.6-4 3.3-6 8-6s7.4 2 8 6"/></>, calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></>,
     pin:<><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/></>, heart:<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.7-7.5a5.5 5.5 0 0 0 1.1-8.9Z"/>,

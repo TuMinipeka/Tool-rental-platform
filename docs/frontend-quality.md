@@ -2,6 +2,8 @@
 
 ## Alcance y evidencia
 
+Los resultados comparativos de este documento corresponden a la optimización guardada en `e8115ca`, anterior a la integración del rediseño de `developer/conde` (`0d5d720`). No describen el rendimiento del rediseño integrado. Sus nuevas rutas de acceso, paginación, estilos e imágenes requieren una nueva medición antes de afirmar mejoras sobre esa versión.
+
 Auditoría realizada el 20 de octubre de 2026 sobre el build de producción. Los valores individuales, medianas, rangos, versiones y condiciones están en [los resultados verificables](quality/frontend-audit-results.json). Los informes Lighthouse HTML/JSON, capturas y trazas de pruebas se conservan localmente en `frontend/test-results/` y `frontend/playwright-report/`; no forman parte del bundle ni del contexto Docker.
 
 Se comparan tres navegaciones con caché fría para cada escenario: inicio móvil, inicio de escritorio y catálogo móvil. Ambos estados utilizan Nginx, el mismo equipo, Chrome y configuración Lighthouse. El servidor de auditoría ocupa `localhost:4173` y reenvía `/api/` al backend local de `8080`. La API devolvió un catálogo vacío durante estas mediciones: se midió la muestra demostrativa que la aplicación ya ofrece en ese estado.

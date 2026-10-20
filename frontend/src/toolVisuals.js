@@ -28,6 +28,12 @@ const featuredOrder = [
   /generador/,
 ]
 
+const catalogVisuals = new Map(
+  Array.from({ length: 30 }, (_, index) => index + 1)
+    .filter(number => number !== 29)
+    .map(number => [number, `/assets/tools/catalog/${String(number).padStart(2, '0')}.${number === 17 || number === 30 ? 'webp' : 'png'}`]),
+)
+
 function normalizeName(value = '') {
   return value
     .normalize('NFD')
@@ -37,7 +43,15 @@ function normalizeName(value = '') {
 
 export function resolveToolVisual(tool) {
   const name = normalizeName(tool?.name)
-  return equipmentVisuals.find(({ pattern }) => pattern.test(name))?.src ?? null
+  const demoNumber = Number(String(tool?.id ?? '').slice(-3))
+  return catalogVisuals.get(demoNumber) ?? equipmentVisuals.find(({ pattern }) => pattern.test(name))?.src ?? null
+}
+
+export function resolveToolVisualClass(tool) {
+  const demoNumber = Number(String(tool?.id ?? '').slice(-3))
+  return Number.isInteger(demoNumber) && demoNumber > 0
+    ? `tool-visual-${String(demoNumber).padStart(2, '0')}`
+    : ''
 }
 
 export function prioritizeFeaturedTools(tools) {

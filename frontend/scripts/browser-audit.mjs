@@ -18,7 +18,7 @@ try {
     await mockApi(page)
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
-    const paths = ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/no-existe']
+    const paths = ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/no-existe']
     for (const path of paths) {
       await page.goto(`${baseURL}${path}`)
       await page.locator('h1').first().waitFor()
@@ -52,10 +52,11 @@ try {
     }
     await page.goto(baseURL)
     await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
-    await page.getByRole('dialog').waitFor()
+    await page.waitForURL('**/login')
+    await page.getByRole('heading', { name: 'Bienvenido de nuevo' }).waitFor()
     await page.waitForTimeout(900)
     const modalAxe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()
-    report.routes.push({ path: '/#login-dialog', profile,
+    report.routes.push({ path: '/login', profile,
       violations: modalAxe.violations.map(v => ({ id: v.id, impact: v.impact,
         nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) })),
     })

@@ -2,6 +2,12 @@
 
 ## Alcance revisado
 
+### Integración del 20 de octubre de 2026
+
+Se integró `developer/conde` hasta `0d5d720` en `developer/daniel`. Se conservan el catálogo con filtros de precio y paginación, las rutas `/login` y `/registro`, las nuevas vistas informativas y de proveedor, el diseño de pago y las imágenes de referencia. Los componentes trasladados permanecen en `src/pages/` y `src/components/`, con carga diferida y recuperación ante fallos de descarga. Las pruebas de navegador se adaptaron a estas rutas y a páginas de diez herramientas.
+
+Los hallazgos que siguen documentan la revisión original; no constituyen una lista actualizada de pendientes. Las mediciones de rendimiento anteriores al merge se identifican por separado en [la guía de calidad](frontend-quality.md).
+
 La auditoría contrasta el frontend React, el contrato REST, la seguridad de sesión, los cinco archivos gráficos de referencia y el prompt definitivo. El logo, el símbolo de marca y el favicon quedan congelados: el rediseño puede cambiar su posición o tamaño adaptable, pero no su geometría, composición ni colores internos.
 
 ## Estado verificable de rutas
@@ -84,3 +90,33 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - Vite sirvió inicio, catálogo, detalle, sobre nosotros, cómo funciona, cuenta, publicar, panel de proveedor, términos y ruta desconocida con respuesta HTTP 200 del fallback SPA.
 - Revisión headless en Edge a 1600 × 1000 y 390 × 844; se corrigieron el ancho del buscador y el desbordamiento del hero móvil detectados en la primera pasada.
 - `mvnw.cmd clean verify`: correcto; 74 pruebas superadas (`25 domain`, `16 application`, `33 infrastructure`), incluidas arquitectura, migraciones Flyway, persistencia, concurrencia y PostgreSQL real con Testcontainers.
+
+### Catálogo y Cómo funciona — referencias adicionales
+
+- `/catalogo` reproduce la composición de la referencia adicional: hero técnico oscuro, buscador flotante, filtros laterales, cuadrícula de cuatro columnas en escritorio y paginación funcional.
+- La cuadrícula de escritorio se amplió a cuatro columnas para priorizar la lectura del nombre, precio y fotografía de cada herramienta. El hero reserva una zona independiente para texto e imagen y mantiene el buscador fuera del contenido editorial, sin superposiciones.
+- Las 29 imágenes entregadas en `infrastructure/src/main/resources/images` se exponen como recursos estáticos del frontend; el registro 29 conserva el recurso visual existente porque el archivo `29` no está presente en la carpeta de origen.
+- Las fotografías del catálogo usan encuadre contenido y espacio interior estable para mostrar herramientas completas sin recortes por zoom. El catálogo demostrativo permanece etiquetado y no añade reseñas, verificaciones ni disponibilidad ficticias.
+- `/como-funciona` reproduce la estructura editorial de la referencia adicional con hero dividido, cuatro pasos, beneficios verificables, perfiles de uso y CTA final. El texto sigue el flujo realmente implementado y declara el pago académico.
+- La revisión visual se realizó a `1680 × 945` y `390 × 844`. Ambas rutas mantienen `scrollWidth` igual a `clientWidth` en móvil, sin desplazamiento horizontal.
+- Durante esta revisión no se ejecutaron pruebas automatizadas ni compilación. La consola mostró únicamente las respuestas `404` esperadas de `/api/v1/auth/csrf` y `/api/v1/public/catalog` porque el backend local no estaba levantado; el fallback demostrativo funcionó.
+
+### Acceso y registro
+
+- Se incorporaron las rutas públicas `/login` y `/registro`, integradas con `POST /api/v1/auth/login` y `POST /api/v1/auth/register` respectivamente.
+- El acceso conserva la recuperación real de contraseña, permite mostrar u ocultar la clave y comunica errores de conexión sin fabricar una sesión.
+- El registro público crea exclusivamente cuentas de cliente conforme al contrato actual. Solicita nombre, correo, contraseña de 12 caracteres, confirmación, tipo y número de documento, además de aceptación explícita de los Términos y Condiciones.
+- La opción de proveedor conduce al proceso autorizado de `/publicar`; no muestra ni envía teléfono, nacimiento, datos bancarios, archivos o información empresarial que el endpoint público todavía no admite.
+- Ambas rutas usan la referencia como dirección visual, conservan la identidad existente y se reorganizan en una sola columna en móvil sin desplazamiento horizontal.
+- Los accesos protegidos, incluida la continuación de una cotización, redirigen a estas rutas públicas mediante `returnTo`. El cambio entre login y registro conserva el destino y ya no expone el modal de autenticación heredado.
+- Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La comprobación manual cubrió navegación, visibilidad de contraseña, rechazo local de contraseñas distintas y propagación del error real cuando el backend no está levantado.
+
+### Método de pago académico
+
+- `/pago` adopta la composición de la referencia: hero técnico, progreso del proceso, selector de método, captura mínima y resumen de la reserva.
+- La pantalla ofrece únicamente los métodos admitidos por el contrato vigente: tarjeta de crédito, tarjeta débito y PayPal, todos identificados como simulación académica.
+- Para tarjetas solo solicita red, últimos cuatro dígitos y vencimiento. No solicita ni conserva número completo, CVV o credenciales externas; PayPal tampoco presenta un inicio de sesión ficticio.
+- El resumen usa la herramienta, fechas, duración y subtotal de la cotización activa. Registra la primera mitad del valor base y mantiene entrega e impuestos como pendientes de cálculo.
+- La acción permanece deshabilitada hasta completar los campos aplicables y aceptar expresamente el carácter simulado de la operación. El envío continúa integrado con `POST /api/v1/payments/simulations` cuando existe una reserva persistida.
+- Sin una cotización activa se muestra un estado vacío que conduce al catálogo, en vez de fabricar una reserva. PSE, cupones, reseñas y garantías no acreditadas de la imagen de referencia se excluyeron por no existir en el contrato actual.
+- Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La revisión manual cubrió tarjeta, PayPal, habilitación de la acción y vistas de `1680 × 945` y `390 × 844`, sin desplazamiento horizontal.
