@@ -196,7 +196,13 @@ async page => {
       check('Supplier report ' + kind + ' loads real data', response.ok() && Array.isArray(await response.json()))
       await reports.getByRole('table').waitFor()
     }
-    await capture(supplier.page.getByRole('region', { name: 'Reportes operativos' }), 'qa-supplier-report.png')
+    const incomeReport = supplier.page.getByRole('region', { name: 'Reportes operativos' })
+    await incomeReport.locator('[name=kind]').selectOption('income')
+    const incomeResponse = supplier.page.waitForResponse(response => response.url().includes('/reports/income?'))
+    await incomeReport.getByRole('button', { name: 'Consultar reporte' }).click()
+    await incomeResponse
+    await incomeReport.locator('caption').filter({ hasText: /^Ingresos:/ }).waitFor()
+    await capture(incomeReport, 'qa-supplier-report.png')
     await page.waitForTimeout(61000) // Respect the shared authentication window before the next role group.
     const next = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10)
     const nextInput = { ...input, startDate: next, returnDate: next, scheduledFulfillmentAt: next + 'T14:00:00Z' }
@@ -316,7 +322,10 @@ async page => {
     await registration.getByRole('button', { name: 'Abrir mi cuenta' }).waitFor()
     check('Refresh cookie restores customer session after reload', Boolean(buyer.token))
     check('Access token is not stored in web storage', !(await registration.evaluate(() => JSON.stringify({ ...localStorage, ...sessionStorage }))).includes(buyer.token))
+    const loggedOut = registration.waitForResponse(response => response.url().endsWith('/auth/logout')).catch(() => null)
     await registration.getByRole('button', { name: 'Cerrar sesión' }).click()
+    const logoutResponse = await loggedOut
+    check('Logout is accepted by server with current CSRF token', logoutResponse?.status() === 204)
     await registration.getByRole('button', { name: 'Ingresar', exact: true }).first().waitFor()
     check('Logout revokes previous access token', (await request(buyer, '/reservations')).status === 401)
     check('No uncaught application JavaScript errors during role workflows', runtimeErrors.length === 0)

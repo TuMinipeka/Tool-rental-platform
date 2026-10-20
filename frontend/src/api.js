@@ -3,7 +3,6 @@ const apiPrefix = '/api/v1'
 const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 let activeSession = null
-let csrfToken = null
 let refreshPromise = null
 
 export class ApiError extends Error {
@@ -57,17 +56,14 @@ async function fetchApi(path, options = {}) {
 }
 
 async function getCsrfToken() {
-  if (csrfToken) return csrfToken
-
   const response = await fetchApi(`${apiPrefix}/auth/csrf`)
   const payload = await parseResponse(response)
   if (!response.ok) throw toApiError(response, payload)
 
-  csrfToken = {
+  return {
     headerName: payload.headerName,
     token: payload.token,
   }
-  return csrfToken
 }
 
 async function refreshSession() {

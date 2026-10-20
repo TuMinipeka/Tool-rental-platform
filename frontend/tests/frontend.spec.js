@@ -392,3 +392,34 @@ test('supplier tool and equipment forms reset only after successful persistence'
   await expect(form.locator('[name=inventoryCode]')).toHaveValue('')
   await expect(page.locator('main [role=alert]')).toHaveCount(0)
 })
+
+
+for (const reload of [false, true]) {
+  test('logout fetches a current CSRF token and revokes the server session' + (reload ? ' after refresh' : ' after login'), async ({ page }) => {
+    let authenticated = false
+    let csrf = 'before-login'
+    const headers = []
+    const session = { accessToken: 'qa-access-token', userId: 'qa-customer', email: 'qa@example.test', displayName: 'QA Customer', roles: ['CUSTOMER'] }
+    await page.route('**/api/v1/auth/csrf', route => route.fulfill({ json: { headerName: 'X-XSRF-TOKEN', token: csrf } }))
+    await page.route('**/api/v1/auth/login', route => { authenticated = true; csrf = 'after-login'; return route.fulfill({ json: session }) })
+    await page.route('**/api/v1/auth/refresh', route => {
+      if (!authenticated) return route.fulfill({ status: 401, json: { code: 'SESSION_REQUIRED' } })
+      csrf = 'after-refresh'
+      return route.fulfill({ json: session })
+    })
+    await page.route('**/api/v1/auth/logout', route => {
+      headers.push(route.request().headers()['x-xsrf-token'])
+      const valid = headers.at(-1) === csrf
+      if (valid) authenticated = false
+      return route.fulfill({ status: valid ? 204 : 403, ...(valid ? {} : { json: { code: 'CSRF_VALIDATION_FAILED' } }) })
+    })
+    await page.goto('/cuenta')
+    await login(page)
+    if (reload) { await page.reload(); await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible() }
+    await page.getByRole('button', { name: 'Cerrar sesión' }).click()
+    await expect.poll(() => headers.length).toBe(1)
+    expect(headers[0]).toBe(reload ? 'after-refresh' : 'after-login')
+    expect(authenticated).toBe(false)
+    await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toHaveCount(0)
+  })
+}
