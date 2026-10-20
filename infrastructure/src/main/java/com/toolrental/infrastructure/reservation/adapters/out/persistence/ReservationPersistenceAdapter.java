@@ -106,6 +106,27 @@ public class ReservationPersistenceAdapter
   }
 
   @Override
+  public java.util.List<Reservation> findExpiredPaymentHolds(java.time.Instant now) {
+    return reservations.findExpiredPaymentHolds(now).stream()
+        .map(this::hydrate)
+        .map(entity -> reservationMapper.toDomain(entity, loadSupplierIds(entity)))
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public Reservation create(Reservation reservation, Function<Context, Reservation> operation) {
+    if (reservations.existsById(reservation.id().value()))
+      throw new BusinessRuleException("Reservation already exists");
+    var context = lockedContext(reservation);
+    var result = operation.apply(context);
+    if (!reservation.id().equals(result.id()))
+      throw new BusinessRuleException("Reservation identity cannot change");
+    saveWithItems(result);
+    return result;
+  }
+
+  @Override
   @Transactional
   public Reservation execute(ReservationId id, Function<Context, Reservation> operation) {
     var reservationEntity =
@@ -117,11 +138,26 @@ public class ReservationPersistenceAdapter
                         .ReservationNotFoundApplicationException(id));
 
     hydrate(reservationEntity);
+    var reservation =
+        reservationMapper.toDomain(reservationEntity, loadSupplierIds(reservationEntity));
+    var context = lockedContext(reservation);
+    var result = operation.apply(context);
+    if (result.status()
+            == com.toolrental.domain.reservation.model.valueobject.ReservationStatus.CANCELLED
+        && entityManager
+                .createNativeQuery("select count(*) from rentals where reservation_id=:id")
+                .setParameter("id", id.value())
+                .getSingleResult()
+            instanceof Number count
+        && count.longValue() > 0)
+      throw new BusinessRuleException("A reservation with a rental cannot be cancelled");
+    saveWithItems(result);
+    return result;
+  }
+
+  private PersistenceContext lockedContext(Reservation reservation) {
     var equipmentUnitIds =
-        reservationEntity.getItems().stream()
-            .map(item -> item.getEquipmentUnitId())
-            .sorted()
-            .toList();
+        reservation.items().stream().map(item -> item.equipmentUnitId().value()).sorted().toList();
     var lockedEquipmentUnits = equipmentUnits.findAllByIdForUpdate(equipmentUnitIds);
     requireCompleteLoad("equipment units", equipmentUnitIds, lockedEquipmentUnits);
     var equipmentUnitEntities = indexEquipmentUnits(lockedEquipmentUnits);
@@ -139,29 +175,15 @@ public class ReservationPersistenceAdapter
 
     var participantIds =
         Stream.concat(
-                Stream.of(reservationEntity.getCustomerId()),
+                Stream.of(reservation.customerId().value()),
                 supplierByEquipmentUnit.values().stream())
             .distinct()
             .sorted()
             .toList();
     accounts.findAllByIdForUpdate(participantIds);
 
-    var reservation = reservationMapper.toDomain(reservationEntity, supplierByEquipmentUnit);
-    var context =
-        new PersistenceContext(
-            reservation, equipmentUnitEntities, toolEntities, participants, reservations);
-    var result = operation.apply(context);
-    if (result.status()
-            == com.toolrental.domain.reservation.model.valueobject.ReservationStatus.CANCELLED
-        && entityManager
-                .createNativeQuery("select count(*) from rentals where reservation_id=:id")
-                .setParameter("id", id.value())
-                .getSingleResult()
-            instanceof Number count
-        && count.longValue() > 0)
-      throw new BusinessRuleException("A reservation with a rental cannot be cancelled");
-    saveWithItems(result);
-    return result;
+    return new PersistenceContext(
+        reservation, equipmentUnitEntities, toolEntities, participants, reservations);
   }
 
   private ReservationJpaEntity hydrate(ReservationJpaEntity entity) {
@@ -279,7 +301,7 @@ public class ReservationPersistenceAdapter
 
     @Override
     public boolean isOccupied(EquipmentUnitId id, ReservationPeriod period) {
-      return reservations.existsConfirmedOverlap(
+      return reservations.existsActiveOverlap(
           id.value(), reservation.id().value(), period.startDate(), period.returnDate());
     }
   }

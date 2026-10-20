@@ -18,6 +18,11 @@ public class WebConfiguration implements WebMvcConfigurer {
         .addInterceptor(principal)
         .addPathPatterns("/api/**")
         .excludePathPatterns(
-            "/api/auth/**", "/api/public/**", "/api/v1/auth/**", "/api/v1/public/**");
+            "/api/auth/**",
+            "/api/public/**",
+            "/api/payments/sandbox/webhooks",
+            "/api/v1/auth/**",
+            "/api/v1/public/**",
+            "/api/v1/payments/sandbox/webhooks");
   }
 }

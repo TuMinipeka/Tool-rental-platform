@@ -13,6 +13,7 @@ import com.toolrental.application.passwordreset.dto.PasswordRecoveryResponse;
 import com.toolrental.application.passwordreset.usecase.RecoverPasswordUseCase;
 import com.toolrental.application.user.usecase.AuthenticateUserUseCase;
 import com.toolrental.application.user.usecase.RegisterCustomerAccountUseCase;
+import com.toolrental.application.user.usecase.RegisterSupplierAccountUseCase;
 import com.toolrental.application.usersession.usecase.ManageUserSessionUseCase;
 import com.toolrental.application.usersession.usecase.RefreshSessionUseCase;
 import com.toolrental.infrastructure.cancellationpolicy.adapters.in.rest.controllers.CancellationPolicyController;
@@ -43,6 +44,7 @@ class BoundedContextHttpMappingTest {
                 new AuthenticationController(
                     mock(AuthenticateUserUseCase.class),
                     mock(RegisterCustomerAccountUseCase.class),
+                    mock(RegisterSupplierAccountUseCase.class),
                     cookies),
                 new PasswordRecoveryController(recovery),
                 new UserSessionController(

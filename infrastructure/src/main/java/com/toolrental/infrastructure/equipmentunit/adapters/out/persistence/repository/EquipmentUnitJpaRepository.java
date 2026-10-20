@@ -25,7 +25,13 @@ public interface EquipmentUnitJpaRepository extends JpaRepository<EquipmentUnitJ
                    JOIN reservations reservation
                      ON reservation.reservation_id = item.reservation_id
                   WHERE item.equipment_unit_id = unit.equipment_unit_id
-                    AND reservation.reservation_status IN ('CONFIRMED', 'CANCELLATION_REVIEW')
+                    AND (
+                        reservation.reservation_status IN ('CONFIRMED', 'CANCELLATION_REVIEW')
+                        OR (
+                            reservation.reservation_status = 'PENDING_PAYMENT'
+                            AND reservation.expires_at > CURRENT_TIMESTAMP
+                        )
+                    )
                     AND reservation.start_date <= :returnDate
                     AND reservation.effective_return_date >= :startDate
              )

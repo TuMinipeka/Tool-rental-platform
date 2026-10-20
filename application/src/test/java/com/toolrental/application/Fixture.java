@@ -23,6 +23,7 @@ import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import com.toolrental.domain.tool.model.aggregate.Tool;
 import com.toolrental.domain.tool.model.valueobject.ToolId;
 import com.toolrental.domain.tool.port.repository.ToolRepository;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -118,6 +119,13 @@ final class Fixture {
             throw new BusinessRuleException("Invalid reservation request");
           reservations.put(r.id(), r);
         }
+
+        public List<Reservation> findExpiredPaymentHolds(Instant now) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.status() == ReservationStatus.PENDING_PAYMENT)
+              .filter(reservation -> !reservation.expiresAt().isAfter(now))
+              .toList();
+        }
       };
   final AtomicEquipmentUnitRegistration equipmentUnitRegistration =
       (id, code, clock) -> {
@@ -137,11 +145,27 @@ final class Fixture {
         }
       };
   final AtomicReservationManagement management =
-      (id, operation) -> {
-        synchronized (this) {
-          var isolated = reservation(id).copy();
+      new AtomicReservationManagement() {
+        public Reservation create(
+            Reservation requested, java.util.function.Function<Context, Reservation> operation) {
+          synchronized (Fixture.this) {
+            if (reservations.containsKey(requested.id()))
+              throw new BusinessRuleException("Reservation already exists");
+            return apply(requested, operation);
+          }
+        }
+
+        public Reservation execute(
+            ReservationId id, java.util.function.Function<Context, Reservation> operation) {
+          synchronized (Fixture.this) {
+            return apply(reservation(id).copy(), operation);
+          }
+        }
+
+        private Reservation apply(
+            Reservation isolated, java.util.function.Function<Context, Reservation> operation) {
           var context =
-              new AtomicReservationManagement.Context() {
+              new Context() {
                 public Reservation reservation() {
                   return isolated;
                 }
@@ -168,8 +192,11 @@ final class Fixture {
                 public boolean isOccupied(
                     EquipmentUnitId equipmentUnitId, ReservationPeriod period) {
                   return reservations.values().stream()
-                      .filter(other -> !other.id().equals(id))
-                      .filter(other -> other.status() == ReservationStatus.CONFIRMED)
+                      .filter(other -> !other.id().equals(isolated.id()))
+                      .filter(
+                          other ->
+                              other.status() == ReservationStatus.CONFIRMED
+                                  || other.status() == ReservationStatus.PENDING_PAYMENT)
                       .filter(other -> other.period().overlaps(period))
                       .anyMatch(
                           other ->
@@ -178,9 +205,9 @@ final class Fixture {
                 }
               };
           var result = operation.apply(context);
-          if (!id.equals(result.id()))
+          if (!isolated.id().equals(result.id()))
             throw new BusinessRuleException("Reservation identity cannot change");
-          reservations.put(id, result);
+          reservations.put(isolated.id(), result);
           return result;
         }
       };

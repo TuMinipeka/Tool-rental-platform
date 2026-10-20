@@ -3,6 +3,7 @@ package com.toolrental.infrastructure.invoice.adapters.out.persistence;
 import com.toolrental.domain.invoice.model.aggregate.Invoice;
 import com.toolrental.domain.invoice.model.valueobject.InvoiceId;
 import com.toolrental.domain.invoice.port.repository.InvoiceRepository;
+import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.infrastructure.invoice.adapters.out.persistence.mapper.InvoicePersistenceMapper;
 import com.toolrental.infrastructure.invoice.adapters.out.persistence.repository.InvoiceJpaRepository;
 import java.util.List;
@@ -32,6 +33,10 @@ public class InvoicePersistenceAdapter implements InvoiceRepository {
 
   public List<Invoice> findByParticipant(UUID participantId) {
     return rows.findByParticipantId(participantId).stream().map(mapper::toDomain).toList();
+  }
+
+  public Optional<Invoice> findByReservation(ReservationId reservationId) {
+    return rows.findByReservationId(reservationId.value()).map(mapper::toDomain);
   }
 
   public Invoice save(Invoice value) {

@@ -2,6 +2,7 @@ package com.toolrental.infrastructure.reservation.adapters.out.persistence.repos
 
 import com.toolrental.infrastructure.reservation.adapters.out.persistence.entity.ReservationJpaEntity;
 import jakarta.persistence.LockModeType;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -40,12 +41,20 @@ public interface ReservationJpaRepository extends JpaRepository<ReservationJpaEn
           + "join ReservationItemJpaEntity item on item.id.reservationId = reservation.id "
           + "where item.id.equipmentUnitId = :equipmentUnitId "
           + "and reservation.id <> :excludedReservationId "
-          + "and reservation.reservationStatus in ('CONFIRMED', 'CANCELLATION_REVIEW') "
+          + "and (reservation.reservationStatus in ('CONFIRMED', 'CANCELLATION_REVIEW') "
+          + "or (reservation.reservationStatus = 'PENDING_PAYMENT' "
+          + "and reservation.expiresAt > CURRENT_TIMESTAMP)) "
           + "and reservation.startDate <= :returnDate "
           + "and reservation.effectiveReturnDate >= :startDate")
-  boolean existsConfirmedOverlap(
+  boolean existsActiveOverlap(
       @Param("equipmentUnitId") UUID equipmentUnitId,
       @Param("excludedReservationId") UUID excludedReservationId,
       @Param("startDate") LocalDate startDate,
       @Param("returnDate") LocalDate returnDate);
+
+  @Query(
+      "select reservation from ReservationJpaEntity reservation "
+          + "where reservation.reservationStatus = 'PENDING_PAYMENT' "
+          + "and reservation.expiresAt <= :now order by reservation.expiresAt")
+  List<ReservationJpaEntity> findExpiredPaymentHolds(@Param("now") Instant now);
 }

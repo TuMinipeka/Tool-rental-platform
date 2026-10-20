@@ -36,6 +36,7 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 | Método | Ruta | Acceso |
 | --- | --- | --- |
 | POST | `/api/v1/auth/register` | Público; devuelve access JSON y refresh cookie |
+| POST | `/api/v1/auth/supplier-registration` | Público; crea proveedor `SUSPENDED`, sin sesión |
 | POST | `/api/v1/auth/login` | Público; devuelve access JSON y refresh cookie |
 | GET | `/api/v1/auth/csrf` | Público; inicializa cookie CSRF |
 | POST | `/api/v1/auth/refresh` | Refresh cookie + `X-XSRF-TOKEN` |
@@ -48,9 +49,34 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 
 El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La recuperación nunca devuelve el token: el puerto SMTP entrega el enlace; Mailpit lo captura en desarrollo.
 
+El administrador activa una solicitud de proveedor mediante `PATCH /api/v1/users/{id}/status` con `{"status":"ACTIVE"}`. Antes de esa transición el login es rechazado. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
+
 ## Reservas y cotización
 
-`POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La respuesta conserva modalidad, desglose, política, fecha efectiva y acciones permitidas.
+`POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La creación bloquea y vuelve a comprobar las unidades en la misma transacción, responde `PENDING_PAYMENT` con `expiresAt` y evita retenciones superpuestas. Un proceso programado cambia retenciones vencidas a `EXPIRED`.
+
+## Checkout sandbox y comprobante académico
+
+- `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key` y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` sin recibir PAN ni CVV.
+- `POST /api/v1/payments/sandbox/webhooks` es público exclusivamente para el sandbox interno y exige `X-Sandbox-Timestamp` y `X-Sandbox-Signature`. La firma es HMAC-SHA256 de `timestamp.eventId.externalReference.outcome`; se rechazan mensajes de más de cinco minutos.
+- `APPROVED` confirma pago y reserva en una transacción y emite un comprobante académico `PAID`; `DECLINED` marca pago y reserva como fallidos y libera la retención.
+- `GET /api/v1/invoices/{id}/document` devuelve HTML descargable y siempre muestra que es una simulación sin validez ante la DIAN.
+
+El secreto `SANDBOX_WEBHOOK_SECRET` debe tener al menos 32 bytes y es obligatorio en producción. Este sandbox interno es demostrativo; no representa integración con un adquirente ni transferencia real de fondos.
+
+## Reportes operativos
+
+Todos requieren `from` y `to` en formato ISO `YYYY-MM-DD`:
+
+| Método | Ruta | Resultado |
+| --- | --- | --- |
+| GET | `/api/v1/reports/income` | Pagos confirmados, reembolsos y neto por moneda |
+| GET | `/api/v1/reports/most-rented-tools` | Reservas, días y valor reservado por herramienta |
+| GET | `/api/v1/reports/frequent-customers` | Frecuencia e ingreso neto por cliente y moneda |
+| GET | `/api/v1/reports/availability` | Unidades disponibles, reservadas, en mantenimiento y retiradas |
+| GET | `/api/v1/reports/profitability` | Indicador de ingreso reservado por herramienta |
+
+El proveedor queda limitado a sus herramientas. El administrador consulta toda la plataforma o filtra con `supplierId`; el cliente recibe 403. El indicador de rentabilidad usa ingreso reservado porque el modelo aún no registra costos operativos y, por tanto, no afirma un margen contable.
 
 ## Catálogo operativo por rol
 

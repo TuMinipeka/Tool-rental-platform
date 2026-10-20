@@ -4,10 +4,12 @@ import com.toolrental.application.common.service.WorkflowReferences;
 import com.toolrental.application.user.usecase.AuthenticateUserUseCase;
 import com.toolrental.application.user.usecase.ManageUserUseCase;
 import com.toolrental.application.user.usecase.RegisterCustomerAccountUseCase;
+import com.toolrental.application.user.usecase.RegisterSupplierAccountUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
 import com.toolrental.domain.customer.port.repository.CustomerRepository;
 import com.toolrental.domain.role.port.repository.RoleRepository;
+import com.toolrental.domain.supplier.port.repository.SupplierRepository;
 import com.toolrental.domain.user.port.AuthenticationTokenProvider;
 import com.toolrental.domain.user.port.PasswordHasher;
 import com.toolrental.domain.user.port.SecureTokenService;
@@ -36,6 +38,19 @@ public class UserBeanConfiguration {
       @Value("${auth.jwt.refresh-ttl:P30D}") Duration refreshTtl) {
     return new AuthenticateUserUseCase(
         users, passwords, roles, tokens, work, clock, sessions, secrets, refreshTtl);
+  }
+
+  @Bean
+  RegisterSupplierAccountUseCase registerSupplierAccountUseCase(
+      UserRepository users,
+      SupplierRepository suppliers,
+      RoleRepository roles,
+      UserRoleRepository assignments,
+      PasswordHasher passwords,
+      UnitOfWork work,
+      Clock clock) {
+    return new RegisterSupplierAccountUseCase(
+        users, suppliers, roles, assignments, passwords, work, clock);
   }
 
   @Bean

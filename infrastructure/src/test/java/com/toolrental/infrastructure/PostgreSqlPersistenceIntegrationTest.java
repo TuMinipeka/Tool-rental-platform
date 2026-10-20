@@ -105,7 +105,7 @@ class PostgreSqlPersistenceIntegrationTest {
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
     assertEquals("302", flyway.info().current().getVersion().getVersion());
     assertEquals(
-        54,
+        56,
         java.util.Arrays.stream(flyway.info().applied())
             .filter(info -> info.getVersion() != null)
             .count());

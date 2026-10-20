@@ -24,10 +24,11 @@ El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módu
 | Área | Implementado | Fuera de este alcance |
 | --- | --- | --- |
 | Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación, CSRF y recuperación opaca por correo | MFA y proveedores de identidad externos |
-| Reservas | Confirmación atómica, cancelación, inasistencia, retracto revisado, extensión y mora | Optimización logística avanzada |
-| Dinero | Tarifas congeladas, ajustes y reembolsos idempotentes | Pasarela real, impuestos definitivos y conciliación bancaria |
+| Reservas | Retención atómica con vencimiento, confirmación automática, cancelación, entrega, devolución, extensión y mora | Optimización logística avanzada |
+| Dinero | Checkout sandbox académico firmado, comprobante descargable, ajustes y reembolsos idempotentes | Pasarela real, impuestos definitivos y conciliación bancaria |
+| Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway V1–V208 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway V1–V210 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -73,6 +74,7 @@ $env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
 $env:DB_USERNAME = 'tool_rental'
 $env:DB_PASSWORD = '<secret>'
 $env:JWT_SECRET = '<mínimo-32-bytes>'
+$env:SANDBOX_WEBHOOK_SECRET = '<mínimo-32-bytes>'
 $env:SMTP_HOST = '<smtp-host>'
 $env:SMTP_PORT = '587'
 $env:SMTP_USERNAME = '<smtp-user>'
@@ -154,6 +156,9 @@ Rutas principales:
 - `GET /api/v1/auth/csrf`, `POST /auth/refresh`, `/logout` y `/logout-all`.
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
 - `POST /api/v1/auth/password-recovery` y `/password-reset`.
+- `POST /api/v1/auth/supplier-registration` y activación administrativa del usuario.
+- `POST /api/v1/payments/checkouts`, webhook firmado y descarga del comprobante académico.
+- `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.
 - `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.
 - `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
 - `GET|POST /api/v1/commercial-configuration/delivery-rates` y `/cancellation-policies` para administración.
@@ -163,7 +168,7 @@ La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en 
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V208 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos y campos operativos. `db/demo/V300–V301` carga únicamente políticas, cuentas y catálogo de demostración.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V301` carga únicamente políticas, cuentas y catálogo de demostración.
 
 Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 
