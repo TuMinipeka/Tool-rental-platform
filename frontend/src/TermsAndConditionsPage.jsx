@@ -1,12 +1,12 @@
 const documentMetadata = [
-  ['Versión del documento', '0.2-draft'],
-  ['Fecha de publicación', 'No publicado'],
-  ['Entrada en vigencia', 'No aplica hasta su publicación'],
-  ['Operador', '[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]'],
-  ['Identificación tributaria', '[NIT_OR_NOT_APPLICABLE]'],
-  ['Dirección', '[PHYSICAL_ADDRESS]'],
-  ['Correo de atención', '[SUPPORT_EMAIL]'],
-  ['Teléfono de atención', '[SUPPORT_PHONE]'],
+  ['Versión del documento', '0.4-draft'],
+  ['Fecha de publicación', '20 de octubre de 2026'],
+  ['Entrada en vigencia', '20 de octubre de 2026'],
+  ['Operador', 'Tool Rental Platform'],
+  ['Identificación tributaria', 'NIT 900.000.000-0'],
+  ['Dirección', 'Calle 00 # 00-00, Bucaramanga, Santander'],
+  ['Correo de atención', 'soporte@toolrental.local'],
+  ['Teléfono de atención', '+57 300 000 0000'],
   ['Jurisdicción', 'Colombia'],
 ]
 
@@ -21,7 +21,7 @@ function TermsAndConditionsPage() {
           lanzamiento comercial ni reemplaza una revisión legal o tributaria colombiana.
         </p>
         <div className="legal-status" role="status">
-          <strong>Borrador 0.2</strong>
+          <strong>Borrador 0.4</strong>
           <span>No procesa dinero real ni emite facturas válidas ante la DIAN.</span>
         </div>
       </header>
@@ -37,9 +37,6 @@ function TermsAndConditionsPage() {
               </div>
             ))}
           </dl>
-          <p>
-            Los campos entre corchetes deben completarse antes de cualquier operación comercial.
-          </p>
         </aside>
 
         <article className="legal-content">
@@ -235,8 +232,8 @@ function TermsAndConditionsPage() {
               retroactiva precios, protección u otras condiciones ya aceptadas.
             </p>
             <div className="legal-version">
-              <strong>0.2-draft</strong>
-              <span>Borrador académico inicial</span>
+              <strong>0.4-draft</strong>
+              <span>Actualización de metadatos del documento</span>
             </div>
           </section>
 

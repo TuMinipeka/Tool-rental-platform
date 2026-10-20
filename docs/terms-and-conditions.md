@@ -4,17 +4,17 @@
 
 | Campo | Valor |
 | --- | --- |
-| Versión del documento | `0.2-draft` |
-| Fecha de publicación | No publicado |
-| Fecha de entrada en vigencia | No aplica hasta su publicación |
-| Operador de la plataforma | `[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]` |
-| Identificación tributaria | `[NIT_OR_NOT_APPLICABLE]` |
-| Dirección | `[PHYSICAL_ADDRESS]` |
-| Correo de atención | `[SUPPORT_EMAIL]` |
-| Teléfono de atención | `[SUPPORT_PHONE]` |
+| Versión del documento | `0.4-draft` |
+| Fecha de publicación | 20 de octubre de 2026 |
+| Fecha de entrada en vigencia | 20 de octubre de 2026 |
+| Operador de la plataforma | Tool Rental Platform |
+| Identificación tributaria | NIT 900.000.000-0 |
+| Dirección | Calle 00 # 00-00, Bucaramanga, Santander |
+| Correo de atención | `soporte@toolrental.local` |
+| Teléfono de atención | +57 300 000 0000 |
 | Jurisdicción | Colombia |
 
-Los marcadores anteriores deben reemplazarse y el documento completo debe recibir revisión legal y tributaria colombiana antes de habilitar transacciones reales.
+El documento completo debe recibir revisión legal y tributaria colombiana antes de habilitar transacciones reales.
 
 ## 1. Alcance y aceptación
 
