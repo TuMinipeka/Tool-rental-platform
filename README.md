@@ -39,6 +39,25 @@ docker compose up --build
 
 Compose levanta PostgreSQL, Mailpit, backend y frontend. Mailpit expone la bandeja de desarrollo en `http://localhost:8025`. El backend queda en `http://localhost:8080`; la página raíz ejecuta una consulta JDBC real y muestra si la conexión fue exitosa.
 
+### Entorno demostrativo
+
+El perfil `demo` carga un catálogo aislado de 30 herramientas y tres cuentas locales. No debe activarse sobre una base productiva.
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'demo'
+$env:VITE_DEMO_MODE = 'true'
+$env:POSTGRES_PASSWORD = 'tool_rental_local_2026'
+docker compose up --build
+```
+
+| Rol | Correo | Contraseña | Acceso esperado |
+| --- | --- | --- | --- |
+| Cliente | `cliente@toolrental.local` | `ToolRental2026!` | Catálogo, cotización, reservas y cuenta |
+| Proveedor | `proveedor@toolrental.local` | `ToolRental2026!` | Panel y publicaciones propias |
+| Administrador | `admin@toolrental.local` | `ToolRental2026!` | Panel y recursos administrativos |
+
+Estas credenciales existen únicamente en las migraciones `db/demo`; no son usuarios predeterminados de producción.
+
 Para ejecutar sin Compose:
 
 ```powershell
@@ -137,7 +156,7 @@ La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en 
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V208 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos y campos operativos. `db/demo/V300` carga únicamente la tarifa académica de demostración.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V208 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos y campos operativos. `db/demo/V300–V301` carga únicamente políticas, cuentas y catálogo de demostración.
 
 Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 
