@@ -84,3 +84,12 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - Vite sirvió inicio, catálogo, detalle, sobre nosotros, cómo funciona, cuenta, publicar, panel de proveedor, términos y ruta desconocida con respuesta HTTP 200 del fallback SPA.
 - Revisión headless en Edge a 1600 × 1000 y 390 × 844; se corrigieron el ancho del buscador y el desbordamiento del hero móvil detectados en la primera pasada.
 - `mvnw.cmd clean verify`: correcto; 74 pruebas superadas (`25 domain`, `16 application`, `33 infrastructure`), incluidas arquitectura, migraciones Flyway, persistencia, concurrencia y PostgreSQL real con Testcontainers.
+
+### Catálogo y Cómo funciona — referencias adicionales
+
+- `/catalogo` reproduce la composición de la referencia adicional: hero técnico oscuro, buscador flotante, filtros laterales, cuadrícula de cinco columnas en escritorio y paginación funcional.
+- Las 29 imágenes entregadas en `infrastructure/src/main/resources/images` se exponen como recursos estáticos del frontend; el registro 29 conserva el recurso visual existente porque el archivo `29` no está presente en la carpeta de origen.
+- Las fotografías del catálogo usan encuadre contenido y espacio interior estable para mostrar herramientas completas sin recortes por zoom. El catálogo demostrativo permanece etiquetado y no añade reseñas, verificaciones ni disponibilidad ficticias.
+- `/como-funciona` reproduce la estructura editorial de la referencia adicional con hero dividido, cuatro pasos, beneficios verificables, perfiles de uso y CTA final. El texto sigue el flujo realmente implementado y declara el pago académico.
+- La revisión visual se realizó a `1680 × 945` y `390 × 844`. Ambas rutas mantienen `scrollWidth` igual a `clientWidth` en móvil, sin desplazamiento horizontal.
+- Durante esta revisión no se ejecutaron pruebas automatizadas ni compilación. La consola mostró únicamente las respuestas `404` esperadas de `/api/v1/auth/csrf` y `/api/v1/public/catalog` porque el backend local no estaba levantado; el fallback demostrativo funcionó.
