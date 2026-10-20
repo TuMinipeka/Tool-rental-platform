@@ -151,13 +151,11 @@ Compose levanta PostgreSQL, backend y frontend. Mailpit se conserva como herrami
 
 ### Entorno demostrativo
 
-El perfil `demo` carga un catálogo aislado de 30 herramientas publicadas, 20 herramientas históricas sin publicar y tres cuentas locales. No debe activarse sobre una base productiva.
+El Compose local activa los perfiles `local,demo` y carga, sobre una base nueva, un catálogo aislado de 30 herramientas publicadas, 20 herramientas históricas sin publicar y tres cuentas listas para iniciar sesión. No debe activarse sobre una base productiva.
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE = 'local,demo'
-$env:VITE_DEMO_MODE = 'true'
-$env:POSTGRES_PASSWORD = 'tool_rental_local_2026'
-docker compose up --build
+Copy-Item .env.example .env
+docker compose up --build -d
 ```
 
 | Rol | Correo | Contraseña | Acceso esperado |
@@ -166,7 +164,7 @@ docker compose up --build
 | Proveedor | `proveedor@toolrental.local` | `ToolRental2026!` | Panel y publicaciones propias |
 | Administrador | `admin@toolrental.local` | `ToolRental2026!` | Panel y recursos administrativos |
 
-Estas credenciales existen únicamente en las migraciones `db/demo`; no son usuarios predeterminados de producción.
+Estas credenciales existen únicamente en las migraciones `db/demo`; no son usuarios predeterminados de producción. En otro computador, al clonar el repositorio, copiar `.env.example` como `.env` y ejecutar el comando anterior, Flyway crea las tres cuentas automáticamente. La carga está pensada para una base o volumen nuevo; no actives `demo` posteriormente sobre una base que ya haya avanzado hasta V305 sin esas migraciones.
 
 Para ejecutar sin Compose:
 
