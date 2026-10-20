@@ -88,15 +88,11 @@ test('authentication uses the shared login and registration routes', async ({ pa
   await expect(page.getByRole('heading', { name: 'Crea tu cuenta' })).toBeVisible()
 })
 
-test('login and password recovery keep their working contracts', async ({ page }) => {
+test('login works while recovery is outside the MVP', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
   const dialog = page.getByRole('main')
-  await dialog.getByRole('button', { name: '¿Olvidaste tu contraseña?' }).click()
-  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
-  await dialog.getByRole('button', { name: 'Solicitar recuperación' }).click()
-  await expect(dialog.getByText('Solicitud recibida')).toBeVisible()
-  await dialog.getByRole('button', { name: /Volver al ingreso/ }).click()
+  await expect(dialog.getByRole('button', { name: '¿Olvidaste tu contraseña?' })).toBeHidden()
   await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
   await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
   await dialog.getByRole('button', { name: 'Ingresar', exact: true }).click()
@@ -302,4 +298,43 @@ test('cancellation preserves the idempotency key and waits for server success', 
   expect(keys).toHaveLength(2)
   expect(keys[0]).toBeTruthy()
   expect(keys[1]).toBe(keys[0])
+})
+
+
+test('recovery route stays disabled even with a token in the URL', async ({ page }) => {
+  await page.goto('/password-reset?token=untrusted-token')
+  await expect(page.getByRole('heading', { name: 'Recuperación no disponible' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Guardar nueva contraseña' })).toHaveCount(0)
+})
+
+test('provider return parameters never confirm a pending payment', async ({ page }) => {
+  const id = '90000000-0000-0000-0000-000000000001'
+  await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, paymentStatus: 'READY' } }))
+  await page.goto('/cuenta')
+  await login(page)
+  await page.evaluate(id => {
+    history.pushState({}, '', '/payment-return?paymentId=' + id + '&status=approved')
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }, id)
+  await expect(page.getByRole('heading', { name: 'Estado de tu pago' })).toBeVisible()
+  await expect(page.getByRole('main').getByRole('status')).toHaveText('Esperando verificación del proveedor')
+  await expect(page.getByText('Pago verificado y reserva confirmada')).toHaveCount(0)
+})
+
+test('checkout sends only the reservation and redirects to the hosted provider', async ({ page }) => {
+  const id = '90000000-0000-0000-0000-000000000001'
+  const requests = []
+  await page.route('**/api/v1/reservations', route => route.fulfill({ json: [{ id, status: 'PENDING_PAYMENT', period: { startDate: '2027-01-01', returnDate: '2027-01-01' }, total: { amount: 25000 } }] }))
+  await page.route('**/api/v1/payments/checkouts', async route => {
+    requests.push({ body: route.request().postDataJSON(), key: route.request().headers()['idempotency-key'] })
+    await route.fulfill({ json: { paymentId: id, paymentStatus: 'READY', checkoutUrl: 'https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=test' } })
+  })
+  await page.route('https://www.mercadopago.com.co/**', route => route.fulfill({ contentType: 'text/html', body: '<h1>Checkout de prueba aislado</h1>' }))
+  await page.goto('/cuenta')
+  await login(page)
+  await page.getByRole('button', { name: 'Continuar en Mercado Pago' }).click()
+  await expect(page).toHaveURL(/https:\/\/www.mercadopago.com.co\/checkout\//)
+  expect(requests).toHaveLength(1)
+  expect(requests[0].body).toEqual({ reservationId: id })
+  expect(requests[0].key).toBeTruthy()
 })

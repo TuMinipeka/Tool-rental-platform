@@ -7,9 +7,9 @@ mkdir -p backups
 stamp=$(date -u +%Y%m%dT%H%M%SZ)
 file="backups/tool-rental-$stamp.dump"
 trap 'rm -f -- "$file.partial"' EXIT HUP INT TERM
-docker compose --env-file .env.showcase -f compose.showcase.yml exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom --no-owner --no-acl' > "$file.partial"
+docker compose --env-file .env.showcase --env-file .env.mercadopago.local -f compose.showcase.yml exec -T postgres sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom --no-owner --no-acl' > "$file.partial"
 test -s "$file.partial"
-docker compose --env-file .env.showcase -f compose.showcase.yml exec -T postgres pg_restore --list < "$file.partial" > /dev/null
+docker compose --env-file .env.showcase --env-file .env.mercadopago.local -f compose.showcase.yml exec -T postgres pg_restore --list < "$file.partial" > /dev/null
 mv -- "$file.partial" "$file"
 # Copy offsite before pruning local history. SSH keys stay outside the repository.
 rsync --protect-args -e 'ssh -o BatchMode=yes' -- "$file" "$BACKUP_TARGET"

@@ -3,7 +3,7 @@ import {readFileSync,writeFileSync} from 'node:fs'
 import {resolve} from 'node:path'
 import {randomBytes} from 'node:crypto'
 let env=readFileSync('.env.showcase.example','utf8')
-const values={SANDBOX_WEBHOOK_SECRET:randomBytes(48).toString('hex'),PUBLIC_HOST:'tool-rental-validation.invalid',ACME_EMAIL:'evaluator@example.test',POSTGRES_PASSWORD:randomBytes(24).toString('hex'),JWT_SECRET:randomBytes(48).toString('hex'),BACKEND_IMAGE:'tool-rental-mvp-backend:working',FRONTEND_IMAGE:'tool-rental-mvp-frontend:working',SMTP_HOST:'mailpit',SMTP_USERNAME:'private-config-validation',SMTP_PASSWORD:randomBytes(24).toString('hex'),PASSWORD_RECOVERY_SENDER:'evaluator@example.test'}
+const values={MERCADOPAGO_ACCESS_TOKEN:"configuration-validation-only",MERCADOPAGO_COLLECTOR_ID:"123456",MERCADOPAGO_WEBHOOK_SECRET:randomBytes(48).toString("hex"),SANDBOX_WEBHOOK_SECRET:randomBytes(48).toString('hex'),PUBLIC_HOST:'tool-rental-validation.invalid',ACME_EMAIL:'evaluator@example.test',POSTGRES_PASSWORD:randomBytes(24).toString('hex'),JWT_SECRET:randomBytes(48).toString('hex'),BACKEND_IMAGE:'tool-rental-mvp-backend:working',FRONTEND_IMAGE:'tool-rental-mvp-frontend:working',SMTP_HOST:'mailpit',SMTP_USERNAME:'private-config-validation',SMTP_PASSWORD:randomBytes(24).toString('hex'),PASSWORD_RECOVERY_SENDER:'evaluator@example.test'}
 for(const [key,value] of Object.entries(values))env=env.replace(new RegExp('^'+key+'=.*$','m'),key+'='+value)
 writeFileSync('.env.showcase.validation',env,{mode:0o600})
 execFileSync('docker',['compose','--env-file','.env.showcase.validation','-f','compose.showcase.yml','config','--quiet'],{stdio:'pipe'})

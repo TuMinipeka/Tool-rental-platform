@@ -3,7 +3,7 @@ set -eu
 cd "$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
 : "${IMAGE_PREFIX:?Set authenticated registry image prefix}"
 revision=$(git rev-parse HEAD)
-if test -n "$(git status --porcelain --untracked-files=no)"; then
+if test -n "$(git status --porcelain --untracked-files=normal -- . ':!.agents/skills/**')"; then
     echo 'Commit and validate the source before building a release.' >&2
     exit 1
 fi

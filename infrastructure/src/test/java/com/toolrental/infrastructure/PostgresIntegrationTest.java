@@ -50,7 +50,14 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /** Uses Docker by default; an explicit isolated PostgreSQL URL supports local validation. */
-@SpringBootTest
+@SpringBootTest(
+    properties = {
+      "auth.password-recovery.enabled=true",
+      "payments.internal-enabled=true",
+      "payments.mercadopago.collector-id=123",
+      "payments.reconciliation-delay-ms=3600000",
+      "payments.mercadopago.webhook-secret=official-test-webhook-secret-long-enough-2026"
+    })
 @AutoConfigureMockMvc
 class PostgresIntegrationTest {
   static final String schema = "validation_" + UUID.randomUUID().toString().replace("-", "");
@@ -89,10 +96,33 @@ class PostgresIntegrationTest {
   @Autowired SecureTokenService tokenService;
   @Autowired ReservationRepository reservationRepository;
   @Autowired Clock clock;
+
+  @org.springframework.test.context.bean.override.mockito.MockitoBean
+  com.toolrental.domain.payment.port.PaymentGateway gateway;
+
+  @Autowired
+  com.toolrental.application.payment.usecase.ReconcileHostedPaymentUseCase reconcileHosted;
+
+  @Autowired com.toolrental.application.payment.usecase.CreateHostedCheckoutUseCase createHosted;
   UUID admin, supplier, customer, category, tool, unit;
 
   @BeforeEach
   void seed() {
+    org.mockito.Mockito.reset(gateway);
+    org.mockito.Mockito.when(gateway.search(org.mockito.ArgumentMatchers.anyString()))
+        .thenReturn(List.of());
+    org.mockito.Mockito.when(gateway.recoverCheckout(org.mockito.ArgumentMatchers.anyString()))
+        .thenReturn(java.util.Optional.empty());
+    org.mockito.Mockito.when(
+            gateway.create(
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()))
+        .thenAnswer(
+            invocation ->
+                new com.toolrental.domain.payment.port.PaymentGateway.Checkout(
+                    "preference-1",
+                    "https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=preference-1"));
     db.execute(
         "truncate invoice_items,invoices,payments,damage_reports,unit_returns,unit_deliveries,rentals,reservation_items,reservations,equipment_units,tool_images,tools,categories,customers,suppliers,user_roles,users cascade");
     admin = UUID.randomUUID();
@@ -172,7 +202,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(35);
+        .isEqualTo(36);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
@@ -415,6 +445,327 @@ class PostgresIntegrationTest {
         401);
   }
 
+  com.toolrental.domain.payment.port.PaymentGateway.Result providerResult(UUID id, String status) {
+    return new com.toolrental.domain.payment.port.PaymentGateway.Result(
+        "9001", id.toString(), new BigDecimal("20"), "COP", status, false, "123");
+  }
+
+  @Test
+  void hostedCheckoutRequiresActorAndVerifiesSignedProviderApprovalExactlyOnce() throws Exception {
+    var held = held();
+    call(
+        null,
+        post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
+        Map.of("reservationId", held.id().value()),
+        401);
+    var checkout =
+        call(
+            customer,
+            post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
+            Map.of("reservationId", held.id().value()),
+            200);
+    var id = UUID.fromString(checkout.path("paymentId").asText());
+    assertThat(checkout.path("checkoutUrl").asText()).startsWith("https://www.mercadopago.com.co/");
+    call(
+        customer,
+        post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
+        Map.of("reservationId", held.id().value()),
+        200);
+    call(supplier, get("/api/v1/payments/checkouts/" + id), null, 200);
+    org.mockito.Mockito.verify(gateway, org.mockito.Mockito.times(1))
+        .create(
+            org.mockito.ArgumentMatchers.anyString(),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.any());
+    org.mockito.Mockito.when(gateway.fetch("9001")).thenReturn(providerResult(id, "approved"));
+    call(
+        null,
+        post("/api/v1/payments/mercadopago/webhooks?data.id=9001")
+            .header("x-request-id", "request-1")
+            .header("x-signature", "ts=1,v1=bad"),
+        null,
+        401);
+    var ts = Long.toString(Instant.now().getEpochSecond());
+    var mac = javax.crypto.Mac.getInstance("HmacSHA256");
+    mac.init(
+        new javax.crypto.spec.SecretKeySpec(
+            "official-test-webhook-secret-long-enough-2026"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            "HmacSHA256"));
+    var sig =
+        java.util.HexFormat.of()
+            .formatHex(
+                mac.doFinal(
+                    ("id:9001;request-id:request-1;ts:" + ts + ";")
+                        .getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+    for (int n = 0; n < 2; n++)
+      call(
+          null,
+          post("/api/v1/payments/mercadopago/webhooks?data.id=9001")
+              .header("x-request-id", "request-1")
+              .header("x-signature", "ts=" + ts + ",v1=" + sig),
+          null,
+          200);
+    assertThat(
+            db.queryForObject(
+                "select reservation_status from reservations where reservation_id=?",
+                String.class,
+                held.id().value()))
+        .isEqualTo("CONFIRMED");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isEqualTo(1);
+    assertThat(
+            call(customer, get("/api/v1/payments/checkouts/" + id), null, 200)
+                .path("paymentStatus")
+                .asText())
+        .isEqualTo("DONE");
+    org.mockito.Mockito.when(gateway.fetch("9001")).thenReturn(providerResult(id, "rejected"));
+    reconcileHosted.webhook("9001");
+    assertThat(
+            db.queryForObject(
+                "select payment_status from payments where payment_id=?", String.class, id))
+        .isEqualTo("CONFIRMED");
+  }
+
+  @Test
+  void hostedCheckoutConcurrentRequestsReuseOnePersistedAttempt() throws Exception {
+    var held = held();
+    try (var pool = Executors.newFixedThreadPool(2)) {
+      var gate = new CyclicBarrier(2);
+      var jobs =
+          new ArrayList<Future<com.toolrental.application.payment.dto.HostedCheckoutResponse>>();
+      for (int i = 0; i < 2; i++) {
+        final var key = "parallel-" + i;
+        jobs.add(
+            pool.submit(
+                () -> {
+                  gate.await();
+                  return createHosted.execute(customer, held.id(), key);
+                }));
+      }
+      var first = jobs.get(0).get(20, TimeUnit.SECONDS);
+      var second = jobs.get(1).get(20, TimeUnit.SECONDS);
+      assertThat(first.paymentId()).isEqualTo(second.paymentId());
+    }
+    assertThat(
+            db.queryForObject(
+                "select count(*) from payments where processor='MERCADO_PAGO'", Integer.class))
+        .isEqualTo(1);
+    org.mockito.Mockito.verify(gateway, org.mockito.Mockito.times(1))
+        .create(
+            org.mockito.ArgumentMatchers.anyString(),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.any());
+  }
+
+  @Test
+  void lateHostedApprovalRefundsWithoutRestoringExpiredInventory() {
+    var held = held();
+    var checkout = createHosted.execute(customer, held.id(), "late-1");
+    db.update(
+        "update reservations set expires_at=now()-interval '1 minute' where reservation_id=?",
+        held.id().value());
+    org.mockito.Mockito.when(gateway.fetch("9001"))
+        .thenReturn(providerResult(checkout.paymentId(), "approved"));
+    reconcileHosted.webhook("9001");
+    reconcileHosted.webhook("9001");
+    assertThat(
+            db.queryForObject(
+                "select payment_status from payments where payment_id=?",
+                String.class,
+                checkout.paymentId()))
+        .isEqualTo("REFUNDED");
+    assertThat(
+            db.queryForObject(
+                "select reservation_status from reservations where reservation_id=?",
+                String.class,
+                held.id().value()))
+        .isEqualTo("EXPIRED");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isZero();
+    org.mockito.Mockito.verify(gateway, org.mockito.Mockito.times(1))
+        .refund("9001", new BigDecimal("20.0000"), "late-" + checkout.paymentId());
+  }
+
+  @Test
+  void failedLateRefundRetainsItsLedgerAndRetriesWithTheSameKey() {
+    var held = held();
+    var checkout = createHosted.execute(customer, held.id(), "refund-retry-1");
+    db.update(
+        "update reservations set expires_at=now()-interval '1 minute' where reservation_id=?",
+        held.id().value());
+    org.mockito.Mockito.when(gateway.fetch("9001"))
+        .thenReturn(providerResult(checkout.paymentId(), "approved"));
+    org.mockito.Mockito.doThrow(new IllegalStateException("Temporary refund outage"))
+        .doNothing()
+        .when(gateway)
+        .refund(
+            org.mockito.ArgumentMatchers.eq("9001"),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.eq("late-" + checkout.paymentId()));
+    assertThatThrownBy(() -> reconcileHosted.webhook("9001"))
+        .isInstanceOf(IllegalStateException.class);
+    assertThat(
+            db.queryForObject(
+                "select refund_status from refunds where payment_id=?",
+                String.class,
+                checkout.paymentId()))
+        .isEqualTo("PENDING");
+    reconcileHosted.webhook("9001");
+    assertThat(
+            db.queryForObject(
+                "select refund_status from refunds where payment_id=?",
+                String.class,
+                checkout.paymentId()))
+        .isEqualTo("CONFIRMED");
+    assertThat(
+            db.queryForObject(
+                "select count(*) from refunds where payment_id=?",
+                Integer.class,
+                checkout.paymentId()))
+        .isEqualTo(1);
+  }
+
+  @Test
+  void officialApprovalRollsBackPaymentAndReservationWhenInvoiceCannotBeSaved() {
+    var held = held();
+    var checkout = createHosted.execute(customer, held.id(), "invoice-rollback-1");
+    org.mockito.Mockito.when(gateway.fetch("9001"))
+        .thenReturn(providerResult(checkout.paymentId(), "approved"));
+    db.execute(
+        "CREATE FUNCTION reject_test_invoice() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Invoice unavailable'; END $$");
+    db.execute(
+        "CREATE TRIGGER reject_test_invoice BEFORE INSERT ON invoices FOR EACH ROW EXECUTE FUNCTION reject_test_invoice()");
+    try {
+      assertThatThrownBy(() -> reconcileHosted.webhook("9001"))
+          .isInstanceOf(RuntimeException.class);
+      assertThat(
+              db.queryForObject(
+                  "select payment_status from payments where payment_id=?",
+                  String.class,
+                  checkout.paymentId()))
+          .isEqualTo("PENDING");
+      assertThat(
+              db.queryForObject(
+                  "select reservation_status from reservations where reservation_id=?",
+                  String.class,
+                  held.id().value()))
+          .isEqualTo("PENDING_PAYMENT");
+      assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isZero();
+    } finally {
+      db.execute("DROP TRIGGER reject_test_invoice ON invoices");
+      db.execute("DROP FUNCTION reject_test_invoice()");
+    }
+    reconcileHosted.webhook("9001");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isEqualTo(1);
+  }
+
+  @Test
+  void mismatchedOrLiveProviderPaymentNeverConfirmsReservation() {
+    var held = held();
+    var checkout = createHosted.execute(customer, held.id(), "mismatch-1");
+    var invalid =
+        List.of(
+            new com.toolrental.domain.payment.port.PaymentGateway.Result(
+                "9001",
+                checkout.paymentId().toString(),
+                BigDecimal.ONE,
+                "COP",
+                "approved",
+                false,
+                "123"),
+            new com.toolrental.domain.payment.port.PaymentGateway.Result(
+                "9001",
+                checkout.paymentId().toString(),
+                new BigDecimal("20"),
+                "USD",
+                "approved",
+                false,
+                "123"),
+            new com.toolrental.domain.payment.port.PaymentGateway.Result(
+                "9001",
+                checkout.paymentId().toString(),
+                new BigDecimal("20"),
+                "COP",
+                "approved",
+                true,
+                "123"),
+            new com.toolrental.domain.payment.port.PaymentGateway.Result(
+                "9001",
+                checkout.paymentId().toString(),
+                new BigDecimal("20"),
+                "COP",
+                "approved",
+                false,
+                "456"));
+    for (var result : invalid) {
+      org.mockito.Mockito.when(gateway.fetch("9001")).thenReturn(result);
+      assertThatThrownBy(() -> reconcileHosted.webhook("9001"))
+          .isInstanceOf(com.toolrental.domain.common.exception.BusinessRuleException.class);
+    }
+    assertThat(
+            db.queryForObject(
+                "select payment_status from payments where payment_id=?",
+                String.class,
+                checkout.paymentId()))
+        .isEqualTo("PENDING");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isZero();
+  }
+
+  @Test
+  void interruptedHostedCreationIsReconciledWithoutCreatingAnotherPreference() {
+    var held = held();
+    org.mockito.Mockito.when(
+            gateway.create(
+                org.mockito.ArgumentMatchers.anyString(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any()))
+        .thenThrow(new IllegalStateException("Provider timeout"));
+    assertThatThrownBy(() -> createHosted.execute(customer, held.id(), "interrupted-1"))
+        .isInstanceOf(IllegalStateException.class);
+    var id =
+        db.queryForObject(
+            "select payment_id from payments where processor='MERCADO_PAGO'", UUID.class);
+    org.mockito.Mockito.when(gateway.recoverCheckout(id.toString()))
+        .thenReturn(
+            java.util.Optional.of(
+                new com.toolrental.domain.payment.port.PaymentGateway.Checkout(
+                    "recovered-1",
+                    "https://www.mercadopago.com.co/checkout/v1/redirect?pref_id=recovered-1")));
+    var recovered = createHosted.execute(customer, held.id(), "interrupted-1");
+    assertThat(recovered.paymentId()).isEqualTo(id);
+    assertThat(recovered.paymentStatus()).isEqualTo("READY");
+    org.mockito.Mockito.verify(gateway, org.mockito.Mockito.times(1))
+        .create(
+            org.mockito.ArgumentMatchers.anyString(),
+            org.mockito.ArgumentMatchers.any(),
+            org.mockito.ArgumentMatchers.any());
+  }
+
+  @Test
+  void hostedRejectionReleasesHoldAndSubsequentApprovalIsRefunded() {
+    var held = held();
+    var checkout = createHosted.execute(customer, held.id(), "declined-1");
+    org.mockito.Mockito.when(gateway.fetch("9001"))
+        .thenReturn(providerResult(checkout.paymentId(), "rejected"));
+    reconcileHosted.webhook("9001");
+    assertThat(
+            db.queryForObject(
+                "select reservation_status from reservations where reservation_id=?",
+                String.class,
+                held.id().value()))
+        .isEqualTo("PAYMENT_FAILED");
+    assertThat(held().status().name()).isEqualTo("PENDING_PAYMENT");
+    org.mockito.Mockito.when(gateway.fetch("9001"))
+        .thenReturn(providerResult(checkout.paymentId(), "approved"));
+    reconcileHosted.webhook("9001");
+    assertThat(
+            db.queryForObject(
+                "select payment_status from payments where payment_id=?",
+                String.class,
+                checkout.paymentId()))
+        .isEqualTo("REFUNDED");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isZero();
+  }
+
   @Test
   void signedSandboxWebhookConfirmsHoldAndIssuesDownloadableAcademicInvoice() throws Exception {
     var reservation = held();
@@ -425,7 +776,7 @@ class PostgresIntegrationTest {
     var payment =
         call(
             customer,
-            post("/api/payments/checkouts").header("Idempotency-Key", "full-checkout-1"),
+            post("/api/payments/internal/checkouts").header("Idempotency-Key", "full-checkout-1"),
             Map.of(
                 "reservationId",
                 reservation.id().value(),

@@ -1,3 +1,4 @@
+if(process.env.RUN_LEGACY_INTERNAL_SANDBOX !== 'true') throw new Error('Historical internal-HMAC/Mailpit runner. Current MVP: use scripts/verify-showcase.mjs and official-provider acceptance in docs/mercadopago-mvp.md; do not enable legacy routes in production.')
 import {createHmac,randomBytes} from 'node:crypto'
 import {execFileSync} from 'node:child_process'
 import {sourceFingerprint} from '../../scripts/source-fingerprint.mjs'
