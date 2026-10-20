@@ -31,7 +31,7 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - El access token permanece únicamente en memoria; el refresh usa cookie `HttpOnly`, rotación y CSRF.
 - La disponibilidad se comprueba en servidor y la cotización del backend es autoritativa.
 - Las fechas de reserva son inclusivas.
-- El flujo aprobado vigente sigue siendo solicitud, confirmación del proveedor y pago académico 50/50.
+- El flujo aprobado objetivo es orden pendiente, retención temporal y confirmación automática mediante webhook verificado. El recorrido 50/50 con aprobación del proveedor permanece como implementación heredada hasta completar la migración funcional.
 - Los tres módulos Maven y la dirección `infrastructure -> application -> domain` no cambian por el rediseño.
 
 ## Hallazgos prioritarios
@@ -45,7 +45,7 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 
 ## Bloqueos de integración
 
-- El pago directo solicitado no puede declararse implementado: no hay proveedor sandbox elegido, credenciales, contrato de webhook, política de expiración de retenciones ni cambio aprobado en `docs/product-scope.md`. Hasta resolverlo se conserva la simulación académica etiquetada.
+- El pago directo solicitado no puede declararse implementado: el contrato objetivo ya está aprobado en `docs/product-scope.md`, pero todavía faltan el proveedor sandbox, sus credenciales, el contrato de webhook y la implementación de expiración de retenciones. Hasta resolverlo se conserva la simulación académica etiquetada.
 - La política de privacidad, consentimientos versionados, impuestos definitivos y Plan Opcional de Protección por Daños siguen pendientes de decisión legal o comercial.
 - Los paneles completos requieren endpoints orientados a cada actor y respuestas que identifiquen al usuario autenticado; el frontend no debe inferir autorización ni filtrar recursos ajenos como sustituto del servidor.
 - Fotografías adicionales solo pueden incorporarse como material editorial o placeholders mientras no exista carga autorizada y almacenamiento seguro para publicaciones.
@@ -69,7 +69,7 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - Catálogo sincroniza término, categoría y municipio con la URL; no ofrece orden por reseñas inexistentes.
 - Detalle usa una composición de galería, información y reserva en tres áreas. Solo muestra reseñas, ubicación o verificación cuando el contrato las acredita; el placeholder declara que no es una fotografía del proveedor.
 - Sobre nosotros incorpora una fotografía editorial genérica sin marcas, narrativa local, valores y los cuatro municipios sin estadísticas comerciales inventadas.
-- Cómo funciona explica solicitud, confirmación del proveedor y pago académico 50/50 sin fingir el flujo sandbox futuro.
+- Cómo funciona explica el recorrido heredado que realmente ejecuta el sistema y advierte que la integración sandbox continúa pendiente; no presenta el flujo objetivo como terminado.
 - Mi cuenta usa identidad de sesión y `GET /api/v1/reservations`; las secciones sin integración muestran un estado pendiente en vez de cifras o documentos falsos.
 - Los paneles de proveedor y administración comprueban roles antes de renderizar y no presentan operaciones demostrativas como reales.
 - El panel de proveedor consulta herramientas, categorías y unidades reales; permite crear herramientas sin fotografías falsas y registrar unidades físicas propias. El backend limita el listado de unidades al inventario del proveedor, mientras el administrador conserva la vista total.

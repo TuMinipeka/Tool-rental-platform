@@ -12,8 +12,8 @@ La primera versión completa tiene tres roles:
 
 | Rol | Responsabilidades |
 | --- | --- |
-| Customer | Explorar el catálogo, solicitar reservas, elegir protección opcional, realizar pagos simulados, recibir y devolver herramientas, revisar valoraciones de daños y consultar facturas simuladas. |
-| Supplier | Publicar herramientas, administrar unidades físicas y disponibilidad, confirmar o rechazar reservas, registrar condiciones de entrega y devolución, reportar daños y revisar pagos de alquiler. |
+| Customer | Explorar el catálogo, iniciar órdenes, elegir protección opcional, completar pagos en sandbox, recibir y devolver herramientas, revisar valoraciones de daños y consultar comprobantes académicos. |
+| Supplier | Publicar herramientas, administrar unidades físicas y disponibilidad, registrar condiciones de entrega y devolución, reportar daños y revisar pagos de alquiler. |
 | Administrator | Administrar usuarios y roles, moderar el catálogo, configurar parámetros comerciales, revisar disputas y evidencias de daños, y monitorear la plataforma. |
 
 Supplier realiza las actividades de entrega, devolución y gestión de daños en el alcance inicial. No existe un rol separado de logística.
@@ -24,10 +24,10 @@ El software debe ofrecer finalmente todas las siguientes capacidades funcionales
 
 1. Identidad, autenticación y autorización para los tres roles.
 2. Catálogo, categorías, imágenes, unidades físicas, publicación y disponibilidad.
-3. Solicitud de reserva, confirmación o rechazo del proveedor, cancelación del cliente y prevención de reservas confirmadas superpuestas.
+3. Orden pendiente de pago, retención temporal atómica de inventario, expiración y prevención de reservas superpuestas.
 4. Activación del alquiler, programación y evidencia de entrega, registro de devolución y comparación de condiciones.
 5. Protección opcional, evidencias de daños, valoración, notificación al cliente, disputas y cargos adicionales justificados.
-6. Procesamiento simulado de pagos y reembolsos.
+6. Procesamiento mediante una pasarela sandbox oficial, webhooks verificados y reembolsos idempotentes.
 7. Facturación simulada con precios e impuestos discriminados.
 8. Administración, reportes operativos, auditoría y aceptación de documentos legales.
 9. Interfaz React adaptable que consuma el contrato REST/OpenAPI publicado.
@@ -50,13 +50,13 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 
 ## Reglas de reserva y pago
 
-- Customer solicita una reserva y Supplier la confirma o rechaza.
-- La confirmación vuelve a validar la disponibilidad de forma atómica.
-- El primer cobro simulado corresponde al 50% del total mostrado cuando Supplier confirma.
-- El 50% restante se cobra al terminar el alquiler y aceptar la devolución.
+- Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica.
+- La orden tiene un vencimiento explícito. El pago rechazado, cancelado o vencido libera la retención de inventario de manera idempotente.
+- Una confirmación auténtica recibida y verificada mediante webhook del proveedor sandbox convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
+- El checkout sandbox cobra el total aprobado y mostrado. Daños, extensiones u otros ajustes posteriores se discriminan como operaciones separadas.
 - Extensiones, daños, pérdidas u otros ajustes autorizados son cargos separados y discriminados; nunca se ocultan en el saldo restante.
-- Los medios simulados son tarjeta débito, tarjeta crédito y PayPal. Las tarjetas pueden mostrar Visa o Mastercard como red.
-- La plataforma solo guarda token simulado del procesador, red, últimos cuatro dígitos y expiración necesarios para la demostración. Nunca guarda número completo ni CVV.
+- Los medios objetivo son tarjeta y PayPal mediante SDK o campos alojados/tokenizados del proveedor seleccionado. La selección y credenciales sandbox continúan pendientes de configuración.
+- La plataforma solo guarda referencias tokenizadas y metadatos mínimos autorizados. Nunca recibe ni guarda PAN completo, CVV o contraseña de PayPal.
 - Los estados distinguen como mínimo transacciones pendientes, aprobadas, rechazadas, canceladas y reembolsadas.
 - Cada pago y reembolso debe ser idempotente y auditable.
 

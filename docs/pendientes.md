@@ -13,7 +13,7 @@
 ## Pendientes antes de producción
 
 1. Ejecutar la suite completa PostgreSQL/Testcontainers con Docker disponible.
-2. Integrar pasarela de pagos y reembolsos real con webhooks firmados.
+2. Implementar el nuevo flujo directo: orden pendiente, retención temporal, expiración, pasarela sandbox oficial, webhooks firmados y confirmación automática sin aprobación manual del proveedor.
 3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
 4. Configurar SMTP productivo, reputación de dominio, plantillas y telemetría de entrega.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
@@ -22,6 +22,6 @@
 
 ## Frontend
 
-La base React ya consume la API oficial `/api/v1`, conserva el access token solo en memoria, restaura la sesión mediante la cookie refresh, obtiene CSRF antes de renovar o cerrar sesión y usa `credentials: include`. El recorrido de solicitud ya captura recogida o entrega, hora programada y dirección colombiana, y espera la confirmación del proveedor antes de habilitar el pago simulado. También existe la ruta pública e imprimible `/terms-and-conditions`.
+La base React ya consume la API oficial `/api/v1`, conserva el access token solo en memoria, restaura la sesión mediante la cookie refresh, obtiene CSRF antes de renovar o cerrar sesión y usa `credentials: include`. El recorrido heredado todavía espera confirmación del proveedor y usa pago simulado; debe migrarse al flujo directo aprobado sin presentarlo como terminado. También existe la ruta pública e imprimible `/terms-and-conditions`.
 
 Siguen pendientes los paneles funcionales contra datos reales, el registro persistente de aceptaciones legales, la selección del Plan Opcional de Protección por Daños y el tratamiento específico de 403, 409 y 429 por `code`. El frontend nunca debe tomar decisiones de autorización por sí solo.
