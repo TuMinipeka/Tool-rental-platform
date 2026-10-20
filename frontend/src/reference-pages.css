@@ -243,3 +243,63 @@
   .how-cta>.page-shell{padding-block:40px;gap:24px}
   .how-cta h2{font-size:34px}
 }
+
+/* How it works: 35 percent shorter composition */
+.how-reference-hero{height:340px}
+.how-reference-copy h1{margin-block:7px 10px;font-size:clamp(52px,4.4vw,66px);line-height:.86}
+.how-reference-copy>p:not(.kicker){margin-block:10px 14px;font-size:14px;line-height:1.45}
+.how-reference-copy .button{min-height:42px;padding-inline:22px;font-size:11px}
+.how-process{padding-block:38px 34px}
+.how-process>header{margin-bottom:22px}
+.how-process h2{font-size:44px}
+.how-process>header>p{font-size:14px;line-height:1.5}
+.how-step-grid{gap:18px}
+.how-step-grid article{min-height:176px;padding:18px;grid-template-columns:42px 1fr}
+.how-step-number{width:38px;height:38px;font-size:17px}
+.how-step-grid h3{margin:4px 0 5px;font-size:18px}
+.how-step-grid p{font-size:12px;line-height:1.4}
+.how-step-grid article>img{right:14px;bottom:8px;height:84px}
+.how-benefits{padding-block:32px}
+.how-benefit-title{margin-bottom:14px;padding-bottom:14px}
+.how-benefit-title h2{font-size:34px}
+.how-benefits article{min-height:82px;padding:15px 20px;align-items:center}
+.how-benefits h3{font-size:14px}
+.how-benefits article p{margin-top:4px;font-size:11px;line-height:1.4}
+.how-audience{padding-block:34px;gap:14px}
+.how-audience>div{margin-bottom:4px}
+.how-audience h2{font-size:34px}
+.how-audience>button{min-height:86px;padding:15px}
+.how-audience button strong{font-size:15px}
+.how-audience button small{margin-top:4px;font-size:11px;line-height:1.35}
+.how-cta,.how-cta>.page-shell{min-height:175px}
+.how-cta h2{font-size:34px}
+.how-cta .button{min-height:42px;padding-inline:18px;font-size:10px}
+
+@media(max-width:820px){
+  .how-reference-hero{height:340px}
+  .how-reference-copy h1{font-size:52px}
+  .how-step-grid article{min-height:176px}
+}
+
+@media(max-width:620px){
+  .how-reference-hero,.how-reference-hero>.page-shell{min-height:480px}
+  .how-reference-hero>.page-shell{padding-top:32px}
+  .how-reference-hero>img{height:44%}
+  .how-reference-copy h1{font-size:clamp(40px,12vw,48px)}
+  .how-reference-copy>p:not(.kicker){font-size:13px}
+  .how-process{padding-block:32px 28px}
+  .how-process>header{gap:14px;margin-bottom:18px}
+  .how-process h2{font-size:34px}
+  .how-process>header>p{font-size:12px}
+  .how-step-grid{gap:12px}
+  .how-step-grid article{min-height:155px;padding:16px}
+  .how-step-grid article>img{height:76px}
+  .how-benefits{padding-block:28px}
+  .how-benefit-title h2,.how-audience h2{font-size:30px}
+  .how-benefits article{min-height:78px;padding:14px}
+  .how-audience{padding-block:30px}
+  .how-audience>button{min-height:78px;padding:14px}
+  .how-cta,.how-cta>.page-shell{min-height:240px}
+  .how-cta>.page-shell{padding-block:30px;gap:18px}
+  .how-cta h2{font-size:30px}
+}
