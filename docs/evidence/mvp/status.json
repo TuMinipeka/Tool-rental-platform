@@ -1,17 +1,17 @@
 {
-  "updatedAt": "2026-10-20T17:56:13.003855+00:00",
-  "state": "locally-validated-public-release-blocked",
-  "validatedSourceCommit": "3fbde10ac48a2a3fd33681d45de2b841bb6e92b2",
+  "updatedAt": "2026-10-20T20:10:58.035304+00:00",
+  "state": "locally-validated-provider-acceptance-pending",
+  "validatedSourceCommit": "0692c3111f966c169d41ed4faf0ef2953a2d8dab",
   "condeReference": "981a16e",
-  "sourceFingerprint": "03d8a5b08c5241e9f7a5372b850394df739a626c0ae7ed35a2ffa812b9041cf0",
+  "sourceFingerprint": "8451f65c1caf7aad0532181dfbc364b132008d335e78105eb4b0dc94dbc3c760",
   "localValidation": {
     "mavenPostgres": true,
     "frontendLintBuild": true,
     "browserTests": true,
-    "realRoleJourneys": true,
-    "internalSandboxInvoiceReports": true,
-    "privateMailpitRecovery": true,
-    "showcaseSecurity": true,
+    "realRoleViews": true,
+    "officialGatewayAdapterWithIsolatedDoubles": true,
+    "passwordRecoveryDisabled": true,
+    "showcaseSecurityWithoutSmtp": true,
     "backupRestoreAndPersistence": true,
     "dataMinimums": true,
     "composeConfiguration": true
@@ -19,19 +19,22 @@
   "publicReleaseGates": {
     "oracleCapacity": false,
     "dnsAndHttps": false,
-    "condeSandboxInvoiceReports": false,
-    "condeRecoveryEmail": false,
+    "officialSandboxAccepted": false,
+    "passwordRecoveryDisabled": true,
     "realRoleJourneys": false,
     "credentialsProvisioned": false,
     "offsiteBackupAndRestore": false,
     "armRuntimeValidated": false
   },
   "limitations": [
+    "Private Mercado Pago test seller credentials and authentic HTTPS callbacks not supplied; only isolated gateway doubles exercised",
     "No Oracle account/capacity or DuckDNS configuration supplied",
-    "Official external sandbox provider remains required by approved product scope; internal HMAC sandbox tested separately",
-    "Public SMTP delivery not verified; private Mailpit verified",
-    "Private evaluator bootstrap verified, but public target credentials not provisioned",
-    "No external backup destination supplied; local restore passed",
-    "ARM64 base manifests verified, Oracle ARM runtime not exercised"
+    "Public target evaluator credentials not provisioned",
+    "No external backup destination supplied; fresh local restore passed",
+    "ARM64 base manifests verified previously; Oracle ARM runtime not exercised"
+  ],
+  "approvedScopeChanges": [
+    "PayPal deferred",
+    "Public email, password recovery and reset deferred; endpoints and UI disabled, no SMTP requirement"
   ]
 }

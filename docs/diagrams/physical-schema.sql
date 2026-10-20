@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict xLNk8EQjvT6m8yUgDdeceZmWZXuPTGaN0SlHmE7vBYNwnnewYlgUqKyRUjSjHA7
+\restrict WNnMPodbNZlFavVovtrsOdHD96JhhWMSLghx5WB8qXVWOouk7AkLVVKvTFajJWN
 
 -- Dumped from database version 17.11
 -- Dumped by pg_dump version 17.11
@@ -248,10 +248,19 @@ CREATE TABLE public.payments (
     card_expiry_year smallint,
     adjustment_type character varying(30),
     adjustment_reference uuid,
+    checkout_expires_at timestamp with time zone,
+    checkout_preference_id character varying(200),
+    checkout_url character varying(2000),
+    provider_payment_id character varying(200),
+    checkout_phase character varying(30),
+    checkout_attempts integer DEFAULT 0 NOT NULL,
+    checkout_lease_until timestamp with time zone,
+    checkout_retry_at timestamp with time zone,
     CONSTRAINT ck_payments_adjustment_reference CHECK (((((payment_stage)::text = 'ADJUSTMENT'::text) AND (adjustment_type IS NOT NULL) AND (adjustment_reference IS NOT NULL)) OR (((payment_stage)::text <> 'ADJUSTMENT'::text) AND (adjustment_type IS NULL) AND (adjustment_reference IS NULL)))),
     CONSTRAINT ck_payments_amount_positive CHECK ((amount > (0)::numeric)),
-    CONSTRAINT ck_payments_card_details CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL)))),
-    CONSTRAINT ck_payments_method CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying])::text[]))),
+    CONSTRAINT ck_payments_card_details CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL)))),
+    CONSTRAINT ck_payments_checkout CHECK (((checkout_phase IS NULL) OR (((processor)::text = 'MERCADO_PAGO'::text) AND (checkout_expires_at IS NOT NULL) AND ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying, 'REFUNDED'::character varying, 'DONE'::character varying, 'REJECTED'::character varying])::text[]))))),
+    CONSTRAINT ck_payments_method CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[]))),
     CONSTRAINT ck_payments_processor_not_blank CHECK ((btrim((processor)::text) <> ''::text)),
     CONSTRAINT ck_payments_reference_not_blank CHECK ((btrim((external_reference)::text) <> ''::text)),
     CONSTRAINT ck_payments_stage CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'FULL_PAYMENT'::character varying, 'ADJUSTMENT'::character varying])::text[]))),
@@ -905,6 +914,13 @@ CREATE INDEX ix_password_reset_tokens_user_active ON public.password_reset_token
 
 
 --
+-- Name: ix_payments_checkout_due; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_payments_checkout_due ON public.payments USING btree (checkout_lease_until) WHERE ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying])::text[]));
+
+
+--
 -- Name: ix_payments_reservation_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1010,10 +1026,24 @@ CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (
 
 
 --
+-- Name: ux_payments_hosted_reservation; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ux_payments_hosted_reservation ON public.payments USING btree (reservation_id) WHERE (((processor)::text = 'MERCADO_PAGO'::text) AND ((payment_stage)::text = 'FULL_PAYMENT'::text));
+
+
+--
 -- Name: ux_payments_idempotency_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX ux_payments_idempotency_key ON public.payments USING btree (idempotency_key);
+
+
+--
+-- Name: ux_payments_provider_payment; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX ux_payments_provider_payment ON public.payments USING btree (processor, provider_payment_id) WHERE (provider_payment_id IS NOT NULL);
 
 
 --
@@ -1296,4 +1326,4 @@ ALTER TABLE ONLY public.user_sessions
 -- PostgreSQL database dump complete
 --
 
-\unrestrict xLNk8EQjvT6m8yUgDdeceZmWZXuPTGaN0SlHmE7vBYNwnnewYlgUqKyRUjSjHA7
+\unrestrict WNnMPodbNZlFavVovtrsOdHD96JhhWMSLghx5WB8qXVWOouk7AkLVVKvTFajJWN

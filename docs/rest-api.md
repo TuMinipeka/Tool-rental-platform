@@ -113,3 +113,9 @@ Todas las operaciones directas requieren `Idempotency-Key`:
 - `GET|POST /api/v1/commercial-configuration/cancellation-policies` versiona la política.
 - `GET /api/v1/refunds/payments/{id}` consulta reembolsos.
 - Los endpoints existentes de pagos muestran ajustes `PENDING` de terminación, extensión o mora.
+
+## Contrato vigente del MVP: checkout alojado
+
+La entrada actual de POST /api/v1/payments/checkouts es {"reservationId":"UUID"} con Idempotency-Key y Principal autenticado. No recibe método, PAN, CVV ni datos de PayPal. GET /api/v1/payments/checkouts/{id} informa el estado de conciliación. El webhook oficial usa /api/v1/payments/mercadopago/webhooks. Los ejemplos anteriores de simulación/HMAC son históricos y están deshabilitados por defecto.
+
+Recuperación y restablecimiento salen del MVP y devuelven 404 FEATURE_DISABLED; OpenAPI los omite. GET /api/v1/public/features comparte las capacidades con el navegador. Véase [pagos del MVP](mercadopago-mvp.md) para configuración, estados y aceptación externa pendiente.

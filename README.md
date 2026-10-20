@@ -23,12 +23,12 @@ El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módu
 
 | Área | Implementado | Fuera de este alcance |
 | --- | --- | --- |
-| Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación, CSRF y recuperación opaca por correo | MFA y proveedores de identidad externos |
+| Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación y CSRF; recuperación deshabilitada en el MVP | MFA y proveedores de identidad externos |
 | Reservas | Retención atómica con vencimiento, confirmación automática, cancelación, entrega, devolución, extensión y mora | Optimización logística avanzada |
-| Dinero | Checkout sandbox académico firmado, comprobante descargable, ajustes y reembolsos idempotentes | Pasarela real, impuestos definitivos y conciliación bancaria |
+| Dinero | Mercado Pago Checkout Pro en COP, conciliación, comprobante académico y reembolso tardío; aceptación externa pendiente | Cobros reales, PayPal e impuestos definitivos |
 | Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway V1–V210 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway hasta V304 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -45,7 +45,7 @@ docker compose config --quiet
 docker compose up --build
 ```
 
-Compose levanta PostgreSQL, Mailpit, backend y frontend. Mailpit expone la bandeja de desarrollo en `http://localhost:8025`. El backend queda en `http://localhost:8080`; la página raíz ejecuta una consulta JDBC real y muestra si la conexión fue exitosa.
+Compose levanta PostgreSQL, backend y frontend. Mailpit se conserva como herramienta de desarrollo para una entrega futura; correo y recuperación están deshabilitados en el MVP. El backend queda en `http://localhost:8080`; la página raíz ejecuta una consulta JDBC real y muestra si la conexión fue exitosa.
 
 ### Entorno demostrativo
 
@@ -74,13 +74,10 @@ $env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
 $env:DB_USERNAME = 'tool_rental'
 $env:DB_PASSWORD = '<secret>'
 $env:JWT_SECRET = '<mínimo-32-bytes>'
-$env:SANDBOX_WEBHOOK_SECRET = '<mínimo-32-bytes>'
-$env:SMTP_HOST = '<smtp-host>'
-$env:SMTP_PORT = '587'
-$env:SMTP_USERNAME = '<smtp-user>'
-$env:SMTP_PASSWORD = '<smtp-secret>'
-$env:PASSWORD_RECOVERY_SENDER = '<verified-sender>'
-$env:PASSWORD_RECOVERY_RESET_URL = 'https://app.example/password-reset'
+$env:MERCADOPAGO_ACCESS_TOKEN = '<private-test-seller-token>'
+$env:MERCADOPAGO_COLLECTOR_ID = '<test-seller-id>'
+$env:MERCADOPAGO_WEBHOOK_SECRET = '<private-webhook-secret>'
+$env:PAYMENTS_PUBLIC_URL = 'https://app.example'
 $env:CORS_ALLOWED_ORIGINS = 'https://app.example'
 .\mvnw.cmd -pl infrastructure -am spring-boot:run
 ```
@@ -95,7 +92,7 @@ flowchart LR
     APP --> DOMAIN[Aggregates and ports / Domain]
     JPA[JPA adapters / Infrastructure] -. implements .-> DOMAIN
     JPA --> PG[(PostgreSQL)]
-    SMTP[SMTP / Mailpit] -. implements notification port .-> DOMAIN
+    SMTP[SMTP / Mailpit · aplazado] -. implements notification port .-> DOMAIN
 ```
 
 Los módulos Domain y Application no importan Spring, Hibernate ni HTTP. Infrastructure contiene controladores, seguridad, entidades JPA, mappers, repositorios Spring Data y configuración.
@@ -131,7 +128,7 @@ Consulta [arquitectura](docs/backend-architecture.md) y [mapa de paquetes](docs/
 - El refresh vive en cookie `HttpOnly`, ruta `/api`, `SameSite=Lax` y `Secure` en producción.
 - Renovación y cierres de sesión exigen cookie CSRF y cabecera `X-XSRF-TOKEN`.
 - Cambio de contraseña, cambio de roles y desactivación revocan sesiones activas.
-- Recuperación con token opaco de un solo uso y 15 minutos. La respuesta pública siempre es genérica; el token solo viaja por el puerto SMTP.
+- Recuperación y restablecimiento quedan deshabilitados y ocultos en el MVP; el código opaco de un uso se conserva para una entrega futura. No se exige SMTP.
 - CORS con credenciales acepta únicamente los orígenes configurados.
 - Los errores usan `application/problem+json` con `code`, `status`, `detail`, `instance` y `traceId`.
 
@@ -155,9 +152,9 @@ Rutas principales:
 
 - `GET /api/v1/auth/csrf`, `POST /auth/refresh`, `/logout` y `/logout-all`.
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
-- `POST /api/v1/auth/password-recovery` y `/password-reset`.
+- `GET /api/v1/public/features`: capacidades vigentes; recuperación deshabilitada.
 - `POST /api/v1/auth/supplier-registration` y activación administrativa del usuario.
-- `POST /api/v1/payments/checkouts`, webhook firmado y descarga del comprobante académico.
+- `POST /api/v1/payments/checkouts`, checkout oficial alojado, webhook Mercado Pago y descarga del comprobante académico.
 - `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.
 - `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.
 - `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
@@ -168,7 +165,9 @@ La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en 
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout oficial en payments.
+
+Consulta [pagos del MVP](docs/mercadopago-mvp.md): configuración privada, retorno, conciliación y aceptación externa pendiente. PayPal y correo están aplazados por decisión de alcance.
 
 Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 

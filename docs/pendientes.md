@@ -13,9 +13,9 @@
 ## Pendientes antes de producción
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
-2. Conectar un proveedor sandbox oficial externo: retención, expiración, checkout interno, HMAC y confirmación automática ya están implementados y probados.
+2. Validar el adaptador Mercado Pago Checkout Pro con cuentas oficiales de prueba, callback HTTPS auténtico y conciliación; no confundir pruebas aisladas con aceptación externa.
 3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
-4. Configurar SMTP productivo, reputación de dominio, plantillas y telemetría de entrega.
+4. Fuera del MVP: recuperación por SMTP, reputación del dominio, plantillas y telemetría; mantener la función oculta y deshabilitada.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
 6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
 7. Cerrar las capacidades futuras de producto: protección, evidencias y aceptación legal persistente; los recorridos operativos y reportes actuales ya están conectados.

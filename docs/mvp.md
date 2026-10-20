@@ -1,74 +1,44 @@
-# MVP — entrega de Daniel/Mayorga
+# MVP — cierre de Conde e integración de Daniel/Mayorga
 
-## Estado verificable
+## Decisiones vigentes
 
-**Validado localmente; publicación pública bloqueada.** Demo académica con datos ficticios, sin cargos externos. Rama `developer/daniel`; entrega de Conde integrada hasta `981a16e`. El diseño existente se conserva.
+Demo pública académica; COP y Mercado Pago Checkout Pro con cuentas oficiales de prueba. **PayPal y correo quedan fuera de este MVP por decisión de Daniel.** La recuperación se conserva en código, pero está oculta y deshabilitada. No se ejecutan cobros reales ni se emiten documentos fiscales.
 
-| Prioridad | Trabajo | Responsable | Estado y evidencia |
-| --- | --- | --- | --- |
-| P0 | Compose, base exclusiva, backend, frontend y proxy | Daniel | Ejecutándose en localhost:15173; [configuración](evidence/mvp/configuration.json) |
-| P0 | Oracle ARM, DuckDNS y HTTPS público | Daniel | Preparado; faltan cuenta/capacidad, dominio y ensayo ARM |
-| P0 | Retención atómica, expiración y confirmación por webhook | Conde | Integrado; Maven/PostgreSQL y [recorrido real](evidence/mvp/live-integration.json) |
-| P0 | Checkout y comprobante descargable | Conde + integración Daniel | Sandbox **interno HMAC**, pago total y comprobante académico verificados; proveedor oficial externo pendiente |
-| P0 | Reportes y permisos | Conde + integración Daniel | Cinco reportes del backend, restricciones por rol y proveedor; alta de proveedor suspendido y activación administrativa verificadas |
-| P0 | Correo y restablecimiento | Conde + integración Daniel | SMTP privado Mailpit y pantalla /password-reset verificados; SMTP público pendiente |
-| P0 | Respaldo, persistencia y restauración | Daniel | [Restauración local](evidence/mvp/backup-restore.json) satisfactoria; destino externo pendiente |
-| P1 | 20 filas por entidad de negocio | Daniel | V302 y [matriz real](evidence/mvp/database-audit.json); excepciones técnicas justificadas |
-| P1 | Modelos y normalización | Daniel | [Relacional y DDL físico](logical-physical-model.md); conceptual y 4FN conservados |
-| P1 | Documentación y pruebas | Ambos | [Reporte de validación](validation-report.md) |
+Rama de trabajo: developer/daniel. Se conserva el diseño de Conde y la arquitectura hexagonal de los tres módulos. El enunciado original no se modifica.
 
-## Cierre local de Daniel
+## Tareas de Conde
 
-- [x] Maven clean verify con JDK 21 y PostgreSQL/Testcontainers.
-- [x] Instalación vacía, actualización desde V200, rollback y concurrencia.
-- [x] Lint, build y pruebas de navegador aisladas en escritorio y móvil.
-- [x] Recorrido real de tres roles sin mocks: catálogo, unidad, reserva, checkout interno, webhook, factura, entrega, devolución y cierre.
-- [x] Permisos, suspensión/activación de proveedor, renovación y revocación.
-- [x] Recuperación por Mailpit, token de un uso y revocación de sesión tras cambiar contraseña.
-- [x] Restauración y persistencia tras reinicio; configuración pública validada sin abrir servicios públicos.
-- [x] Modelos, matriz de datos y evidencias sin secretos.
+| Tarea | Implementación y aceptación |
+| --- | --- |
+| Clientes y proveedores | CRUD y baja lógica existentes; revocación de sesiones y conservación del historial cubiertas por regresión |
+| Reservas | Retenciones, vencimiento, disponibilidad, confirmación, cancelación y ciclo operativo existentes; nueva aprobación oficial mantiene una transacción local |
+| Pagos y comprobante | Adaptador oficial, checkout alojado, firma, consulta canónica, conciliación, idempotencia y reembolso tardío implementados; **aceptación real del proveedor pendiente de credenciales y callback HTTPS** |
+| Reportes | Cinco consultas con datos persistidos y alcance por rol; profitability significa ingreso reservado, no margen neto |
+| JWT y roles | Sesiones rotativas, CSRF, activación administrativa de proveedor y revocación existentes; conservar pruebas de accesos prohibidos |
+| Documentación y pruebas | Contrato y procedimiento en [pagos del MVP](mercadopago-mvp.md); resultados actuales en [validación](validation-report.md) |
+| Frontend | Checkout oficial y retorno conectado al estado del servidor, sin formulario académico ni PayPal; recuperación oculta y deshabilitada; se conserva el diseño |
 
-Las pruebas automáticas crean datos ficticios en una base exclusiva. No prueban cobros bancarios, envío público de correo ni ejecución en Oracle.
+La implementación no equivale a aceptación externa. El sandbox HMAC anterior solo conserva utilidad de regresión interna; no satisface el requisito oficial y está bloqueado por defecto.
 
-## Dependencias y aceptación pública
+## Responsabilidades de Daniel
 
-| Dependencia | Responsable | Criterio pendiente |
+| Prioridad | Entrega | Condición de cierre |
 | --- | --- | --- |
-| Pasarela oficial sandbox | Conde / decisión de producto | Proveedor configurado, callback auténtico, rechazo, duplicados y conciliación; el HMAC interno no sustituye este requisito vigente |
-| SMTP público | Conde + Daniel | Remitente verificado, TLS y recepción real en buzón de evaluación |
-| Oracle y DNS | Daniel / titular de cuenta | Capacidad gratuita disponible, DNS y HTTPS válidos, ensayo en ARM sin recursos de pago |
-| Copia externa | Daniel / titular del destino | Recepción y restauración desde otro servidor, siete copias y alertas |
-| Accesos públicos | Operador | Provisionar y rotar evaluadores privados en la base pública; los usuarios demo conocidos quedan desactivados |
+| P0 | Compose aislado, frontend, backend y PostgreSQL | Repetir arranque, integración y evidencia de la revisión actual |
+| P0 | Mercado Pago oficial | Titular proporciona configuración privada; validar compra aprobada/rechazada, callback auténtico y conciliación |
+| P0 | Oracle gratuito, DNS y HTTPS | Cuenta y capacidad disponibles, dominio configurado, certificado válido y ejecución ARM probada |
+| P0 | Respaldo externo | Recepción, retención de siete copias y restauración desde otro servidor |
+| P0 | Evaluadores | Provisionar y rotar accesos privados; nunca publicar usuarios demo conocidos |
+| P1 | Datos y modelos | Conservar matriz de 20 registros de negocio, excepciones técnicas, modelos y 4FN |
 
-[status.json](evidence/mvp/status.json) distingue validación local de aceptación pública. El script de publicación y Caddy permanecen bloqueados. Los indicadores públicos solo se habilitan con evidencia del entorno destino; no por compilar. El procedimiento está en [despliegue](deployment.md).
+Correo público deja de ser una condición de publicación. Se sustituye por comprobar que la recuperación esté deshabilitada en backend, navegador y OpenAPI, sin exigir SMTP.
 
-Los contratos consumidos están en [integración](integration-contracts.md). La autoridad de importes, permisos, disponibilidad y transiciones pertenece al backend. Se conserva el [enunciado original](../ejercicioDemo.md).
+## Publicación condicionada
 
-## Auditoría de las tareas originales de Conde
+[Estado verificable](evidence/mvp/status.json) conserva bloqueado el lanzamiento mientras falten requisitos externos. No marcar una compra oficial como probada por pasar un doble HTTP. No abrir la demo general para resolver el callback; usar un entorno HTTPS de aceptación restringido.
 
-Revisión: 20 de octubre de 2026. Referencia remota `developer/conde@981a16e`; integrada en `developer/daniel@59bb9c2`. Se contrastó este seguimiento con la sección «Tarea 2» del archivo original conservado en esa referencia de Git, los casos de uso y las pruebas. Las marcas de tarea completada del documento original no sustituyen la aceptación del alcance aprobado.
+Las evidencias anteriores de Mailpit y HMAC quedan como históricas, no como comportamiento público vigente. Consulta [despliegue](deployment.md), [contratos](integration-contracts.md) y [enunciado original](../ejercicioDemo.md).
 
-| Tarea original | Resultado verificado | Pendiente / límite |
-| --- | --- | --- |
-| 1. CRUD de clientes y proveedores | Implementados registro, consulta, actualización y baja lógica; se conserva el perfil y se revocan sesiones | Cierre backend de los perfiles verificado; no implica que toda operación futura de producto tenga pantalla |
-| 2. Reservas | Retención atómica, vencimiento, disponibilidad, confirmación por evento interno, cancelación, entrega y devolución implementados | La confirmación desde un proveedor sandbox oficial depende de la tarea 3 |
-| 3. Pagos y facturación | Checkout interno idempotente, HMAC, pago total, confirmación y comprobante HTML académico | **Parcial para el MVP aprobado:** falta proveedor sandbox oficial, checkout del proveedor, callback auténtico, rechazo/duplicados y conciliación verificados; la simulación interna no satisface el requisito confirmado por Daniel |
-| 4. Reportes y estadísticas | Cinco endpoints con consultas persistidas, alcance de proveedor/administrador y 403 para cliente | profitability representa ingreso reservado, no utilidad neta; no hay costos contables en el modelo |
-| 5. JWT y roles | Registro de proveedor suspendido, activación administrativa, restricciones, validaciones y revocación probados | Los accesos privados del entorno público se provisionan durante el despliegue; no reutilizar usuarios demo |
-| 6. Documentación y pruebas backend | Conde entregó contratos y documentación en 981a16e; existen pruebas de onboarding, pago firmado, reportes y persistencia | La validación PostgreSQL que su documento dejaba pendiente fue cerrada por Daniel; faltan pruebas de la futura pasarela oficial y SMTP público |
-| 7. Mejoras frontend e integración posterior | El documento original de Conde aún las marca pendientes; Daniel ya conectó los recorridos y reportes actuales preservando su diseño | No atribuir a Conde las integraciones posteriores de Daniel ni declarar terminadas mejoras adicionales sin criterios concretos de aceptación |
+## Validación de esta entrega
 
-### Evidencias de implementación
-
-- [CRUD de cliente](../application/src/main/java/com/toolrental/application/customer/usecase/ManageCustomerUseCase.java) y [proveedor](../application/src/main/java/com/toolrental/application/supplier/usecase/ManageSupplierUseCase.java): registro, actualización y baja lógica.
-- [Checkout](../application/src/main/java/com/toolrental/application/payment/usecase/CreateSandboxCheckoutUseCase.java): crea una referencia local sandbox_; no invoca un adquirente externo. [Verificador](../infrastructure/src/main/java/com/toolrental/infrastructure/payment/adapters/in/rest/SandboxWebhookVerifier.java): HMAC propio con vigencia de cinco minutos.
-- [Pruebas PostgreSQL/HTTP](../infrastructure/src/test/java/com/toolrental/infrastructure/PostgresIntegrationTest.java): onboarding y baja, firma inválida, confirmación, comprobante y alcance de reportes. La prueba PostgreSQL adicional conserva restricciones y concurrencia.
-- [Recorrido real ya ejecutado](evidence/mvp/live-integration.json): 43 comprobaciones de integración sin mocks, incluyendo el sandbox interno y Mailpit. [Reporte de pruebas](validation-report.md): alcance, fecha y límites de las suites.
-
-### Dictamen de despliegue
-
-**No está completo el cierre público del MVP.** La pasarela oficial sigue siendo obligatoria por decisión expresa de Daniel. La recuperación está implementada, pero requiere configurar y demostrar recepción por SMTP público. Son dependencias de aceptación, no errores de compilación ni ausencia del flujo académico.
-
-Además de esas tareas funcionales, Daniel debe cerrar capacidad Oracle gratuita, DNS/HTTPS, ejecución ARM, respaldo externo restaurado y accesos privados del destino. No se desplegará públicamente mientras falten estas evidencias. Protección, fiscalidad definitiva y otras capacidades futuras de product-scope no se declaran implementadas por haber completado el ciclo académico.
-
-Revalidación de esta auditoría: `mvnw.cmd clean verify` con Java 21.0.12.1 y PostgreSQL/Testcontainers terminó el 20 de octubre a las 14:27:35 (America/Bogota): 83 pruebas, cero fallos, errores u omisiones; Spotless satisfactorio. Se conserva la huella del log privado en [evidencia consolidada](evidence/mvp/validation-summary.json). Los recorridos frontend se consultaron en su evidencia previa; no se presentan como repetidos en esta auditoría. La conexión JDBC local volvió a responder connected=true.
+Código `0692c31`: Maven 100/100 sin omisiones; navegador 78 pruebas correctas y dos omisiones previstas por dispositivo; 21 comprobaciones contra vistas/API/PostgreSQL reales y 17 del perfil seguro sin SMTP. Respaldo restaurado y persistencia tras reinicio verificados con V304. La compra oficial sigue pendiente de las credenciales y el callback auténtico, no de Mailpit ni de un simulador. [Evidencias y límites](validation-report.md).

@@ -56,10 +56,9 @@ Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y complet
 | PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
 | POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
 | JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
-| SANDBOX_WEBHOOK_SECRET | Secreto privado independiente para el sandbox interno; nunca incluir en VITE_* |
+| MERCADOPAGO_ACCESS_TOKEN / COLLECTOR_ID / WEBHOOK_SECRET | Vendedor oficial de prueba y firma; nunca incluir en VITE_* |
 | BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
-| SMTP_HOST / PORT / USERNAME / PASSWORD | Entrega de correo configurada por Conde; TLS obligatorio |
-| PASSWORD_RECOVERY_SENDER | Remitente verificado |
+| PAYMENTS_PUBLIC_URL | Origen HTTPS de callback; Compose lo deriva de PUBLIC_HOST |
 
 CORS permite exactamente el origen HTTPS configurado; el refresh es HttpOnly/Secure/SameSite=Lax y la API conserva CSRF. Spring procesa cabeceras reenviadas solo detrás del proxy privado. La especificación conserva exclusivamente /api/v1; el alias heredado no se anuncia como contrato nuevo.
 
@@ -89,8 +88,12 @@ Antes de actualizar guarda las referencias de imágenes y el respaldo probado. P
 
 ## Límites restantes
 
-Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, SMTP público, pasarela oficial, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, aceptación del sandbox oficial, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
 
 ## Migraciones tras integrar Conde
 
 V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V303.
+
+## Configuración privada del proveedor
+
+La ubicación preparada es `.env.mercadopago.local`, ignorada por Git; la plantilla versionada es `.env.mercadopago.example`. Los scripts operativos leen primero `.env.showcase` y luego ese archivo privado. No se han inventado credenciales. Configura la cuenta oficial de vendedor de prueba y el secreto del webhook; consulta [pagos del MVP](mercadopago-mvp.md). El origen HTTPS público se deriva de PUBLIC_HOST. Recuperación y SMTP permanecen deshabilitados.

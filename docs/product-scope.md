@@ -1,5 +1,7 @@
 # Alcance del producto
 
+> Alcance vigente del MVP: Mercado Pago Checkout Pro en COP; PayPal y correo aplazados. Recuperación oculta y deshabilitada. El resto de este documento también describe producto futuro; consulta [MVP](mvp.md) para aceptación actual.
+
 ## Propósito
 
 Tool Rental Platform es una simulación universitaria realista de un mercado colombiano para alquilar herramientas y equipos de construcción. El producto objetivo debe soportar el ciclo completo de alquiler y mantener el ambiente académico claramente separado de una operación comercial real.
@@ -136,3 +138,7 @@ El diseño se basa en fuentes oficiales:
 - [Superintendencia Financiera: aseguradoras e intermediarios autorizados](https://www.superfinanciera.gov.co/publicaciones/15491/industrias-supervisadasindustria-aseguradorainformacion-general-aseguradoras-e-intermediarios-de-seguros-15491/).
 
 Estos documentos orientan una simulación académica y no sustituyen asesoría legal, tributaria, contable ni de seguridad. Un lanzamiento comercial real queda bloqueado hasta que profesionales colombianos calificados revisen identidad del operador, cancelaciones, parámetros de protección, tratamiento tributario, facturación, privacidad y texto legal final.
+
+## Decisión de alcance del MVP — 20 de octubre de 2026
+
+Para el cierre académico se selecciona Mercado Pago Checkout Pro en COP, exclusivamente con cuentas oficiales de prueba. PayPal y correo se aplazan, incluida recuperación y restablecimiento de contraseña: quedan ocultos y deshabilitados. Esta decisión sustituye los requisitos anteriores de esos medios para el MVP; no elimina capacidades del producto futuro. El adaptador oficial requiere aceptación con credenciales y webhook auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).

@@ -1,42 +1,14 @@
 {
-  "recordedAt": "2026-10-20T17:56:13.003855+00:00",
-  "validatedSourceCommit": "3fbde10ac48a2a3fd33681d45de2b841bb6e92b2",
-  "condeReference": "981a16e",
-  "sourceFingerprint": "03d8a5b08c5241e9f7a5372b850394df739a626c0ae7ed35a2ffa812b9041cf0",
+  "recordedAt": "2026-10-20T20:10:58.035304+00:00",
+  "validatedSourceCommit": "0692c3111f966c169d41ed4faf0ef2953a2d8dab",
+  "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
+  "sourceFingerprint": "8451f65c1caf7aad0532181dfbc364b132008d335e78105eb4b0dc94dbc3c760",
   "maven": {
     "command": ".\\mvnw.cmd clean verify",
     "java": "21.0.12.1",
-    "finishedAt": "2026-10-20T12:17:11-05:00",
+    "finishedAt": "2026-10-20T15:03:32-05:00",
     "result": "BUILD SUCCESS",
     "suites": [
-      {
-        "suite": "com.toolrental.application.ApplicationExceptionsTest",
-        "tests": 2,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0
-      },
-      {
-        "suite": "com.toolrental.application.CatalogAndReservationsTest",
-        "tests": 11,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0
-      },
-      {
-        "suite": "com.toolrental.application.EquipmentUnitListingUseCaseTest",
-        "tests": 2,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0
-      },
-      {
-        "suite": "com.toolrental.application.RefreshSessionUseCaseTest",
-        "tests": 1,
-        "failures": 0,
-        "errors": 0,
-        "skipped": 0
-      },
       {
         "suite": "com.toolrental.domain.common.AggregateEventsTest",
         "tests": 8,
@@ -66,6 +38,34 @@
         "skipped": 0
       },
       {
+        "suite": "com.toolrental.application.ApplicationExceptionsTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.CatalogAndReservationsTest",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.EquipmentUnitListingUseCaseTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.RefreshSessionUseCaseTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
         "suite": "com.toolrental.infrastructure.ArchitectureTest",
         "tests": 4,
         "failures": 0,
@@ -89,6 +89,13 @@
       {
         "suite": "com.toolrental.infrastructure.BoundedContextHttpMappingTest",
         "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.common.web.MvpFeatureFilterTest",
+        "tests": 2,
         "failures": 0,
         "errors": 0,
         "skipped": 0
@@ -129,8 +136,22 @@
         "skipped": 0
       },
       {
+        "suite": "com.toolrental.infrastructure.payment.adapters.in.rest.MercadoPagoWebhookVerifierTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.payment.adapters.out.gateway.MercadoPagoPaymentGatewayTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
         "suite": "com.toolrental.infrastructure.PostgresIntegrationTest",
-        "tests": 15,
+        "tests": 23,
         "failures": 0,
         "errors": 0,
         "skipped": 0
@@ -151,12 +172,12 @@
       }
     ],
     "totals": {
-      "tests": 83,
+      "tests": 100,
       "failures": 0,
       "errors": 0,
       "skipped": 0
     },
-    "logSha256": "6a951847dedb8b7f3971b64b1c568dc379125108a1f852d88e392430d5257c10"
+    "logSha256": "839584434e1585a19faccbc24cf99104168711f637689e3c053c9ed36725203b"
   },
   "frontend": {
     "commands": [
@@ -164,48 +185,55 @@
       "npm run build",
       "npm run test:e2e"
     ],
-    "passed": 72,
+    "passed": 78,
     "failed": 0,
     "skipped": 2,
-    "scope": "Isolated API fixtures; desktop/mobile, axe accessibility, motion, routing and retry contracts"
+    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, hosted redirect and untrusted return parameters",
+    "logSha256": "79cad7f79253e10b576f9da076c31b1edf19606179d864c23d62475fc1dd00cb"
   },
   "integration": {
-    "command": "node frontend/scripts/verify-live-mvp.mjs",
-    "passed": 43,
-    "scope": "Actual isolated Spring Boot/PostgreSQL; internal sandbox; private Mailpit"
+    "command": "node frontend/scripts/verify-hosted-mvp.mjs",
+    "passed": 21,
+    "scope": "Real isolated frontend/backend/PostgreSQL; no API mocks; external checkout acceptance unavailable without credentials",
+    "evidence": "hosted-integration.json"
   },
   "security": {
     "command": "node scripts/verify-showcase.mjs",
-    "passed": 11,
-    "scope": "Private production+showcase profile; no public deployment"
+    "passed": 17,
+    "scope": "Private production+showcase profile without SMTP; no public HTTPS or external payment acceptance",
+    "evidence": "secure-profile.json"
   },
   "operationalCommands": [
     "node scripts/verify-backup.mjs",
     "node scripts/audit-database.mjs",
-    "node scripts/verify-configuration.mjs",
-    "node scripts/verify-arm-images.mjs"
+    "node scripts/verify-configuration.mjs"
   ],
+  "localImages": {
+    "tool-rental-mvp-backend:working": "sha256:1706e501ecb04aa865d100ec1819e5f59a14f016291ab71a975f02d0f6e43072",
+    "tool-rental-mvp-frontend:working": "sha256:f2175aa0e65cab5f612240ec6ddf5402a69ab592fdfd41b297cf980186f12f21"
+  },
   "publicDeploymentPerformed": false,
-  "condeTaskAudit": {
-    "auditedAt": "2026-10-20T19:27:56.004824+00:00",
-    "sourceCommit": "59bb9c2b136ea3315904390797564153a00a6cd2",
-    "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
-    "command": ".\\mvnw.cmd clean verify",
-    "finishedAt": "2026-10-20T14:27:35-05:00",
-    "result": "BUILD SUCCESS",
-    "java": "21.0.12.1",
-    "totals": {
-      "tests": 83,
-      "failures": 0,
-      "errors": 0,
-      "skipped": 0
+  "officialProviderAcceptancePassed": false,
+  "privateConfiguration": {
+    "path": ".env.mercadopago.local",
+    "gitIgnored": true,
+    "credentialsSupplied": false
+  },
+  "scopeDecisions": {
+    "provider": "Mercado Pago Checkout Pro",
+    "currency": "COP",
+    "liveCharges": false,
+    "paypal": "deferred",
+    "emailAndRecovery": "deferred and disabled"
+  },
+  "historicalEvidence": [
+    {
+      "evidence": "live-integration.json",
+      "scope": "Previous internal HMAC and Mailpit journey; not current public acceptance"
     },
-    "logSha256": "ba881bc338281e60cf15f33e602128891c152f660e09174a888ebb135e45ea9f",
-    "frontendJourneysRepeated": false,
-    "publicDeploymentAuthorizedByChecklist": false,
-    "blockingFunctionalAcceptance": [
-      "Official external sandbox provider integration",
-      "Public SMTP delivery acceptance"
-    ]
-  }
+    {
+      "evidence": "arm-manifests.json",
+      "scope": "Base image architecture manifests; no Oracle ARM runtime acceptance"
+    }
+  ]
 }

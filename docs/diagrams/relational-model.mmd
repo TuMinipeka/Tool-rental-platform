@@ -91,6 +91,14 @@ erDiagram
         smallint card_expiry_year
         character_varying adjustment_type
         uuid adjustment_reference
+        timestamp_with_time_zone checkout_expires_at
+        character_varying checkout_preference_id
+        character_varying checkout_url
+        character_varying provider_payment_id
+        character_varying checkout_phase
+        integer checkout_attempts
+        timestamp_with_time_zone checkout_lease_until
+        timestamp_with_time_zone checkout_retry_at
     }
     refunds {
         uuid refund_id PK

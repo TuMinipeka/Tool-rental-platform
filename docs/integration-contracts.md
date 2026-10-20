@@ -1,33 +1,25 @@
 # Integración por rol y contratos
 
-Entrega de Conde integrada hasta `981a16e`; API oficial `/api/v1`. El navegador conserva access tokens en memoria, cookies refresh HttpOnly y CSRF. Nunca recibe el secreto del webhook.
+La API oficial usa /api/v1 y mantiene temporalmente el alias /api. El navegador guarda access tokens en memoria, refresh en cookie HttpOnly y usa CSRF. El backend decide importes, permisos y transiciones.
 
-| Vista / operación | Contrato | Autoridad y aceptación |
-| --- | --- | --- |
-| Catálogo y disponibilidad | GET /public/catalog y disponibilidad por herramienta | Backend; build público sin catálogo ficticio de respaldo |
-| Registro cliente y proveedor | POST /auth/register y /auth/supplier-registration | Cliente activo; proveedor SUSPENDED hasta activación administrativa; sin token al registrar proveedor |
-| Sesión y recuperación | /auth/login, refresh, logout, password-recovery y password-reset | Cookies/CSRF y respuesta genérica; correo probado con Mailpit privado |
-| Reservas e historial | GET /reservations, /rentals, /payments y /invoices | Filtrado por actor; carga, vacío y error explícitos |
-| Herramientas y unidades | /tools, /equipment-units y /categories | Propiedad y permisos en servidor |
-| Reserva nueva | POST /reservations | PENDING_PAYMENT con vencimiento y retención atómica; total inclusivo del servidor |
-| Checkout | POST /payments/checkouts | Idempotency-Key estable; FULL_PAYMENT; registra referencia del sandbox interno, sin cobro externo |
-| Verificación académica | POST /payments/sandbox/webhooks | Operador privado; HMAC, timestamp y duplicados; jamás firmado en React |
-| Comprobante | GET /invoices/{id}/document | Descarga HTML autenticada con aviso de simulación no válida ante DIAN |
-| Cancelación | POST /reservations/{id}/cancellation | Idempotency-Key estable por intento; importes y transición del servidor |
-| Entrega y alquiler | /unit-deliveries, /rentals y /unit-returns | Proveedor propietario; programación, entrega, inicio, devolución y cierre según estado |
-| Usuarios | GET /users; PATCH /users/{id}/status | Administrador; activar suspendido/desactivar activo, revocación inmediata |
-| Reportes | GET /reports/{income,most-rented-tools,frequent-customers,availability,profitability} | From/to obligatorios; proveedor limitado a su alcance, administrador global, cliente 403 |
+| Operación | Contrato y aceptación |
+| --- | --- |
+| Capacidades | GET /public/features; recuperación deshabilitada en el MVP |
+| Catálogo | /public/catalog; sin catálogo ficticio de respaldo en publicación |
+| Registro y sesión | /auth/register, /auth/supplier-registration, login, refresh y logout; proveedor suspendido hasta activación administrativa |
+| Historial | /reservations, /rentals, /payments e /invoices; filtrados por actor |
+| Catálogo del proveedor | /tools, /equipment-units y /categories; permisos y propiedad en servidor |
+| Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas |
+| Pago oficial | POST /payments/checkouts con reserva e Idempotency-Key; GET /payments/checkouts/{id} para retorno y conciliación |
+| Notificación oficial | POST /payments/mercadopago/webhooks; firma oficial y consulta del pago antes de aplicar el resultado |
+| Comprobante | GET /invoices/{id}/document; descarga autenticada, académica y sin validez fiscal |
+| Cancelación | POST /reservations/{id}/cancellation; clave idempotente e importes del servidor |
+| Entrega y alquiler | /unit-deliveries, /rentals y /unit-returns; proveedor propietario y orden operativo vigente |
+| Usuarios | /users; administrador activa o desactiva y revoca sesiones |
+| Reportes | /reports/{income,most-rented-tools,frequent-customers,availability,profitability}; fechas y alcance por rol |
 
-Las rutas de la tabla son relativas a `/api/v1`. OpenAPI es la referencia exacta de cuerpos, parámetros y errores. La confirmación/rechazo manual se conserva solo para solicitudes heredadas PENDING, no para nuevas órdenes pendientes de pago.
+Todas las rutas son relativas a /api/v1. [Mercado Pago](mercadopago-mvp.md) documenta campos, configuración y aceptación pendiente. Un retorno del navegador nunca confirma un pago.
 
-El reporte profitability muestra ingreso reservado, **no margen contable**: aún no se registran costos. Las facturas se generan atómicamente al aprobar el pago interno y pueden preceder al alquiler. Los documentos históricos no se editan en el navegador.
+Recuperación, restablecimiento, simulaciones, webhook HMAC y cambios manuales de pagos no están disponibles en el MVP público. Devuelven FEATURE_DISABLED. Las pruebas de regresión antiguas habilitan expresamente esas funciones; no son instrucciones de publicación.
 
-## Verificación del sandbox interno
-
-Crear el checkout desde la cuenta del cliente. Copiar su referencia académica y, exclusivamente en el entorno local aislado, configurar SANDBOX_EXTERNAL_REFERENCE en una terminal privada y ejecutar `node scripts/send-sandbox-event.mjs`. SANDBOX_OUTCOME admite APPROVED o DECLINED. El script lee el secreto de .env.validation, genera timestamp/firma y no imprime secretos ni simula un proveedor externo. El pago aprobado confirma la reserva y emite un único comprobante.
-
-La prueba `node frontend/scripts/verify-live-mvp.mjs` ejecuta este contrato contra PostgreSQL, verifica firma inválida, duplicados, descarga, reportes, permisos, ciclo operativo, correo privado y revocación. Los estados de error no se convierten en éxitos locales.
-
-## Pendiente de aceptación pública
-
-Pasarela sandbox oficial, SMTP público, HTTPS y pruebas en Oracle ARM mantienen sus criterios en [MVP](mvp.md). El frontend no inventa endpoints para reemplazar esas dependencias. Los reportes y el correo privado ya entregados por Conde no se clasifican como ausentes.
+Los reportes representan datos persistidos. profitability es ingreso reservado, sin cálculo de utilidad neta. El comprobante puede preceder al alquiler y sus datos históricos no se editan libremente.

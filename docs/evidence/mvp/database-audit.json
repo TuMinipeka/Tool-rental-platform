@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-20T17:51:07.682Z",
-  "sourceFingerprint": "fbe4f67cb7dd261139b20736c011c37c03c2612cd090735c48de8bdcbc6c0d3d",
+  "generatedAt": "2026-10-20T20:08:36.456Z",
+  "sourceFingerprint": "1f6013c3371f3891f65da8a6a2a794b39b8a14030d18dae9683f1f8c7c7433d2",
   "validatedWorkingTree": true,
-  "sourceCommit": "9ee38c84366497af3fdf038da2b61483d463c5cc",
+  "sourceCommit": "2b4c78889818f981fb070cfbe351e7331e92e934",
   "database": "isolated MVP validation",
   "tables": [
     {
@@ -19,7 +19,7 @@
     },
     {
       "table": "customers",
-      "rows": 31,
+      "rows": 32,
       "minimum": 20,
       "exception": null
     },
@@ -37,31 +37,31 @@
     },
     {
       "table": "equipment_units",
-      "rows": 57,
+      "rows": 58,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "invoice_items",
-      "rows": 31,
+      "rows": 32,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "invoices",
-      "rows": 31,
+      "rows": 32,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "password_reset_tokens",
-      "rows": 5,
+      "rows": 6,
       "minimum": null,
       "exception": "Created by actual recovery; no seeded secrets"
     },
     {
       "table": "payments",
-      "rows": 51,
+      "rows": 52,
       "minimum": 20,
       "exception": null
     },
@@ -73,7 +73,7 @@
     },
     {
       "table": "rentals",
-      "rows": 30,
+      "rows": 31,
       "minimum": 20,
       "exception": null
     },
@@ -85,19 +85,19 @@
     },
     {
       "table": "reservation_items",
-      "rows": 56,
+      "rows": 58,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "reservation_terminations",
-      "rows": 24,
+      "rows": 25,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "reservations",
-      "rows": 56,
+      "rows": 58,
       "minimum": 20,
       "exception": null
     },
@@ -109,49 +109,49 @@
     },
     {
       "table": "suppliers",
-      "rows": 27,
+      "rows": 28,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "tool_images",
-      "rows": 32,
+      "rows": 33,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "tools",
-      "rows": 57,
+      "rows": 58,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "unit_deliveries",
-      "rows": 31,
+      "rows": 32,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "unit_returns",
-      "rows": 29,
+      "rows": 30,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "user_roles",
-      "rows": 59,
+      "rows": 61,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "user_sessions",
-      "rows": 46,
+      "rows": 63,
       "minimum": null,
       "exception": "Created by actual authentication; no seeded sessions"
     },
     {
       "table": "users",
-      "rows": 54,
+      "rows": 56,
       "minimum": 20,
       "exception": null
     }
@@ -667,6 +667,62 @@
       "data_type": "uuid",
       "is_nullable": "YES",
       "ordinal_position": 17
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_preference_id",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_url",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "payments",
+      "column_name": "provider_payment_id",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_phase",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 22
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_attempts",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 23
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_lease_until",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 24
+    },
+    {
+      "table_name": "payments",
+      "column_name": "checkout_retry_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 25
     },
     {
       "table_name": "refunds",
@@ -1815,14 +1871,21 @@
       "table_name": "payments",
       "name": "ck_payments_card_details",
       "type": "c",
-      "definition": "CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL))))",
+      "definition": "CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_checkout",
+      "type": "c",
+      "definition": "CHECK (((checkout_phase IS NULL) OR (((processor)::text = 'MERCADO_PAGO'::text) AND (checkout_expires_at IS NOT NULL) AND ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying, 'REFUNDED'::character varying, 'DONE'::character varying, 'REJECTED'::character varying])::text[])))))",
       "validated": true
     },
     {
       "table_name": "payments",
       "name": "ck_payments_method",
       "type": "c",
-      "definition": "CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying])::text[])))",
+      "definition": "CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[])))",
       "validated": true
     },
     {
@@ -2691,6 +2754,13 @@
     {
       "schemaname": "public",
       "tablename": "payments",
+      "indexname": "ix_payments_checkout_due",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_payments_checkout_due ON public.payments USING btree (checkout_lease_until) WHERE ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying])::text[]))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
       "indexname": "ix_payments_reservation_id",
       "tablespace": null,
       "indexdef": "CREATE INDEX ix_payments_reservation_id ON public.payments USING btree (reservation_id)"
@@ -2719,9 +2789,23 @@
     {
       "schemaname": "public",
       "tablename": "payments",
+      "indexname": "ux_payments_hosted_reservation",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_payments_hosted_reservation ON public.payments USING btree (reservation_id) WHERE (((processor)::text = 'MERCADO_PAGO'::text) AND ((payment_stage)::text = 'FULL_PAYMENT'::text))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
       "indexname": "ux_payments_idempotency_key",
       "tablespace": null,
       "indexdef": "CREATE UNIQUE INDEX ux_payments_idempotency_key ON public.payments USING btree (idempotency_key)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "ux_payments_provider_payment",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_payments_provider_payment ON public.payments USING btree (processor, provider_payment_id) WHERE (provider_payment_id IS NOT NULL)"
     },
     {
       "schemaname": "public",
@@ -3628,6 +3712,14 @@
       "description": "complete mvp business fixtures",
       "script": "V302__complete_mvp_business_fixtures.sql",
       "checksum": -1174550292,
+      "success": true
+    },
+    {
+      "installed_rank": 57,
+      "version": "304",
+      "description": "add hosted payment checkout",
+      "script": "V304__add_hosted_payment_checkout.sql",
+      "checksum": -1960208570,
       "success": true
     }
   ]

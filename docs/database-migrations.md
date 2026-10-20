@@ -20,7 +20,7 @@
 | V101–V118 | Datos académicos base, solo perfil demo |
 | V300 | Tarifa académica de entrega, solo perfil demo |
 
-V1–V200 no se modifican. Las evoluciones compartidas continúan hasta V210. Las migraciones demo tienen una ubicación separada (`db/demo`) y no se cargan en producción.
+V1–V200 no se modifican. Las evoluciones compartidas conservan V1–V210 y continúan con V304. Las migraciones demo tienen una ubicación separada (`db/demo`) y no se cargan en producción.
 
 ## Reglas
 
@@ -50,4 +50,8 @@ V301 amplía el catálogo y los accesos exclusivamente locales. V302 completa es
 
 ## Integración de historiales
 
-La instalación demo combinada tiene 56 migraciones hasta V302; showcase añade V303. V209–V210 se integraron sobre una base nueva de validación porque bases demo previas ya habían aplicado versiones superiores. No se activó out-of-order, repair ni baseline para ocultar la divergencia. Coordinar las nuevas versiones por encima de V303 y ensayar una evolución explícita para bases que deban conservarse.
+La instalación demo combinada tiene 57 migraciones versionadas hasta V304; showcase añade V303 durante una instalación vacía. V209–V210 se integraron sobre una base nueva de validación porque bases demo previas ya habían aplicado versiones superiores. No se activó out-of-order, repair ni baseline para ocultar la divergencia. Coordinar las próximas versiones por encima de V304 y ensayar una evolución explícita para bases que deban conservarse.
+
+## V304 — checkout oficial
+
+Añade ocho columnas de orquestación a payments, claves únicas de reserva oficial/pago del proveedor y validación HOSTED_CHECKOUT. No crea tablas ni reescribe V1–V303. Las columnas se mapean una sola vez en PaymentJpaEntity como lectura; el adaptador JDBC del mismo contexto realiza sus actualizaciones atómicas sin que JPA las sobrescriba. La instalación base alcanza V304; con demo hay 57 migraciones versionadas y showcase añade V303 en instalación vacía.
