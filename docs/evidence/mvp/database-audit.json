@@ -1,0 +1,3604 @@
+{
+  "generatedAt": "2026-10-20T17:09:36.420Z",
+  "sourceFingerprint": "83429093aeb9bf602fdd333fcb33b37139820ae40d9093906997e1d0b031795e",
+  "validatedWorkingTree": true,
+  "sourceCommit": "fcdb0d4b1873e1912b31b74107169119e19ecf40",
+  "database": "isolated MVP validation",
+  "tables": [
+    {
+      "table": "cancellation_policies",
+      "rows": 1,
+      "minimum": null,
+      "exception": "Versioned active policy configuration"
+    },
+    {
+      "table": "categories",
+      "rows": 31,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "customers",
+      "rows": 26,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "damage_reports",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "delivery_rates",
+      "rows": 1,
+      "minimum": null,
+      "exception": "Versioned active delivery configuration"
+    },
+    {
+      "table": "equipment_units",
+      "rows": 53,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "invoice_items",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "invoices",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "password_reset_tokens",
+      "rows": 0,
+      "minimum": null,
+      "exception": "Created by actual recovery; no seeded secrets"
+    },
+    {
+      "table": "payments",
+      "rows": 45,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "refunds",
+      "rows": 20,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "rentals",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "reservation_extensions",
+      "rows": 20,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "reservation_items",
+      "rows": 48,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "reservation_terminations",
+      "rows": 23,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "reservations",
+      "rows": 48,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "roles",
+      "rows": 5,
+      "minimum": null,
+      "exception": "Controlled authorization vocabulary, not 20 invented roles"
+    },
+    {
+      "table": "suppliers",
+      "rows": 26,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "tool_images",
+      "rows": 28,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "tools",
+      "rows": 53,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "unit_deliveries",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "unit_returns",
+      "rows": 25,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "user_roles",
+      "rows": 53,
+      "minimum": 20,
+      "exception": null
+    },
+    {
+      "table": "user_sessions",
+      "rows": 24,
+      "minimum": null,
+      "exception": "Created by actual authentication; no seeded sessions"
+    },
+    {
+      "table": "users",
+      "rows": 48,
+      "minimum": 20,
+      "exception": null
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "cancellation_policy_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "policy_version",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "cutoff_hours",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "late_cancellation_rate",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "no_show_rate",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "no_show_grace_minutes",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "cancellation_policies",
+      "column_name": "effective_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "categories",
+      "column_name": "category_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "categories",
+      "column_name": "name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "categories",
+      "column_name": "description",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "customers",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "customers",
+      "column_name": "person_type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "customers",
+      "column_name": "document_type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "customers",
+      "column_name": "document_number",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "customers",
+      "column_name": "billing_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "damage_report_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "equipment_unit_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "reported_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "description",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "report_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "damage_reports",
+      "column_name": "assessed_cost",
+      "data_type": "numeric",
+      "is_nullable": "YES",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "delivery_rate_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "rate_version",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "active",
+      "data_type": "boolean",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "delivery_rates",
+      "column_name": "effective_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "equipment_unit_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "tool_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "inventory_code",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "serial_number",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "current_condition",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "equipment_units",
+      "column_name": "operational_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "invoice_items",
+      "column_name": "invoice_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "invoice_items",
+      "column_name": "line_number",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "invoice_items",
+      "column_name": "issued_description",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "invoice_items",
+      "column_name": "quantity",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "invoice_items",
+      "column_name": "issued_unit_price",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "invoice_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "number",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "issued_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "invoice_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "issued_supplier_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "issued_supplier_document",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "issued_customer_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "invoices",
+      "column_name": "issued_customer_document",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "password_reset_token_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "token_hash",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "used_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "payments",
+      "column_name": "payment_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "payments",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "payments",
+      "column_name": "processor",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "payments",
+      "column_name": "external_reference",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "payments",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "payments",
+      "column_name": "payment_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "payments",
+      "column_name": "recorded_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "payments",
+      "column_name": "confirmed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "payments",
+      "column_name": "payment_method",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "payments",
+      "column_name": "payment_stage",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "payments",
+      "column_name": "idempotency_key",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "payments",
+      "column_name": "card_network",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "payments",
+      "column_name": "card_last_four",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "payments",
+      "column_name": "card_expiry_month",
+      "data_type": "smallint",
+      "is_nullable": "YES",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "payments",
+      "column_name": "card_expiry_year",
+      "data_type": "smallint",
+      "is_nullable": "YES",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "payments",
+      "column_name": "adjustment_type",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "payments",
+      "column_name": "adjustment_reference",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "refund_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "payment_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "reservation_termination_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "refund_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "idempotency_key",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "recorded_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "refunds",
+      "column_name": "confirmed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "rentals",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "rentals",
+      "column_name": "started_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "rentals",
+      "column_name": "rental_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "reservation_extension_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "requested_by",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "requested_return_date",
+      "data_type": "date",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "extension_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "requested_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "resolved_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "resolved_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "additional_amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "reservation_extensions",
+      "column_name": "idempotency_key",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "reservation_items",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "reservation_items",
+      "column_name": "equipment_unit_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "reservation_items",
+      "column_name": "agreed_daily_rate",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "reservation_termination_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "termination_type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "termination_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "requested_by",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "requested_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "resolved_by",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "resolved_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "reason",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "fee_amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "refund_amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "outstanding_amount",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "reservation_terminations",
+      "column_name": "idempotency_key",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "customer_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "start_date",
+      "data_type": "date",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "return_date",
+      "data_type": "date",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "reservation_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "confirmed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "scheduled_fulfillment_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "fulfillment_method",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_rate_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "cancellation_policy_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_fee",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "effective_return_date",
+      "data_type": "date",
+      "is_nullable": "NO",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_address_line",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_city",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_region",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "reservations",
+      "column_name": "delivery_country_code",
+      "data_type": "character",
+      "is_nullable": "YES",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "roles",
+      "column_name": "role_id",
+      "data_type": "smallint",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "roles",
+      "column_name": "code",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "roles",
+      "column_name": "description",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "suppliers",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "suppliers",
+      "column_name": "document_type",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "suppliers",
+      "column_name": "document_number",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "suppliers",
+      "column_name": "business_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "tool_images",
+      "column_name": "tool_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "tool_images",
+      "column_name": "image_url",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "tools",
+      "column_name": "tool_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "tools",
+      "column_name": "supplier_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "tools",
+      "column_name": "category_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "tools",
+      "column_name": "name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "tools",
+      "column_name": "description",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "tools",
+      "column_name": "current_daily_rate",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "tools",
+      "column_name": "rate_currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "tools",
+      "column_name": "publication_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "equipment_unit_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "scheduled_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "delivered_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "outbound_condition",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "address_line",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "city",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "region",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "country",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "fulfillment_method",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "delivery_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "failure_type",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "failure_reason",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "unit_deliveries",
+      "column_name": "failed_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "reservation_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "equipment_unit_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "received_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "inbound_condition",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "notes",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "late_days",
+      "data_type": "integer",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "late_fee",
+      "data_type": "numeric",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "unit_returns",
+      "column_name": "late_fee_currency",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "user_roles",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "user_roles",
+      "column_name": "role_id",
+      "data_type": "smallint",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "session_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "family_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "refresh_token_hash",
+      "data_type": "character",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "session_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "created_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "expires_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "rotated_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "revoked_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "YES",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "replaced_by_session_id",
+      "data_type": "uuid",
+      "is_nullable": "YES",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "user_sessions",
+      "column_name": "client_label",
+      "data_type": "character varying",
+      "is_nullable": "YES",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "users",
+      "column_name": "user_id",
+      "data_type": "uuid",
+      "is_nullable": "NO",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "users",
+      "column_name": "email",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "users",
+      "column_name": "display_name",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "users",
+      "column_name": "password_hash",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "users",
+      "column_name": "account_status",
+      "data_type": "character varying",
+      "is_nullable": "NO",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "users",
+      "column_name": "registered_at",
+      "data_type": "timestamp with time zone",
+      "is_nullable": "NO",
+      "ordinal_position": 6
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "cancellation_policies",
+      "name": "cancellation_policies_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (cancellation_policy_id)",
+      "validated": true
+    },
+    {
+      "table_name": "cancellation_policies",
+      "name": "ck_cancellation_policies_values",
+      "type": "c",
+      "definition": "CHECK (((policy_version > 0) AND (cutoff_hours >= 0) AND ((late_cancellation_rate >= (0)::numeric) AND (late_cancellation_rate <= (1)::numeric)) AND ((no_show_rate >= (0)::numeric) AND (no_show_rate <= (1)::numeric)) AND (no_show_grace_minutes >= 0)))",
+      "validated": true
+    },
+    {
+      "table_name": "cancellation_policies",
+      "name": "uq_cancellation_policies_version",
+      "type": "u",
+      "definition": "UNIQUE (policy_version)",
+      "validated": true
+    },
+    {
+      "table_name": "categories",
+      "name": "categories_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (category_id)",
+      "validated": true
+    },
+    {
+      "table_name": "categories",
+      "name": "ck_categories_name_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((name)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "ck_customers_billing_name_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((billing_name)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "ck_customers_document_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((document_number)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "ck_customers_person_type",
+      "type": "c",
+      "definition": "CHECK (((person_type)::text = ANY ((ARRAY['PERSON'::character varying, 'COMPANY'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "customers_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (user_id)",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "customers_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "customers",
+      "name": "uq_customers_document",
+      "type": "u",
+      "definition": "UNIQUE (document_type, document_number)",
+      "validated": true
+    },
+    {
+      "table_name": "damage_reports",
+      "name": "ck_damage_reports_assessed_cost",
+      "type": "c",
+      "definition": "CHECK (((assessed_cost IS NULL) OR (assessed_cost >= (0)::numeric)))",
+      "validated": true
+    },
+    {
+      "table_name": "damage_reports",
+      "name": "ck_damage_reports_description_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((description)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "damage_reports",
+      "name": "ck_damage_reports_status",
+      "type": "c",
+      "definition": "CHECK (((report_status)::text = ANY ((ARRAY['OPEN'::character varying, 'ASSESSED'::character varying, 'CLOSED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "damage_reports",
+      "name": "damage_reports_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (damage_report_id)",
+      "validated": true
+    },
+    {
+      "table_name": "damage_reports",
+      "name": "fk_damage_reports_return",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id, equipment_unit_id) REFERENCES unit_returns(reservation_id, equipment_unit_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "delivery_rates",
+      "name": "ck_delivery_rates_amount",
+      "type": "c",
+      "definition": "CHECK ((amount >= (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "delivery_rates",
+      "name": "ck_delivery_rates_currency",
+      "type": "c",
+      "definition": "CHECK ((currency = 'COP'::bpchar))",
+      "validated": true
+    },
+    {
+      "table_name": "delivery_rates",
+      "name": "ck_delivery_rates_version",
+      "type": "c",
+      "definition": "CHECK ((rate_version > 0))",
+      "validated": true
+    },
+    {
+      "table_name": "delivery_rates",
+      "name": "delivery_rates_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (delivery_rate_id)",
+      "validated": true
+    },
+    {
+      "table_name": "delivery_rates",
+      "name": "uq_delivery_rates_version",
+      "type": "u",
+      "definition": "UNIQUE (rate_version)",
+      "validated": true
+    },
+    {
+      "table_name": "equipment_units",
+      "name": "ck_equipment_units_current_condition_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((current_condition)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "equipment_units",
+      "name": "ck_equipment_units_inventory_code_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((inventory_code)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "equipment_units",
+      "name": "ck_equipment_units_operational_status",
+      "type": "c",
+      "definition": "CHECK (((operational_status)::text = ANY ((ARRAY['OPERATIONAL'::character varying, 'MAINTENANCE'::character varying, 'RETIRED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "equipment_units",
+      "name": "equipment_units_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (equipment_unit_id)",
+      "validated": true
+    },
+    {
+      "table_name": "equipment_units",
+      "name": "equipment_units_tool_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (tool_id) REFERENCES tools(tool_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "flyway_schema_history",
+      "name": "flyway_schema_history_pk",
+      "type": "p",
+      "definition": "PRIMARY KEY (installed_rank)",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "ck_invoice_items_description_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((issued_description)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "ck_invoice_items_line_number_positive",
+      "type": "c",
+      "definition": "CHECK ((line_number > 0))",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "ck_invoice_items_quantity_positive",
+      "type": "c",
+      "definition": "CHECK ((quantity > (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "ck_invoice_items_unit_price_non_negative",
+      "type": "c",
+      "definition": "CHECK ((issued_unit_price >= (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "invoice_items_invoice_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (invoice_id) REFERENCES invoices(invoice_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "invoice_items",
+      "name": "invoice_items_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (invoice_id, line_number)",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "ck_invoices_number_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((number)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "ck_invoices_status",
+      "type": "c",
+      "definition": "CHECK (((invoice_status)::text = ANY ((ARRAY['ISSUED'::character varying, 'VOIDED'::character varying, 'PAID'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "invoices_number_key",
+      "type": "u",
+      "definition": "UNIQUE (number)",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "invoices_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (invoice_id)",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "invoices_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES rentals(reservation_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "invoices",
+      "name": "invoices_reservation_id_key",
+      "type": "u",
+      "definition": "UNIQUE (reservation_id)",
+      "validated": true
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "name": "ck_password_reset_tokens_completion",
+      "type": "c",
+      "definition": "CHECK (((used_at IS NULL) OR (revoked_at IS NULL)))",
+      "validated": true
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "name": "ck_password_reset_tokens_time",
+      "type": "c",
+      "definition": "CHECK ((created_at < expires_at))",
+      "validated": true
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "name": "password_reset_tokens_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (password_reset_token_id)",
+      "validated": true
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "name": "password_reset_tokens_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "password_reset_tokens",
+      "name": "uq_password_reset_tokens_hash",
+      "type": "u",
+      "definition": "UNIQUE (token_hash)",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_adjustment_reference",
+      "type": "c",
+      "definition": "CHECK (((((payment_stage)::text = 'ADJUSTMENT'::text) AND (adjustment_type IS NOT NULL) AND (adjustment_reference IS NOT NULL)) OR (((payment_stage)::text <> 'ADJUSTMENT'::text) AND (adjustment_type IS NULL) AND (adjustment_reference IS NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_amount_positive",
+      "type": "c",
+      "definition": "CHECK ((amount > (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_card_details",
+      "type": "c",
+      "definition": "CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_method",
+      "type": "c",
+      "definition": "CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_processor_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((processor)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_reference_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((external_reference)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_stage",
+      "type": "c",
+      "definition": "CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'ADJUSTMENT'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "ck_payments_status",
+      "type": "c",
+      "definition": "CHECK (((payment_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'FAILED'::character varying, 'REFUNDED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "payments_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (payment_id)",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "payments_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "payments",
+      "name": "uq_payments_processor_reference",
+      "type": "u",
+      "definition": "UNIQUE (processor, external_reference)",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "ck_refunds_amount",
+      "type": "c",
+      "definition": "CHECK ((amount > (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "ck_refunds_confirmation",
+      "type": "c",
+      "definition": "CHECK (((((refund_status)::text = 'CONFIRMED'::text) AND (confirmed_at IS NOT NULL)) OR (((refund_status)::text <> 'CONFIRMED'::text) AND (confirmed_at IS NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "ck_refunds_currency",
+      "type": "c",
+      "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "ck_refunds_status",
+      "type": "c",
+      "definition": "CHECK (((refund_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'FAILED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "refunds_payment_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (payment_id) REFERENCES payments(payment_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "refunds_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (refund_id)",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "refunds_reservation_termination_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_termination_id) REFERENCES reservation_terminations(reservation_termination_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "refunds",
+      "name": "uq_refunds_idempotency",
+      "type": "u",
+      "definition": "UNIQUE (idempotency_key)",
+      "validated": true
+    },
+    {
+      "table_name": "rentals",
+      "name": "ck_rentals_status",
+      "type": "c",
+      "definition": "CHECK (((rental_status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'COMPLETED'::character varying, 'CANCELLED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "rentals",
+      "name": "rentals_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_id)",
+      "validated": true
+    },
+    {
+      "table_name": "rentals",
+      "name": "rentals_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "ck_reservation_extensions_amount",
+      "type": "c",
+      "definition": "CHECK ((additional_amount >= (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "ck_reservation_extensions_currency",
+      "type": "c",
+      "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "ck_reservation_extensions_resolution",
+      "type": "c",
+      "definition": "CHECK (((((extension_status)::text = 'REQUESTED'::text) AND (resolved_by IS NULL) AND (resolved_at IS NULL)) OR (((extension_status)::text <> 'REQUESTED'::text) AND (resolved_by IS NOT NULL) AND (resolved_at IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "ck_reservation_extensions_status",
+      "type": "c",
+      "definition": "CHECK (((extension_status)::text = ANY ((ARRAY['REQUESTED'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "reservation_extensions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_extension_id)",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "reservation_extensions_requested_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (requested_by) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "reservation_extensions_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "reservation_extensions_resolved_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (resolved_by) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_extensions",
+      "name": "uq_reservation_extensions_idempotency",
+      "type": "u",
+      "definition": "UNIQUE (idempotency_key)",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_items",
+      "name": "ck_reservation_items_rate_non_negative",
+      "type": "c",
+      "definition": "CHECK ((agreed_daily_rate >= (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_items",
+      "name": "reservation_items_equipment_unit_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (equipment_unit_id) REFERENCES equipment_units(equipment_unit_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_items",
+      "name": "reservation_items_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_id, equipment_unit_id)",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_items",
+      "name": "reservation_items_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "ck_reservation_terminations_amounts",
+      "type": "c",
+      "definition": "CHECK (((fee_amount >= (0)::numeric) AND (refund_amount >= (0)::numeric) AND (outstanding_amount >= (0)::numeric)))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "ck_reservation_terminations_currency",
+      "type": "c",
+      "definition": "CHECK ((currency ~ '^[A-Z]{3}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "ck_reservation_terminations_resolution",
+      "type": "c",
+      "definition": "CHECK (((((termination_status)::text = 'REQUESTED'::text) AND (resolved_by IS NULL) AND (resolved_at IS NULL)) OR (((termination_status)::text <> 'REQUESTED'::text) AND (resolved_at IS NOT NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "ck_reservation_terminations_status",
+      "type": "c",
+      "definition": "CHECK (((termination_status)::text = ANY ((ARRAY['REQUESTED'::character varying, 'APPLIED'::character varying, 'APPROVED'::character varying, 'REJECTED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "ck_reservation_terminations_type",
+      "type": "c",
+      "definition": "CHECK (((termination_type)::text = ANY ((ARRAY['STANDARD'::character varying, 'NO_SHOW'::character varying, 'WITHDRAWAL'::character varying, 'SUPPLIER_FAILURE'::character varying, 'EXTERNAL_REVIEW'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "reservation_terminations_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_termination_id)",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "reservation_terminations_requested_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (requested_by) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "reservation_terminations_reservation_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "reservation_terminations_resolved_by_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (resolved_by) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservation_terminations",
+      "name": "uq_reservation_terminations_idempotency",
+      "type": "u",
+      "definition": "UNIQUE (idempotency_key)",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_confirmation",
+      "type": "c",
+      "definition": "CHECK (((((reservation_status)::text = ANY ((ARRAY['CONFIRMED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])) AND (confirmed_at IS NOT NULL)) OR (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'REJECTED'::character varying])::text[])) AND (confirmed_at IS NULL)) OR ((reservation_status)::text = 'CANCELLED'::text)))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_currency_uppercase",
+      "type": "c",
+      "definition": "CHECK (((currency)::text ~ '^[A-Z]{3}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_effective_period",
+      "type": "c",
+      "definition": "CHECK ((effective_return_date >= return_date))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_fulfillment",
+      "type": "c",
+      "definition": "CHECK (((((fulfillment_method)::text = 'CUSTOMER_PICKUP'::text) AND (delivery_rate_id IS NULL) AND (delivery_fee = (0)::numeric) AND (delivery_address_line IS NULL) AND (delivery_city IS NULL) AND (delivery_region IS NULL) AND (delivery_country_code IS NULL)) OR (((fulfillment_method)::text = 'SUPPLIER_DELIVERY'::text) AND (delivery_rate_id IS NOT NULL) AND (delivery_fee >= (0)::numeric) AND (delivery_address_line IS NOT NULL) AND (delivery_city IS NOT NULL) AND (delivery_region IS NOT NULL) AND (delivery_country_code = 'CO'::bpchar))))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_period",
+      "type": "c",
+      "definition": "CHECK ((start_date <= return_date))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "ck_reservations_status",
+      "type": "c",
+      "definition": "CHECK (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'REJECTED'::character varying, 'CANCELLED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "reservations_cancellation_policy_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (cancellation_policy_id) REFERENCES cancellation_policies(cancellation_policy_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "reservations_customer_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (customer_id) REFERENCES customers(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "reservations_delivery_rate_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (delivery_rate_id) REFERENCES delivery_rates(delivery_rate_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
+      "name": "reservations_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_id)",
+      "validated": true
+    },
+    {
+      "table_name": "roles",
+      "name": "ck_roles_code_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((code)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "roles",
+      "name": "ck_roles_description_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((description)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "roles",
+      "name": "roles_code_key",
+      "type": "u",
+      "definition": "UNIQUE (code)",
+      "validated": true
+    },
+    {
+      "table_name": "roles",
+      "name": "roles_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (role_id)",
+      "validated": true
+    },
+    {
+      "table_name": "suppliers",
+      "name": "ck_suppliers_business_name_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((business_name)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "suppliers",
+      "name": "ck_suppliers_document_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((document_number)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "suppliers",
+      "name": "suppliers_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (user_id)",
+      "validated": true
+    },
+    {
+      "table_name": "suppliers",
+      "name": "suppliers_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "suppliers",
+      "name": "uq_suppliers_document",
+      "type": "u",
+      "definition": "UNIQUE (document_type, document_number)",
+      "validated": true
+    },
+    {
+      "table_name": "tool_images",
+      "name": "ck_tool_images_url_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((image_url)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "tool_images",
+      "name": "tool_images_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tool_id, image_url)",
+      "validated": true
+    },
+    {
+      "table_name": "tool_images",
+      "name": "tool_images_tool_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (tool_id) REFERENCES tools(tool_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "ck_tools_currency_uppercase",
+      "type": "c",
+      "definition": "CHECK (((rate_currency)::text ~ '^[A-Z]{3}$'::text))",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "ck_tools_daily_rate_non_negative",
+      "type": "c",
+      "definition": "CHECK ((current_daily_rate >= (0)::numeric))",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "ck_tools_description_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((description)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "ck_tools_name_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((name)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "ck_tools_publication_status",
+      "type": "c",
+      "definition": "CHECK (((publication_status)::text = ANY ((ARRAY['PUBLISHED'::character varying, 'UNPUBLISHED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "tools_category_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "tools_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (tool_id)",
+      "validated": true
+    },
+    {
+      "table_name": "tools",
+      "name": "tools_supplier_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (supplier_id) REFERENCES suppliers(user_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_address_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((address_line)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_city_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((city)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_country_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((country)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_failure",
+      "type": "c",
+      "definition": "CHECK (((((delivery_status)::text = 'FAILED'::text) AND (failed_at IS NOT NULL) AND (failure_type IS NOT NULL) AND (failure_reason IS NOT NULL)) OR (((delivery_status)::text <> 'FAILED'::text) AND (failed_at IS NULL) AND (failure_type IS NULL) AND (failure_reason IS NULL))))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_method",
+      "type": "c",
+      "definition": "CHECK (((fulfillment_method)::text = ANY ((ARRAY['CUSTOMER_PICKUP'::character varying, 'SUPPLIER_DELIVERY'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_region_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((region)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "ck_unit_deliveries_status",
+      "type": "c",
+      "definition": "CHECK (((delivery_status)::text = ANY ((ARRAY['SCHEDULED'::character varying, 'COMPLETED'::character varying, 'FAILED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "fk_unit_deliveries_item",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id, equipment_unit_id) REFERENCES reservation_items(reservation_id, equipment_unit_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "unit_deliveries",
+      "name": "unit_deliveries_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_id, equipment_unit_id)",
+      "validated": true
+    },
+    {
+      "table_name": "unit_returns",
+      "name": "ck_unit_returns_condition_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((inbound_condition)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_returns",
+      "name": "ck_unit_returns_late_values",
+      "type": "c",
+      "definition": "CHECK (((late_days >= 0) AND (late_fee >= (0)::numeric) AND (late_fee_currency ~ '^[A-Z]{3}$'::text)))",
+      "validated": true
+    },
+    {
+      "table_name": "unit_returns",
+      "name": "fk_unit_returns_delivery",
+      "type": "f",
+      "definition": "FOREIGN KEY (reservation_id, equipment_unit_id) REFERENCES unit_deliveries(reservation_id, equipment_unit_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "unit_returns",
+      "name": "unit_returns_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (reservation_id, equipment_unit_id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_roles",
+      "name": "user_roles_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (user_id, role_id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_roles",
+      "name": "user_roles_role_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (role_id) REFERENCES roles(role_id) ON DELETE RESTRICT",
+      "validated": true
+    },
+    {
+      "table_name": "user_roles",
+      "name": "user_roles_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "ck_user_sessions_status",
+      "type": "c",
+      "definition": "CHECK (((session_status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'ROTATED'::character varying, 'REVOKED'::character varying, 'COMPROMISED'::character varying, 'EXPIRED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "ck_user_sessions_time",
+      "type": "c",
+      "definition": "CHECK ((created_at < expires_at))",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "ck_user_sessions_transition_time",
+      "type": "c",
+      "definition": "CHECK (((((session_status)::text = 'ACTIVE'::text) AND (rotated_at IS NULL) AND (revoked_at IS NULL)) OR (((session_status)::text = 'ROTATED'::text) AND (rotated_at IS NOT NULL) AND (revoked_at IS NULL)) OR (((session_status)::text = ANY ((ARRAY['REVOKED'::character varying, 'COMPROMISED'::character varying])::text[])) AND (revoked_at IS NOT NULL)) OR ((session_status)::text = 'EXPIRED'::text)))",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "uq_user_sessions_refresh_hash",
+      "type": "u",
+      "definition": "UNIQUE (refresh_token_hash)",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "user_sessions_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (session_id)",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "user_sessions_replaced_by_session_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (replaced_by_session_id) REFERENCES user_sessions(session_id) ON DELETE SET NULL",
+      "validated": true
+    },
+    {
+      "table_name": "user_sessions",
+      "name": "user_sessions_user_id_fkey",
+      "type": "f",
+      "definition": "FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE",
+      "validated": true
+    },
+    {
+      "table_name": "users",
+      "name": "ck_users_account_status",
+      "type": "c",
+      "definition": "CHECK (((account_status)::text = ANY ((ARRAY['ACTIVE'::character varying, 'SUSPENDED'::character varying, 'DISABLED'::character varying])::text[])))",
+      "validated": true
+    },
+    {
+      "table_name": "users",
+      "name": "ck_users_display_name_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((display_name)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "users",
+      "name": "ck_users_email_not_blank",
+      "type": "c",
+      "definition": "CHECK ((btrim((email)::text) <> ''::text))",
+      "validated": true
+    },
+    {
+      "table_name": "users",
+      "name": "users_pkey",
+      "type": "p",
+      "definition": "PRIMARY KEY (user_id)",
+      "validated": true
+    }
+  ],
+  "indexes": [
+    {
+      "schemaname": "public",
+      "tablename": "cancellation_policies",
+      "indexname": "cancellation_policies_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX cancellation_policies_pkey ON public.cancellation_policies USING btree (cancellation_policy_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "cancellation_policies",
+      "indexname": "uq_cancellation_policies_version",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_cancellation_policies_version ON public.cancellation_policies USING btree (policy_version)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "cancellation_policies",
+      "indexname": "ux_cancellation_policies_active",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_cancellation_policies_active ON public.cancellation_policies USING btree (active) WHERE active"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "categories",
+      "indexname": "categories_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX categories_pkey ON public.categories USING btree (category_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "categories",
+      "indexname": "ux_categories_name_lower",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_categories_name_lower ON public.categories USING btree (lower((name)::text))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "customers",
+      "indexname": "customers_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX customers_pkey ON public.customers USING btree (user_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "customers",
+      "indexname": "uq_customers_document",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_customers_document ON public.customers USING btree (document_type, document_number)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "damage_reports",
+      "indexname": "damage_reports_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX damage_reports_pkey ON public.damage_reports USING btree (damage_report_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "damage_reports",
+      "indexname": "ix_damage_reports_return",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_damage_reports_return ON public.damage_reports USING btree (reservation_id, equipment_unit_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "delivery_rates",
+      "indexname": "delivery_rates_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX delivery_rates_pkey ON public.delivery_rates USING btree (delivery_rate_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "delivery_rates",
+      "indexname": "uq_delivery_rates_version",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_delivery_rates_version ON public.delivery_rates USING btree (rate_version)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "delivery_rates",
+      "indexname": "ux_delivery_rates_active",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_delivery_rates_active ON public.delivery_rates USING btree (active) WHERE active"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "equipment_units",
+      "indexname": "equipment_units_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX equipment_units_pkey ON public.equipment_units USING btree (equipment_unit_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "equipment_units",
+      "indexname": "ix_equipment_units_inventory_code_lower",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_equipment_units_inventory_code_lower ON public.equipment_units USING btree (lower((inventory_code)::text))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "equipment_units",
+      "indexname": "ix_equipment_units_tool_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_equipment_units_tool_id ON public.equipment_units USING btree (tool_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "flyway_schema_history",
+      "indexname": "flyway_schema_history_pk",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX flyway_schema_history_pk ON public.flyway_schema_history USING btree (installed_rank)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "flyway_schema_history",
+      "indexname": "flyway_schema_history_s_idx",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX flyway_schema_history_s_idx ON public.flyway_schema_history USING btree (success)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "invoice_items",
+      "indexname": "invoice_items_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX invoice_items_pkey ON public.invoice_items USING btree (invoice_id, line_number)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "invoices",
+      "indexname": "invoices_number_key",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX invoices_number_key ON public.invoices USING btree (number)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "invoices",
+      "indexname": "invoices_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX invoices_pkey ON public.invoices USING btree (invoice_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "invoices",
+      "indexname": "invoices_reservation_id_key",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX invoices_reservation_id_key ON public.invoices USING btree (reservation_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "password_reset_tokens",
+      "indexname": "ix_password_reset_tokens_user_active",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_password_reset_tokens_user_active ON public.password_reset_tokens USING btree (user_id, expires_at) WHERE ((used_at IS NULL) AND (revoked_at IS NULL))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "password_reset_tokens",
+      "indexname": "password_reset_tokens_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX password_reset_tokens_pkey ON public.password_reset_tokens USING btree (password_reset_token_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "password_reset_tokens",
+      "indexname": "uq_password_reset_tokens_hash",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_password_reset_tokens_hash ON public.password_reset_tokens USING btree (token_hash)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "ix_payments_reservation_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_payments_reservation_id ON public.payments USING btree (reservation_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "payments_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX payments_pkey ON public.payments USING btree (payment_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "uq_payments_processor_reference",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_payments_processor_reference ON public.payments USING btree (processor, external_reference)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "ux_payments_confirmed_stage",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (reservation_id, payment_stage) WHERE (((payment_status)::text = 'CONFIRMED'::text) AND ((payment_stage)::text = ANY ((ARRAY['FIRST_HALF'::character varying, 'FINAL_HALF'::character varying])::text[])))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "payments",
+      "indexname": "ux_payments_idempotency_key",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_payments_idempotency_key ON public.payments USING btree (idempotency_key)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "refunds",
+      "indexname": "ix_refunds_payment",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_refunds_payment ON public.refunds USING btree (payment_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "refunds",
+      "indexname": "ix_refunds_termination",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_refunds_termination ON public.refunds USING btree (reservation_termination_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "refunds",
+      "indexname": "refunds_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX refunds_pkey ON public.refunds USING btree (refund_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "refunds",
+      "indexname": "uq_refunds_idempotency",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_refunds_idempotency ON public.refunds USING btree (idempotency_key)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "rentals",
+      "indexname": "rentals_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX rentals_pkey ON public.rentals USING btree (reservation_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_extensions",
+      "indexname": "reservation_extensions_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX reservation_extensions_pkey ON public.reservation_extensions USING btree (reservation_extension_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_extensions",
+      "indexname": "uq_reservation_extensions_idempotency",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_reservation_extensions_idempotency ON public.reservation_extensions USING btree (idempotency_key)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_extensions",
+      "indexname": "ux_reservation_extensions_open",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_reservation_extensions_open ON public.reservation_extensions USING btree (reservation_id) WHERE ((extension_status)::text = 'REQUESTED'::text)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_items",
+      "indexname": "ix_reservation_items_equipment_unit_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_reservation_items_equipment_unit_id ON public.reservation_items USING btree (equipment_unit_id, reservation_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_items",
+      "indexname": "reservation_items_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX reservation_items_pkey ON public.reservation_items USING btree (reservation_id, equipment_unit_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_terminations",
+      "indexname": "reservation_terminations_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX reservation_terminations_pkey ON public.reservation_terminations USING btree (reservation_termination_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_terminations",
+      "indexname": "uq_reservation_terminations_idempotency",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_reservation_terminations_idempotency ON public.reservation_terminations USING btree (idempotency_key)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservation_terminations",
+      "indexname": "ux_reservation_terminations_open",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_reservation_terminations_open ON public.reservation_terminations USING btree (reservation_id) WHERE ((termination_status)::text = ANY ((ARRAY['REQUESTED'::character varying, 'APPLIED'::character varying, 'APPROVED'::character varying])::text[]))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservations",
+      "indexname": "ix_reservations_customer_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_reservations_customer_id ON public.reservations USING btree (customer_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservations",
+      "indexname": "ix_reservations_status_period",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_reservations_status_period ON public.reservations USING btree (reservation_status, start_date, return_date)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservations",
+      "indexname": "reservations_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX reservations_pkey ON public.reservations USING btree (reservation_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "roles",
+      "indexname": "roles_code_key",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX roles_code_key ON public.roles USING btree (code)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "roles",
+      "indexname": "roles_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX roles_pkey ON public.roles USING btree (role_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "suppliers",
+      "indexname": "suppliers_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX suppliers_pkey ON public.suppliers USING btree (user_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "suppliers",
+      "indexname": "uq_suppliers_document",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_suppliers_document ON public.suppliers USING btree (document_type, document_number)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "tool_images",
+      "indexname": "tool_images_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX tool_images_pkey ON public.tool_images USING btree (tool_id, image_url)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "tools",
+      "indexname": "ix_tools_category_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_tools_category_id ON public.tools USING btree (category_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "tools",
+      "indexname": "ix_tools_supplier_id",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_tools_supplier_id ON public.tools USING btree (supplier_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "tools",
+      "indexname": "tools_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX tools_pkey ON public.tools USING btree (tool_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "unit_deliveries",
+      "indexname": "unit_deliveries_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX unit_deliveries_pkey ON public.unit_deliveries USING btree (reservation_id, equipment_unit_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "unit_returns",
+      "indexname": "unit_returns_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX unit_returns_pkey ON public.unit_returns USING btree (reservation_id, equipment_unit_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_roles",
+      "indexname": "user_roles_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX user_roles_pkey ON public.user_roles USING btree (user_id, role_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_sessions",
+      "indexname": "ix_user_sessions_family",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_user_sessions_family ON public.user_sessions USING btree (family_id, session_status)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_sessions",
+      "indexname": "ix_user_sessions_user_status",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_user_sessions_user_status ON public.user_sessions USING btree (user_id, session_status, expires_at)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_sessions",
+      "indexname": "uq_user_sessions_refresh_hash",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX uq_user_sessions_refresh_hash ON public.user_sessions USING btree (refresh_token_hash)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "user_sessions",
+      "indexname": "user_sessions_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX user_sessions_pkey ON public.user_sessions USING btree (session_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "users",
+      "indexname": "users_pkey",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX users_pkey ON public.users USING btree (user_id)"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "users",
+      "indexname": "ux_users_email_lower",
+      "tablespace": null,
+      "indexdef": "CREATE UNIQUE INDEX ux_users_email_lower ON public.users USING btree (lower((email)::text))"
+    }
+  ],
+  "relationships": [
+    {
+      "name": "customers_user_id_fkey",
+      "child": "customers",
+      "parent": "users",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "fk_damage_reports_return",
+      "child": "damage_reports",
+      "parent": "unit_returns",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "equipment_units_tool_id_fkey",
+      "child": "equipment_units",
+      "parent": "tools",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "invoice_items_invoice_id_fkey",
+      "child": "invoice_items",
+      "parent": "invoices",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "invoices_reservation_id_fkey",
+      "child": "invoices",
+      "parent": "rentals",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "password_reset_tokens_user_id_fkey",
+      "child": "password_reset_tokens",
+      "parent": "users",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "payments_reservation_id_fkey",
+      "child": "payments",
+      "parent": "reservations",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "refunds_payment_id_fkey",
+      "child": "refunds",
+      "parent": "payments",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "refunds_reservation_termination_id_fkey",
+      "child": "refunds",
+      "parent": "reservation_terminations",
+      "child_unique": false,
+      "required": false
+    },
+    {
+      "name": "rentals_reservation_id_fkey",
+      "child": "rentals",
+      "parent": "reservations",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "reservation_extensions_requested_by_fkey",
+      "child": "reservation_extensions",
+      "parent": "users",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_extensions_reservation_id_fkey",
+      "child": "reservation_extensions",
+      "parent": "reservations",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_extensions_resolved_by_fkey",
+      "child": "reservation_extensions",
+      "parent": "users",
+      "child_unique": false,
+      "required": false
+    },
+    {
+      "name": "reservation_items_equipment_unit_id_fkey",
+      "child": "reservation_items",
+      "parent": "equipment_units",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_items_reservation_id_fkey",
+      "child": "reservation_items",
+      "parent": "reservations",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_terminations_requested_by_fkey",
+      "child": "reservation_terminations",
+      "parent": "users",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_terminations_reservation_id_fkey",
+      "child": "reservation_terminations",
+      "parent": "reservations",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservation_terminations_resolved_by_fkey",
+      "child": "reservation_terminations",
+      "parent": "users",
+      "child_unique": false,
+      "required": false
+    },
+    {
+      "name": "reservations_cancellation_policy_id_fkey",
+      "child": "reservations",
+      "parent": "cancellation_policies",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservations_customer_id_fkey",
+      "child": "reservations",
+      "parent": "customers",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "reservations_delivery_rate_id_fkey",
+      "child": "reservations",
+      "parent": "delivery_rates",
+      "child_unique": false,
+      "required": false
+    },
+    {
+      "name": "suppliers_user_id_fkey",
+      "child": "suppliers",
+      "parent": "users",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "tool_images_tool_id_fkey",
+      "child": "tool_images",
+      "parent": "tools",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "tools_category_id_fkey",
+      "child": "tools",
+      "parent": "categories",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "tools_supplier_id_fkey",
+      "child": "tools",
+      "parent": "suppliers",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "fk_unit_deliveries_item",
+      "child": "unit_deliveries",
+      "parent": "reservation_items",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "fk_unit_returns_delivery",
+      "child": "unit_returns",
+      "parent": "unit_deliveries",
+      "child_unique": true,
+      "required": true
+    },
+    {
+      "name": "user_roles_role_id_fkey",
+      "child": "user_roles",
+      "parent": "roles",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "user_roles_user_id_fkey",
+      "child": "user_roles",
+      "parent": "users",
+      "child_unique": false,
+      "required": true
+    },
+    {
+      "name": "user_sessions_replaced_by_session_id_fkey",
+      "child": "user_sessions",
+      "parent": "user_sessions",
+      "child_unique": false,
+      "required": false
+    },
+    {
+      "name": "user_sessions_user_id_fkey",
+      "child": "user_sessions",
+      "parent": "users",
+      "child_unique": false,
+      "required": true
+    }
+  ],
+  "migrations": [
+    {
+      "installed_rank": 1,
+      "version": "1",
+      "description": "create initial schema",
+      "script": "V1__create_initial_schema.sql",
+      "checksum": -978317428,
+      "success": true
+    },
+    {
+      "installed_rank": 2,
+      "version": "2",
+      "description": "seed roles",
+      "script": "V2__seed_roles.sql",
+      "checksum": 422467080,
+      "success": true
+    },
+    {
+      "installed_rank": 3,
+      "version": "3",
+      "description": "seed administrator role",
+      "script": "V3__seed_administrator_role.sql",
+      "checksum": 607200124,
+      "success": true
+    },
+    {
+      "installed_rank": 4,
+      "version": "4",
+      "description": "create users table",
+      "script": "V4__create_users_table.sql",
+      "checksum": -77356713,
+      "success": true
+    },
+    {
+      "installed_rank": 5,
+      "version": "5",
+      "description": "create roles table",
+      "script": "V5__create_roles_table.sql",
+      "checksum": 1099576139,
+      "success": true
+    },
+    {
+      "installed_rank": 6,
+      "version": "6",
+      "description": "create user roles table",
+      "script": "V6__create_user_roles_table.sql",
+      "checksum": -262017507,
+      "success": true
+    },
+    {
+      "installed_rank": 7,
+      "version": "7",
+      "description": "create customers table",
+      "script": "V7__create_customers_table.sql",
+      "checksum": -1760424066,
+      "success": true
+    },
+    {
+      "installed_rank": 8,
+      "version": "8",
+      "description": "create suppliers table",
+      "script": "V8__create_suppliers_table.sql",
+      "checksum": 1468370260,
+      "success": true
+    },
+    {
+      "installed_rank": 9,
+      "version": "9",
+      "description": "create categories table",
+      "script": "V9__create_categories_table.sql",
+      "checksum": -1099749722,
+      "success": true
+    },
+    {
+      "installed_rank": 10,
+      "version": "10",
+      "description": "create tools table",
+      "script": "V10__create_tools_table.sql",
+      "checksum": 28158273,
+      "success": true
+    },
+    {
+      "installed_rank": 11,
+      "version": "11",
+      "description": "create tool images table",
+      "script": "V11__create_tool_images_table.sql",
+      "checksum": 1378946504,
+      "success": true
+    },
+    {
+      "installed_rank": 12,
+      "version": "12",
+      "description": "create equipment units table",
+      "script": "V12__create_equipment_units_table.sql",
+      "checksum": -1936551376,
+      "success": true
+    },
+    {
+      "installed_rank": 13,
+      "version": "13",
+      "description": "create reservations table",
+      "script": "V13__create_reservations_table.sql",
+      "checksum": -81699510,
+      "success": true
+    },
+    {
+      "installed_rank": 14,
+      "version": "14",
+      "description": "create reservation items table",
+      "script": "V14__create_reservation_items_table.sql",
+      "checksum": 20276541,
+      "success": true
+    },
+    {
+      "installed_rank": 15,
+      "version": "15",
+      "description": "create rentals table",
+      "script": "V15__create_rentals_table.sql",
+      "checksum": -2037942463,
+      "success": true
+    },
+    {
+      "installed_rank": 16,
+      "version": "16",
+      "description": "create unit deliveries table",
+      "script": "V16__create_unit_deliveries_table.sql",
+      "checksum": -2027019661,
+      "success": true
+    },
+    {
+      "installed_rank": 17,
+      "version": "17",
+      "description": "create unit returns table",
+      "script": "V17__create_unit_returns_table.sql",
+      "checksum": 1971211264,
+      "success": true
+    },
+    {
+      "installed_rank": 18,
+      "version": "18",
+      "description": "create damage reports table",
+      "script": "V18__create_damage_reports_table.sql",
+      "checksum": 472082015,
+      "success": true
+    },
+    {
+      "installed_rank": 19,
+      "version": "19",
+      "description": "create payments table",
+      "script": "V19__create_payments_table.sql",
+      "checksum": 293827165,
+      "success": true
+    },
+    {
+      "installed_rank": 20,
+      "version": "20",
+      "description": "create invoices table",
+      "script": "V20__create_invoices_table.sql",
+      "checksum": -1237561814,
+      "success": true
+    },
+    {
+      "installed_rank": 21,
+      "version": "21",
+      "description": "create invoice items table",
+      "script": "V21__create_invoice_items_table.sql",
+      "checksum": 1977673099,
+      "success": true
+    },
+    {
+      "installed_rank": 22,
+      "version": "22",
+      "description": "align currency columns with jpa",
+      "script": "V22__align_currency_columns_with_jpa.sql",
+      "checksum": -1062100208,
+      "success": true
+    },
+    {
+      "installed_rank": 23,
+      "version": "23",
+      "description": "seed administrator role",
+      "script": "V23__seed_administrator_role.sql",
+      "checksum": 2119761949,
+      "success": true
+    },
+    {
+      "installed_rank": 24,
+      "version": "24",
+      "description": "align currency columns with bounded contexts",
+      "script": "V24__align_currency_columns_with_bounded_contexts.sql",
+      "checksum": 1731688511,
+      "success": true
+    },
+    {
+      "installed_rank": 25,
+      "version": "101",
+      "description": "insert users demo data",
+      "script": "V101__insert_users_demo_data.sql",
+      "checksum": -1951390719,
+      "success": true
+    },
+    {
+      "installed_rank": 26,
+      "version": "102",
+      "description": "insert roles demo data",
+      "script": "V102__insert_roles_demo_data.sql",
+      "checksum": 550585549,
+      "success": true
+    },
+    {
+      "installed_rank": 27,
+      "version": "103",
+      "description": "insert user roles demo data",
+      "script": "V103__insert_user_roles_demo_data.sql",
+      "checksum": -429311007,
+      "success": true
+    },
+    {
+      "installed_rank": 28,
+      "version": "104",
+      "description": "insert customers demo data",
+      "script": "V104__insert_customers_demo_data.sql",
+      "checksum": -1880481608,
+      "success": true
+    },
+    {
+      "installed_rank": 29,
+      "version": "105",
+      "description": "insert suppliers demo data",
+      "script": "V105__insert_suppliers_demo_data.sql",
+      "checksum": 244522290,
+      "success": true
+    },
+    {
+      "installed_rank": 30,
+      "version": "106",
+      "description": "insert categories demo data",
+      "script": "V106__insert_categories_demo_data.sql",
+      "checksum": 1578194862,
+      "success": true
+    },
+    {
+      "installed_rank": 31,
+      "version": "107",
+      "description": "insert tools demo data",
+      "script": "V107__insert_tools_demo_data.sql",
+      "checksum": -663049215,
+      "success": true
+    },
+    {
+      "installed_rank": 32,
+      "version": "108",
+      "description": "insert tool images demo data",
+      "script": "V108__insert_tool_images_demo_data.sql",
+      "checksum": 529753022,
+      "success": true
+    },
+    {
+      "installed_rank": 33,
+      "version": "109",
+      "description": "insert equipment units demo data",
+      "script": "V109__insert_equipment_units_demo_data.sql",
+      "checksum": 1118620121,
+      "success": true
+    },
+    {
+      "installed_rank": 34,
+      "version": "110",
+      "description": "insert reservations demo data",
+      "script": "V110__insert_reservations_demo_data.sql",
+      "checksum": -1934021415,
+      "success": true
+    },
+    {
+      "installed_rank": 35,
+      "version": "111",
+      "description": "insert reservation items demo data",
+      "script": "V111__insert_reservation_items_demo_data.sql",
+      "checksum": 1582410931,
+      "success": true
+    },
+    {
+      "installed_rank": 36,
+      "version": "112",
+      "description": "insert rentals demo data",
+      "script": "V112__insert_rentals_demo_data.sql",
+      "checksum": 356602874,
+      "success": true
+    },
+    {
+      "installed_rank": 37,
+      "version": "113",
+      "description": "insert unit deliveries demo data",
+      "script": "V113__insert_unit_deliveries_demo_data.sql",
+      "checksum": -2124333932,
+      "success": true
+    },
+    {
+      "installed_rank": 38,
+      "version": "114",
+      "description": "insert unit returns demo data",
+      "script": "V114__insert_unit_returns_demo_data.sql",
+      "checksum": 1065904694,
+      "success": true
+    },
+    {
+      "installed_rank": 39,
+      "version": "115",
+      "description": "insert damage reports demo data",
+      "script": "V115__insert_damage_reports_demo_data.sql",
+      "checksum": -1562205192,
+      "success": true
+    },
+    {
+      "installed_rank": 40,
+      "version": "116",
+      "description": "insert payments demo data",
+      "script": "V116__insert_payments_demo_data.sql",
+      "checksum": 275935416,
+      "success": true
+    },
+    {
+      "installed_rank": 41,
+      "version": "117",
+      "description": "insert invoices demo data",
+      "script": "V117__insert_invoices_demo_data.sql",
+      "checksum": -216595724,
+      "success": true
+    },
+    {
+      "installed_rank": 42,
+      "version": "118",
+      "description": "insert invoice items demo data",
+      "script": "V118__insert_invoice_items_demo_data.sql",
+      "checksum": 1906746379,
+      "success": true
+    },
+    {
+      "installed_rank": 43,
+      "version": "200",
+      "description": "add simulated payment details",
+      "script": "V200__add_simulated_payment_details.sql",
+      "checksum": 1203329303,
+      "success": true
+    },
+    {
+      "installed_rank": 44,
+      "version": "201",
+      "description": "create user sessions table",
+      "script": "V201__create_user_sessions_table.sql",
+      "checksum": -949232175,
+      "success": true
+    },
+    {
+      "installed_rank": 45,
+      "version": "202",
+      "description": "create password reset tokens table",
+      "script": "V202__create_password_reset_tokens_table.sql",
+      "checksum": 627838788,
+      "success": true
+    },
+    {
+      "installed_rank": 46,
+      "version": "203",
+      "description": "create cancellation policies table",
+      "script": "V203__create_cancellation_policies_table.sql",
+      "checksum": 1632224342,
+      "success": true
+    },
+    {
+      "installed_rank": 47,
+      "version": "204",
+      "description": "create reservation terminations table",
+      "script": "V204__create_reservation_terminations_table.sql",
+      "checksum": 1205511749,
+      "success": true
+    },
+    {
+      "installed_rank": 48,
+      "version": "205",
+      "description": "create delivery rates table",
+      "script": "V205__create_delivery_rates_table.sql",
+      "checksum": 1432071718,
+      "success": true
+    },
+    {
+      "installed_rank": 49,
+      "version": "206",
+      "description": "create reservation extensions table",
+      "script": "V206__create_reservation_extensions_table.sql",
+      "checksum": -650722205,
+      "success": true
+    },
+    {
+      "installed_rank": 50,
+      "version": "207",
+      "description": "create refunds table",
+      "script": "V207__create_refunds_table.sql",
+      "checksum": -1167188949,
+      "success": true
+    },
+    {
+      "installed_rank": 51,
+      "version": "208",
+      "description": "extend critical rental workflows",
+      "script": "V208__extend_critical_rental_workflows.sql",
+      "checksum": 1494445329,
+      "success": true
+    },
+    {
+      "installed_rank": 52,
+      "version": "300",
+      "description": "seed critical commercial policies",
+      "script": "V300__seed_critical_commercial_policies.sql",
+      "checksum": 615773801,
+      "success": true
+    },
+    {
+      "installed_rank": 53,
+      "version": "301",
+      "description": "expand demo catalog and access",
+      "script": "V301__expand_demo_catalog_and_access.sql",
+      "checksum": 482780873,
+      "success": true
+    },
+    {
+      "installed_rank": 54,
+      "version": "302",
+      "description": "complete mvp business fixtures",
+      "script": "V302__complete_mvp_business_fixtures.sql",
+      "checksum": -1174550292,
+      "success": true
+    }
+  ]
+}

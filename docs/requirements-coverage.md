@@ -16,3 +16,7 @@
 | Producción operada | Pendiente | Faltan CI/CD, observabilidad y recuperación ensayada |
 
 La suite sin PostgreSQL pasa Domain, Application, arquitectura, mapeo y formato. La evidencia completa de migraciones y concurrencia requiere Docker activo o un usuario dueño de una base de pruebas con permiso `CREATE SCHEMA`.
+
+## Evidencias del cierre local MVP
+
+Consulta [validación](validation-report.md), [contratos por rol](integration-contracts.md) y [modelo relacional/físico](logical-physical-model.md). Las filas implementadas del backend heredado no acreditan el flujo sandbox aprobado. La publicación pública y las dependencias de Conde permanecen pendientes en [MVP](mvp.md).

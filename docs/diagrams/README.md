@@ -18,3 +18,7 @@ Los rectángulos representan entidades. `[ID]` identifica la identidad conceptua
 La primera sección conserva el modelo base. El panel de ampliación conecta usuario con sesiones y recuperación, reserva con política, tarifa, terminación y extensión, y pagos con reembolsos. Es un modelo conceptual; tipos SQL, índices y restricciones físicas se documentan en las migraciones.
 
 Para editar, abre el archivo `.excalidraw` y vuelve a exportar SVG y PNG. Actualiza también la huella SHA-256 del modelo y los conteos de la auditoría.
+
+## Modelo lógico y físico
+
+El [modelo relacional](../logical-physical-model.md) añade PK, FK y cardinalidades extraídas del esquema real. Se conserva el conceptual editable de Excalidraw como artefacto distinto.

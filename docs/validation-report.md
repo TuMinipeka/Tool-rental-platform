@@ -1,24 +1,16 @@
 # Reporte de validación
 
-Fecha de actualización: 2026-10-19.
+Fecha: 2026-10-20. Evidencia de la preparación local previa a integrar la nueva entrega de Conde; la publicación sigue bloqueada.
 
-## Resultado verificado
+- Maven clean verify con Java 21: 78 pruebas, 0 fallos, 0 errores y 0 omisiones. Incluye PostgreSQL/Testcontainers, actualización desde V200, restricciones, rollback y concurrencia.
+- Frontend: lint/build y 68 pruebas Playwright satisfactorias; dos omisiones por dispositivo.
+- [Integración real](evidence/mvp/live-integration.json): sesiones, roles, herramientas, unidades, reserva inclusiva, confirmación/cancelación y catálogo sin respaldo ficticio al caer el servidor.
+- [Perfil seguro](evidence/mvp/secure-profile.json): credenciales demo desactivadas, bootstrap privado, cookies seguras y revocación por rotación.
+- [Respaldo](evidence/mvp/backup-restore.json): 26 tablas restauradas con conteos iguales; datos persistentes tras reiniciar PostgreSQL/backend. La copia externa no está validada.
+- [Base](evidence/mvp/database-audit.json): 25 tablas, 20 de negocio con al menos 20 filas, 146 restricciones y 62 índices.
+- [Configuración](evidence/mvp/configuration.json): Compose/Caddy/shell válidos; publicación incompleta rechazada.
+- [ARM](evidence/mvp/arm-manifests.json): seis imágenes base con manifiestos ARM64; no se acredita ejecución en Oracle.
 
-- Java 21 y compilación de los tres módulos.
-- Pruebas de Domain y Application exitosas.
-- Spotless aplicado; arquitectura hexagonal y mapeo de 25 entidades JPA comprobados mediante pruebas sin base de datos.
-- `ArchitectureTest` verifica los 25 paquetes en los tres módulos, sus configuraciones, la correspondencia de `package` con la ruta y LF en Java. `BoundedContextBeanWiringTest` verifica los casos de uso ensamblados y `BoundedContextHttpMappingTest` comprueba que las rutas de sesión, recuperación, políticas y tarifas se registran sin colisiones.
-- Configuración Compose válida mediante `docker compose config --quiet`.
-- El perfil PostgreSQL local respondió en una comprobación anterior de conectividad; no se ejecutaron las migraciones nuevas contra él.
-- Límites exactos de 48 horas, dos horas, precisión monetaria y margen de reutilización cubiertos por pruebas de dominio.
-- OpenAPI configurado para filtrar `/api/v1`; alias `/api` configurado con cabeceras de obsolescencia. Falta comprobar ambos contratos mediante HTTP con PostgreSQL activo.
+Los informes incluyen fecha y huella de los archivos probados; sourceCommit identifica el commit base y validatedWorkingTree indica pruebas sobre los cambios de esta entrega. Las capturas son de datos académicos en [screenshots](evidence/mvp/screenshots/). Los logs completos y dumps permanecen privados.
 
-## Validación pendiente por entorno
-
-`mvnw.cmd clean verify` se repitió tras la reorganización y terminó con error en 20 pruebas de infraestructura dependientes de Testcontainers: Docker Desktop no expuso el motor. Dominio (25 pruebas), Application (14 pruebas), compilación de Infrastructure y sus 13 pruebas sin PostgreSQL pasaron; la nueva prueba de ensamblado también pasó en una ejecución posterior. Se intentó previamente la suite Flyway sobre PostgreSQL local, pero el usuario de aplicación recibió SQLSTATE `42501` al crear un esquema aislado. No se modificó el esquema de trabajo.
-
-Para completar la evidencia ejecuta `mvnw.cmd clean verify` con Docker activo o concede `CREATE` sobre una base exclusiva al usuario de pruebas. Deben pasar actualización V200→V208, instalación vacía, `ddl-auto: validate`, concurrencia e idempotencia. Las 25 tablas y los contratos HTTP no están aún validados contra PostgreSQL.
-
-## Límites
-
-La implementación de reembolso y pagos continúa siendo académica; no ejecuta transferencias reales. SMTP necesita credenciales y TLS de un proveedor en producción. La respuesta de estado JDBC acredita conectividad en ese momento, no respaldo, recuperación, alertas ni alta disponibilidad.
+Se repetirá la validación afectada al integrar la nueva entrega de Conde. No se acredita proveedor de pagos externo, SMTP público, DNS/HTTPS público, respaldo externo ni instancia Oracle.

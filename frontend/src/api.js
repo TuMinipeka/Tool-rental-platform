@@ -180,6 +180,14 @@ export const api = {
       { authenticated: true },
     )
   },
+  reservationAction(id, action, idempotencyKey) {
+    return request('/reservations/' + encodeURIComponent(id) + '/' + action,
+      { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
+      { authenticated: true })
+  },
+  listRentals() { return request('/rentals', {}, { authenticated: true }) },
+  listPayments() { return request('/payments', {}, { authenticated: true }) },
+  listInvoices() { return request('/invoices', {}, { authenticated: true }) },
   listReservations() {
     return request('/reservations', {}, { authenticated: true })
   },

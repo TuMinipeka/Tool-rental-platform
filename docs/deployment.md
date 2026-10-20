@@ -1,82 +1,91 @@
-# Despliegue y operación
+# Despliegue y operación del MVP
 
-## Alcance
+## Estado y separación de entornos
 
-El proyecto ofrece un JAR ejecutable con Tomcat embebido y una composición Docker de PostgreSQL, backend y frontend Nginx. No genera un WAR para Tomcat externo. Docker cubre la alternativa de contenedores de la rúbrica; la ejecución de contenedores requiere validar su motor en el entorno destino.
+La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle ni se acredita una pasarela sandbox. El cierre depende del [MVP](mvp.md).
 
-La entrega sigue en desarrollo. Revisa los [bloqueos de producción](production-readiness.md) antes de exponerla públicamente.
+| Entorno | Composición | Datos / acceso |
+| --- | --- | --- |
+| Desarrollo existente | compose.yml | Base de trabajo; puertos locales 5173/8080 y PostgreSQL local |
+| Validación aislada | compose.validation.yml | Proyecto tool-rental-mvp, volumen exclusivo, frontend/proxy 15173 y backend 18080, solo loopback |
+| Publicación académica | compose.showcase.yml | Base exclusiva, production + showcase, Caddy HTTPS; ningún puerto público de PostgreSQL/backend |
 
-## Variables de conexión
+Nunca uses la base de trabajo para fixtures o pruebas de restauración. No ejecutes down -v contra un volumen que debas conservar.
 
-| Variable | Uso |
+## Validación local reproducible
+
+Requisitos: Git, JDK 21, Node.js 24, Chrome y Docker con Compose operativo. Desde la raíz:
+
+~~~powershell
+node scripts/prepare-validation.mjs
+docker compose --env-file .env.validation -f compose.validation.yml config --quiet
+docker compose --env-file .env.validation -f compose.validation.yml up --build -d
+# Espera a que /status/database responda connected: true.
+Invoke-RestMethod http://localhost:15173/status/database
+node scripts/audit-database.mjs
+node frontend/scripts/verify-live-mvp.mjs
+node scripts/verify-backup.mjs
+~~~
+
+prepare-validation conserva cualquier archivo privado existente y no imprime secretos. El frontend usa /api/v1 bajo el mismo origen mediante Caddy. Mailpit de pruebas queda exclusivamente en localhost:18025. Los tres accesos demo documentados en README son válidos solo para esta base privada; no se llevan a la publicación.
+
+Los scripts de integración escriben registros ficticios en la base aislada. verify-backup crea una base de restauración separada, compara conteos y reinicia únicamente PostgreSQL/backend de tool-rental-mvp. El dump permanece privado dentro del contenedor y no se versiona.
+
+Para reiniciar o recompilar después de un merge usa up --build -d; actualizar el navegador no reconstruye las imágenes.
+
+## Preparación de Oracle ARM
+
+Destino previsto: Ubuntu ARM64 en una VM Always Free A1, hasta el cupo que muestre la cuenta. Verifica las condiciones y disponibilidad en la [documentación oficial](https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm). No se autoriza contratar capacidad de pago. La disponibilidad y la permanencia de una instancia gratuita no están garantizadas.
+
+Instala Git, Docker Engine/Compose, curl y rsync. Reserva una IPv4 si está incluida en la cuenta, registra el subdominio gratuito y configura DNS. En OCI y en el firewall del host permite 80/443; limita SSH a la dirección de administración. No abras 5432, 8080, 5173 ni Mailpit.
+
+La [verificación de imágenes](evidence/mvp/arm-manifests.json) comprueba manifiestos ARM64, no ejecución en Oracle. La JVM usa una base Ubuntu compatible y usuario sin privilegios. El ensayo ARM real queda pendiente.
+
+## Imágenes identificadas por revisión
+
+Desde una copia limpia y validada, autentica Docker en el registro elegido. Con IMAGE_PREFIX configurado, ejecuta scripts/build-release.sh. Construye backend y frontend para amd64/arm64, publica etiquetas con el SHA completo del commit y configura BACKEND_IMAGE/FRONTEND_IMAGE con esas etiquetas o sus digests. El frontend público exige API real y no incorpora un segundo catálogo ficticio cuando falla el servidor.
+
+La publicación de imágenes no despliega la aplicación. No uses latest para una revisión aprobada ni cambies la imagen sin repetir las pruebas afectadas.
+
+## Configuración pública privada
+
+Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y completa sus campos. Nunca subas ese archivo. No actives showcase sobre la base de trabajo: el arranque exige production y un nombre de base explícitamente aislado que contenga showcase.
+
+| Variables | Requisito |
 | --- | --- |
-| `SPRING_PROFILES_ACTIVE` | `production` exige credenciales externas; `local` permite configuración local |
-| `DB_URL` | URL JDBC PostgreSQL; dentro de Compose utiliza el servicio `postgres` |
-| `DB_USERNAME`, `DB_PASSWORD` | Credenciales externas, nunca dentro del repositorio o una imagen publicada |
-| `DB_MAX_POOL_SIZE`, `DB_MIN_IDLE` | Tamaño máximo y conexiones ociosas mínimas del pool |
-| `DB_CONNECTION_TIMEOUT_MS` | Espera máxima de Hikari para obtener conexión |
-| `JWT_SECRET` | Secreto aleatorio de al menos 32 bytes para firmar access tokens |
-| `CORS_ALLOWED_ORIGINS` | Orígenes HTTPS explícitos autorizados a enviar credenciales |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` | Transporte SMTP de recuperación |
-| `PASSWORD_RECOVERY_SENDER`, `PASSWORD_RECOVERY_RESET_URL` | Remitente verificado y URL pública del frontend |
+| PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
+| POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
+| JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
+| BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
+| SMTP_HOST / PORT / USERNAME / PASSWORD | Entrega de correo configurada por Conde; TLS obligatorio |
+| PASSWORD_RECOVERY_SENDER | Remitente verificado |
 
-Los valores compartidos del pool son 10/2; `local` usa 2/0 salvo sobrescritura. Dimensiona el total entre réplicas y clientes de administración según el límite del rol PostgreSQL.
+CORS permite exactamente el origen HTTPS configurado; el refresh es HttpOnly/Secure/SameSite=Lax y la API conserva CSRF. Spring procesa cabeceras reenviadas solo detrás del proxy privado. La especificación conserva exclusivamente /api/v1; el alias heredado no se anuncia como contrato nuevo.
 
-## Ejecutar el JAR
+V303 desactiva todos los usuarios precargados y revoca sesiones/tokens anteriores únicamente al instalar showcase. Antes de abrir la demo provisiona evaluadores privados. Con EVALUATOR_EMAIL (prefijo evaluator.), EVALUATOR_PASSWORD y EVALUATOR_ROLE configurados en la sesión privada, scripts/provision-evaluator.sh ejecuta una herramienta offline, guarda BCrypt y revoca sesiones/tokens anteriores. El operador necesita acceso al servidor y al contenedor; no existe un endpoint HTTP de bootstrap. Retira después la contraseña del entorno de la terminal. No reutilices cuentas o contraseñas demo conocidas.
 
-Completa [compilación y pruebas](build-and-test.md). El perfil `production` exige las variables de base de datos, JWT, CORS, SMTP y recuperación de la tabla anterior; suminístralas mediante el entorno del proceso o tu gestor de secretos.
+## DNS y HTTPS
 
-```powershell
-& "$env:JAVA_HOME/bin/java.exe" -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
-```
+Registra un subdominio disponible en DuckDNS. Configura DUCKDNS_SUBDOMAIN, DUCKDNS_TOKEN y PUBLIC_IPV4 en el entorno privado y ejecuta scripts/update-duckdns.sh; el token se transmite por stdin, no en argumentos ni logs. Comprueba el registro A antes de arrancar Caddy. No se ha registrado ni actualizado ningún dominio durante esta entrega.
 
-Linux/macOS, con Java 21 seleccionado:
+Caddy conserva certificados en volúmenes, sirve la SPA y enruta /api, Swagger, OpenAPI y /status/database al backend. Consulta [la documentación del proxy](https://caddyserver.com/docs/caddyfile/directives/reverse_proxy).
 
-```bash
-java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
-```
+## Publicación y verificación final
 
-Flyway aplica migraciones pendientes antes de que Hibernate valide. Un fallo debe impedir el arranque; no actives `ddl-auto: update`, `baseline-on-migrate` ni `repair` para ocultarlo. Para producción separa el rol migrador del rol de ejecución con privilegios limitados; actualmente se utiliza el mismo DataSource.
+Todos los campos de publicReleaseGates deben estar verificados en evidence/mvp/status.json, con evidencias actuales. scripts/release.sh falla si falta alguno. Solo entonces habilita Caddy, descarga las imágenes aprobadas y ejecuta Compose con espera de arranque. El Compose público mantiene Caddy bloqueado por defecto aunque alguien omita el script.
 
-## Ejecutar con Docker Compose
+Comprobar externamente HTTPS válido, /health, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, sandbox/webhook, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
 
-```powershell
-Copy-Item .env.example .env
-# Edita .env y reemplaza las contraseñas de ejemplo antes de continuar.
-docker compose --env-file .env config --quiet
-docker compose --env-file .env up --build -d
-docker compose ps
-docker compose logs --tail 100 backend
-```
+## Respaldo y recuperación
 
-Compose usa `POSTGRES_PASSWORD` para el servidor y para `DB_PASSWORD` del backend. Para ejecutar el JAR fuera de Compose define también `DB_PASSWORD`. `.env` no se versiona. Spring Boot fuera de Compose no carga automáticamente ese archivo.
+Configura acceso SSH restringido a un destino externo y BACKUP_TARGET=user@host:/private/path/. Ejecuta scripts/backup.sh: genera pg_dump custom, copia fuera del servidor y solo después conserva las últimas siete copias locales. La retención externa se configura también para siete copias en el destino. Si la copia externa falla, no purga el historial local.
 
-| Servicio | Dirección local predeterminada |
-| --- | --- |
-| Backend / estado | http://localhost:8080 |
-| Frontend Nginx | http://localhost:5173 |
-| PostgreSQL | localhost:5432 |
+Programa diariamente a las 03:00 UTC desde cron, ejecutando el script desde la ruta del repositorio y cargando BACKUP_TARGET desde un archivo privado. Verifica espacio, permisos, recepción y alertas del cron. El ensayo local no acredita esta copia externa.
 
-Si ya utilizas PostgreSQL en 5432, cambia `POSTGRES_PORT`. La conexión interna sigue usando `postgres:5432`. El volumen `postgres_data` conserva los datos. `docker compose down` detiene los servicios; evita eliminar volúmenes con información que debas conservar.
+Para restaurar, crea una base exclusiva y usa pg_restore --no-owner --no-acl --exit-on-error. Compara conteos, historial Flyway y restricciones antes de aceptar el respaldo. [Referencia PostgreSQL](https://www.postgresql.org/docs/17/app-pgrestore.html).
 
-La imagen backend ejecuta Java 21 con un usuario sin privilegios. La etapa de empaquetado omite tests: verifica antes la revisión con `clean verify`. Las imágenes actuales son una base de desarrollo; fija versiones y digest revisados al publicar. No se acredita un arranque Docker cuando su motor no está operativo.
+Antes de actualizar guarda las referencias de imágenes y el respaldo probado. Para revertir una aplicación selecciona la imagen anterior compatible y repite Compose y los smoke checks. No reviertas Flyway ni restaures sobre la base activa automáticamente. Si el esquema ya no es compatible, detén escrituras y restaura en un destino nuevo durante una ventana controlada.
 
-## Demostración aislada
+## Límites restantes
 
-En una base vacía de demostración, activa `local,demo` y proporciona sus variables de conexión. El historial actual contiene 33 migraciones estructurales y 19 migraciones de demostración. No habilites `demo` en producción o en la base de trabajo: incluye cuentas y operaciones ficticias. No se ofrece un inicio de sesión demo.
-
-## Verificaciones posteriores al arranque
-
-```powershell
-Invoke-RestMethod http://localhost:8080/status/database
-```
-
-Debe responder `connected: true`. La página raíz presenta el resultado de una consulta real; si falla responde 503. Verifica también Flyway, Hibernate y 401 en `/api/v1/categories` sin autenticación. El estado de conexión no sustituye métricas, alertas ni pruebas de negocio.
-
-## Actualización, respaldo y recuperación
-
-Antes de publicar: respalda con `pg_dump -Fc` usando credenciales externas; prueba la restauración en un destino aislado; registra el artefacto e historial Flyway; programa una ventana de cambio. [Migraciones](database-migrations.md) explica los bloqueos de moneda y la compatibilidad con V3.
-
-Ante un fallo, conserva logs privados y revisa la transacción. No borres historial ni restaures sobre la base activa automáticamente. Una recuperación requiere detener escrituras y un procedimiento ensayado; retroceder el JAR no revierte el esquema. El respaldo privado generado durante esta entrega no acredita un ensayo completo de recuperación.
-
-Consulta los [criterios de salida a producción](production-readiness.md).
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, correo de Conde, flujo sandbox/factura/reportes, respaldo externo y cierre final de roles mantienen bloqueada la publicación. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.

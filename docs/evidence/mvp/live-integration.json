@@ -1,0 +1,77 @@
+{
+  "sourceFingerprint": "e55bbab807f64542523917fa92e6e9ce9bf77ad0e63531cc4a21c715c507133f",
+  "testedAt": "2026-10-20T17:07:38.104Z",
+  "baseUrl": "http://localhost:15173",
+  "scope": "Actual Spring Boot and isolated PostgreSQL; no API mocks",
+  "checks": [
+    {
+      "name": "Anonymous protected endpoint returns 401",
+      "passed": true
+    },
+    {
+      "name": "JDBC connected",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI only publishes v1",
+      "passed": true
+    },
+    {
+      "name": "Real proveedor login",
+      "passed": true
+    },
+    {
+      "name": "Supplier tool and physical unit persist",
+      "passed": true
+    },
+    {
+      "name": "Real cliente login",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot list administrative users",
+      "passed": true
+    },
+    {
+      "name": "Inclusive single day total is 25000 COP",
+      "passed": true
+    },
+    {
+      "name": "Supplier confirms through the actual browser UI",
+      "passed": true
+    },
+    {
+      "name": "Customer cancels through the actual browser UI",
+      "passed": true
+    },
+    {
+      "name": "History panels consume real endpoints without fabricated reports",
+      "passed": true
+    },
+    {
+      "name": "Access token is absent from web storage",
+      "passed": true
+    },
+    {
+      "name": "Refresh cookie renews the actual session",
+      "passed": true
+    },
+    {
+      "name": "Logout immediately invalidates the access session",
+      "passed": true
+    },
+    {
+      "name": "Real admin login",
+      "passed": true
+    },
+    {
+      "name": "Admin panel lists actual users",
+      "passed": true
+    },
+    {
+      "name": "Backend outage never substitutes a fabricated catalog in the live build",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

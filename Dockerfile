@@ -1,6 +1,6 @@
 ARG JAVA_VERSION=21
 
-FROM eclipse-temurin:${JAVA_VERSION}-jdk-alpine AS builder
+FROM eclipse-temurin:${JAVA_VERSION}-jdk-jammy AS builder
 WORKDIR /workspace
 
 COPY .mvn/ .mvn/
@@ -18,10 +18,12 @@ RUN java -Djarmode=tools \
     -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar \
     extract --layers --destination /workspace/extracted
 
-FROM eclipse-temurin:${JAVA_VERSION}-jre-alpine AS runtime
+FROM eclipse-temurin:${JAVA_VERSION}-jre-jammy AS runtime
 WORKDIR /application
 
-RUN addgroup --system spring && adduser --system --ingroup spring spring
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --system spring && useradd --system --gid spring spring
 USER spring:spring
 
 COPY --from=builder --chown=spring:spring /workspace/extracted/dependencies/ ./

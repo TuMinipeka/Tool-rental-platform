@@ -8,7 +8,7 @@ export default defineConfig([
   globalIgnores(['dist', 'test-results', 'playwright-report']),
   { files: ['playwright.config.js'], languageOptions: { globals: globals.node } },
   { files: ['scripts/**/*.mjs'], extends: [js.configs.recommended], languageOptions: { globals: globals.node } },
-  { files: ['scripts/browser-audit.mjs', 'scripts/runtime-audit.mjs'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
+  { files: ['scripts/browser-audit.mjs', 'scripts/runtime-audit.mjs', 'scripts/render-relational-model.mjs', 'scripts/verify-live-mvp.mjs'], languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   {
     files: ['**/*.{js,jsx}'],
     extends: [

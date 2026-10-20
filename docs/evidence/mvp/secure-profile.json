@@ -1,0 +1,52 @@
+{
+  "testedAt": "2026-10-20T17:08:46.858Z",
+  "sourceFingerprint": "e55bbab807f64542523917fa92e6e9ce9bf77ad0e63531cc4a21c715c507133f",
+  "scope": "Private production+showcase profile; no public HTTPS or SMTP delivery validated",
+  "checks": [
+    {
+      "name": "Secure profile starts against an isolated showcase database",
+      "passed": true
+    },
+    {
+      "name": "Known demonstration administrator credentials are disabled",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned CUSTOMER can authenticate",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER offline credential rotation revokes prior access",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned SUPPLIER can authenticate",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER offline credential rotation revokes prior access",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned ADMIN can authenticate",
+      "passed": true
+    },
+    {
+      "name": "ADMIN refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "ADMIN offline credential rotation revokes prior access",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

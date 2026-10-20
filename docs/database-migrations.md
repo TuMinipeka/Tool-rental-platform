@@ -41,3 +41,7 @@ V1–V200 no se modifican. Las evoluciones compartidas continúan después de V2
 ```
 
 El usuario de prueba necesita `CREATE` sobre la base para generar y eliminar esquemas aislados. El usuario de ejecución de producción debe tener privilegios menores y seguir una estrategia separada de migración.
+
+## Entrega MVP académica
+
+V301 amplía el catálogo y los accesos exclusivamente locales. V302 completa escenarios históricos y la matriz de 20 filas por entidad de negocio. V303 está exclusivamente en db/showcase: desactiva credenciales conocidas y revoca sesiones y tokens anteriores. Se activa mediante production,showcase, sobre una base exclusiva con nombre validado; no se aplica a la base de trabajo. No se modificaron V1–V301. La instalación normal no carga fixtures.

@@ -1,0 +1,8 @@
+{
+  "testedAt": "2026-10-20T17:09:41.813Z",
+  "publicComposeValid": true,
+  "caddyConfigurationValid": true,
+  "operationalShellSyntaxValid": true,
+  "incompleteMvpReleaseRejected": true,
+  "publicServicesStarted": false
+}

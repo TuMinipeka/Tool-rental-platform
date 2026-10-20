@@ -69,3 +69,7 @@ Java usa LF; `.cmd` usa CRLF. Para el error Spotless ejecuta `spotless:apply` y 
 Abre como carpeta de VS Code la raíz real `Tool-rental-platform`, que contiene el POM agregador. El archivo compartido `.vscode/settings.json` permite que la extensión Java actualice automáticamente la configuración Maven. Después ejecuta **Java: Clean Java Language Server Workspace** y vuelve a importar el proyecto si el editor conserva errores de imports que Maven no reproduce. Usa **Java: Configure Java Runtime** para asociar JavaSE-21 a tu JDK 21 local; no se versiona una ruta absoluta de otra máquina. La comprobación de paquetes y saltos de línea está en `ArchitectureTest`.
 
 Un puerto PostgreSQL abierto no demuestra integración: se requiere conexión, migración/validación Flyway, validación Hibernate y arranque correcto.
+
+## Integración y publicación MVP
+
+Consulta [MVP](mvp.md), [contratos por rol](integration-contracts.md), [despliegue](deployment.md) y [reglas visuales consolidadas](DESIGN.md). La composición de validación usa proyecto, base y puertos separados. No restaures skills eliminadas por el usuario ni incluyas esas eliminaciones en un commit de otra entrega.

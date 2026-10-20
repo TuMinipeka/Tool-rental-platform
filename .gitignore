@@ -22,3 +22,7 @@ frontend/playwright-report/
 .playwright-cli/
 .impeccable/review/
 tmp/
+
+# Public showcase template and private operational artifacts
+!.env.showcase.example
+backups/

@@ -1,0 +1,14 @@
+{
+  "updatedAt": "2026-10-20T16:36:05.794Z",
+  "state": "implementation-in-progress",
+  "publicReleaseGates": {
+    "oracleCapacity": false,
+    "dnsAndHttps": false,
+    "condeSandboxInvoiceReports": false,
+    "condeRecoveryEmail": false,
+    "realRoleJourneys": false,
+    "credentialsProvisioned": false,
+    "offsiteBackupAndRestore": false,
+    "armRuntimeValidated": false
+  }
+}

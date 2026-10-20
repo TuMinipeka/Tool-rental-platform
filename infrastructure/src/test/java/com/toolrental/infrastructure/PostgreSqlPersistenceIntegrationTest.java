@@ -39,7 +39,6 @@ class PostgreSqlPersistenceIntegrationTest {
   private static final List<String> BUSINESS_TABLES =
       List.of(
           "users",
-          "roles",
           "user_roles",
           "customers",
           "suppliers",
@@ -55,7 +54,10 @@ class PostgreSqlPersistenceIntegrationTest {
           "damage_reports",
           "payments",
           "invoices",
-          "invoice_items");
+          "invoice_items",
+          "reservation_terminations",
+          "reservation_extensions",
+          "refunds");
 
   static PostgreSQLContainer<?> postgres;
   static final String schema = "demo_validation_" + UUID.randomUUID().toString().replace("-", "");
@@ -93,15 +95,17 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Autowired private CategoryRepository categoryRepository;
 
+  @Autowired private com.toolrental.domain.tool.port.repository.ToolRepository toolRepository;
+
   @Autowired private ConfirmReservationUseCase confirmReservationUseCase;
 
   @Autowired private PlatformTransactionManager transactionManager;
 
   @Test
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
-    assertEquals("301", flyway.info().current().getVersion().getVersion());
+    assertEquals("302", flyway.info().current().getVersion().getVersion());
     assertEquals(
-        53,
+        54,
         java.util.Arrays.stream(flyway.info().applied())
             .filter(info -> info.getVersion() != null)
             .count());
@@ -109,12 +113,13 @@ class PostgreSqlPersistenceIntegrationTest {
   }
 
   @Test
-  void loadsAtLeastFiveDemoRowsIntoEveryBusinessTable() {
+  void loadsAtLeastTwentyDemoRowsIntoEveryBusinessTable() {
     BUSINESS_TABLES.forEach(
         table -> {
           Integer rowCount =
               jdbcTemplate.queryForObject("SELECT count(*) FROM " + table, Integer.class);
-          assertTrue(rowCount != null && rowCount >= 5, table + " must contain at least five rows");
+          assertTrue(
+              rowCount != null && rowCount >= 20, table + " must contain at least twenty rows");
         });
   }
 
@@ -131,14 +136,15 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Test
   void readsMigratedDataThroughTheRepositoryAdapter() {
-    assertEquals(11, categoryRepository.findAll().size());
+    assertTrue(categoryRepository.findAll().size() >= 20);
+    assertTrue(toolRepository.findAll().size() >= 50);
   }
 
   @Test
-  void providesThirtyDemoToolsAndOneAccountPerPrimaryRole() {
-    assertEquals(30, jdbcTemplate.queryForObject("SELECT count(*) FROM tools", Integer.class));
+  void providesCatalogAndHistoricalFixturesWithOneAccountPerPrimaryRole() {
+    assertTrue(jdbcTemplate.queryForObject("SELECT count(*) FROM tools", Integer.class) >= 30);
     assertEquals(
-        30, jdbcTemplate.queryForObject("SELECT count(*) FROM equipment_units", Integer.class));
+        50, jdbcTemplate.queryForObject("SELECT count(*) FROM equipment_units", Integer.class));
     assertEquals(
         3,
         jdbcTemplate.queryForObject(

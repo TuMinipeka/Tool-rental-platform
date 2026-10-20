@@ -3,6 +3,8 @@
 .idea
 .vscode
 .env
+.env.*
+backups
 **/target
 frontend/node_modules
 frontend/dist

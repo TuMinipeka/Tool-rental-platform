@@ -22,3 +22,7 @@ Configura mediante un gestor de secretos: `JWT_SECRET`, credenciales PostgreSQL 
 - Se ensayan migración V200→V208, restauración de backup y rollback de aplicación.
 - Se verifican logs sin tokens ni credenciales.
 - Producto, legal y finanzas aprueban porcentajes, retracto, impuestos y textos.
+
+## Demo académica del MVP
+
+El [procedimiento](deployment.md) añade composición pública aislada, proxy HTTPS, imágenes ARM64, bootstrap privado y respaldo. Es preparación de despliegue, no publicación acreditada. Las [puertas de salida](evidence/mvp/status.json) impiden publicar mientras falten Oracle, DNS, correo, sandbox/factura/reportes, recorridos finales, credenciales, copia externa y ejecución ARM. Las imágenes base se verifican por manifiesto; ese control no sustituye una prueba en el servidor destino.

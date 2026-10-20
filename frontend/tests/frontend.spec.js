@@ -277,3 +277,29 @@ test('card motion preserves mouse feedback, touch scrolling, and keyboard naviga
   await page.keyboard.press('Enter')
   await expect(page).toHaveURL(/\/herramienta\//)
 })
+
+test('cancellation preserves the idempotency key and waits for server success', async ({ page }) => {
+  const id = '90000000-0000-0000-0000-000000000001'
+  let cancelled = false
+  const keys = []
+  await page.route('**/api/v1/reservations**', async route => {
+    if (route.request().method() === 'POST') {
+      keys.push(route.request().headers()['idempotency-key'])
+      if (keys.length === 1) return route.fulfill({ status: 409, json: { code: 'BUSINESS_CONFLICT', detail: 'Retry the same operation' } })
+      cancelled = true
+      return route.fulfill({ json: { terminationStatus: 'APPLIED' } })
+    }
+    return route.fulfill({ json: [{ id, status: cancelled ? 'CANCELLED' : 'PENDING', period: { startDate: '2027-01-01', returnDate: '2027-01-01' }, total: { amount: 25000 } }] })
+  })
+  await page.goto('/cuenta')
+  await login(page)
+  const row = page.locator('.reservation-row')
+  await row.getByRole('button', { name: 'Solicitar cancelación' }).click()
+  await expect(row.getByRole('alert')).toContainText('BUSINESS_CONFLICT')
+  await expect(row.locator('.status-pill')).toHaveText('PENDING')
+  await row.getByRole('button', { name: 'Solicitar cancelación' }).click()
+  await expect(row.locator('.status-pill')).toHaveText('CANCELLED')
+  expect(keys).toHaveLength(2)
+  expect(keys[0]).toBeTruthy()
+  expect(keys[1]).toBe(keys[0])
+})

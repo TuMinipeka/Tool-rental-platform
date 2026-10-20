@@ -1,0 +1,11 @@
+# Public academic data is permitted only in an isolated database.
+# Activate together with production; never use against the working database.
+spring:
+  config:
+    activate:
+      on-profile: showcase
+  flyway:
+    locations:
+      - classpath:db/migration
+      - classpath:db/demo
+      - classpath:db/showcase
