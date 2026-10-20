@@ -93,3 +93,12 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - `/como-funciona` reproduce la estructura editorial de la referencia adicional con hero dividido, cuatro pasos, beneficios verificables, perfiles de uso y CTA final. El texto sigue el flujo realmente implementado y declara el pago académico.
 - La revisión visual se realizó a `1680 × 945` y `390 × 844`. Ambas rutas mantienen `scrollWidth` igual a `clientWidth` en móvil, sin desplazamiento horizontal.
 - Durante esta revisión no se ejecutaron pruebas automatizadas ni compilación. La consola mostró únicamente las respuestas `404` esperadas de `/api/v1/auth/csrf` y `/api/v1/public/catalog` porque el backend local no estaba levantado; el fallback demostrativo funcionó.
+
+### Acceso y registro
+
+- Se incorporaron las rutas públicas `/login` y `/registro`, integradas con `POST /api/v1/auth/login` y `POST /api/v1/auth/register` respectivamente.
+- El acceso conserva la recuperación real de contraseña, permite mostrar u ocultar la clave y comunica errores de conexión sin fabricar una sesión.
+- El registro público crea exclusivamente cuentas de cliente conforme al contrato actual. Solicita nombre, correo, contraseña de 12 caracteres, confirmación, tipo y número de documento, además de aceptación explícita de los Términos y Condiciones.
+- La opción de proveedor conduce al proceso autorizado de `/publicar`; no muestra ni envía teléfono, nacimiento, datos bancarios, archivos o información empresarial que el endpoint público todavía no admite.
+- Ambas rutas usan la referencia como dirección visual, conservan la identidad existente y se reorganizan en una sola columna en móvil sin desplazamiento horizontal.
+- Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La comprobación manual cubrió navegación, visibilidad de contraseña, rechazo local de contraseñas distintas y propagación del error real cuando el backend no está levantado.
