@@ -6,6 +6,8 @@ Tool Rental Platform es una simulación universitaria realista de un mercado col
 
 La fase 0 define el contrato del producto. Una capacidad descrita aquí no está implementada hasta que el estado del repositorio lo indique expresamente.
 
+Estado académico actual: el backend ya implementa retención atómica, vencimiento, checkout interno idempotente, webhook HMAC, confirmación automática, comprobante descargable y reportes por rol. La integración con una pasarela sandbox oficial externa, los impuestos definitivos y la facturación electrónica siguen fuera del estado implementado.
+
 ## Actores confirmados
 
 La primera versión completa tiene tres roles:

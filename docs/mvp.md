@@ -17,19 +17,19 @@
 
 # Tarea 2 — Conde Objetivo: Completar las funcionalidades que todavía impiden demostrar el flujo real de alquiler. Actividades asignadas
 
-1. Completar los CRUD: revisar especialmente clientes, proveedores, reservas y pagos. Faltan operaciones en algunos controladores, como eliminación de clientes y proveedores. Usar eliminación lógica cuando corresponda para conservar historial financiero.,
+1. ✅ Completar los CRUD: clientes y proveedores usan baja lógica del usuario compartido, conservan el perfil y el historial financiero y revocan sus sesiones.,
 
-2. Sistema de reservas: cerrar el flujo de solicitud, confirmación automática, validación de disponibilidad, expiración, cancelación, entrega y devolución. Actualmente parte del recorrido depende de aprobación del proveedor.,
+2. ✅ Sistema de reservas: solicitud con retención atómica, confirmación automática por pago, validación de disponibilidad, expiración, cancelación, entrega y devolución.,
 
-3. Pagos y facturación: evolucionar el pago simulado hacia una pasarela sandbox verificable, confirmar operaciones de forma segura y generar automáticamente comprobantes o facturas descargables.,
+3. ✅ Pagos y facturación: checkout sandbox académico idempotente, webhook HMAC verificable, confirmación segura y comprobante académico automático descargable.,
 
-4. Reportes y estadísticas: implementar endpoints de ingresos, herramientas más alquiladas, clientes frecuentes, disponibilidad y rentabilidad, con permisos según el rol.,
+4. ✅ Reportes y estadísticas: endpoints de ingresos, herramientas más alquiladas, clientes frecuentes, disponibilidad y rentabilidad con alcance de proveedor y administración.,
 
-5. Seguridad JWT y roles: probar registro, autenticación, permisos de cliente/proveedor/admin y accesos prohibidos. Completar el proceso de incorporación de proveedores y sus validaciones.,
+5. ✅ Seguridad JWT y roles: incorporación pública suspendida, activación administrativa, autenticación, permisos, accesos prohibidos, validaciones y revocación por baja lógica probados.,
 
-6. Documentación y pruebas backend: documentar endpoints con Swagger, agregar ejemplos JSON y pruebas de lógica, autorización, pagos, disponibilidad y concurrencia. Entregar contratos claros para que Daniel conecte las pantallas.
+6. ⏳ Documentación y pruebas backend: se realizará después, según el acuerdo del equipo. Los contratos modificados en las tareas 1–5 se mantienen sincronizados para no documentar comportamiento obsoleto.
 
-7. Mejorar Frontend y funcionalidades: Para integrara a futuro la rama developer/daniel/adds y lograr un cambio visual extraordinario
+7. ⏳ Mejorar Frontend y funcionalidades: se realizará después para integrar la rama `developer/daniel/adds`.
 
 
 

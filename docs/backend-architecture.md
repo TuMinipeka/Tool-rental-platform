@@ -26,10 +26,12 @@ Cada uno de los 25 contextos tiene paquetes en los tres módulos y una configura
 
 ## Consistencia
 
-- `AtomicReservationManagement` bloquea reserva y unidades en orden estable para confirmación y extensión.
+- `AtomicReservationManagement` bloquea reserva y unidades en orden estable para crear la retención, confirmar el webhook y resolver extensiones.
 - Un refresh se busca con bloqueo pesimista; la fila anterior y su sucesora se guardan en una transacción.
 - El hash SHA-256 identifica secretos aleatorios de alta entropía. La base nunca guarda refresh ni token de recuperación en claro.
+- El checkout registra `FULL_PAYMENT/PENDING`; un webhook HMAC válido confirma o rechaza pago y reserva dentro de una transacción y la aprobación emite el comprobante académico.
 - La liquidación comercial usa pagos `CONFIRMED`, genera reembolsos con clave idempotente y crea un pago `ADJUSTMENT/PENDING` cuando queda saldo.
+- `OperationalReportingPort` mantiene SQL y proyecciones de lectura en Infrastructure; Application aplica alcance de proveedor o administrador antes de consultarlo.
 - JPA conserva referencias escalares entre contextos. Las claves compuestas viven solo en Infrastructure mediante `@EmbeddedId`.
 
 ## Seguridad HTTP
@@ -44,4 +46,4 @@ Los controladores publican `/api/v1` y un alias `/api`. Un interceptor añade `D
 
 ## Persistencia
 
-Hay 25 entidades JPA para 25 tablas. Flyway aplica V1–V208; V201–V208 son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300; no debe ejecutarse sobre producción.
+Hay 25 entidades JPA para 25 tablas. Flyway aplica V1–V210; V201–V210 son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.

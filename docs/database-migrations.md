@@ -15,10 +15,12 @@
 | V206 | Extensiones de reserva |
 | V207 | Reembolsos idempotentes |
 | V208 | Modalidad, hora, dirección, fecha efectiva, fallos, mora y ajustes |
+| V209 | Estados y vencimiento de retenciones de inventario pendientes de pago |
+| V210 | Pago total sandbox, unicidad por etapa y factura previa al alquiler |
 | V101–V118 | Datos académicos base, solo perfil demo |
 | V300 | Tarifa académica de entrega, solo perfil demo |
 
-V1–V200 no se modifican. Las evoluciones compartidas continúan después de V208. Las migraciones demo tienen una ubicación separada (`db/demo`) y no se cargan en producción.
+V1–V200 no se modifican. Las evoluciones compartidas continúan hasta V210. Las migraciones demo tienen una ubicación separada (`db/demo`) y no se cargan en producción.
 
 ## Reglas
 
@@ -31,7 +33,7 @@ V1–V200 no se modifican. Las evoluciones compartidas continúan después de V2
 
 ## Pruebas
 
-`MappingContractTest` compara las 25 tablas y entidades JPA. `FlywayUpgradeIntegrationTest` conserva checksums y datos al actualizar desde V200 hasta V208. Las pruebas PostgreSQL verifican restricciones, rollback y confirmación concurrente. Testcontainers se usa por defecto; también puede suministrarse una base con permiso para crear esquemas:
+`MappingContractTest` compara las 25 tablas y entidades JPA. `FlywayUpgradeIntegrationTest` conserva checksums y datos al actualizar desde V200 hasta V210. Las pruebas PostgreSQL verifican restricciones, rollback, retenciones y confirmación concurrente. Testcontainers se usa por defecto; también puede suministrarse una base con permiso para crear esquemas:
 
 ```powershell
 .\mvnw.cmd clean verify `

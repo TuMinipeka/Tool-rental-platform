@@ -1,23 +1,27 @@
 # Reporte de validación
 
-Fecha de actualización: 2026-10-19.
+Fecha de actualización: 2026-10-20.
 
 ## Resultado verificado
 
-- Java 21 y compilación de los tres módulos.
-- Pruebas de Domain y Application exitosas.
+- `./mvnw clean verify` finalizó correctamente con Java 21 y Docker/Testcontainers: 27 pruebas de Domain, 16 de Application y 37 de Infrastructure, sin fallos ni omisiones.
 - Spotless aplicado; arquitectura hexagonal y mapeo de 25 entidades JPA comprobados mediante pruebas sin base de datos.
 - `ArchitectureTest` verifica los 25 paquetes en los tres módulos, sus configuraciones, la correspondencia de `package` con la ruta y LF en Java. `BoundedContextBeanWiringTest` verifica los casos de uso ensamblados y `BoundedContextHttpMappingTest` comprueba que las rutas de sesión, recuperación, políticas y tarifas se registran sin colisiones.
 - Configuración Compose válida mediante `docker compose config --quiet`.
-- El perfil PostgreSQL local respondió en una comprobación anterior de conectividad; no se ejecutaron las migraciones nuevas contra él.
+- PostgreSQL 17 ejecutó una instalación vacía hasta V210, validación Hibernate de las 25 entidades y actualización V200→V210 sin pérdida de datos ni cambio de checksums.
 - Límites exactos de 48 horas, dos horas, precisión monetaria y margen de reutilización cubiertos por pruebas de dominio.
-- OpenAPI configurado para filtrar `/api/v1`; alias `/api` configurado con cabeceras de obsolescencia. Falta comprobar ambos contratos mediante HTTP con PostgreSQL activo.
+- OpenAPI filtra `/api/v1`; el alias `/api` conserva cabeceras de obsolescencia. Ambos contratos se comprobaron mediante HTTP con PostgreSQL activo.
+- Las integraciones cubren retenciones concurrentes, checkout/webhook firmado, factura académica, cinco reportes por rol, incorporación de proveedor, permisos prohibidos y revocación de sesiones por baja lógica.
 
-## Validación pendiente por entorno
+## Evidencia reproducible
 
-`mvnw.cmd clean verify` se repitió tras la reorganización y terminó con error en 20 pruebas de infraestructura dependientes de Testcontainers: Docker Desktop no expuso el motor. Dominio (25 pruebas), Application (14 pruebas), compilación de Infrastructure y sus 13 pruebas sin PostgreSQL pasaron; la nueva prueba de ensamblado también pasó en una ejecución posterior. Se intentó previamente la suite Flyway sobre PostgreSQL local, pero el usuario de aplicación recibió SQLSTATE `42501` al crear un esquema aislado. No se modificó el esquema de trabajo.
+La ejecución verificada fue:
 
-Para completar la evidencia ejecuta `mvnw.cmd clean verify` con Docker activo o concede `CREATE` sobre una base exclusiva al usuario de pruebas. Deben pasar actualización V200→V208, instalación vacía, `ddl-auto: validate`, concurrencia e idempotencia. Las 25 tablas y los contratos HTTP no están aún validados contra PostgreSQL.
+```bash
+JAVA_HOME=/ruta/al/jdk-21 ./mvnw clean verify
+```
+
+El resultado fue `BUILD SUCCESS` en 36.336 segundos. Docker debe estar disponible; Testcontainers crea bases y esquemas desechables y no modifica la base de trabajo.
 
 ## Límites
 
