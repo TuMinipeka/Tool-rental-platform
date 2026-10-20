@@ -10,6 +10,13 @@
 
 ---
 
+## Entrega MVP de Daniel/Mayorga
+
+**Estado: integración y despliegue local en validación; publicación pública pendiente.** No hay una demo pública acreditada todavía. El cierre compartido y las dependencias de Conde están en [el MVP](docs/mvp.md).
+
+[Despliegue reproducible](docs/deployment.md) · [Contratos por rol](docs/integration-contracts.md) · [Modelo relacional y físico](docs/logical-physical-model.md) · [Evidencias](docs/validation-report.md)
+
+
 ## Estado actual
 
 El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módulos Maven conservan las dependencias hacia dentro: `infrastructure → application → domain`. El modelo contiene **25 tablas y 25 contextos organizativos**; las transacciones coordinan las reglas que atraviesan reservas, pagos, sesiones, devoluciones y reembolsos.
@@ -41,10 +48,10 @@ Compose levanta PostgreSQL, Mailpit, backend y frontend. Mailpit expone la bande
 
 ### Entorno demostrativo
 
-El perfil `demo` carga un catálogo aislado de 30 herramientas y tres cuentas locales. No debe activarse sobre una base productiva.
+El perfil `demo` carga un catálogo aislado de 30 herramientas publicadas, 20 herramientas históricas sin publicar y tres cuentas locales. No debe activarse sobre una base productiva.
 
 ```powershell
-$env:SPRING_PROFILES_ACTIVE = 'demo'
+$env:SPRING_PROFILES_ACTIVE = 'local,demo'
 $env:VITE_DEMO_MODE = 'true'
 $env:POSTGRES_PASSWORD = 'tool_rental_local_2026'
 docker compose up --build
