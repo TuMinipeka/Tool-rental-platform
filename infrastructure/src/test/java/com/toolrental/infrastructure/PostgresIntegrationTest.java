@@ -264,6 +264,158 @@ class PostgresIntegrationTest {
   }
 
   @Test
+  void supplierOnboardingAndProfileDeactivationEnforceJwtRolesAndSessionRevocation()
+      throws Exception {
+    String supplierEmail = "candidate.supplier@example.com";
+    String supplierPassword = "SupplierPass123!";
+    var supplierRequest =
+        Map.of(
+            "email",
+            supplierEmail,
+            "displayName",
+            "Candidate Supplier",
+            "password",
+            supplierPassword,
+            "documentType",
+            "NIT",
+            "documentNumber",
+            "SUPPLIER-9001",
+            "businessName",
+            "Candidate Tools");
+    var registration = call(null, post("/api/auth/supplier-registration"), supplierRequest, 202);
+    var candidateId = UUID.fromString(registration.get("userId").asText());
+    assertThat(registration.get("accountStatus").asText()).isEqualTo("SUSPENDED");
+    call(
+        null,
+        post("/api/auth/login"),
+        Map.of("email", supplierEmail, "password", supplierPassword),
+        401);
+    call(customer, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 403);
+    call(admin, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 200);
+
+    var supplierLogin =
+        call(
+            null,
+            post("/api/auth/login"),
+            Map.of("email", supplierEmail, "password", supplierPassword),
+            200);
+    assertThat(supplierLogin.get("roles").toString()).contains("SUPPLIER");
+    var supplierToken = supplierLogin.get("accessToken").asText();
+    var today = LocalDate.now(ZoneId.of("America/Bogota"));
+    call(
+        null,
+        get("/api/reports/availability?from=" + today + "&to=" + today)
+            .header("Authorization", "Bearer " + supplierToken),
+        null,
+        200);
+    call(null, get("/api/users").header("Authorization", "Bearer " + supplierToken), null, 403);
+
+    call(
+        null,
+        post("/api/auth/supplier-registration"),
+        Map.of(
+            "email",
+            "duplicate.document@example.com",
+            "displayName",
+            "Duplicate Supplier",
+            "password",
+            supplierPassword,
+            "documentType",
+            "NIT",
+            "documentNumber",
+            "SUPPLIER-9001",
+            "businessName",
+            "Duplicate Tools"),
+        409);
+    call(
+        null,
+        post("/api/auth/supplier-registration"),
+        Map.of(
+            "email",
+            "invalid.supplier@example.com",
+            "displayName",
+            "Invalid Supplier",
+            "password",
+            "short",
+            "documentType",
+            "NIT",
+            "documentNumber",
+            "SUPPLIER-9002",
+            "businessName",
+            "Invalid Tools"),
+        400);
+
+    call(
+        null,
+        delete("/api/suppliers/" + candidateId).header("Authorization", "Bearer " + supplierToken),
+        null,
+        204);
+    assertThat(
+            db.queryForObject(
+                "select account_status from users where user_id=?", String.class, candidateId))
+        .isEqualTo("DISABLED");
+    assertThat(
+            db.queryForObject(
+                "select count(*) from suppliers where user_id=?", Integer.class, candidateId))
+        .isEqualTo(1);
+    assertThat(
+            db.queryForObject(
+                "select count(*) from user_sessions where user_id=? and session_status='REVOKED'",
+                Integer.class,
+                candidateId))
+        .isEqualTo(1);
+    call(null, get("/api/tools").header("Authorization", "Bearer " + supplierToken), null, 401);
+
+    String customerEmail = "deactivated.customer@example.com";
+    var customerRegistration =
+        call(
+            null,
+            post("/api/auth/register"),
+            Map.of(
+                "email",
+                customerEmail,
+                "displayName",
+                "Deactivated Customer",
+                "password",
+                "CustomerPass123!",
+                "personType",
+                "PERSON",
+                "documentType",
+                "ID",
+                "documentNumber",
+                "CUSTOMER-9001",
+                "billingName",
+                "Deactivated Customer"),
+            201);
+    var customerId = UUID.fromString(customerRegistration.get("userId").asText());
+    var customerToken = customerRegistration.get("accessToken").asText();
+    call(
+        null,
+        get("/api/reports/income?from=" + today + "&to=" + today)
+            .header("Authorization", "Bearer " + customerToken),
+        null,
+        403);
+    call(
+        null,
+        delete("/api/customers/" + customerId).header("Authorization", "Bearer " + customerToken),
+        null,
+        204);
+    assertThat(
+            db.queryForObject(
+                "select account_status from users where user_id=?", String.class, customerId))
+        .isEqualTo("DISABLED");
+    assertThat(
+            db.queryForObject(
+                "select count(*) from customers where user_id=?", Integer.class, customerId))
+        .isEqualTo(1);
+    call(
+        null,
+        get("/api/reservations").header("Authorization", "Bearer " + customerToken),
+        null,
+        401);
+  }
+
+  @Test
   void signedSandboxWebhookConfirmsHoldAndIssuesDownloadableAcademicInvoice() throws Exception {
     var reservation = held();
     assertThat(reservation.status().name()).isEqualTo("PENDING_PAYMENT");
