@@ -8,7 +8,7 @@ Tool Rental Platform es una simulación universitaria realista de un mercado col
 
 La fase 0 define el contrato del producto. Una capacidad descrita aquí no está implementada hasta que el estado del repositorio lo indique expresamente.
 
-Estado académico actual: el backend implementa retención atómica, vencimiento, pasarela ficticia persistente e idempotente, confirmación automática, comprobante descargable y reportes por rol. Los recorridos de cliente, proveedor y administrador se verifican con [Playwright CLI](browser-verification.md). La pasarela oficial externa, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
+Estado académico actual: el backend implementa registro directo de clientes y proveedores, retención atómica, vencimiento, pasarela ficticia persistente e idempotente, confirmación automática, comprobante descargable y reportes por rol. Los recorridos de cliente, proveedor y administrador se documentan en [la matriz de verificación](browser-verification.md). La pasarela oficial externa, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
 
 ## Actores confirmados
 
@@ -35,6 +35,8 @@ El software debe ofrecer finalmente todas las siguientes capacidades funcionales
 7. Facturación simulada con identificación de la herramienta y su ciudad de servicio, precios e impuestos discriminados.
 8. Administración, reportes operativos, auditoría y aceptación de documentos legales.
 9. Interfaz React adaptable que consuma el contrato REST/OpenAPI publicado.
+
+El registro público de proveedor solicita identidad, documento y razón social, crea la cuenta en estado activo y abre una sesión con rol `SUPPLIER`; no requiere aprobación administrativa previa.
 
 ## Decisiones tecnológicas
 

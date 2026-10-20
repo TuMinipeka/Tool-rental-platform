@@ -24,8 +24,8 @@ Recorridos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, 
 | Perfil | Acciones verificadas |
 | --- | --- |
 | Cliente | Registro, consulta y búsqueda del catálogo, cotización, reserva, aprobación/rechazo del pago, cancelación, descarga de comprobante, renovación y cierre de sesión |
-| Proveedor | Registro sujeto a activación, publicación y unidades propias, entrega, alquiler, devolución y cierre; cinco reportes con alcance autorizado |
-| Administrador | Consulta operativa, activación y desactivación de proveedores; revocación inmediata del acceso al desactivar |
+| Proveedor | Publicación y unidades propias, entrega, alquiler, devolución y cierre; cinco reportes con alcance autorizado |
+| Administrador | Consulta operativa y gestión del estado de las cuentas; revocación inmediata del acceso al desactivar |
 | Contratos REST adicionales | Extensiones, daños y valoración, retracto en revisión, reembolsos registrados, políticas, tarifas y consultas administrativas |
 
 La [matriz de verificación](docs/browser-verification.md) distingue interfaz, REST y pruebas automatizadas; incluye límites y pasos para repetir el recorrido. Los resultados y las huellas de las imágenes están en [la evidencia JSON](docs/evidence/mvp/role-workflows.json).
@@ -54,11 +54,11 @@ La [matriz de verificación](docs/browser-verification.md) distingue interfaz, R
 
 ![Reporte de ingresos por moneda con datos reales de la base aislada](docs/evidence/mvp/screenshots/qa-supplier-report.png)
 
-### Administrador: permisos y activación
+### Administrador: permisos y cuentas
 
-**Proveedor activado por administración.** El registro inicial queda suspendido; la baja posterior revoca su sesión.
+**Gestión administrativa de cuentas.** El administrador puede desactivar una cuenta y revocar inmediatamente sus sesiones.
 
-![Cuenta de proveedor activada mediante el panel administrativo](docs/evidence/mvp/screenshots/qa-admin-supplier-activation.png)
+![Cuenta de proveedor gestionada desde el panel administrativo](docs/evidence/mvp/screenshots/qa-admin-supplier-activation.png)
 
 <details>
 <summary>Más evidencias: catálogo, inventario, rechazo, comprobante y acceso restringido</summary>
@@ -103,11 +103,9 @@ La [matriz de verificación](docs/browser-verification.md) distingue interfaz, R
 
 ![Reserva cancelada desde la cuenta del cliente](docs/evidence/mvp/screenshots/qa-customer-cancellation.png)
 
-**Publicación y solicitud de incorporación del proveedor.**
+**Publicación del proveedor.**
 
 ![Formulario del proveedor después de guardar una herramienta](docs/evidence/mvp/screenshots/qa-supplier-inventory.png)
-
-![Solicitud de proveedor recibida y pendiente de activación](docs/evidence/mvp/screenshots/qa-supplier-registration.png)
 
 **Administración y rechazo de acceso.**
 
@@ -255,7 +253,7 @@ Rutas principales:
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
 - `GET /api/v1/public/features`: capacidades vigentes; recuperación deshabilitada.
 - `GET /api/v1/public/catalog?serviceCity={municipio}`: catálogo público filtrado por la ciudad persistida de cada herramienta.
-- `POST /api/v1/auth/supplier-registration` y activación administrativa del usuario.
+- `POST /api/v1/auth/supplier-registration`: crea la cuenta activa de proveedor, inicia sesión y devuelve la cookie de renovación.
 - `POST /api/v1/payments/checkouts`, checkout ficticio y decisión autenticada y descarga del comprobante académico.
 - `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.
 - `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.

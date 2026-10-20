@@ -309,7 +309,7 @@ class PostgresIntegrationTest {
   }
 
   @Test
-  void supplierOnboardingAndProfileDeactivationEnforceJwtRolesAndSessionRevocation()
+  void directSupplierRegistrationAndProfileDeactivationEnforceJwtRolesAndSessionRevocation()
       throws Exception {
     String supplierEmail = "candidate.supplier@example.com";
     String supplierPassword = "SupplierPass123!";
@@ -327,25 +327,11 @@ class PostgresIntegrationTest {
             "SUPPLIER-9001",
             "businessName",
             "Candidate Tools");
-    var registration = call(null, post("/api/auth/supplier-registration"), supplierRequest, 202);
+    var registration = call(null, post("/api/auth/supplier-registration"), supplierRequest, 201);
     var candidateId = UUID.fromString(registration.get("userId").asText());
-    assertThat(registration.get("accountStatus").asText()).isEqualTo("SUSPENDED");
-    call(
-        null,
-        post("/api/auth/login"),
-        Map.of("email", supplierEmail, "password", supplierPassword),
-        401);
+    assertThat(registration.get("roles").toString()).contains("SUPPLIER");
     call(customer, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 403);
-    call(admin, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 200);
-
-    var supplierLogin =
-        call(
-            null,
-            post("/api/auth/login"),
-            Map.of("email", supplierEmail, "password", supplierPassword),
-            200);
-    assertThat(supplierLogin.get("roles").toString()).contains("SUPPLIER");
-    var supplierToken = supplierLogin.get("accessToken").asText();
+    var supplierToken = registration.get("accessToken").asText();
     var today = LocalDate.now(ZoneId.of("America/Bogota"));
     call(
         null,

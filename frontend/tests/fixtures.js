@@ -19,9 +19,9 @@ export async function mockApi(page, { empty = false, unavailable = false, roles 
     } else if (path.endsWith('/availability')) body = { availableEquipmentUnitIds: ['40000000-0000-0000-0000-000000000001'] }
     else if (path === '/auth/csrf') body = { headerName: 'X-XSRF-TOKEN', token: 'qa-csrf-token' }
     else if (path === '/auth/refresh') { status = 401; body = { code: 'SESSION_REQUIRED', detail: 'No active session' } }
-    else if (path === '/auth/login' || path === '/auth/register') body = {
+    else if (path === '/auth/login' || path === '/auth/register' || path === '/auth/supplier-registration') body = {
       accessToken: 'qa-access-token', userId: 'qa-customer', email: 'qa@example.test',
-      displayName: 'QA Customer', roles,
+      displayName: 'QA Customer', roles: path === '/auth/supplier-registration' ? ['SUPPLIER'] : roles,
     }
     else if (path === '/public/features') body = { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'FICTIONAL_GATEWAY', currency: 'COP' }
     else if (path === '/auth/password-recovery') body = { accepted: true }

@@ -36,7 +36,7 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 | Método | Ruta | Acceso |
 | --- | --- | --- |
 | POST | `/api/v1/auth/register` | Público; devuelve access JSON y refresh cookie |
-| POST | `/api/v1/auth/supplier-registration` | Público; crea proveedor `SUSPENDED`, sin sesión |
+| POST | `/api/v1/auth/supplier-registration` | Público; crea proveedor `ACTIVE`, devuelve access JSON y refresh cookie |
 | POST | `/api/v1/auth/login` | Público; devuelve access JSON y refresh cookie |
 | GET | `/api/v1/auth/csrf` | Público; inicializa cookie CSRF |
 | POST | `/api/v1/auth/refresh` | Refresh cookie + `X-XSRF-TOKEN` |
@@ -49,7 +49,7 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 
 El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La recuperación nunca devuelve el token: el puerto SMTP entrega el enlace; Mailpit lo captura en desarrollo.
 
-El administrador activa una solicitud de proveedor mediante `PATCH /api/v1/users/{id}/status` con `{"status":"ACTIVE"}`. Antes de esa transición el login es rechazado. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
+El proveedor queda activo al completar el formulario público y puede entrar directamente a su panel. El administrador conserva `PATCH /api/v1/users/{id}/status` para gestionar estados. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
 
 ## Reservas y cotización
 

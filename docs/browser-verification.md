@@ -18,7 +18,7 @@ Una captura documenta el estado visible; las comprobaciones de respuestas y cons
 | --- | --- | --- |
 | Visitante | Catálogo, búsqueda por nombre y presentación móvil | Administración sin sesión devuelve 401 |
 | Cliente | Alta, cuenta inicialmente vacía, ingreso, cotización, reserva y cancelación | Solo obtiene CUSTOMER; fechas inclusivas; unidad retenida no admite superposición ni duplicados |
-| Proveedor | Alta pendiente, publicación y registro de una unidad física | Proveedor suspendido no inicia sesión; el panel del proveedor muestra inventario propio; puede leer publicaciones públicas ajenas, pero no editarlas |
+| Proveedor | Registro directo, publicación y registro de una unidad física | Pendiente de repetir manualmente tras el cambio: el contrato crea la cuenta activa y abre la sesión; el panel limita el inventario al proveedor |
 | Pago ficticio | Aprobación y rechazo desde la pantalla del cliente | Propietario autorizado; proveedor/otro cliente denegados; aprobación repetida no duplica factura; decisión contradictoria devuelve 409 |
 | Comprobante | Descarga desde la cuenta y contenido devuelto por el backend | Un solo documento académico, marcado sin validez ante DIAN |
 | Entrega y alquiler | Programación, entrega completa, inicio, devolución y cierre | Estado COMPLETED persistido; devolución puntual con cero días y cero importe de mora |

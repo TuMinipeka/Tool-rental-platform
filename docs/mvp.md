@@ -14,7 +14,7 @@ Rama de trabajo: developer/daniel. Se conserva el diseño de Conde y la arquitec
 | Reservas | Retenciones, vencimiento, disponibilidad, confirmación, cancelación y ciclo operativo existentes; la decisión académica mantiene una transacción local |
 | Pagos y comprobante | Pasarela ficticia persistente, decisión autenticada, idempotencia, confirmación y comprobante académico; aceptación mediante recorrido real contra PostgreSQL |
 | Reportes | Cinco consultas con datos persistidos y alcance por rol; profitability significa ingreso reservado, no margen neto |
-| JWT y roles | Sesiones rotativas, CSRF, activación administrativa de proveedor y revocación existentes; conservar pruebas de accesos prohibidos |
+| JWT y roles | Sesiones rotativas, CSRF, registro directo de proveedor y revocación existentes; conservar pruebas de accesos prohibidos |
 | Documentación y pruebas | Contrato y procedimiento en [pagos del MVP](fictional-payments.md); resultados actuales en [validación](validation-report.md) |
 | Frontend | Pasarela ficticia y retorno conectado al estado del servidor, sin formulario académico ni PayPal; recuperación oculta y deshabilitada; se conserva el diseño |
 
