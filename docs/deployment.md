@@ -2,7 +2,7 @@
 
 ## Estado y separación de entornos
 
-La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle ni se acredita una pasarela sandbox. El cierre depende del [MVP](mvp.md).
+La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle. El sandbox interno firmado está probado; no se acredita una pasarela oficial externa. El cierre depende del [MVP](mvp.md).
 
 | Entorno | Composición | Datos / acceso |
 | --- | --- | --- |
@@ -56,6 +56,7 @@ Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y complet
 | PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
 | POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
 | JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
+| SANDBOX_WEBHOOK_SECRET | Secreto privado independiente para el sandbox interno; nunca incluir en VITE_* |
 | BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
 | SMTP_HOST / PORT / USERNAME / PASSWORD | Entrega de correo configurada por Conde; TLS obligatorio |
 | PASSWORD_RECOVERY_SENDER | Remitente verificado |
@@ -74,7 +75,7 @@ Caddy conserva certificados en volúmenes, sirve la SPA y enruta /api, Swagger, 
 
 Todos los campos de publicReleaseGates deben estar verificados en evidence/mvp/status.json, con evidencias actuales. scripts/release.sh falla si falta alguno. Solo entonces habilita Caddy, descarga las imágenes aprobadas y ejecuta Compose con espera de arranque. El Compose público mantiene Caddy bloqueado por defecto aunque alguien omita el script.
 
-Comprobar externamente HTTPS válido, /health, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, sandbox/webhook, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
+Comprobar externamente HTTPS válido, /, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, sandbox/webhook, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
 
 ## Respaldo y recuperación
 
@@ -88,4 +89,8 @@ Antes de actualizar guarda las referencias de imágenes y el respaldo probado. P
 
 ## Límites restantes
 
-Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, correo de Conde, flujo sandbox/factura/reportes, respaldo externo y cierre final de roles mantienen bloqueada la publicación. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, SMTP público, pasarela oficial, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+
+## Migraciones tras integrar Conde
+
+V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V303.

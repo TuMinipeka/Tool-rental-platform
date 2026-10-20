@@ -1,22 +1,33 @@
-# Integración por rol y contratos pendientes
+# Integración por rol y contratos
 
-| Vista / operación | Contrato actual | Autoridad / estado |
+Entrega de Conde integrada hasta `981a16e`; API oficial `/api/v1`. El navegador conserva access tokens en memoria, cookies refresh HttpOnly y CSRF. Nunca recibe el secreto del webhook.
+
+| Vista / operación | Contrato | Autoridad y aceptación |
 | --- | --- | --- |
-| Catálogo público y disponibilidad | GET /api/v1/public/catalog y disponibilidad por herramienta | Backend; datos reales, sin respaldo ficticio en el build público |
-| Registro y acceso | /api/v1/auth/register y login | Cliente público; roles privilegiados requieren autorización |
-| Cuenta: reservas | GET /api/v1/reservations | Filtrado por actor en backend |
-| Cuenta: alquileres, pagos, comprobantes | GET /api/v1/rentals, payments, invoices | Datos persistidos; no equivalen a reportes ni a pasarela/factura descargable |
-| Proveedor: publicaciones/unidades | /api/v1/tools, equipment-units, categories | Registro y consulta existentes; propietario validado en servidor |
-| Proveedor: confirmar/rechazar | POST /api/v1/reservations/{id}/confirmation y rejection | Flujo heredado, pendiente de reemplazar por webhook sandbox |
-| Cliente: cancelación | POST /api/v1/reservations/{id}/cancellation | Idempotency-Key estable por intento; conflictos se muestran sin modificar el estado local como si hubiera éxito |
-| Administrador: usuarios y categorías | GET /api/v1/users y categories | Respuesta real; controles visuales no sustituyen permisos |
-| Reportes, sandbox, comprobante descargable | Pendiente de Conde | Esperar OpenAPI, ejemplos y pruebas; no inventar endpoints |
-| Correo y restablecimiento | Contratos backend existentes; validación final pendiente de Conde | No acreditar entrega SMTP ni recorrido completo hasta comprobarlos |
+| Catálogo y disponibilidad | GET /public/catalog y disponibilidad por herramienta | Backend; build público sin catálogo ficticio de respaldo |
+| Registro cliente y proveedor | POST /auth/register y /auth/supplier-registration | Cliente activo; proveedor SUSPENDED hasta activación administrativa; sin token al registrar proveedor |
+| Sesión y recuperación | /auth/login, refresh, logout, password-recovery y password-reset | Cookies/CSRF y respuesta genérica; correo probado con Mailpit privado |
+| Reservas e historial | GET /reservations, /rentals, /payments y /invoices | Filtrado por actor; carga, vacío y error explícitos |
+| Herramientas y unidades | /tools, /equipment-units y /categories | Propiedad y permisos en servidor |
+| Reserva nueva | POST /reservations | PENDING_PAYMENT con vencimiento y retención atómica; total inclusivo del servidor |
+| Checkout | POST /payments/checkouts | Idempotency-Key estable; FULL_PAYMENT; registra referencia del sandbox interno, sin cobro externo |
+| Verificación académica | POST /payments/sandbox/webhooks | Operador privado; HMAC, timestamp y duplicados; jamás firmado en React |
+| Comprobante | GET /invoices/{id}/document | Descarga HTML autenticada con aviso de simulación no válida ante DIAN |
+| Cancelación | POST /reservations/{id}/cancellation | Idempotency-Key estable por intento; importes y transición del servidor |
+| Entrega y alquiler | /unit-deliveries, /rentals y /unit-returns | Proveedor propietario; programación, entrega, inicio, devolución y cierre según estado |
+| Usuarios | GET /users; PATCH /users/{id}/status | Administrador; activar suspendido/desactivar activo, revocación inmediata |
+| Reportes | GET /reports/{income,most-rented-tools,frequent-customers,availability,profitability} | From/to obligatorios; proveedor limitado a su alcance, administrador global, cliente 403 |
 
-Las pantallas presentan carga, vacío y error. Las acciones solo actualizan la vista después de una respuesta satisfactoria del backend. La disponibilidad, el importe, la autorización y las transiciones no se recalculan como decisiones del navegador.
+Las rutas de la tabla son relativas a `/api/v1`. OpenAPI es la referencia exacta de cuerpos, parámetros y errores. La confirmación/rechazo manual se conserva solo para solicitudes heredadas PENDING, no para nuevas órdenes pendientes de pago.
 
-El build de publicación usa VITE_API_BASE_URL vacío, VITE_DEMO_MODE=false y VITE_REQUIRE_LIVE_API=true. Una caída de catálogo se comunica como error; no se reemplaza por el catálogo local. El diseño, las imágenes y las animaciones de Conde se conservan.
+El reporte profitability muestra ingreso reservado, **no margen contable**: aún no se registran costos. Las facturas se generan atómicamente al aprobar el pago interno y pueden preceder al alquiler. Los documentos históricos no se editan en el navegador.
 
-## Entrega esperada de Conde
+## Verificación del sandbox interno
 
-Por cada capacidad pendiente: commit de referencia, OpenAPI versionado, roles/propietario, ejemplos de entrada/salida, códigos de error, estados permitidos y pruebas con PostgreSQL. Para pasarela: configuración sandbox, firma del webhook, duplicados, rechazo, expiración y reembolso; para correo: proveedor configurado y token de un uso sin exposición. Daniel conectará las pantallas cuando exista esa entrega.
+Crear el checkout desde la cuenta del cliente. Copiar su referencia académica y, exclusivamente en el entorno local aislado, configurar SANDBOX_EXTERNAL_REFERENCE en una terminal privada y ejecutar `node scripts/send-sandbox-event.mjs`. SANDBOX_OUTCOME admite APPROVED o DECLINED. El script lee el secreto de .env.validation, genera timestamp/firma y no imprime secretos ni simula un proveedor externo. El pago aprobado confirma la reserva y emite un único comprobante.
+
+La prueba `node frontend/scripts/verify-live-mvp.mjs` ejecuta este contrato contra PostgreSQL, verifica firma inválida, duplicados, descarga, reportes, permisos, ciclo operativo, correo privado y revocación. Los estados de error no se convierten en éxitos locales.
+
+## Pendiente de aceptación pública
+
+Pasarela sandbox oficial, SMTP público, HTTPS y pruebas en Oracle ARM mantienen sus criterios en [MVP](mvp.md). El frontend no inventa endpoints para reemplazar esas dependencias. Los reportes y el correo privado ya entregados por Conde no se clasifican como ausentes.

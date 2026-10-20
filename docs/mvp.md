@@ -1,52 +1,45 @@
 # MVP — entrega de Daniel/Mayorga
 
-## Estado de entrega
+## Estado verificable
 
-**Preparado para validación local; publicación pública bloqueada hasta cerrar el MVP.** La finalidad es una demo académica, con datos ficticios y pagos sandbox, no una operación comercial. La rama de integración es developer/daniel y conserva el diseño de Conde.
+**Validado localmente; publicación pública bloqueada.** Demo académica con datos ficticios, sin cargos externos. Rama `developer/daniel`; entrega de Conde integrada hasta `981a16e`. El diseño existente se conserva.
 
-| Prioridad | Trabajo | Responsable | Estado / aceptación |
+| Prioridad | Trabajo | Responsable | Estado y evidencia |
 | --- | --- | --- | --- |
-| P0 | Compose, PostgreSQL, backend, frontend y proxy | Daniel | Implementado; validar con los comandos de [despliegue](deployment.md) |
-| P0 | HTTPS público en Oracle ARM | Daniel | Preparado; requiere cuenta/cupo, DNS y cierre funcional |
-| P0 | Historial, herramientas, unidades y acciones vigentes de reserva | Daniel | Integración real; [evidencia HTTP/navegador](evidence/mvp/live-integration.json) |
-| P0 | Orden, retención, expiración y confirmación automática por webhook | Conde | Pendiente; el flujo heredado aún permite confirmación del proveedor |
-| P0 | Pasarela sandbox verificable y comprobante descargable | Conde | Pendiente; pagos registrados no prueban una pasarela |
-| P0 | Reportes y permisos/CRUD pendientes | Conde | Pendiente; no fabricar reportes calculados en el navegador |
-| P0 | Recuperación por correo y recorrido completo de restablecimiento | Conde + integración Daniel | Pendiente de entrega/validación; no se acredita SMTP público |
-| P1 | 20 filas por entidad de negocio | Daniel | Migración demo V302; [matriz real](evidence/mvp/database-audit.json) |
-| P1 | Modelo relacional, físico y 4FN | Daniel | [Modelo lógico](logical-physical-model.md), DDL exportado y normalización |
-| P1 | Pruebas, Swagger, README y evidencias | Ambos | Registro actualizado en [validación](validation-report.md) |
-
-## Contratos de integración
-
-La API vigente es /api/v1. El frontend usa las consultas reales de reservas, herramientas, unidades, categorías, usuarios, alquileres, pagos y facturas. Las acciones vigentes son confirmation, rejection y cancellation; la cancelación conserva Idempotency-Key. La autorización y la disponibilidad las decide el backend.
-
-Conde deberá entregar OpenAPI actualizado, ejemplos, permisos por rol/propietario, estados y errores estables, instrucciones sandbox, verificación de webhooks y pruebas. No se inventan rutas para sus contratos futuros. Daniel integrará esos contratos después de recibirlos y repetirá los recorridos reales.
+| P0 | Compose, base exclusiva, backend, frontend y proxy | Daniel | Ejecutándose en localhost:15173; [configuración](evidence/mvp/configuration.json) |
+| P0 | Oracle ARM, DuckDNS y HTTPS público | Daniel | Preparado; faltan cuenta/capacidad, dominio y ensayo ARM |
+| P0 | Retención atómica, expiración y confirmación por webhook | Conde | Integrado; Maven/PostgreSQL y [recorrido real](evidence/mvp/live-integration.json) |
+| P0 | Checkout y comprobante descargable | Conde + integración Daniel | Sandbox **interno HMAC**, pago total y comprobante académico verificados; proveedor oficial externo pendiente |
+| P0 | Reportes y permisos | Conde + integración Daniel | Cinco reportes del backend, restricciones por rol y proveedor; alta de proveedor suspendido y activación administrativa verificadas |
+| P0 | Correo y restablecimiento | Conde + integración Daniel | SMTP privado Mailpit y pantalla /password-reset verificados; SMTP público pendiente |
+| P0 | Respaldo, persistencia y restauración | Daniel | [Restauración local](evidence/mvp/backup-restore.json) satisfactoria; destino externo pendiente |
+| P1 | 20 filas por entidad de negocio | Daniel | V302 y [matriz real](evidence/mvp/database-audit.json); excepciones técnicas justificadas |
+| P1 | Modelos y normalización | Daniel | [Relacional y DDL físico](logical-physical-model.md); conceptual y 4FN conservados |
+| P1 | Documentación y pruebas | Ambos | [Reporte de validación](validation-report.md) |
 
 ## Cierre local de Daniel
 
-- [ ] Compilación Maven y PostgreSQL/Testcontainers en la revisión final.
-- [ ] Lint, build y suite de navegador aislada.
-- [ ] Pruebas de navegador contra backend y PostgreSQL reales.
-- [ ] Migración vacía, actualización, restricciones y concurrencia.
-- [ ] Respaldo restaurado y persistencia tras reiniciar la composición aislada.
-- [ ] Configuraciones Compose y proxy comprobadas.
+- [x] Maven clean verify con JDK 21 y PostgreSQL/Testcontainers.
+- [x] Instalación vacía, actualización desde V200, rollback y concurrencia.
+- [x] Lint, build y pruebas de navegador aisladas en escritorio y móvil.
+- [x] Recorrido real de tres roles sin mocks: catálogo, unidad, reserva, checkout interno, webhook, factura, entrega, devolución y cierre.
+- [x] Permisos, suspensión/activación de proveedor, renovación y revocación.
+- [x] Recuperación por Mailpit, token de un uso y revocación de sesión tras cambiar contraseña.
+- [x] Restauración y persistencia tras reinicio; configuración pública validada sin abrir servicios públicos.
+- [x] Modelos, matriz de datos y evidencias sin secretos.
 
-Los resultados ejecutados, fecha y huella del código se conservan en evidence/mvp. Los datos SQL no sustituyen una prueba funcional.
+Las pruebas automáticas crean datos ficticios en una base exclusiva. No prueban cobros bancarios, envío público de correo ni ejecución en Oracle.
 
-## Puerta de publicación
+## Dependencias y aceptación pública
 
-[status.json](evidence/mvp/status.json) mantiene las condiciones externas en false hasta obtener evidencia: capacidad Oracle, DNS/HTTPS, flujo sandbox/factura/reportes, recuperación por correo, recorridos finales por rol, credenciales privadas provisionadas, respaldo externo y ejecución ARM. El script de publicación falla mientras quede una condición sin verificar. No se contratarán recursos de pago.
+| Dependencia | Responsable | Criterio pendiente |
+| --- | --- | --- |
+| Pasarela oficial sandbox | Conde / decisión de producto | Proveedor configurado, callback auténtico, rechazo, duplicados y conciliación; el HMAC interno no sustituye este requisito vigente |
+| SMTP público | Conde + Daniel | Remitente verificado, TLS y recepción real en buzón de evaluación |
+| Oracle y DNS | Daniel / titular de cuenta | Capacidad gratuita disponible, DNS y HTTPS válidos, ensayo en ARM sin recursos de pago |
+| Copia externa | Daniel / titular del destino | Recepción y restauración desde otro servidor, siete copias y alertas |
+| Accesos públicos | Operador | Provisionar y rotar evaluadores privados en la base pública; los usuarios demo conocidos quedan desactivados |
 
-## Checklist funcional compartido
+[status.json](evidence/mvp/status.json) distingue validación local de aceptación pública. El script de publicación y Caddy permanecen bloqueados. Los indicadores públicos solo se habilitan con evidencia del entorno destino; no por compilar. El procedimiento está en [despliegue](deployment.md).
 
-- [ ] Tres roles con acceso correcto y prohibiciones verificadas en la entrega final.
-- [ ] Proveedor gestiona herramientas y unidades.
-- [ ] Cliente reserva una unidad realmente disponible.
-- [ ] Pago sandbox verificado confirma automáticamente la reserva.
-- [ ] Entrega, devolución y comprobante descargable completan el recorrido.
-- [ ] Paneles muestran reportes reales con permisos correctos.
-- [ ] Recuperación funciona por el proveedor de correo configurado.
-- [ ] Demo pública HTTPS desplegada y respaldada.
-
-Conservar el [enunciado original](../ejercicioDemo.md). Las tareas pendientes de Conde no se reasignan silenciosamente a Daniel.
+Los contratos consumidos están en [integración](integration-contracts.md). La autoridad de importes, permisos, disponibilidad y transiciones pertenece al backend. Se conserva el [enunciado original](../ejercicioDemo.md).

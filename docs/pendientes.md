@@ -13,18 +13,18 @@
 ## Pendientes antes de producción
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
-2. Implementar el nuevo flujo directo: orden pendiente, retención temporal, expiración, pasarela sandbox oficial, webhooks firmados y confirmación automática sin aprobación manual del proveedor.
+2. Conectar un proveedor sandbox oficial externo: retención, expiración, checkout interno, HMAC y confirmación automática ya están implementados y probados.
 3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
 4. Configurar SMTP productivo, reputación de dominio, plantillas y telemetría de entrega.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
 6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
-7. Completar los paneles y recorridos operativos del frontend para clientes, proveedores y administradores.
+7. Cerrar las capacidades futuras de producto: protección, evidencias y aceptación legal persistente; los recorridos operativos y reportes actuales ya están conectados.
 
 ## Frontend
 
-La base React ya consume la API oficial `/api/v1`, conserva el access token solo en memoria, restaura la sesión mediante la cookie refresh, obtiene CSRF antes de renovar o cerrar sesión y usa `credentials: include`. El recorrido heredado todavía espera confirmación del proveedor y usa pago simulado; debe migrarse al flujo directo aprobado sin presentarlo como terminado. También existe la ruta pública e imprimible `/terms-and-conditions`.
+React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes reales; el flujo actual usa PENDING_PAYMENT, checkout interno firmado, comprobante descargable, entrega y devolución. La recuperación se probó con Mailpit privado. Consulta los [contratos](integration-contracts.md).
 
-Siguen pendientes los paneles funcionales contra datos reales, el registro persistente de aceptaciones legales, la selección del Plan Opcional de Protección por Daños y el tratamiento específico de 403, 409 y 429 por `code`. El frontend nunca debe tomar decisiones de autorización por sí solo.
+Siguen pendientes aceptación legal persistente, protección por daños, pasarela oficial y correo público. El frontend nunca decide permisos ni importes finales.
 
 ## Entrega Daniel/Mayorga
 

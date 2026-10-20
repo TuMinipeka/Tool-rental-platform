@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-10-20T17:09:36.420Z",
-  "sourceFingerprint": "83429093aeb9bf602fdd333fcb33b37139820ae40d9093906997e1d0b031795e",
+  "generatedAt": "2026-10-20T17:51:07.682Z",
+  "sourceFingerprint": "fbe4f67cb7dd261139b20736c011c37c03c2612cd090735c48de8bdcbc6c0d3d",
   "validatedWorkingTree": true,
-  "sourceCommit": "fcdb0d4b1873e1912b31b74107169119e19ecf40",
+  "sourceCommit": "9ee38c84366497af3fdf038da2b61483d463c5cc",
   "database": "isolated MVP validation",
   "tables": [
     {
@@ -19,7 +19,7 @@
     },
     {
       "table": "customers",
-      "rows": 26,
+      "rows": 31,
       "minimum": 20,
       "exception": null
     },
@@ -37,31 +37,31 @@
     },
     {
       "table": "equipment_units",
-      "rows": 53,
+      "rows": 57,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "invoice_items",
-      "rows": 25,
+      "rows": 31,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "invoices",
-      "rows": 25,
+      "rows": 31,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "password_reset_tokens",
-      "rows": 0,
+      "rows": 5,
       "minimum": null,
       "exception": "Created by actual recovery; no seeded secrets"
     },
     {
       "table": "payments",
-      "rows": 45,
+      "rows": 51,
       "minimum": 20,
       "exception": null
     },
@@ -73,7 +73,7 @@
     },
     {
       "table": "rentals",
-      "rows": 25,
+      "rows": 30,
       "minimum": 20,
       "exception": null
     },
@@ -85,19 +85,19 @@
     },
     {
       "table": "reservation_items",
-      "rows": 48,
+      "rows": 56,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "reservation_terminations",
-      "rows": 23,
+      "rows": 24,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "reservations",
-      "rows": 48,
+      "rows": 56,
       "minimum": 20,
       "exception": null
     },
@@ -109,49 +109,49 @@
     },
     {
       "table": "suppliers",
-      "rows": 26,
+      "rows": 27,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "tool_images",
-      "rows": 28,
+      "rows": 32,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "tools",
-      "rows": 53,
+      "rows": 57,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "unit_deliveries",
-      "rows": 25,
+      "rows": 31,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "unit_returns",
-      "rows": 25,
+      "rows": 29,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "user_roles",
-      "rows": 53,
+      "rows": 59,
       "minimum": 20,
       "exception": null
     },
     {
       "table": "user_sessions",
-      "rows": 24,
+      "rows": 46,
       "minimum": null,
       "exception": "Created by actual authentication; no seeded sessions"
     },
     {
       "table": "users",
-      "rows": 48,
+      "rows": 54,
       "minimum": 20,
       "exception": null
     }
@@ -1752,7 +1752,7 @@
       "table_name": "invoices",
       "name": "invoices_reservation_id_fkey",
       "type": "f",
-      "definition": "FOREIGN KEY (reservation_id) REFERENCES rentals(reservation_id) ON DELETE RESTRICT",
+      "definition": "FOREIGN KEY (reservation_id) REFERENCES reservations(reservation_id) ON DELETE RESTRICT",
       "validated": true
     },
     {
@@ -1843,7 +1843,7 @@
       "table_name": "payments",
       "name": "ck_payments_stage",
       "type": "c",
-      "definition": "CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'ADJUSTMENT'::character varying])::text[])))",
+      "definition": "CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'FULL_PAYMENT'::character varying, 'ADJUSTMENT'::character varying])::text[])))",
       "validated": true
     },
     {
@@ -2116,7 +2116,7 @@
       "table_name": "reservations",
       "name": "ck_reservations_confirmation",
       "type": "c",
-      "definition": "CHECK (((((reservation_status)::text = ANY ((ARRAY['CONFIRMED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])) AND (confirmed_at IS NOT NULL)) OR (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'REJECTED'::character varying])::text[])) AND (confirmed_at IS NULL)) OR ((reservation_status)::text = 'CANCELLED'::text)))",
+      "definition": "CHECK (((((reservation_status)::text = ANY ((ARRAY['CONFIRMED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])) AND (confirmed_at IS NOT NULL)) OR (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'PENDING_PAYMENT'::character varying, 'REJECTED'::character varying, 'PAYMENT_FAILED'::character varying, 'EXPIRED'::character varying])::text[])) AND (confirmed_at IS NULL)) OR ((reservation_status)::text = 'CANCELLED'::text)))",
       "validated": true
     },
     {
@@ -2142,6 +2142,13 @@
     },
     {
       "table_name": "reservations",
+      "name": "ck_reservations_payment_hold_expiration",
+      "type": "c",
+      "definition": "CHECK ((((reservation_status)::text <> 'PENDING_PAYMENT'::text) OR (expires_at IS NOT NULL)))",
+      "validated": true
+    },
+    {
+      "table_name": "reservations",
       "name": "ck_reservations_period",
       "type": "c",
       "definition": "CHECK ((start_date <= return_date))",
@@ -2151,7 +2158,7 @@
       "table_name": "reservations",
       "name": "ck_reservations_status",
       "type": "c",
-      "definition": "CHECK (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'REJECTED'::character varying, 'CANCELLED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])))",
+      "definition": "CHECK (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'PENDING_PAYMENT'::character varying, 'CONFIRMED'::character varying, 'REJECTED'::character varying, 'CANCELLED'::character varying, 'PAYMENT_FAILED'::character varying, 'EXPIRED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])))",
       "validated": true
     },
     {
@@ -2707,7 +2714,7 @@
       "tablename": "payments",
       "indexname": "ux_payments_confirmed_stage",
       "tablespace": null,
-      "indexdef": "CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (reservation_id, payment_stage) WHERE (((payment_status)::text = 'CONFIRMED'::text) AND ((payment_stage)::text = ANY ((ARRAY['FIRST_HALF'::character varying, 'FINAL_HALF'::character varying])::text[])))"
+      "indexdef": "CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (reservation_id, payment_stage) WHERE (((payment_status)::text = 'CONFIRMED'::text) AND ((payment_stage)::text = ANY ((ARRAY['FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'FULL_PAYMENT'::character varying])::text[])))"
     },
     {
       "schemaname": "public",
@@ -2806,6 +2813,13 @@
       "indexname": "ux_reservation_terminations_open",
       "tablespace": null,
       "indexdef": "CREATE UNIQUE INDEX ux_reservation_terminations_open ON public.reservation_terminations USING btree (reservation_id) WHERE ((termination_status)::text = ANY ((ARRAY['REQUESTED'::character varying, 'APPLIED'::character varying, 'APPROVED'::character varying])::text[]))"
+    },
+    {
+      "schemaname": "public",
+      "tablename": "reservations",
+      "indexname": "ix_reservations_active_holds",
+      "tablespace": null,
+      "indexdef": "CREATE INDEX ix_reservations_active_holds ON public.reservations USING btree (expires_at, start_date, effective_return_date) WHERE ((reservation_status)::text = 'PENDING_PAYMENT'::text)"
     },
     {
       "schemaname": "public",
@@ -2980,7 +2994,7 @@
     {
       "name": "invoices_reservation_id_fkey",
       "child": "invoices",
-      "parent": "rentals",
+      "parent": "reservations",
       "child_unique": true,
       "required": true
     },
@@ -3578,6 +3592,22 @@
     },
     {
       "installed_rank": 52,
+      "version": "209",
+      "description": "add payment reservation holds",
+      "script": "V209__add_payment_reservation_holds.sql",
+      "checksum": -1684037530,
+      "success": true
+    },
+    {
+      "installed_rank": 53,
+      "version": "210",
+      "description": "add full sandbox payments",
+      "script": "V210__add_full_sandbox_payments.sql",
+      "checksum": -464911287,
+      "success": true
+    },
+    {
+      "installed_rank": 54,
       "version": "300",
       "description": "seed critical commercial policies",
       "script": "V300__seed_critical_commercial_policies.sql",
@@ -3585,7 +3615,7 @@
       "success": true
     },
     {
-      "installed_rank": 53,
+      "installed_rank": 55,
       "version": "301",
       "description": "expand demo catalog and access",
       "script": "V301__expand_demo_catalog_and_access.sql",
@@ -3593,7 +3623,7 @@
       "success": true
     },
     {
-      "installed_rank": 54,
+      "installed_rank": 56,
       "version": "302",
       "description": "complete mvp business fixtures",
       "script": "V302__complete_mvp_business_fixtures.sql",

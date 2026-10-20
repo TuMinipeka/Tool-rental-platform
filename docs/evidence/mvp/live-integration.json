@@ -1,6 +1,6 @@
 {
-  "sourceFingerprint": "e55bbab807f64542523917fa92e6e9ce9bf77ad0e63531cc4a21c715c507133f",
-  "testedAt": "2026-10-20T17:07:38.104Z",
+  "sourceFingerprint": "03d8a5b08c5241e9f7a5372b850394df739a626c0ae7ed35a2ffa812b9041cf0",
+  "testedAt": "2026-10-20T17:54:03.867Z",
   "baseUrl": "http://localhost:15173",
   "scope": "Actual Spring Boot and isolated PostgreSQL; no API mocks",
   "checks": [
@@ -37,11 +37,55 @@
       "passed": true
     },
     {
-      "name": "Supplier confirms through the actual browser UI",
+      "name": "Reservation creates an expiring payment hold",
       "passed": true
     },
     {
-      "name": "Customer cancels through the actual browser UI",
+      "name": "A second overlapping hold is rejected",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot query operational reports",
+      "passed": true
+    },
+    {
+      "name": "Browser checkout registers the full server amount",
+      "passed": true
+    },
+    {
+      "name": "Unsigned sandbox approval is rejected",
+      "passed": true
+    },
+    {
+      "name": "Trusted internal sandbox event accepted 0",
+      "passed": true
+    },
+    {
+      "name": "Trusted internal sandbox event accepted 1",
+      "passed": true
+    },
+    {
+      "name": "Signed internal payment confirms the reservation automatically",
+      "passed": true
+    },
+    {
+      "name": "Repeated approval issues only one invoice",
+      "passed": true
+    },
+    {
+      "name": "Academic invoice downloads with DIAN disclaimer",
+      "passed": true
+    },
+    {
+      "name": "Supplier completes delivery, rental and return through actual UI",
+      "passed": true
+    },
+    {
+      "name": "Supplier report uses server data after payment",
+      "passed": true
+    },
+    {
+      "name": "Customer cancels an unpaid hold through the actual UI",
       "passed": true
     },
     {
@@ -69,9 +113,70 @@
       "passed": true
     },
     {
+      "name": "Admin report uses actual server data",
+      "passed": true
+    },
+    {
+      "name": "Supplier registration waits for administrative activation without an access token",
+      "passed": true
+    },
+    {
+      "name": "Suspended supplier cannot authenticate",
+      "passed": true
+    },
+    {
+      "name": "Administrative UI activates the supplier and the actual role can authenticate",
+      "passed": true
+    },
+    {
+      "name": "Activated supplier access is valid before deactivation",
+      "passed": true
+    },
+    {
+      "name": "Administrative deactivation revokes the supplier session",
+      "passed": true
+    },
+    {
+      "name": "Public customer registration uses the actual PERSON contract",
+      "passed": true
+    },
+    {
+      "name": "Recovery response is generic and contains no token",
+      "passed": true
+    },
+    {
+      "name": "Existing mail adapter delivers to private Mailpit",
+      "passed": true
+    },
+    {
+      "name": "Recovery link targets the integrated frontend",
+      "passed": true
+    },
+    {
+      "name": "Registered session renews on reset navigation",
+      "passed": true
+    },
+    {
+      "name": "Recovery session is active before password change",
+      "passed": true
+    },
+    {
+      "name": "Browser resets the password and removes the token from its URL",
+      "passed": true
+    },
+    {
+      "name": "Password reset revokes the prior access session",
+      "passed": true
+    },
+    {
+      "name": "Password reset token cannot be reused",
+      "passed": true
+    },
+    {
       "name": "Backend outage never substitutes a fabricated catalog in the live build",
       "passed": true
     }
   ],
+  "recoveryRefreshStatus": 200,
   "completed": true
 }

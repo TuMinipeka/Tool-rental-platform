@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | Java 21, Maven multimódulo | Implementado | POM raíz y wrapper |
 | Arquitectura hexagonal y DDD | Implementado | ArchUnit y módulos Domain/Application/Infrastructure |
-| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, V1–V208 y `ddl-auto: validate` |
+| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, V1–V210 y `ddl-auto: validate` |
 | Catálogo y equipos | Implementado | Contextos base y disponibilidad |
 | Reserva concurrente | Implementado | `AtomicReservationManagement` y pruebas PostgreSQL |
 | Sesiones y recuperación segura | Implementado | V201–V202, refresh opaco, SMTP y revocación |
@@ -12,11 +12,11 @@
 | Entrega, extensión y mora | Implementado | V205–V208 y ajustes |
 | Reembolsos | Simulación implementada | Contexto `refund`; falta proveedor financiero real |
 | API estable | Implementado | `/api/v1`, ProblemDetail, OpenAPI filtrado |
-| Frontend completo | Pendiente | Base React existente; recorridos aún no implementados |
-| Producción operada | Pendiente | Faltan CI/CD, observabilidad y recuperación ensayada |
+| Frontend operativo actual | Integrado y probado | Historial, checkout interno, comprobante, reportes y ciclo de alquiler; alcance futuro en MVP |
+| Publicación académica | Preparada, bloqueada | Compose seguro, respaldo restaurado localmente; faltan entorno público y dependencias externas |
 
-La suite sin PostgreSQL pasa Domain, Application, arquitectura, mapeo y formato. La evidencia completa de migraciones y concurrencia requiere Docker activo o un usuario dueño de una base de pruebas con permiso `CREATE SCHEMA`.
+La suite completa se ejecutó con JDK 21 y PostgreSQL/Testcontainers. Los comandos, resultados y límites se conservan en el reporte de validación.
 
 ## Evidencias del cierre local MVP
 
-Consulta [validación](validation-report.md), [contratos por rol](integration-contracts.md) y [modelo relacional/físico](logical-physical-model.md). Las filas implementadas del backend heredado no acreditan el flujo sandbox aprobado. La publicación pública y las dependencias de Conde permanecen pendientes en [MVP](mvp.md).
+Consulta [validación](validation-report.md), [contratos por rol](integration-contracts.md) y [modelo relacional/físico](logical-physical-model.md). El sandbox interno firmado está probado; no acredita una pasarela oficial externa. La publicación pública y las dependencias externas permanecen pendientes en [MVP](mvp.md).

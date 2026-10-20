@@ -1,0 +1,189 @@
+{
+  "recordedAt": "2026-10-20T17:56:13.003855+00:00",
+  "validatedSourceCommit": "3fbde10ac48a2a3fd33681d45de2b841bb6e92b2",
+  "condeReference": "981a16e",
+  "sourceFingerprint": "03d8a5b08c5241e9f7a5372b850394df739a626c0ae7ed35a2ffa812b9041cf0",
+  "maven": {
+    "command": ".\\mvnw.cmd clean verify",
+    "java": "21.0.12.1",
+    "finishedAt": "2026-10-20T12:17:11-05:00",
+    "result": "BUILD SUCCESS",
+    "suites": [
+      {
+        "suite": "com.toolrental.application.ApplicationExceptionsTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.CatalogAndReservationsTest",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.EquipmentUnitListingUseCaseTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.RefreshSessionUseCaseTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.common.AggregateEventsTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.CriticalPolicyTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.OperationalRecordsTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.reservation.ReservationTest",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.ArchitectureTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BeanConfigurationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BoundedContextBeanWiringTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BoundedContextHttpMappingTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.DatabaseConnectivityProbeTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.DatabaseStatusControllerTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.FlywayUpgradeIntegrationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.MappingContractTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PasswordRecoveryNotifierTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PostgresIntegrationTest",
+        "tests": 15,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PostgreSqlPersistenceIntegrationTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.ShowcaseConfigurationTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "totals": {
+      "tests": 83,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "logSha256": "6a951847dedb8b7f3971b64b1c568dc379125108a1f852d88e392430d5257c10"
+  },
+  "frontend": {
+    "commands": [
+      "npm run lint",
+      "npm run build",
+      "npm run test:e2e"
+    ],
+    "passed": 72,
+    "failed": 0,
+    "skipped": 2,
+    "scope": "Isolated API fixtures; desktop/mobile, axe accessibility, motion, routing and retry contracts"
+  },
+  "integration": {
+    "command": "node frontend/scripts/verify-live-mvp.mjs",
+    "passed": 43,
+    "scope": "Actual isolated Spring Boot/PostgreSQL; internal sandbox; private Mailpit"
+  },
+  "security": {
+    "command": "node scripts/verify-showcase.mjs",
+    "passed": 11,
+    "scope": "Private production+showcase profile; no public deployment"
+  },
+  "operationalCommands": [
+    "node scripts/verify-backup.mjs",
+    "node scripts/audit-database.mjs",
+    "node scripts/verify-configuration.mjs",
+    "node scripts/verify-arm-images.mjs"
+  ],
+  "publicDeploymentPerformed": false
+}

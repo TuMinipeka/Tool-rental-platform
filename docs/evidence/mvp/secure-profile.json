@@ -1,6 +1,6 @@
 {
-  "testedAt": "2026-10-20T17:08:46.858Z",
-  "sourceFingerprint": "e55bbab807f64542523917fa92e6e9ce9bf77ad0e63531cc4a21c715c507133f",
+  "testedAt": "2026-10-20T17:49:45.049Z",
+  "sourceFingerprint": "fbe4f67cb7dd261139b20736c011c37c03c2612cd090735c48de8bdcbc6c0d3d",
   "scope": "Private production+showcase profile; no public HTTPS or SMTP delivery validated",
   "checks": [
     {

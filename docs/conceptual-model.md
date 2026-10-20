@@ -12,7 +12,7 @@ Fuente: [enunciado original](../ejercicioDemo.md). Se identifican entidades, atr
 6. Una reserva confirmada genera como máximo un alquiler: la reserva es la solicitud; el alquiler representa su ejecución.
 7. Cada unidad alquilada tiene como máximo una entrega y una devolución en ese alquiler. Una devolución puede tener varios reportes de daño.
 8. Una reserva puede registrar pagos parciales, ajustes y reembolsos. No se almacena el número completo ni el CVV.
-9. Un alquiler tiene como máximo una factura; sus datos emitidos son instantáneas históricas.
+9. Una reserva tiene como máximo una factura, emitida al aprobar el pago académico; puede existir antes del alquiler. Sus datos son instantáneas históricas.
 10. La reserva congela modalidad, hora, dirección opcional, política y tarifa de entrega aplicadas.
 11. Sesiones y recuperación conservan exclusivamente hashes de secretos opacos.
 12. Nombres, direcciones y tarifas no constituyen identidades estables.
@@ -41,7 +41,7 @@ Modificar estos supuestos exige revisar dependencias funcionales y multivaluadas
 | UnitReturn | reservation + equipmentUnit | receivedAt, inboundCondition, notes?, lateDays, lateFee, currency |
 | DamageReport | damageReportId | devolución afectada, reportedAt, description, reportStatus, assessedCost? |
 | Payment | paymentId; processor + externalReference | reservation, amount, status, stage, idempotencyKey, adjustmentType?, adjustmentReference?, datos mínimos del medio simulado |
-| Invoice | invoiceId; único reservation; único number | rental, number, issuedAt, invoiceStatus, nombres y documentos históricos de emisor/destinatario |
+| Invoice | invoiceId; único reservation; único number | reservation, number, issuedAt, invoiceStatus, nombres y documentos históricos de emisor/destinatario |
 | InvoiceItem | invoice + lineNumber | issuedDescription, quantity, issuedUnitPrice |
 | UserSession | sessionId; único refreshTokenHash | familyId, user, status, createdAt, expiresAt, rotatedAt?, revokedAt?, replacedBy?, clientLabel? |
 | PasswordResetToken | passwordResetTokenId; único tokenHash | user, createdAt, expiresAt, usedAt?, revokedAt? |
@@ -70,7 +70,7 @@ Los importes usan decimales exactos y moneda explícita. No hay conversión impl
 | UnitDelivery — UnitReturn | Entrega 0..1 devolución; devolución exige una entrega completada |
 | UnitReturn — DamageReport | Devolución 0..N reportes; reporte exactamente una devolución |
 | Reservation — Payment | Reserva 0..N pagos; pago exactamente una reserva |
-| Rental — Invoice | Alquiler 0..1 factura; factura exactamente un alquiler |
+| Reservation — Invoice | Reserva 0..1 factura; factura exactamente una reserva |
 | Invoice — InvoiceItem | Factura emitida 1..N líneas; línea exactamente una factura |
 | User — UserSession / PasswordResetToken | Usuario 0..N de cada conjunto; cada registro pertenece a un usuario |
 | CancellationPolicy — Reservation | Política 0..N reservas; reserva exactamente una versión |
@@ -84,7 +84,7 @@ Los importes usan decimales exactos y moneda explícita. No hay conversión impl
 
 ## Diagrama editable
 
-[Excalidraw](diagrams/conceptual-er-model.excalidraw) · [SVG ampliable](diagrams/conceptual-er-model.svg) · [PNG](diagrams/conceptual-er-model.png) · [Guía de notación](diagrams/README.md)
+Ilustración histórica anterior a V210 (relación de factura actualizada en la tabla anterior y en el modelo relacional): [Excalidraw](diagrams/conceptual-er-model.excalidraw) · [SVG ampliable](diagrams/conceptual-er-model.svg) · [PNG](diagrams/conceptual-er-model.png) · [Guía de notación](diagrams/README.md)
 
 ```mermaid
 erDiagram
@@ -127,13 +127,13 @@ erDiagram
 - El retracto queda en revisión administrativa y no genera penalidad mientras está pendiente.
 - Las extensiones comprueban disponibilidad sobre el tramo nuevo y conservan la tarifa diaria congelada.
 - La mora cuenta cada fecha calendario posterior a la devolución efectiva en `America/Bogota`.
-- La disponibilidad es derivada, no un booleano global. La implementación actual valida solapamientos confirmados y estado operativo; la caducidad automática y obligaciones de alquiler no devuelto requieren revisión adicional antes de producción.
+- La disponibilidad es derivada, no un booleano global. La implementación actual valida solapamientos confirmados y estado operativo; la caducidad de retenciones está implementada; las obligaciones de alquiler no devuelto requieren revisión adicional antes de producción.
 - Las unidades de una reserva pertenecen al mismo proveedor. Cambiar titularidad durante obligaciones vigentes exige un modelo histórico explícito.
 - Los datos del alquiler derivan de su reserva confirmada. Tarifas y documentos emitidos preservan historia.
 - Los registros con historia se conservan o desactivan según su operación; no hay eliminación física indiscriminada.
-- Ingresos cobrados e importes facturados son métricas diferentes; el reporte comercial sigue pendiente.
+- Ingresos cobrados e importes facturados son métricas diferentes; los reportes actuales distinguen ingresos cobrados y reservados; no calculan margen sin costos.
 - Los totales derivados no se guardan como duplicados en el modelo inicial.
 
 ## Correspondencia con DDD y estado
 
-El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva, extensión, terminación, reembolso y factura siguen coordinadas. Las 25 tablas tienen mapeo JPA. La pasarela externa, informes y recorridos del frontend siguen pendientes. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).
+El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva, extensión, terminación, reembolso y factura siguen coordinadas. Las 25 tablas tienen mapeo JPA. La pasarela externa sigue pendiente; informes y recorridos operativos actuales están integrados. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).

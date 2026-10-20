@@ -243,7 +243,7 @@ erDiagram
     unit_returns ||--o{ damage_reports : "damage_reports_return"
     tools ||--o{ equipment_units : "equipment_units_tool_id_fkey"
     invoices ||--o{ invoice_items : "invoice_items_invoice_id_fkey"
-    rentals ||--o| invoices : "invoices_reservation_id_fkey"
+    reservations ||--o| invoices : "invoices_reservation_id_fkey"
     users ||--o{ password_reset_tokens : "password_reset_tokens_user_id_fkey"
     reservations ||--o{ payments : "payments_reservation_id_fkey"
     payments ||--o{ refunds : "refunds_payment_id_fkey"

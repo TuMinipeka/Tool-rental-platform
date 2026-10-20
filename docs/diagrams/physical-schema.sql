@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict ssPdALK9fRQKTudbfDo1O8FPRzOkaXoZLP6iKMeS45xJ30F1Uvo9DDlNaPhWbad
+\restrict xLNk8EQjvT6m8yUgDdeceZmWZXuPTGaN0SlHmE7vBYNwnnewYlgUqKyRUjSjHA7
 
 -- Dumped from database version 17.11
 -- Dumped by pg_dump version 17.11
@@ -254,7 +254,7 @@ CREATE TABLE public.payments (
     CONSTRAINT ck_payments_method CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying])::text[]))),
     CONSTRAINT ck_payments_processor_not_blank CHECK ((btrim((processor)::text) <> ''::text)),
     CONSTRAINT ck_payments_reference_not_blank CHECK ((btrim((external_reference)::text) <> ''::text)),
-    CONSTRAINT ck_payments_stage CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'ADJUSTMENT'::character varying])::text[]))),
+    CONSTRAINT ck_payments_stage CHECK (((payment_stage)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'FULL_PAYMENT'::character varying, 'ADJUSTMENT'::character varying])::text[]))),
     CONSTRAINT ck_payments_status CHECK (((payment_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'FAILED'::character varying, 'REFUNDED'::character varying])::text[])))
 );
 
@@ -378,12 +378,13 @@ CREATE TABLE public.reservations (
     delivery_city character varying(120),
     delivery_region character varying(120),
     delivery_country_code character(2),
-    CONSTRAINT ck_reservations_confirmation CHECK (((((reservation_status)::text = ANY ((ARRAY['CONFIRMED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])) AND (confirmed_at IS NOT NULL)) OR (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'REJECTED'::character varying])::text[])) AND (confirmed_at IS NULL)) OR ((reservation_status)::text = 'CANCELLED'::text))),
+    CONSTRAINT ck_reservations_confirmation CHECK (((((reservation_status)::text = ANY ((ARRAY['CONFIRMED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])) AND (confirmed_at IS NOT NULL)) OR (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'PENDING_PAYMENT'::character varying, 'REJECTED'::character varying, 'PAYMENT_FAILED'::character varying, 'EXPIRED'::character varying])::text[])) AND (confirmed_at IS NULL)) OR ((reservation_status)::text = 'CANCELLED'::text))),
     CONSTRAINT ck_reservations_currency_uppercase CHECK (((currency)::text ~ '^[A-Z]{3}$'::text)),
     CONSTRAINT ck_reservations_effective_period CHECK ((effective_return_date >= return_date)),
     CONSTRAINT ck_reservations_fulfillment CHECK (((((fulfillment_method)::text = 'CUSTOMER_PICKUP'::text) AND (delivery_rate_id IS NULL) AND (delivery_fee = (0)::numeric) AND (delivery_address_line IS NULL) AND (delivery_city IS NULL) AND (delivery_region IS NULL) AND (delivery_country_code IS NULL)) OR (((fulfillment_method)::text = 'SUPPLIER_DELIVERY'::text) AND (delivery_rate_id IS NOT NULL) AND (delivery_fee >= (0)::numeric) AND (delivery_address_line IS NOT NULL) AND (delivery_city IS NOT NULL) AND (delivery_region IS NOT NULL) AND (delivery_country_code = 'CO'::bpchar)))),
+    CONSTRAINT ck_reservations_payment_hold_expiration CHECK ((((reservation_status)::text <> 'PENDING_PAYMENT'::text) OR (expires_at IS NOT NULL))),
     CONSTRAINT ck_reservations_period CHECK ((start_date <= return_date)),
-    CONSTRAINT ck_reservations_status CHECK (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'CONFIRMED'::character varying, 'REJECTED'::character varying, 'CANCELLED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])))
+    CONSTRAINT ck_reservations_status CHECK (((reservation_status)::text = ANY ((ARRAY['PENDING'::character varying, 'PENDING_PAYMENT'::character varying, 'CONFIRMED'::character varying, 'REJECTED'::character varying, 'CANCELLED'::character varying, 'PAYMENT_FAILED'::character varying, 'EXPIRED'::character varying, 'CANCELLATION_REVIEW'::character varying, 'NO_SHOW'::character varying])::text[])))
 );
 
 
@@ -932,6 +933,13 @@ CREATE INDEX ix_reservation_items_equipment_unit_id ON public.reservation_items 
 
 
 --
+-- Name: ix_reservations_active_holds; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX ix_reservations_active_holds ON public.reservations USING btree (expires_at, start_date, effective_return_date) WHERE ((reservation_status)::text = 'PENDING_PAYMENT'::text);
+
+
+--
 -- Name: ix_reservations_customer_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -998,7 +1006,7 @@ CREATE UNIQUE INDEX ux_delivery_rates_active ON public.delivery_rates USING btre
 -- Name: ux_payments_confirmed_stage; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (reservation_id, payment_stage) WHERE (((payment_status)::text = 'CONFIRMED'::text) AND ((payment_stage)::text = ANY ((ARRAY['FIRST_HALF'::character varying, 'FINAL_HALF'::character varying])::text[])));
+CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (reservation_id, payment_stage) WHERE (((payment_status)::text = 'CONFIRMED'::text) AND ((payment_stage)::text = ANY ((ARRAY['FIRST_HALF'::character varying, 'FINAL_HALF'::character varying, 'FULL_PAYMENT'::character varying])::text[])));
 
 
 --
@@ -1089,7 +1097,7 @@ ALTER TABLE ONLY public.invoice_items
 --
 
 ALTER TABLE ONLY public.invoices
-    ADD CONSTRAINT invoices_reservation_id_fkey FOREIGN KEY (reservation_id) REFERENCES public.rentals(reservation_id) ON DELETE RESTRICT;
+    ADD CONSTRAINT invoices_reservation_id_fkey FOREIGN KEY (reservation_id) REFERENCES public.reservations(reservation_id) ON DELETE RESTRICT;
 
 
 --
@@ -1288,5 +1296,4 @@ ALTER TABLE ONLY public.user_sessions
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ssPdALK9fRQKTudbfDo1O8FPRzOkaXoZLP6iKMeS45xJ30F1Uvo9DDlNaPhWbad
-
+\unrestrict xLNk8EQjvT6m8yUgDdeceZmWZXuPTGaN0SlHmE7vBYNwnnewYlgUqKyRUjSjHA7

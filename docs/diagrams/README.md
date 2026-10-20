@@ -1,6 +1,6 @@
 # Diagrama conceptual entidad-relación
 
-El diagrama representa las 25 entidades descritas en el [modelo conceptual](../conceptual-model.md): el modelo base y siete ampliaciones críticas de seguridad y operación.
+La ilustración histórica representa las 25 entidades descritas en el [modelo conceptual](../conceptual-model.md): el modelo base y siete ampliaciones críticas de seguridad y operación.
 
 ## Archivos
 
@@ -22,3 +22,7 @@ Para editar, abre el archivo `.excalidraw` y vuelve a exportar SVG y PNG. Actual
 ## Modelo lógico y físico
 
 El [modelo relacional](../logical-physical-model.md) añade PK, FK y cardinalidades extraídas del esquema real. Se conserva el conceptual editable de Excalidraw como artefacto distinto.
+
+## Cambio de relación de factura (V210)
+
+El texto conceptual y el modelo relacional vigente enlazan Invoice con Reservation, permitiendo emitir el comprobante antes de iniciar Rental. La ilustración Excalidraw/SVG/PNG conservada es una instantánea anterior y aún muestra la relación histórica con Rental; no debe usarse para generar el esquema. Su auditoría mantiene la huella original y marca que no verifica la fuente actual. Usa el [relacional actualizado](relational-model.svg) y el [DDL](physical-schema.sql) para claves y cardinalidades vigentes.

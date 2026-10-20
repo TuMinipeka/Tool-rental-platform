@@ -1,6 +1,21 @@
 {
-  "updatedAt": "2026-10-20T16:36:05.794Z",
-  "state": "implementation-in-progress",
+  "updatedAt": "2026-10-20T17:56:13.003855+00:00",
+  "state": "locally-validated-public-release-blocked",
+  "validatedSourceCommit": "3fbde10ac48a2a3fd33681d45de2b841bb6e92b2",
+  "condeReference": "981a16e",
+  "sourceFingerprint": "03d8a5b08c5241e9f7a5372b850394df739a626c0ae7ed35a2ffa812b9041cf0",
+  "localValidation": {
+    "mavenPostgres": true,
+    "frontendLintBuild": true,
+    "browserTests": true,
+    "realRoleJourneys": true,
+    "internalSandboxInvoiceReports": true,
+    "privateMailpitRecovery": true,
+    "showcaseSecurity": true,
+    "backupRestoreAndPersistence": true,
+    "dataMinimums": true,
+    "composeConfiguration": true
+  },
   "publicReleaseGates": {
     "oracleCapacity": false,
     "dnsAndHttps": false,
@@ -10,5 +25,13 @@
     "credentialsProvisioned": false,
     "offsiteBackupAndRestore": false,
     "armRuntimeValidated": false
-  }
+  },
+  "limitations": [
+    "No Oracle account/capacity or DuckDNS configuration supplied",
+    "Official external sandbox provider remains required by approved product scope; internal HMAC sandbox tested separately",
+    "Public SMTP delivery not verified; private Mailpit verified",
+    "Private evaluator bootstrap verified, but public target credentials not provisioned",
+    "No external backup destination supplied; local restore passed",
+    "ARM64 base manifests verified, Oracle ARM runtime not exercised"
+  ]
 }

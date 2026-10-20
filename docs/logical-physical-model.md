@@ -33,3 +33,7 @@ node scripts/render-relational-model.mjs
 ~~~
 
 El render usa Mermaid 11.12.0 y Chrome mediante Playwright; requiere conexión para obtener la biblioteca. El DDL no contiene filas ni contraseñas. No se versionan dumps con datos.
+
+## Factura anterior al alquiler
+
+V210 hace que invoices.reservation_id referencie reservations, no rentals. El webhook aprobado emite la factura académica antes de iniciar el alquiler. Existe como máximo una factura por reserva; sus líneas e instantáneas siguen siendo históricas. El diagrama relacional exportado refleja la FK real; las ilustraciones conceptuales históricas no sustituyen el DDL vigente.
