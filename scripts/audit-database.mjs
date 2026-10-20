@@ -21,6 +21,6 @@ for(const table of tables){diagram+='    '+table+' {\n';for(const c of columns.f
 for(const relation of relationships)diagram+='    '+relation.parent+' '+(relation.required?'||':'|o')+'--'+(relation.child_unique?'o|':'o{')+' '+relation.child+' : "'+relation.name.replace(/^fk_/,'')+'"\n'
 writeFileSync('docs/diagrams/relational-model.mmd',diagram)
 const schema=execFileSync('docker',[...compose,'pg_dump','-U','mvp_validation','-d',database,'--schema-only','--no-owner','--no-acl'],{encoding:'utf8',maxBuffer:8*1024*1024})
-writeFileSync('docs/diagrams/physical-schema.sql',schema)
+writeFileSync('docs/diagrams/physical-schema.sql',schema.trimEnd()+'\n')
 console.log(JSON.stringify({tables:tables.length,businessTables:counts.filter(t=>t.minimum).length,belowMinimum:counts.filter(t=>t.minimum&&t.rows<t.minimum),constraints:constraints.length,indexes:indexes.length,successfulMigrations:migrations.filter(m=>m.success).length}))
 if(counts.some(t=>t.minimum&&t.rows<t.minimum)||tables.length!==25||constraints.some(c=>!c.validated))process.exitCode=1

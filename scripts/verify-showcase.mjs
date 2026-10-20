@@ -5,7 +5,7 @@ import {sourceFingerprint} from './source-fingerprint.mjs'
 const compose=['compose','--env-file','.env.validation','-f','compose.validation.yml','-f','compose.secure-validation.yml','--profile','security']
 const docker=(args,env)=>execFileSync('docker',args,{encoding:'utf8',env:env||process.env})
 const sql=query=>docker([...compose,'exec','-T','postgres','psql','-X','-qAt','-v','ON_ERROR_STOP=1','-U','mvp_validation','-d','mvp_validation','-c',query]).trim()
-if(sql("SELECT count(*) FROM pg_database WHERE datname='mvp_showcase'")==='0')sql('CREATE DATABASE mvp_showcase OWNER mvp_validation')
+if(sql("SELECT count(*) FROM pg_database WHERE datname='mvp_integrated_showcase'")==='0')sql('CREATE DATABASE mvp_integrated_showcase OWNER mvp_validation')
 let started=false
 const evidence={testedAt:new Date().toISOString(),sourceFingerprint:sourceFingerprint(),scope:'Private production+showcase profile; no public HTTPS or SMTP delivery validated',checks:[]}
 const check=(name,result)=>{if(!result)throw Error(name);evidence.checks.push({name,passed:true})}

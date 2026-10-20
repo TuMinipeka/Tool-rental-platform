@@ -29,7 +29,7 @@ export function saveSession(session) {
 
 async function parseResponse(response) {
   const contentType = response.headers.get('content-type') || ''
-  if (!contentType.includes('application/json')) return null
+  if (!contentType.includes('application/json') && !contentType.includes('application/problem+json')) return null
   return response.json()
 }
 
@@ -106,7 +106,7 @@ async function request(path, options = {}, behavior = {}) {
   }
 
   const response = await fetchApi(`${apiPrefix}${path}`, { ...options, headers })
-  const payload = await parseResponse(response)
+  const payload = behavior.responseType === 'text' && response.ok ? await response.text() : await parseResponse(response)
 
   if (response.status === 401 && authenticated && retry) {
     try {
@@ -144,6 +144,8 @@ export const api = {
       body: JSON.stringify({ email, password }),
     })
   },
+  registerSupplier(account) { return request('/auth/supplier-registration', { method: 'POST', body: JSON.stringify(account) }) },
+  updateUserStatus(id, status) { return request('/users/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }, { authenticated: true }) },
   register(account) {
     return request('/auth/register', { method: 'POST', body: JSON.stringify(account) })
   },
@@ -185,6 +187,19 @@ export const api = {
       { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
       { authenticated: true })
   },
+  createCheckout(reservationId, idempotencyKey) {
+    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId, paymentMethod: 'PAYPAL' }) }, { authenticated: true })
+  },
+  invoiceDocument(id) { return request('/invoices/' + encodeURIComponent(id) + '/document', {}, { authenticated: true, responseType: 'text' }) },
+  operationalReport(kind, from, to) { return request('/reports/' + kind + '?' + new URLSearchParams({ from, to }), {}, { authenticated: true }) },
+  deliveryEntry(reservationId, equipmentUnitId) { return request('/unit-deliveries/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
+  returnEntry(reservationId, equipmentUnitId) { return request('/unit-returns/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
+  getRental(id) { return request('/rentals/' + encodeURIComponent(id), {}, { authenticated: true }) },
+  scheduleDelivery(body) { return request('/unit-deliveries', { method: 'POST', body: JSON.stringify(body) }, { authenticated: true }) },
+  completeDelivery(reservationId, equipmentUnitId, condition) { return request('/unit-deliveries/entry/completion?' + new URLSearchParams({ reservationId, equipmentUnitId }), { method: 'PATCH', body: JSON.stringify({ condition }) }, { authenticated: true }) },
+  startRental(reservationId) { return request('/rentals', { method: 'POST', body: JSON.stringify({ reservationId }) }, { authenticated: true }) },
+  returnUnit(body) { return request('/unit-returns', { method: 'POST', body: JSON.stringify({...body,notes:body.notes?.trim()||null}) }, { authenticated: true }) },
+  completeRental(id) { return request('/rentals/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status: 'COMPLETED' }) }, { authenticated: true }) },
   listRentals() { return request('/rentals', {}, { authenticated: true }) },
   listPayments() { return request('/payments', {}, { authenticated: true }) },
   listInvoices() { return request('/invoices', {}, { authenticated: true }) },

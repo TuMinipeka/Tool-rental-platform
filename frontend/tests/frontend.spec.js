@@ -14,7 +14,7 @@ async function login(page) {
   await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 }
 
-for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/no-existe']) {
+for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/registro/proveedor', '/password-reset', '/no-existe']) {
   test(`renders ${path} without runtime errors or horizontal overflow`, async ({ page }) => {
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
@@ -140,7 +140,7 @@ test('registration still sends customer profile fields', async ({ page }) => {
   await dialog.getByRole('checkbox').check()
   const submission = page.waitForRequest(request => request.url().endsWith('/auth/register'))
   await dialog.getByRole('button', { name: 'Crear cuenta' }).click()
-  expect((await submission).postDataJSON()).toMatchObject({ personType: 'NATURAL_PERSON', documentType: 'CC', documentNumber: '12345678', displayName: 'QA Customer' })
+  expect((await submission).postDataJSON()).toMatchObject({ personType: 'PERSON', documentType: 'CC', documentNumber: '12345678', displayName: 'QA Customer' })
   await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 })
 
