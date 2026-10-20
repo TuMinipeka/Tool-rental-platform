@@ -58,3 +58,26 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 4. Registro, paneles y rutas complementarias según las capacidades verificadas de la API.
 5. Evolución de negocio y pago sandbox únicamente después de cerrar decisiones y credenciales.
 6. Lint, compilación, pruebas Maven pertinentes y revisión responsive.
+
+## Avance implementado
+
+### Fases 2 y 3 — fundamentos y pantallas de referencia
+
+- El municipio de servicio se limita a Bucaramanga, Floridablanca, Girón y Piedecuesta, se conserva en `localStorage` y se sincroniza con la URL del catálogo.
+- El header incorpora selector territorial, estado activo, acceso y una ruta real para el proceso de proveedor.
+- Inicio conserva el logo original y adopta el hero, buscador, cinco categorías, destacados etiquetados y cuatro pasos del flujo vigente.
+- Catálogo sincroniza término, categoría y municipio con la URL; no ofrece orden por reseñas inexistentes.
+- Detalle usa una composición de galería, información y reserva en tres áreas. Solo muestra reseñas, ubicación o verificación cuando el contrato las acredita; el placeholder declara que no es una fotografía del proveedor.
+- Sobre nosotros incorpora una fotografía editorial genérica sin marcas, narrativa local, valores y los cuatro municipios sin estadísticas comerciales inventadas.
+- Cómo funciona explica solicitud, confirmación del proveedor y pago académico 50/50 sin fingir el flujo sandbox futuro.
+- Mi cuenta usa identidad de sesión y `GET /api/v1/reservations`; las secciones sin integración muestran un estado pendiente en vez de cifras o documentos falsos.
+- Los paneles de proveedor y administración comprueban roles antes de renderizar y no presentan operaciones demostrativas como reales.
+- Se eliminó el acceso demostrativo que fabricaba una sesión cuando fallaba la autenticación.
+
+### Validación ejecutada
+
+- `npm.cmd run lint`: correcto.
+- `npm.cmd run build`: correcto.
+- Vite sirvió inicio, catálogo, detalle, sobre nosotros, cómo funciona, cuenta, publicar, panel de proveedor, términos y ruta desconocida con respuesta HTTP 200 del fallback SPA.
+- Revisión headless en Edge a 1600 × 1000 y 390 × 844; se corrigieron el ancho del buscador y el desbordamiento del hero móvil detectados en la primera pasada.
+- La suite Maven completa queda para la fase de calidad porque este avance no cambia Java, persistencia ni contratos del backend.
