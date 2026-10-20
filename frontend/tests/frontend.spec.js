@@ -14,7 +14,7 @@ async function login(page) {
   await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 }
 
-for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/registro/proveedor', '/password-reset', '/no-existe']) {
+for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/registro/proveedor', '/no-existe']) {
   test(`renders ${path} without runtime errors or horizontal overflow`, async ({ page }) => {
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
@@ -297,12 +297,6 @@ test('cancellation preserves the idempotency key and waits for server success', 
 })
 
 
-test('recovery route stays disabled even with a token in the URL', async ({ page }) => {
-  await page.goto('/password-reset?token=untrusted-token')
-  await expect(page.getByRole('heading', { name: 'Recuperación no disponible' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Guardar nueva contraseña' })).toHaveCount(0)
-})
-
 test('provider return parameters never confirm a pending payment', async ({ page }) => {
   const id = '90000000-0000-0000-0000-000000000001'
   await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, paymentStatus: 'READY' } }))
@@ -318,7 +312,7 @@ test('provider return parameters never confirm a pending payment', async ({ page
 })
 
 test('optional external checkout sends only the reservation and redirects to the hosted provider', async ({ page }) => {
-  await page.route('**/api/v1/public/features', route => route.fulfill({ json: { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'MERCADO_PAGO' } }))
+  await page.route('**/api/v1/public/features', route => route.fulfill({ json: { hostedCheckout: true, paymentProvider: 'MERCADO_PAGO' } }))
   const id = '90000000-0000-0000-0000-000000000001'
   const requests = []
   await page.route('**/api/v1/reservations', route => route.fulfill({ json: [{ id, status: 'PENDING_PAYMENT', period: { startDate: '2027-01-01', returnDate: '2027-01-01' }, total: { amount: 25000 } }] }))
@@ -335,28 +329,6 @@ test('optional external checkout sends only the reservation and redirects to the
   expect(requests[0].body).toEqual({ reservationId: id })
   expect(requests[0].key).toBeTruthy()
 })
-
-for (const [outcome, status, label] of [['APPROVED', 'DONE', 'Pago ficticio aprobado y reserva confirmada'], ['DECLINED', 'REJECTED', 'Pago rechazado o cancelado']]) {
-  test('fictional checkout submits ' + outcome + ' without card data', async ({ page }) => {
-    const id = '90000000-0000-0000-0000-000000000001'
-    let phase = 'READY'
-    await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, reservationId: id, paymentStatus: phase, processor: 'FICTIONAL_GATEWAY', amount: 25000, currency: 'COP', expiresAt: '2027-01-01T12:00:00Z' } }))
-    const decisions = []
-    await page.route('**/api/v1/payments/fictional/checkouts/' + id + '/decision', route => {
-      decisions.push(route.request().postDataJSON()); phase = status
-      return route.fulfill({ json: { paymentId: id, paymentStatus: status } })
-    })
-    await page.goto('/checkout/' + id)
-    await login(page)
-    await expect(page.getByRole('heading', { name: 'Pasarela ficticia' })).toBeVisible()
-    await expect(page.locator('main input')).toHaveCount(0)
-    await page.getByRole('button', { name: outcome === 'APPROVED' ? 'Simular aprobación' : 'Simular rechazo' }).click()
-    await expect(page).toHaveURL(/payment-return/)
-    await expect(page.getByRole('main').getByRole('status')).toHaveText(label)
-    expect(decisions).toEqual([{ outcome }])
-  })
-}
-
 
 test('supplier tool and equipment forms reset only after successful persistence', async ({ page }) => {
   await mockApi(page, { roles: ['SUPPLIER'] })

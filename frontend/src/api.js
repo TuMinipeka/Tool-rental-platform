@@ -146,18 +146,6 @@ export const api = {
   register(account) {
     return request('/auth/register', { method: 'POST', body: JSON.stringify(account) })
   },
-  recoverPassword(email) {
-    return request('/auth/password-recovery', {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    })
-  },
-  resetPassword(token, newPassword) {
-    return request('/auth/password-reset', {
-      method: 'POST',
-      body: JSON.stringify({ token, newPassword }),
-    })
-  },
   async logout() {
     try {
       return await request('/auth/logout', { method: 'POST' }, { csrf: true })

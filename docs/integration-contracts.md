@@ -4,22 +4,22 @@ La API oficial usa /api/v1 y mantiene temporalmente el alias /api. El navegador 
 
 | Operación | Contrato y aceptación |
 | --- | --- |
-| Capacidades | GET /public/features; recuperación deshabilitada en el MVP |
+| Capacidades | GET /public/features; disponibilidad del checkout y proveedor activo |
 | Catálogo | /public/catalog; sin catálogo ficticio de respaldo en publicación |
 | Registro y sesión | /auth/register, /auth/supplier-registration, login, refresh y logout; el proveedor queda activo y autenticado al registrarse |
 | Historial | /reservations, /rentals, /payments e /invoices; filtrados por actor |
 | Catálogo del proveedor | /tools, /equipment-units y /categories; permisos y propiedad en servidor |
 | Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas |
-| Pago ficticio | POST /payments/checkouts con reserva e Idempotency-Key; GET /payments/checkouts/{id} para retorno y conciliación |
-| Decisión académica | POST /payments/fictional/checkouts/{id}/decision; APPROVED o DECLINED, cliente propietario autenticado |
+| Mercado Pago | POST /payments/checkouts con reserva e Idempotency-Key; GET /payments/checkouts/{id} para retorno y conciliación |
+| Webhook | POST /payments/mercadopago/webhooks; firma oficial, identificador del pago y consulta posterior al proveedor |
 | Comprobante | GET /invoices/{id}/document; descarga autenticada, académica y sin validez fiscal |
 | Cancelación | POST /reservations/{id}/cancellation; clave idempotente e importes del servidor |
 | Entrega y alquiler | /unit-deliveries, /rentals y /unit-returns; proveedor propietario y orden operativo vigente |
 | Usuarios | /users; administrador activa o desactiva y revoca sesiones |
 | Reportes | /reports/{income,most-rented-tools,frequent-customers,availability,profitability}; fechas y alcance por rol |
 
-Todas las rutas son relativas a /api/v1. [La pasarela ficticia](fictional-payments.md) documenta campos, configuración y aceptación académica. Un retorno del navegador nunca confirma un pago.
+Todas las rutas son relativas a /api/v1. [Mercado Pago](mercadopago-mvp.md) documenta campos, configuración y restricciones del ambiente de prueba. Un retorno del navegador nunca confirma un pago.
 
-Recuperación, restablecimiento, simulaciones heredadas, webhook HMAC y cambios administrativos de pagos no están disponibles en el MVP público. Devuelven FEATURE_DISABLED. Las pruebas de regresión antiguas habilitan expresamente esas funciones; no son instrucciones de publicación.
+Recuperación y restablecimiento de contraseña no forman parte de la API pública. Los endpoints internos heredados y los cambios administrativos de pagos permanecen bloqueados.
 
 Los reportes representan datos persistidos. profitability es ingreso reservado, sin cálculo de utilidad neta. El comprobante puede preceder al alquiler y sus datos históricos no se editan libremente.

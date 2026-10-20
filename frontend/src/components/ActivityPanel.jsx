@@ -29,8 +29,8 @@ export function ActivityPanel({ kind, supplier = false }) {
   }, [contract, revision])
   return <section className="operations-table" aria-label={contract.title}>
     <div className="panel-heading"><div><h2>{contract.title}</h2><p>Registros devueltos por la API para tu usuario.</p></div><button className="button button-ghost" onClick={() => { setState('loading'); setRevision(value => value + 1) }}>Actualizar</button></div>
-    {kind === 'payments' && <p className="panel-state">Los pagos del MVP se procesan en el simulador académico. El servidor verifica su estado; los comprobantes son académicos.</p>}
-    {kind === 'invoices' && <p className="panel-state">Simulación académica: documento no válido como factura ante la DIAN. Descarga el comprobante emitido por el backend.</p>}
+    {kind === 'payments' && <p className="panel-state">Los pagos se procesan con Mercado Pago en ambiente de prueba. El servidor verifica su estado antes de confirmar la reserva.</p>}
+    {kind === 'invoices' && <p className="panel-state">Documento no válido como factura ante la DIAN. Descarga el comprobante emitido por el backend.</p>}
     {state === 'loading' && <p role="status">Cargando registros…</p>}
     {state === 'error' && <p className="form-error" role="alert">{error}</p>}
     {state === 'ready' && !items.length && <p className="panel-state">No hay registros disponibles para tu usuario.</p>}

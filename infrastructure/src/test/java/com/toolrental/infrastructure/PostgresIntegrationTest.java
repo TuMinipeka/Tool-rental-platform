@@ -21,7 +21,6 @@ import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
 import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
-import com.toolrental.domain.user.port.SecureTokenService;
 import jakarta.persistence.EntityManagerFactory;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -94,7 +93,6 @@ class PostgresIntegrationTest {
   @Autowired RequestReservationUseCase request;
   @Autowired ConfirmReservationUseCase confirm;
   @Autowired CancelReservationUseCase cancel;
-  @Autowired SecureTokenService tokenService;
   @Autowired ReservationRepository reservationRepository;
   @Autowired Clock clock;
 
@@ -230,7 +228,6 @@ class PostgresIntegrationTest {
   void authenticationRecoveryPublicCatalogAndOpenApiUseThePublishedContracts() throws Exception {
     String email = "new.customer@example.com";
     String initialPassword = "InitialPass123!";
-    String changedPassword = "ChangedPass123!";
     var registration =
         call(
             null,
@@ -262,33 +259,6 @@ class PostgresIntegrationTest {
     String accessToken = login.get("accessToken").asText();
     call(
         null, get("/api/reservations").header("Authorization", "Bearer " + accessToken), null, 200);
-
-    var recovery = call(null, post("/api/v1/auth/password-recovery"), Map.of("email", email), 202);
-    assertThat(recovery.has("recoveryToken")).isFalse();
-    String resetToken = "integration-reset-token";
-    db.update(
-        "insert into password_reset_tokens (password_reset_token_id,user_id,token_hash,created_at,expires_at) values (?,?,?,now(),now()+interval '15 minutes')",
-        UUID.randomUUID(),
-        UUID.fromString(registration.get("userId").asText()),
-        tokenService.hash(resetToken));
-    call(
-        null,
-        post("/api/v1/auth/password-reset"),
-        Map.of("token", resetToken, "newPassword", changedPassword),
-        204);
-    call(
-        null,
-        get("/api/v1/reservations").header("Authorization", "Bearer " + accessToken),
-        null,
-        401);
-    call(
-        null,
-        post("/api/v1/auth/password-reset"),
-        Map.of("token", resetToken, "newPassword", changedPassword),
-        400);
-    call(null, post("/api/auth/login"), Map.of("email", email, "password", initialPassword), 401);
-    call(
-        null, post("/api/v1/auth/login"), Map.of("email", email, "password", changedPassword), 200);
 
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/api/v1/public/catalog"), null, 200).toString()).contains("Drill");

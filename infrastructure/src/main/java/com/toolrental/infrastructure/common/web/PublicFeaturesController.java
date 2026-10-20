@@ -7,18 +7,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping({"/api/v1/public/features", "/api/public/features"})
 public final class PublicFeaturesController {
-  private final boolean recovery;
   private final boolean hosted;
   private final String provider;
 
   public PublicFeaturesController(
-      @Value("${auth.password-recovery.enabled:false}") boolean recovery,
       @Value("${payments.mercadopago.access-token:}") String token,
       @Value("${payments.mercadopago.collector-id:}") String collector,
       @Value("${payments.mercadopago.webhook-secret:}") String secret,
       @Value("${payments.mercadopago.public-url:}") String url,
-      @Value("${payments.provider:fictional}") String provider) {
-    this.recovery = recovery;
+      @Value("${payments.provider:mercadopago}") String provider) {
     this.provider = provider.equals("fictional") ? "FICTIONAL_GATEWAY" : "MERCADO_PAGO";
     this.hosted =
         provider.equals("fictional")
@@ -31,8 +28,6 @@ public final class PublicFeaturesController {
   @GetMapping
   public Map<String, Object> features() {
     return Map.of(
-        "passwordRecovery",
-        recovery,
         "hostedCheckout",
         hosted,
         "paymentProvider",

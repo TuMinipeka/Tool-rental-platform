@@ -2,10 +2,9 @@ import { useFeatures } from '../lib/features.js'
 import { useRef, useState } from 'react'
 import { api } from '../api.js'
 import { entityId } from '../lib/records.js'
-import { navigate } from '../lib/navigation.js'
 
 export function ReservationActions({ reservation, supplier = false, onChanged }) {
-  const { hostedCheckout, paymentProvider } = useFeatures()
+  const { hostedCheckout } = useFeatures()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [checkout, setCheckout] = useState(null)
@@ -34,11 +33,6 @@ export function ReservationActions({ reservation, supplier = false, onChanged })
       setCheckout(result)
       if (result.checkoutUrl && result.paymentStatus === 'READY') {
         const target = new URL(result.checkoutUrl, window.location.origin)
-        if (result.processor === 'FICTIONAL_GATEWAY' && paymentProvider === 'FICTIONAL_GATEWAY') {
-          if (target.origin !== window.location.origin || target.pathname !== '/checkout/' + result.paymentId) throw new Error('La dirección de la pasarela ficticia es inválida.')
-          navigate(target.pathname)
-          return
-        }
         if (target.protocol !== 'https:' || !['www.mercadopago.com.co', 'www.mercadopago.com', 'mercadopago.com.co'].includes(target.hostname)) throw new Error('El proveedor devolvió una dirección de pago inválida.')
         window.location.assign(target.href)
       }
@@ -48,7 +42,7 @@ export function ReservationActions({ reservation, supplier = false, onChanged })
   }
   return <div className="reservation-actions" aria-busy={busy}>
     {supplier && pending && <><button className="button button-dark" disabled={busy} onClick={() => perform('confirmation')}>Confirmar solicitud</button><button className="button button-ghost" disabled={busy} onClick={() => perform('rejection')}>Rechazar solicitud</button></>}
-    {payable && <button className="button button-dark" disabled={busy || !hostedCheckout} onClick={requestCheckout}>{paymentProvider === 'FICTIONAL_GATEWAY' ? 'Pagar en pasarela ficticia' : 'Continuar en Mercado Pago'}</button>}
+    {payable && <button className="button button-dark" disabled={busy || !hostedCheckout} onClick={requestCheckout}>Continuar en Mercado Pago</button>}
     {payable && !hostedCheckout && <p role="status">La pasarela no está disponible en este entorno.</p>}
     {checkout && <p role="status">Estado del checkout: {checkout.paymentStatus}. La confirmación depende del estado persistido en el servidor. Si requiere revisión, no crees otra reserva para repetir el pago.</p>}
     {cancellable && <button className="button button-ghost" disabled={busy} onClick={() => perform('cancellation')}>Solicitar cancelación</button>}

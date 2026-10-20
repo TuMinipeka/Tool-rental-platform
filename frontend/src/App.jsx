@@ -1,4 +1,3 @@
-import { useFeatures } from './lib/features.js'
 import { createPointerMotion } from './lib/pointerMotion.js'
 import { AsyncBoundary } from './components/AsyncBoundary.jsx'
 import { heroImageSizes, heroImageSource, imageAttributes } from './lib/responsiveImages.js'
@@ -16,11 +15,9 @@ import { navigate } from './lib/navigation.js'
 import { money } from './lib/format.js'
 import { serviceLocations } from './lib/locations.js'
 
-const FictionalCheckoutPage = lazy(() => import('./pages/FictionalCheckoutPage.jsx').then(module => ({ default: module.FictionalCheckoutPage })))
 const PaymentReturnPage = lazy(() => import('./pages/PaymentReturnPage.jsx').then(module => ({ default: module.PaymentReturnPage })))
 const TermsAndConditionsPage = lazy(() => import('./TermsAndConditionsPage.jsx'))
 const loadAccountPages = () => import('./pages/AccountPages.jsx')
-const PasswordResetPage = lazy(() => loadAccountPages().then(module => ({ default: module.PasswordResetPage })))
 const AuthPage = lazy(() => loadAccountPages().then(module => ({ default: module.AuthPage })))
 const AuthModal = lazy(() => loadAccountPages().then(module => ({ default: module.AuthModal })))
 const AccountPage = lazy(() => loadAccountPages().then(module => ({ default: module.AccountPage })))
@@ -89,7 +86,7 @@ function HomePage({catalogTools,dataMode,location,onLocationChange}){return <mai
   <div className="industrial-marquee" aria-hidden="true"><div>PERFORA <i/> CONSTRUYE <i/> LIMPIA <i/> ELEVA <i/> REPARA <i/> PERFORA <i/> CONSTRUYE <i/> LIMPIA <i/> ELEVA <i/> REPARA <i/></div></div>
   <section className="category-section page-shell" data-reveal><div className="section-title-row"><div><p className="kicker dark"><span/> Encuentra lo que buscas</p><h2>Herramientas para<br/><em>cada proyecto.</em></h2></div><button className="text-link" onClick={()=>navigate('/catalogo')}>Ver todo el catálogo <Icon name="arrow"/></button></div><div className="category-tiles">{featuredCategories.map(({category,description,icon},index)=>{const count=catalogTools.filter(tool=>tool.category===category).length;return <button key={category} onClick={()=>navigate(`/catalogo?categoria=${encodeURIComponent(category)}&municipio=${encodeURIComponent(location)}`)} title={`${category}: ${dataMode==='api'?`${count} equipos disponibles`:'explorar muestra'}`}><span className={`category-icon category-${index+1}`}><Icon name={icon} size={42}/></span><span className="category-index" aria-hidden="true">0{index+1}</span><strong>{category}</strong><small>{description}</small><Icon name="arrow"/></button>})}</div></section>
   <FeaturedSection catalogTools={catalogTools} dataMode={dataMode}/>
-  <section className="steps-section page-shell" data-reveal><div className="steps-intro"><p className="kicker dark"><span/> Así de simple</p><h2>Cómo funciona.</h2><p>La reserva retiene la unidad mientras completas el pago ficticio. No se realizan cobros externos.</p></div><div className="steps-list">{[['01','Busca','Explora el catálogo y consulta las fechas.'],['02','Solicita','Elige recogida o entrega y crea la solicitud.'],['03','Confirma','Simula el pago; el servidor valida y confirma la reserva.'],['04','Haz más','Sigue entrega, uso y devolución desde tu cuenta.']].map(x=><article key={x[0]}><span>{x[0]}</span><div><h3>{x[1]}</h3><p>{x[2]}</p></div><Icon name="arrow"/></article>)}</div></section>
+  <section className="steps-section page-shell" data-reveal><div className="steps-intro"><p className="kicker dark"><span/> Así de simple</p><h2>Cómo funciona.</h2><p>La reserva retiene la unidad mientras completas el checkout de prueba en Mercado Pago.</p></div><div className="steps-list">{[['01','Busca','Explora el catálogo y consulta las fechas.'],['02','Solicita','Elige recogida o entrega y crea la solicitud.'],['03','Confirma','Paga con una cuenta de prueba; el servidor verifica y confirma la reserva.'],['04','Haz más','Sigue entrega, uso y devolución desde tu cuenta.']].map(x=><article key={x[0]}><span>{x[0]}</span><div><h3>{x[1]}</h3><p>{x[2]}</p></div><Icon name="arrow"/></article>)}</div></section>
   <section className="supplier-cta" data-reveal><div className="page-shell"><p className="kicker"><span/> Para proveedores</p><h2>Tu equipo puede<br/><em>seguir produciendo.</em></h2><p>Conoce el proceso para operar como proveedor y administrar únicamente tus propios recursos.</p><button className="button button-light" onClick={()=>navigate('/publicar')}>Publica tu herramienta <Icon name="arrow"/></button></div><div className="cta-orbit" aria-hidden="true"><span>PUBLICA</span><b>ACTIVA</b><small>ADMINISTRA</small></div></section>
   </main>}
 const toolCardMotion=createPointerMotion((node,x,y)=>{node.style.transform=`perspective(900px) rotateX(${y*-3}deg) rotateY(${x*4}deg) translateY(-6px)`},node=>{node.style.transform=""})
@@ -127,7 +124,6 @@ function ToolDetailPage({id,onReserve,catalogTools,dataMode}){const tool=catalog
 
 
 function App(){
-  const { passwordRecovery } = useFeatures()
   const [path,setPath]=useState(window.location.pathname)
   const [session,setSession]=useState(readSession())
   const [authOpen,setAuthOpen]=useState(false)
@@ -224,8 +220,6 @@ function App(){
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
   else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
-  else if(path==='/password-reset')page=passwordRecovery?<PasswordResetPage/>:<EmptyState title="Recuperación no disponible" text="La recuperación de contraseña está fuera de esta entrega del MVP." action={()=>navigate('/login')} actionText="Volver al ingreso"/>
-  else if(path.startsWith('/checkout/'))page=<FictionalCheckoutPage session={session} paymentId={path.split('/')[2]}/>
   else if(path==='/payment-return')page=<PaymentReturnPage session={session}/>
   else if(path==='/login')page=<AuthPage mode="login" onAuthenticated={login}/>
   else if(path==='/registro/proveedor')page=<AuthPage mode="supplier" onAuthenticated={login}/>
@@ -241,7 +235,7 @@ function App(){
   else if(path==='/403')page=<ErrorPage code="403"/>
   else page=<ErrorPage/>
   const minimal=path==='/reserva-confirmada'
-  const authRoute=['/login','/registro','/registro/proveedor','/password-reset'].includes(path)
+  const authRoute=['/login','/registro','/registro/proveedor'].includes(path)
   const footerHidden=authRoute||path==='/pago'||path==='/como-funciona'||path.startsWith('/panel/')||path==='/cuenta'
   return <div className={`app ${path==='/'?'home-route':''}`}><a className="skip-link" href="#main-content">Saltar al contenido</a>{!minimal&&<Header path={path} session={session} onOpenAuth={()=>navigate('/login')} location={location} onLocationChange={changeLocation}/>}<div className="page-content page-enter" id="main-content" tabIndex={-1} key={path}><AsyncBoundary key={path}>{dataMode==='error'&&<p className="data-notice" role="alert">No pudimos cargar el catálogo del servidor. Reintenta en unos minutos; no se mostrarán datos de respaldo.</p>}<Suspense fallback={<RouteLoading/>}>{page}</Suspense></AsyncBoundary></div>{!minimal&&!footerHidden&&<Footer/>}{authOpen&&<AsyncBoundary as="section"><Suspense fallback={<div className="modal-backdrop"><p className="auth-modal" role="status">Cargando acceso…</p></div>}><AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/></Suspense></AsyncBoundary>}</div>
 }

@@ -22,7 +22,7 @@ Solo se crean carpetas con clases reales. Los adaptadores de persistencia están
 
 `usersession`, `passwordreset`, `cancellationpolicy`, `reservationtermination`, `deliveryrate`, `reservationextension`, `refund`.
 
-En estos contextos, la coordinación y los adaptadores ahora pertenecen a su paquete propietario: `RecoverPasswordUseCase` a `application.passwordreset`, los endpoints de recuperación a `infrastructure.passwordreset`, los de sesión a `infrastructure.usersession` y los de políticas/tarifas a sus contextos respectivos. Cada uno ensambla sus casos de uso desde `infrastructure/<context>/config`. Las rutas públicas conservan `/api/v1/auth` y `/api/v1/commercial-configuration`.
+En estos contextos, la coordinación y los adaptadores pertenecen a su paquete propietario. `passwordreset` conserva el modelo y persistencia histórica sin exponer endpoints; sesión permanece en `infrastructure.usersession` y políticas/tarifas en sus contextos respectivos. Las rutas públicas conservan `/api/v1/auth` y `/api/v1/commercial-configuration`.
 
 `common` no representa una tabla. Reúne `AggregateRoot`, `DomainEvent`, `Money`, puertos transversales, Unit of Work, seguridad HTTP, transacciones y configuración compartida.
 

@@ -3,7 +3,7 @@
 ## Completado en backend crítico
 
 - 25 contextos con Domain, Application, JPA y REST.
-- Sesiones rotativas, revocación por familia/usuario y recuperación opaca por SMTP.
+- Sesiones rotativas y revocación por familia/usuario.
 - CORS con credenciales, CSRF, rate limit y `ProblemDetail`.
 - API oficial `/api/v1` y alias heredado marcado como obsoleto.
 - Cancelación, inasistencia, retracto administrativo y fallo del proveedor.
@@ -13,18 +13,18 @@
 ## Pendientes antes de producción
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
-2. MVP: validar pasarela ficticia, aprobación/rechazo y comprobante contra PostgreSQL. La integración de una pasarela real queda fuera del cierre académico por decisión de Daniel.
+2. Configurar las credenciales privadas de prueba y validar Mercado Pago, webhook y comprobante contra PostgreSQL.
 3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
-4. Fuera del MVP: recuperación por SMTP, reputación del dominio, plantillas y telemetría; mantener la función oculta y deshabilitada.
+4. Mantener recuperación, restablecimiento y correo fuera de la API y de la interfaz pública.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
 6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
 7. Cerrar las capacidades futuras de producto: protección, evidencias y aceptación legal persistente; los recorridos operativos y reportes actuales ya están conectados.
 
 ## Frontend
 
-React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes reales; el flujo actual usa PENDING_PAYMENT, checkout interno firmado, comprobante descargable, entrega y devolución. La recuperación se probó con Mailpit privado. Consulta los [contratos](integration-contracts.md).
+React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes persistidos; el flujo usa `PENDING_PAYMENT`, redirección a Mercado Pago, comprobante descargable, entrega y devolución. Consulta los [contratos](integration-contracts.md).
 
-Siguen pendientes aceptación legal persistente, protección por daños, pasarela oficial y correo público. El frontend nunca decide permisos ni importes finales.
+Siguen pendientes aceptación legal persistente, protección por daños y aceptación manual del checkout oficial de prueba. El frontend nunca decide permisos, importes ni credenciales.
 
 ## Entrega Daniel/Mayorga
 

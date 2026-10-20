@@ -14,7 +14,7 @@ function TermsAndConditionsPage() {
   return (
     <main className="legal-page page-shell page-top">
       <header className="legal-hero">
-        <p className="legal-eyebrow">Documento legal · Simulación académica</p>
+        <p className="legal-eyebrow">Documento legal · Ambiente académico de prueba</p>
         <h1>Términos y Condiciones</h1>
         <p>
           Este borrador regula el uso académico de Tool Rental. No está aprobado para un
@@ -45,10 +45,10 @@ function TermsAndConditionsPage() {
             <p>
               Estos términos regulan el acceso y uso de Tool Rental por clientes, proveedores y
               administradores, incluyendo catálogo, reservas, alquileres, entregas, devoluciones,
-              protección opcional por daños, pagos, reembolsos y facturas simuladas.
+              protección opcional por daños, pagos, reembolsos y comprobantes.
             </p>
             <p>
-              El ambiente actual es una simulación universitaria. No procesa dinero real, no emite
+              El ambiente actual es una plataforma universitaria de prueba. No procesa dinero real, no emite
               facturas válidas ante la DIAN, no vende seguros ni implica afiliación con PayPal,
               Visa o Mastercard. Toda aceptación debe ser explícita: el silencio, la inactividad o
               una casilla preseleccionada no constituyen aceptación.
@@ -68,10 +68,7 @@ function TermsAndConditionsPage() {
                 <strong>Plan de Protección:</strong> protección contractual opcional; no es seguro
                 ni póliza.
               </li>
-              <li>
-                <strong>Simulación:</strong> reproducción académica de un flujo comercial sin mover
-                dinero real.
-              </li>
+              <li><strong>Ambiente de prueba:</strong> operación con cuentas y medios de pago de prueba.</li>
             </ul>
           </section>
 
@@ -124,19 +121,17 @@ function TermsAndConditionsPage() {
               arrendamiento de bienes muebles debe validarse profesionalmente antes de operar.
             </p>
             <p>
-              Todo documento actual debe indicar: “Simulación académica - documento no válido
-              como factura ante la DIAN”.
+              Todo documento actual debe indicar que no es válido como factura ante la DIAN.
             </p>
           </section>
 
           <section>
-            <h2>7. Pagos simulados</h2>
+            <h2>7. Pagos con Mercado Pago</h2>
             <p>
-              El MVP usa una pasarela ficticia: el cliente elige aprobar o rechazar una operación
-              académica por el total de la reserva. No hay cobros reales ni conexión con bancos,
-              tarjetas o PayPal. El servidor valida importe, propiedad, disponibilidad y vencimiento;
-              una aprobación repetida no duplica el comprobante. Los ajustes se registran aparte.
-              No se solicitan números de tarjeta, CVV ni contraseñas bancarias.
+              El MVP usa Checkout Pro con credenciales oficiales de prueba de Mercado Pago. El
+              cliente abandona temporalmente la plataforma para completar el checkout y el servidor
+              verifica importe, propiedad, disponibilidad, vencimiento y firma del webhook antes de
+              confirmar la reserva. No deben usarse cuentas, tarjetas ni datos bancarios reales.
             </p>
           </section>
 
@@ -202,8 +197,8 @@ function TermsAndConditionsPage() {
             <h2>13. Propiedad intelectual y nombres de terceros</h2>
             <p>
               El software, el contenido original y la marca se rigen por sus licencias y derechos.
-              PayPal, Visa y Mastercard pertenecen a sus titulares; mencionarlas en la simulación
-              no implica patrocinio, certificación ni integración.
+              Mercado Pago y las demás marcas mencionadas pertenecen a sus titulares. Su uso en el
+              ambiente de prueba no implica patrocinio ni certificación.
             </p>
           </section>
 

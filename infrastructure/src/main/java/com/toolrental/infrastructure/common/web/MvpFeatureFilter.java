@@ -17,15 +17,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE + 20)
 public final class MvpFeatureFilter extends OncePerRequestFilter {
-  private final boolean recovery;
   private final boolean internal;
   private final ObjectMapper json;
 
   public MvpFeatureFilter(
-      @Value("${auth.password-recovery.enabled:false}") boolean recovery,
       @Value("${payments.internal-enabled:false}") boolean internal,
       ObjectMapper json) {
-    this.recovery = recovery;
     this.internal = internal;
     this.json = json;
   }
@@ -35,16 +32,13 @@ public final class MvpFeatureFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     var path = request.getRequestURI().replaceFirst("^/api/v1/", "/api/");
     boolean disabled =
-        (!recovery
-                && (path.equals("/api/auth/password-recovery")
-                    || path.equals("/api/auth/password-reset")))
-            || (!internal
-                && (path.startsWith("/api/payments/sandbox/")
-                    || path.equals("/api/payments/simulations")
-                    || path.equals("/api/payments/internal/checkouts")
-                    || ("POST".equals(request.getMethod()) && path.equals("/api/payments"))
-                    || ("PATCH".equals(request.getMethod())
-                        && path.matches("/api/payments/[^/]+/status"))));
+        !internal
+            && (path.startsWith("/api/payments/sandbox/")
+                || path.equals("/api/payments/simulations")
+                || path.equals("/api/payments/internal/checkouts")
+                || ("POST".equals(request.getMethod()) && path.equals("/api/payments"))
+                || ("PATCH".equals(request.getMethod())
+                    && path.matches("/api/payments/[^/]+/status")));
     if (disabled) {
       response.setStatus(404);
       response.setContentType("application/problem+json");

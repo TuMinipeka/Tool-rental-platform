@@ -2,7 +2,7 @@
 
 ## Estado y separación de entornos
 
-La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle. La pasarela ficticia persistente está probada y no realiza operaciones financieras externas. El cierre depende del [MVP](mvp.md).
+La entrega prepara una **demo pública académica**. Actualmente se ejecuta en Docker local y no está publicada en Oracle. El proveedor vigente es Mercado Pago con credenciales oficiales de prueba; la aceptación manual requiere un origen HTTPS público y las claves privadas. El cierre depende del [MVP](mvp.md).
 
 | Entorno | Composición | Datos / acceso |
 | --- | --- | --- |
@@ -56,7 +56,11 @@ Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y complet
 | PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
 | POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
 | JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
-| PAYMENT_PROVIDER | fictional; sin credenciales de pagos externos |
+| PAYMENT_PROVIDER | `mercadopago` |
+| MERCADOPAGO_ACCESS_TOKEN | Access Token del vendedor oficial de prueba; solo backend |
+| MERCADOPAGO_COLLECTOR_ID | Identificador inmutable del mismo vendedor de prueba |
+| MERCADOPAGO_WEBHOOK_SECRET | Secreto de firma configurado en la aplicación de Mercado Pago |
+| PAYMENTS_PUBLIC_URL | Origen HTTPS público para retorno y webhook |
 | BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
 
 
@@ -74,7 +78,7 @@ Caddy conserva certificados en volúmenes, sirve la SPA y enruta /api, Swagger, 
 
 Todos los campos de publicReleaseGates deben estar verificados en evidence/mvp/status.json, con evidencias actuales. scripts/release.sh falla si falta alguno. Solo entonces habilita Caddy, descarga las imágenes aprobadas y ejecuta Compose con espera de arranque. El Compose público mantiene Caddy bloqueado por defecto aunque alguien omita el script.
 
-Comprobar externamente HTTPS válido, /, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, pasarela ficticia, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
+Comprobar externamente HTTPS válido, `/`, `/status/database`, Swagger, rutas React, tres roles, renovación/CSRF, Checkout Pro con vendedor y comprador de prueba, webhook firmado, comprobante descargable y reportes. Capturar evidencias sin tokens ni secretos.
 
 ## Respaldo y recuperación
 
@@ -88,7 +92,7 @@ Antes de actualizar guarda las referencias de imágenes y el respaldo probado. P
 
 ## Límites restantes
 
-Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, validación del flujo ficticio en el destino público, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, validación de Mercado Pago de prueba en el destino público, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles tienen evidencia histórica local. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
 
 ## Migraciones tras integrar Conde
 
@@ -115,7 +119,7 @@ node frontend/scripts/verify-fictional-mvp.mjs
 
 El verificador registra la versión real de Tomcat, el comando de arranque y la conexión JDBC en [evidencia de Tomcat](evidence/mvp/tomcat-runtime.json). La instalación de Maven utiliza JDK 21; el Java del PATH puede ser distinto. Docker ya incluye su propio JRE y no depende del Java del host.
 
-Para publicar, completa .env.showcase con dominio, certificados, acceso PostgreSQL exclusivo, secreto JWT e imágenes identificadas por revisión. No se requieren Mercado Pago ni SMTP. En la VM con Docker configura DNS/puertos 80 y 443, provisiona evaluadores privados, verifica respaldo externo y ejecución ARM. Ejecuta `sh scripts/release.sh` solo cuando el checklist del entorno destino esté completo; ese script valida configuración, descarga imágenes y arranca Compose con espera de salud. Después comprueba HTTPS, Swagger, rutas React, sesión y el recorrido ficticio completo.
+Para publicar, completa `.env.showcase` con dominio, certificados, PostgreSQL, JWT, imágenes y las tres credenciales privadas de Mercado Pago de prueba. No se requiere SMTP. Configura en Mercado Pago el webhook `https://<PUBLIC_HOST>/api/v1/payments/mercadopago/webhooks`. Las credenciales no se versionan ni se administran desde la web.
 
 No se ha aprovisionado una VM ni un dominio en esta entrega. El servidor local no acredita una publicación pública. Las operaciones de actualización/reversión y respaldo descritas arriba siguen vigentes.
 
