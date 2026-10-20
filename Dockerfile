@@ -31,4 +31,5 @@ COPY --from=builder --chown=spring:spring /workspace/extracted/spring-boot-loade
 COPY --from=builder --chown=spring:spring /workspace/extracted/snapshot-dependencies/ ./
 COPY --from=builder --chown=spring:spring /workspace/extracted/application/ ./
 
+## The executable Spring Boot JAR starts the embedded Apache Tomcat server.
 ENTRYPOINT ["java", "-jar", "infrastructure-0.1.0-SNAPSHOT.jar"]

@@ -1,3 +1,4 @@
+if (process.env.RUN_HISTORICAL_EXTERNAL_GATEWAY !== 'true') throw new Error('Historical Mercado Pago configuration check; current MVP uses frontend/scripts/verify-fictional-mvp.mjs')
 import { chromium, expect } from '@playwright/test'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'

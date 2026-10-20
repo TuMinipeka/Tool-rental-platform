@@ -33,10 +33,7 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Set random JWT secret}
       CORS_ALLOWED_ORIGINS: https://${PUBLIC_HOST:?Set DuckDNS host}
       PASSWORD_RECOVERY_ENABLED: "false"
-      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:?Set test seller access token}
-      MERCADOPAGO_COLLECTOR_ID: ${MERCADOPAGO_COLLECTOR_ID:?Set test seller identifier}
-      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:?Set official webhook secret}
-      PAYMENTS_PUBLIC_URL: https://${PUBLIC_HOST}
+      PAYMENT_PROVIDER: fictional
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=65 -XX:+ExitOnOutOfMemoryError
       SERVER_FORWARD_HEADERS_STRATEGY: framework
     networks: [database,edge]

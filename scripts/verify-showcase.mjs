@@ -7,7 +7,7 @@ const docker=(args,env)=>execFileSync('docker',args,{encoding:'utf8',env:env||pr
 const sql=query=>docker([...compose,'exec','-T','postgres','psql','-X','-qAt','-v','ON_ERROR_STOP=1','-U','mvp_validation','-d','mvp_validation','-c',query]).trim()
 if(sql("SELECT count(*) FROM pg_database WHERE datname='mvp_integrated_showcase'")==='0')sql('CREATE DATABASE mvp_integrated_showcase OWNER mvp_validation')
 let started=false
-const evidence={testedAt:new Date().toISOString(),sourceFingerprint:sourceFingerprint(),scope:'Private production+showcase profile without SMTP; no public HTTPS or external payment acceptance',checks:[]}
+const evidence={testedAt:new Date().toISOString(),sourceFingerprint:sourceFingerprint(),scope:'Private production+showcase profile without SMTP; no public HTTPS; fictional academic payment',checks:[]}
 const check=(name,result)=>{if(!result)throw Error(name);evidence.checks.push({name,passed:true})}
 try{
 docker([...compose,'up','-d','--no-build','secure-backend']);started=true
@@ -16,15 +16,16 @@ for(let i=0;i<60;i++){try{if((await fetch('http://localhost:18081/status/databas
 check('Secure profile starts against an isolated showcase database',ready)
 const features=await (await fetch('http://localhost:18081/api/v1/public/features')).json()
 check('Recovery is disabled in the runtime frontend contract',features.passwordRecovery===false)
+check('Fictional gateway needs no external credentials',features.hostedCheckout===true && features.paymentProvider==='FICTIONAL_GATEWAY')
 for(const path of ['password-recovery','password-reset']) {
  const response=await fetch('http://localhost:18081/api/v1/auth/'+path,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
  check(path+' remains disabled with a stable contract',response.status===404 && (await response.json()).code==='FEATURE_DISABLED')
 }
 const spec=await (await fetch('http://localhost:18081/v3/api-docs')).json()
 check('OpenAPI excludes recovery and internal sandbox routes',!Object.keys(spec.paths).some(path=>/password-recovery|password-reset|sandbox|simulations|internal\/checkouts/.test(path)))
-check('OpenAPI exposes official hosted checkout',Boolean(spec.paths['/api/v1/payments/checkouts']?.post))
+check('OpenAPI exposes fictional checkout',Boolean(spec.paths['/api/v1/payments/checkouts']?.post))
 const legacy=await fetch('http://localhost:18081/api/v1/payments/sandbox/webhooks',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'})
-check('Production refuses academic approvals',legacy.status===404 && (await legacy.json()).code==='FEATURE_DISABLED')
+check('Production refuses legacy unsigned approvals',legacy.status===404 && (await legacy.json()).code==='FEATURE_DISABLED')
 const rejected=await fetch('http://localhost:18081/api/v1/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@toolrental.local',password:'ToolRental2026!'})})
 check('Known demonstration administrator credentials are disabled',rejected.status===401)
 for(const role of ['CUSTOMER','SUPPLIER','ADMIN']){
