@@ -1,4 +1,5 @@
 const colors = ['orange', 'yellow', 'blue', 'green', 'red', 'silver']
+const cities = ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta']
 
 // Mirrors the 30 records from the versioned demo migrations for offline frontend use.
 const definitions = [
@@ -40,7 +41,7 @@ export const demoCatalog = definitions.map(([id, name, category, price, descript
   category,
   price,
   description,
-  location: null,
+  location: cities[index % cities.length],
   rating: null,
   reviews: null,
   stock: 1,

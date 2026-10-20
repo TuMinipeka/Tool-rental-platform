@@ -14,6 +14,7 @@ public record ToolResponse(
     CategoryId categoryId,
     String name,
     String description,
+    String serviceCity,
     Money dailyRate,
     Set<URI> imageUrls,
     boolean published) {
@@ -28,6 +29,7 @@ public record ToolResponse(
         c.categoryId(),
         c.name(),
         c.description(),
+        c.serviceCity(),
         c.dailyRate(),
         c.imageUrls(),
         c.published());

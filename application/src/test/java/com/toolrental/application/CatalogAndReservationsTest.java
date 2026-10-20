@@ -84,7 +84,7 @@ class CatalogAndReservationsTest {
     return registerTool
         .execute(
             new RegisterToolCommand(
-                p, category, "Drill", "Industrial drill", money("10000"), Set.of()))
+                p, category, "Drill", "Industrial drill", "Bucaramanga", money("10000"), Set.of()))
         .id();
   }
 
@@ -116,7 +116,13 @@ class CatalogAndReservationsTest {
         () ->
             registerTool.execute(
                 new RegisterToolCommand(
-                    supplier, CategoryId.generate(), "X", "Y", money("1"), Set.of())));
+                    supplier,
+                    CategoryId.generate(),
+                    "X",
+                    "Y",
+                    "Bucaramanga",
+                    money("1"),
+                    Set.of())));
     assertThrows(
         SupplierNotFoundApplicationException.class, () -> createTool(SupplierId.generate()));
     var otherTool = createTool(supplier);

@@ -75,6 +75,7 @@ class EquipmentUnitListingUseCaseTest {
         new CategoryId(UUID.randomUUID()),
         "Tool",
         "Tool description",
+        "Bucaramanga",
         new Money(new BigDecimal("10000"), Currency.getInstance("COP")),
         Set.of(),
         true);

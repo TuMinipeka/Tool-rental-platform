@@ -34,6 +34,7 @@ public class ToolPersistenceMapper {
         new CategoryId(entity.getCategoryId()),
         entity.getName(),
         entity.getDescription(),
+        entity.getServiceCity(),
         new Money(entity.getCurrentDailyRate(), Currency.getInstance(entity.getRateCurrency())),
         images.findByIdToolId(entity.getId()).stream()
             .map(image -> URI.create(image.getId().getImageUrl()))
@@ -48,6 +49,7 @@ public class ToolPersistenceMapper {
         aggregate.categoryId().value(),
         aggregate.name(),
         aggregate.description(),
+        aggregate.serviceCity(),
         aggregate.dailyRate().amount(),
         aggregate.dailyRate().currency().getCurrencyCode(),
         aggregate.published() ? PUBLISHED : UNPUBLISHED,

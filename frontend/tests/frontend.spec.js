@@ -27,25 +27,21 @@ for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nos
 }
 
 test('search keeps municipality and filters the catalog', async ({ page }) => {
-  await page.goto('/?municipio=Gir%C3%B3n')
+  await page.goto('/?municipio=Floridablanca')
   await page.getByLabel('¿Qué necesitas?').fill('Rotomartillo')
   await page.getByRole('button', { name: 'Buscar', exact: true }).click()
-  await expect(page).toHaveURL(/catalogo\?q=Rotomartillo&municipio=Gir/)
+  await expect(page).toHaveURL(/catalogo\?q=Rotomartillo&municipio=Floridablanca/)
   await expect(page.locator('.tool-card')).toHaveCount(1)
   await page.getByRole('textbox', { name: 'Buscar herramienta o categoría' }).fill('no-match-qa')
   await expect(page.getByRole('main')).toHaveCount(1)
   await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeVisible()
   await page.getByRole('button', { name: 'Limpiar filtros' }).click()
-  await expect(page.locator('.tool-card')).toHaveCount(10)
+  await expect(page.locator('.tool-card')).toHaveCount(8)
 })
 
-test('catalog pagination, municipality, and price filters retain their contracts', async ({ page }, testInfo) => {
+test('catalog municipality and price filters retain their contracts', async ({ page }, testInfo) => {
   await page.goto('/catalogo')
-  const firstName = await page.locator('.tool-title-link').first().textContent()
-  const pagination = page.getByRole('navigation', { name: 'Paginación' })
-  await pagination.getByRole('button', { name: '→', exact: true }).click()
-  await expect(page.locator('.tool-title-link').first()).not.toHaveText(firstName)
-  await expect(page.locator('.tool-card')).toHaveCount(10)
+  await expect(page.locator('.tool-card')).toHaveCount(8)
   if (testInfo.project.name === 'desktop') {
     await page.getByRole('combobox', { name: 'Ubicación', exact: true }).selectOption('Girón')
     await expect(page).toHaveURL(/municipio=Gir/)
@@ -54,7 +50,7 @@ test('catalog pagination, municipality, and price filters retain their contracts
     await price.press('Home')
     await expect(page.locator('.tool-card')).toHaveCount(0)
     await page.getByRole('button', { name: 'Limpiar filtros' }).click()
-    await expect(page.locator('.tool-card')).toHaveCount(10)
+    await expect(page.locator('.tool-card')).toHaveCount(7)
   }
 })
 

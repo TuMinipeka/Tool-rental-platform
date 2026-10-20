@@ -14,6 +14,7 @@ public record ToolRequest(
     @NotNull UUID categoryId,
     @NotBlank @Size(max = 160) String name,
     @NotBlank @Size(max = 2000) String description,
+    @NotBlank @Size(max = 120) String serviceCity,
     @NotNull @PositiveOrZero @Digits(integer = 15, fraction = 4) BigDecimal dailyRate,
     @NotBlank @Pattern(regexp = "[A-Z]{3}") String currency,
     @NotNull Set<String> imageUrls,

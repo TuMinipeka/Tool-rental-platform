@@ -20,6 +20,7 @@ public final class Tool extends AggregateRoot {
   private final CategoryId categoryId;
   private final String name;
   private final String description;
+  private final String serviceCity;
   private final Set<URI> imageUrls;
   private Money dailyRate;
   private boolean published;
@@ -30,6 +31,7 @@ public final class Tool extends AggregateRoot {
       CategoryId category,
       String name,
       String description,
+      String serviceCity,
       Money rate,
       Set<URI> imageUrls,
       boolean published) {
@@ -39,7 +41,10 @@ public final class Tool extends AggregateRoot {
     this.categoryId = Objects.requireNonNull(category);
     this.name = Validation.requiredText(name, "name");
     this.description = Validation.requiredText(description, "description");
-    if (this.name.length() > 160 || this.description.length() > 2000)
+    this.serviceCity = Validation.requiredText(serviceCity, "serviceCity");
+    if (this.name.length() > 160
+        || this.description.length() > 2000
+        || this.serviceCity.length() > 120)
       throw new BusinessRuleException("Tool text exceeds the supported length");
     this.dailyRate = Objects.requireNonNull(rate);
     this.imageUrls = Set.copyOf(imageUrls);
@@ -58,11 +63,21 @@ public final class Tool extends AggregateRoot {
       CategoryId category,
       String name,
       String description,
+      String serviceCity,
       Money rate,
       Set<URI> imageUrls,
       Clock clock) {
     var tool =
-        new Tool(ToolId.generate(), supplier, category, name, description, rate, imageUrls, true);
+        new Tool(
+            ToolId.generate(),
+            supplier,
+            category,
+            name,
+            description,
+            serviceCity,
+            rate,
+            imageUrls,
+            true);
     tool.recordEvent(new ToolRegistered(tool.id, Instant.now(clock)));
     return tool;
   }
@@ -73,10 +88,12 @@ public final class Tool extends AggregateRoot {
       CategoryId category,
       String name,
       String description,
+      String serviceCity,
       Money rate,
       Set<URI> imageUrls,
       boolean published) {
-    return new Tool(id, supplier, category, name, description, rate, imageUrls, published);
+    return new Tool(
+        id, supplier, category, name, description, serviceCity, rate, imageUrls, published);
   }
 
   public void changeDailyRate(Money rate) {
@@ -109,6 +126,10 @@ public final class Tool extends AggregateRoot {
     return description;
   }
 
+  public String serviceCity() {
+    return serviceCity;
+  }
+
   public Set<URI> imageUrls() {
     return imageUrls;
   }
@@ -121,9 +142,16 @@ public final class Tool extends AggregateRoot {
     return published;
   }
 
-  public Tool update(String name, String description, Money rate, boolean published, Clock clock) {
+  public Tool update(
+      String name,
+      String description,
+      String serviceCity,
+      Money rate,
+      boolean published,
+      Clock clock) {
     var changed =
-        new Tool(id, supplierId, categoryId, name, description, rate, imageUrls, published);
+        new Tool(
+            id, supplierId, categoryId, name, description, serviceCity, rate, imageUrls, published);
     changed.recordEvent(new com.toolrental.domain.tool.event.ToolUpdated(id, Instant.now(clock)));
     return changed;
   }

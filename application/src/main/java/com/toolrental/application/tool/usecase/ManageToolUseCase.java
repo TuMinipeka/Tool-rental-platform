@@ -71,6 +71,7 @@ public final class ManageToolUseCase {
       ToolId id,
       String name,
       String description,
+      String serviceCity,
       BigDecimal amount,
       String currency,
       boolean published) {
@@ -82,6 +83,7 @@ public final class ManageToolUseCase {
               value.update(
                   name,
                   description,
+                  serviceCity,
                   new com.toolrental.domain.common.model.valueobject.Money(
                       amount, Currency.getInstance(currency)),
                   published,

@@ -40,6 +40,7 @@ class AggregateEventsTest {
             category.id(),
             "Drill",
             "Industrial",
+            "Bucaramanga",
             new Money(BigDecimal.TEN, Currency.getInstance("COP")),
             Set.of(),
             clock);
@@ -114,6 +115,7 @@ class AggregateEventsTest {
             category.id(),
             "Drill",
             "Industrial",
+            "Bucaramanga",
             new Money(BigDecimal.TEN, Currency.getInstance("COP")),
             Set.of(),
             clock);
@@ -125,6 +127,7 @@ class AggregateEventsTest {
             tool.categoryId(),
             tool.name(),
             tool.description(),
+            tool.serviceCity(),
             tool.dailyRate(),
             tool.imageUrls(),
             tool.published());
@@ -179,7 +182,9 @@ class AggregateEventsTest {
     var category = Category.register("Catalog", clock);
     var supplier = SupplierId.generate();
     var rate = new Money(BigDecimal.TEN, Currency.getInstance("COP"));
-    var tool = Tool.register(supplier, category.id(), "Drill", "Industrial", rate, Set.of(), clock);
+    var tool =
+        Tool.register(
+            supplier, category.id(), "Drill", "Industrial", "Bucaramanga", rate, Set.of(), clock);
     var equipmentUnit = EquipmentUnit.register(tool.id(), "EQ-1", clock);
     var date = LocalDate.of(2026, 10, 14);
     return Reservation.request(

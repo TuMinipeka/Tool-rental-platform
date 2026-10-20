@@ -146,7 +146,7 @@ class PostgresIntegrationTest {
     db.update("insert into suppliers values (?,'ID','S-1','Supplier Original')", supplier);
     db.update("insert into categories values (?,'Drills','Full category description')", category);
     db.update(
-        "insert into tools values (?,?,?,'Drill','Power drill',10,'COP','PUBLISHED')",
+        "insert into tools (tool_id,supplier_id,category_id,name,description,current_daily_rate,rate_currency,publication_status,service_city) values (?,?,?,'Drill','Power drill',10,'COP','PUBLISHED','Bucaramanga')",
         tool,
         supplier,
         category);
@@ -204,7 +204,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(37);
+        .isEqualTo(38);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
@@ -292,6 +292,19 @@ class PostgresIntegrationTest {
 
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/api/v1/public/catalog"), null, 200).toString()).contains("Drill");
+    assertThat(
+            call(null, get("/api/v1/public/catalog").param("serviceCity", "Bucaramanga"), null, 200)
+                .get(0)
+                .get("serviceCity")
+                .asText())
+        .isEqualTo("Bucaramanga");
+    assertThat(
+            call(
+                null,
+                get("/api/v1/public/catalog").param("serviceCity", "Floridablanca"),
+                null,
+                200))
+        .isEmpty();
     assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
   }
 
@@ -1334,6 +1347,8 @@ class PostgresIntegrationTest {
                 "Saw",
                 "description",
                 "Circular saw",
+                "serviceCity",
+                "Floridablanca",
                 "dailyRate",
                 15,
                 "currency",
@@ -1352,6 +1367,8 @@ class PostgresIntegrationTest {
             "Updated saw",
             "description",
             "Updated description",
+            "serviceCity",
+            "Piedecuesta",
             "dailyRate",
             18,
             "currency",

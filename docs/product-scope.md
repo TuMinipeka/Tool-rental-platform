@@ -27,12 +27,12 @@ Supplier realiza las actividades de entrega, devolución y gestión de daños en
 El software debe ofrecer finalmente todas las siguientes capacidades funcionales e integradas:
 
 1. Identidad, autenticación y autorización para los tres roles.
-2. Catálogo, categorías, imágenes, unidades físicas, publicación y disponibilidad.
+2. Catálogo, categorías, imágenes, unidades físicas, publicación, ciudad de servicio, filtrado por municipio y disponibilidad.
 3. Orden pendiente de pago, retención temporal atómica de inventario, expiración y prevención de reservas superpuestas.
 4. Activación del alquiler, programación y evidencia de entrega, registro de devolución y comparación de condiciones.
 5. Protección opcional, evidencias de daños, valoración, notificación al cliente, disputas y cargos adicionales justificados.
 6. Procesamiento mediante una pasarela sandbox oficial, webhooks verificados y reembolsos idempotentes.
-7. Facturación simulada con precios e impuestos discriminados.
+7. Facturación simulada con identificación de la herramienta y su ciudad de servicio, precios e impuestos discriminados.
 8. Administración, reportes operativos, auditoría y aceptación de documentos legales.
 9. Interfaz React adaptable que consuma el contrato REST/OpenAPI publicado.
 

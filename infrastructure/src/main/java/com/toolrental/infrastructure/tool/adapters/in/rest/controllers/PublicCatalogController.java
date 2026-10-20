@@ -33,8 +33,9 @@ public final class PublicCatalogController {
   @GetMapping
   public List<CatalogToolResponse> list(
       @RequestParam(required = false) UUID categoryId,
-      @RequestParam(required = false) String query) {
-    return catalog.list(categoryId, query);
+      @RequestParam(required = false) String query,
+      @RequestParam(required = false) String serviceCity) {
+    return catalog.list(categoryId, query, serviceCity);
   }
 
   @GetMapping("/{id}")

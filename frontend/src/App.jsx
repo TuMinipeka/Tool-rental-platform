@@ -135,7 +135,7 @@ function App(){
   const [catalogTools,setCatalogTools]=useState(requireLiveApi ? [] : tools)
   const [dataMode,setDataMode]=useState(requireLiveApi ? 'loading' : 'demo')
   const [location,setLocation]=useState(defaultLocation)
-  const displayedCatalogTools=useMemo(()=>dataMode==='demo'?catalogTools.map(tool=>({...tool,location:`${location}, Santander` })):catalogTools,[catalogTools,dataMode,location])
+  const displayedCatalogTools=useMemo(()=>catalogTools.filter(tool=>tool.location===location),[catalogTools,location])
 
   const changeLocation=nextLocation=>{
     if(!serviceLocations.includes(nextLocation))return
@@ -220,7 +220,7 @@ function App(){
   let page
   if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
   else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
-  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={displayedCatalogTools} dataMode={dataMode}/>
+  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools} dataMode={dataMode}/>
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
   else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>

@@ -125,6 +125,7 @@ export const api = {
     const query = new URLSearchParams()
     if (params.query) query.set('query', params.query)
     if (params.categoryId) query.set('categoryId', params.categoryId)
+    if (params.serviceCity) query.set('serviceCity', params.serviceCity)
     return request(`/public/catalog${query.size ? `?${query}` : ''}`)
   },
   getCatalogTool(toolId) {
@@ -211,7 +212,7 @@ export const api = {
   createTool(tool) {
     return request(
       '/tools',
-      { method: 'POST', body: JSON.stringify(tool) },
+      { method: 'POST', body: JSON.stringify({ serviceCity: 'Bucaramanga', ...tool }) },
       { authenticated: true },
     )
   },
@@ -250,7 +251,7 @@ export function normalizeCatalogTool(tool, index = 0) {
     category: tool.categoryName,
     price: Number(tool.dailyRate),
     deposit: 0,
-    location: null,
+    location: tool.serviceCity,
     rating: null,
     reviews: null,
     stock: tool.operationalUnitCount,

@@ -91,7 +91,7 @@ class FictionalPaymentIntegrationTest {
     var tool = UUID.randomUUID();
     db.update("insert into categories values (?,'Fictional tools','Test category')", category);
     db.update(
-        "insert into tools values (?,?,?,'Drill','Test drill',25000,'COP','PUBLISHED')",
+        "insert into tools (tool_id,supplier_id,category_id,name,description,current_daily_rate,rate_currency,publication_status,service_city) values (?,?,?,'Drill','Test drill',25000,'COP','PUBLISHED','Bucaramanga')",
         tool,
         supplier,
         category);
@@ -126,6 +126,9 @@ class FictionalPaymentIntegrationTest {
           .andExpect(status().isOk())
           .andExpect(jsonPath("$.paymentStatus").value("DONE"));
     assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isEqualTo(1);
+    assertThat(
+            db.queryForObject("select issued_description from invoice_items limit 1", String.class))
+        .isEqualTo("Herramienta: Drill | Ciudad: Bucaramanga");
     assertThat(
             db.queryForObject(
                 "select reservation_status from reservations where reservation_id=?",

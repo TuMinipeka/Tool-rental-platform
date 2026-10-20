@@ -37,6 +37,7 @@ public final class RegisterToolUseCase {
             c.categoryId(),
             c.name(),
             c.description(),
+            c.serviceCity(),
             c.dailyRate(),
             c.imageUrls(),
             clock);

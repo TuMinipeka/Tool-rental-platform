@@ -254,6 +254,7 @@ Rutas principales:
 - `GET /api/v1/auth/csrf`, `POST /auth/refresh`, `/logout` y `/logout-all`.
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
 - `GET /api/v1/public/features`: capacidades vigentes; recuperación deshabilitada.
+- `GET /api/v1/public/catalog?serviceCity={municipio}`: catálogo público filtrado por la ciudad persistida de cada herramienta.
 - `POST /api/v1/auth/supplier-registration` y activación administrativa del usuario.
 - `POST /api/v1/payments/checkouts`, checkout ficticio y decisión autenticada y descarga del comprobante académico.
 - `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.

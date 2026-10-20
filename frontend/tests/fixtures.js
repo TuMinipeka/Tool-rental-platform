@@ -4,7 +4,7 @@ export const catalog = demoCatalog.map(tool => ({
   toolId: tool.id, supplierId: '30000000-0000-0000-0000-000000000001',
   categoryId: tool.category, categoryName: tool.category, name: tool.name,
   description: tool.description, dailyRate: tool.price, currency: 'COP',
-  operationalUnitCount: tool.stock, imageUrls: [],
+  serviceCity: tool.location, operationalUnitCount: tool.stock, imageUrls: [],
 }))
 
 export async function mockApi(page, { empty = false, unavailable = false, roles = ['CUSTOMER'] } = {}) {
