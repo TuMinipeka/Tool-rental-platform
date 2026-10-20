@@ -6,6 +6,7 @@ import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
 import com.toolrental.domain.customer.port.repository.CustomerRepository;
 import com.toolrental.domain.user.port.repository.UserRepository;
+import com.toolrental.domain.usersession.port.repository.UserSessionRepository;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,7 +20,8 @@ public class CustomerBeanConfiguration {
       AccessPolicy access,
       WorkflowReferences references,
       Clock clock,
-      UserRepository users) {
-    return new ManageCustomerUseCase(repository, work, access, references, clock, users);
+      UserRepository users,
+      UserSessionRepository sessions) {
+    return new ManageCustomerUseCase(repository, work, access, references, clock, users, sessions);
   }
 }

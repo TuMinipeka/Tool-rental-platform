@@ -1,11 +1,15 @@
 package com.toolrental.infrastructure.user.adapters.in.rest.controllers;
 
+import com.toolrental.application.supplier.dto.SupplierRegistrationResponse;
 import com.toolrental.application.user.command.RegisterAccountCommand;
+import com.toolrental.application.user.command.RegisterSupplierAccountCommand;
 import com.toolrental.application.user.dto.AuthenticationResponse;
 import com.toolrental.application.user.usecase.AuthenticateUserUseCase;
 import com.toolrental.application.user.usecase.RegisterCustomerAccountUseCase;
+import com.toolrental.application.user.usecase.RegisterSupplierAccountUseCase;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.AccountRegistrationRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.LoginRequest;
+import com.toolrental.infrastructure.user.adapters.in.rest.dtos.SupplierAccountRegistrationRequest;
 import com.toolrental.infrastructure.usersession.adapters.in.rest.RefreshCookieFactory;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,15 +28,33 @@ import org.springframework.web.bind.annotation.RestController;
 public final class AuthenticationController {
   private final AuthenticateUserUseCase authentication;
   private final RegisterCustomerAccountUseCase registration;
+  private final RegisterSupplierAccountUseCase supplierRegistration;
   private final RefreshCookieFactory cookies;
 
   public AuthenticationController(
       AuthenticateUserUseCase authentication,
       RegisterCustomerAccountUseCase registration,
+      RegisterSupplierAccountUseCase supplierRegistration,
       RefreshCookieFactory cookies) {
     this.authentication = authentication;
     this.registration = registration;
+    this.supplierRegistration = supplierRegistration;
     this.cookies = cookies;
+  }
+
+  @PostMapping("/supplier-registration")
+  public ResponseEntity<SupplierRegistrationResponse> registerSupplier(
+      @Valid @RequestBody SupplierAccountRegistrationRequest request) {
+    var result =
+        supplierRegistration.execute(
+            new RegisterSupplierAccountCommand(
+                request.email(),
+                request.displayName(),
+                request.password(),
+                request.documentType(),
+                request.documentNumber(),
+                request.businessName()));
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
   }
 
   @PostMapping("/login")

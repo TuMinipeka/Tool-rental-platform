@@ -11,7 +11,9 @@ import com.toolrental.domain.customer.model.aggregate.Customer;
 import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.customer.port.repository.CustomerRepository;
 import com.toolrental.domain.user.port.repository.UserRepository;
+import com.toolrental.domain.usersession.port.repository.UserSessionRepository;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +24,7 @@ public final class ManageCustomerUseCase {
   private final WorkflowReferences references;
   private final Clock clock;
   private final UserRepository users;
+  private final UserSessionRepository sessions;
 
   public ManageCustomerUseCase(
       CustomerRepository repository,
@@ -29,13 +32,15 @@ public final class ManageCustomerUseCase {
       AccessPolicy access,
       WorkflowReferences references,
       Clock clock,
-      UserRepository users) {
+      UserRepository users,
+      UserSessionRepository sessions) {
     this.repository = repository;
     this.work = work;
     this.access = access;
     this.references = references;
     this.clock = clock;
     this.users = users;
+    this.sessions = sessions;
   }
 
   private Customer load(CustomerId id) {
@@ -96,6 +101,26 @@ public final class ManageCustomerUseCase {
                       command.documentNumber(),
                       command.billingName(),
                       clock)));
+        });
+  }
+
+  public void deactivate(UUID actor, CustomerId id) {
+    work.execute(
+        () -> {
+          load(id);
+          access.requireOwnerOrAdministrator(actor, id.value());
+          var user =
+              users
+                  .findById(new com.toolrental.domain.user.model.valueobject.UserId(id.value()))
+                  .orElseThrow(
+                      () ->
+                          new com.toolrental.application.common.exception
+                              .ReferenceNotFoundApplicationException("User"));
+          if (!"DISABLED".equals(user.accountStatus())) {
+            users.save(user.transition("DISABLED", clock));
+          }
+          sessions.revokeAllForUser(user.id(), Instant.now(clock));
+          return null;
         });
   }
 }
