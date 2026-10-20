@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { api, normalizeCatalogTool, readSession, saveSession } from './api.js'
 import { demoCatalog } from './demoCatalog.js'
 import TermsAndConditionsPage from './TermsAndConditionsPage.jsx'
-import { prioritizeFeaturedTools, resolveToolVisual } from './toolVisuals.js'
+import { prioritizeFeaturedTools, resolveToolVisual, resolveToolVisualClass } from './toolVisuals.js'
 
 const tools = demoCatalog
 const money = new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})
@@ -36,7 +36,7 @@ function Icon({name,size=20}) {
 }
 function navigate(path){window.history.pushState({},'',path);window.dispatchEvent(new PopStateEvent('popstate'));const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.scrollTo({top:0,behavior:reducedMotion?'auto':'smooth'})}
 function Brand(){return <button className="brand" onClick={()=>navigate('/')} aria-label="Ir al inicio"><span className="brand-symbol"><i/><i/><i/></span><span>tool<em>rental</em></span></button>}
-function ToolVisual({tool,compact=false,priority=false}){const [failedUrls,setFailedUrls]=useState([]);const imageUrl=[tool.imageUrl,resolveToolVisual(tool)].find(url=>url&&!failedUrls.includes(url));return <div className={`tool-visual tool-${tool.color} ${compact?'compact':''}`}>{imageUrl?<img src={imageUrl} alt={tool.name} loading={priority?'eager':'lazy'} decoding="async" onError={()=>setFailedUrls(current=>[...current,imageUrl])}/>:<><div className="visual-grid"/><div className="tool-silhouette" aria-hidden="true"><span/><span/><span/></div></>}<b>{tool.category}</b><small>TR—{tool.id.slice(0,3).toUpperCase()}</small></div>}
+function ToolVisual({tool,compact=false,priority=false}){const [failedUrls,setFailedUrls]=useState([]);const imageUrl=[tool.imageUrl,resolveToolVisual(tool)].find(url=>url&&!failedUrls.includes(url));return <div className={`tool-visual tool-${tool.color} ${resolveToolVisualClass(tool)} ${compact?'compact':''}`}>{imageUrl?<img src={imageUrl} alt={tool.name} loading={priority?'eager':'lazy'} decoding="async" onError={()=>setFailedUrls(current=>[...current,imageUrl])}/>:<><div className="visual-grid"/><div className="tool-silhouette" aria-hidden="true"><span/><span/><span/></div></>}<b>{tool.category}</b><small>TR—{tool.id.slice(0,3).toUpperCase()}</small></div>}
 
 function Header({session,onOpenAuth,path,location,onLocationChange}){
   const [open,setOpen]=useState(false); const go=(path)=>{setOpen(false);navigate(path)}
