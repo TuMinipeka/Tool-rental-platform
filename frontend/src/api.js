@@ -188,6 +188,7 @@ export const api = {
       { authenticated: true })
   },
   features() { return request('/public/features', {}) },
+  decideFictionalPayment(id, outcome) { return request('/payments/fictional/checkouts/' + encodeURIComponent(id) + '/decision', { method: 'POST', body: JSON.stringify({ outcome }) }, { authenticated: true }) },
   checkout(id) { return request('/payments/checkouts/' + encodeURIComponent(id), {}, { authenticated: true }) },
   createCheckout(reservationId, idempotencyKey) {
     return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId }) }, { authenticated: true })

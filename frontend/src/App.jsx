@@ -16,6 +16,7 @@ import { navigate } from './lib/navigation.js'
 import { money } from './lib/format.js'
 import { serviceLocations } from './lib/locations.js'
 
+const FictionalCheckoutPage = lazy(() => import('./pages/FictionalCheckoutPage.jsx').then(module => ({ default: module.FictionalCheckoutPage })))
 const PaymentReturnPage = lazy(() => import('./pages/PaymentReturnPage.jsx').then(module => ({ default: module.PaymentReturnPage })))
 const TermsAndConditionsPage = lazy(() => import('./TermsAndConditionsPage.jsx'))
 const loadAccountPages = () => import('./pages/AccountPages.jsx')
@@ -217,6 +218,7 @@ function App(){
   else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
   else if(path==='/password-reset')page=passwordRecovery?<PasswordResetPage/>:<EmptyState title="Recuperación no disponible" text="La recuperación de contraseña está fuera de esta entrega del MVP." action={()=>navigate('/login')} actionText="Volver al ingreso"/>
+  else if(path.startsWith('/checkout/'))page=<FictionalCheckoutPage session={session} paymentId={path.split('/')[2]}/>
   else if(path==='/payment-return')page=<PaymentReturnPage session={session}/>
   else if(path==='/login')page=<AuthPage mode="login" onAuthenticated={login}/>
   else if(path==='/registro/proveedor')page=<AuthPage mode="supplier" onAuthenticated={login}/>

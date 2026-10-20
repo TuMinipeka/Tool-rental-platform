@@ -65,7 +65,7 @@ public final class ManagePaymentUseCase {
     return work.execute(
         () -> {
           access.requireAdministrator(actor);
-          if ("MERCADO_PAGO".equals(command.processor()))
+          if (java.util.Set.of("MERCADO_PAGO", "FICTIONAL_GATEWAY").contains(command.processor()))
             throw new BusinessRuleException(
                 "Official payments must originate from hosted checkout");
           var reservation = references.reservation(actor, command.reservationId(), false);
@@ -95,7 +95,7 @@ public final class ManagePaymentUseCase {
         () -> {
           var value = load(id);
           access.requireAdministrator(actor);
-          if ("MERCADO_PAGO".equals(value.processor()))
+          if (java.util.Set.of("MERCADO_PAGO", "FICTIONAL_GATEWAY").contains(value.processor()))
             throw new BusinessRuleException("Official payments require provider verification");
           return PaymentResponse.from(repository.save(value.transition(next, clock)));
         });

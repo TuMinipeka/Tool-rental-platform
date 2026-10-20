@@ -23,7 +23,7 @@ export async function mockApi(page, { empty = false, unavailable = false, roles 
       accessToken: 'qa-access-token', userId: 'qa-customer', email: 'qa@example.test',
       displayName: 'QA Customer', roles,
     }
-    else if (path === '/public/features') body = { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'MERCADO_PAGO', currency: 'COP' }
+    else if (path === '/public/features') body = { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'FICTIONAL_GATEWAY', currency: 'COP' }
     else if (path === '/auth/password-recovery') body = { accepted: true }
     else if (path === '/quotes/reservations') body = { total: 80000, currency: 'COP' }
     else if (path === '/reservations' && route.request().method() === 'POST') body = { id: 'qa-reservation' }

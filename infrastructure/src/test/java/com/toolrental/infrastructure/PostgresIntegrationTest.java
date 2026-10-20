@@ -54,6 +54,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     properties = {
       "auth.password-recovery.enabled=true",
       "payments.internal-enabled=true",
+      "payments.provider=mercadopago",
       "payments.mercadopago.collector-id=123",
       "payments.reconciliation-delay-ms=3600000",
       "payments.mercadopago.webhook-secret=official-test-webhook-secret-long-enough-2026"
@@ -109,6 +110,7 @@ class PostgresIntegrationTest {
   @BeforeEach
   void seed() {
     org.mockito.Mockito.reset(gateway);
+    org.mockito.Mockito.when(gateway.processor()).thenReturn("MERCADO_PAGO");
     org.mockito.Mockito.when(gateway.search(org.mockito.ArgumentMatchers.anyString()))
         .thenReturn(List.of());
     org.mockito.Mockito.when(gateway.recoverCheckout(org.mockito.ArgumentMatchers.anyString()))
@@ -202,7 +204,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(36);
+        .isEqualTo(37);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",

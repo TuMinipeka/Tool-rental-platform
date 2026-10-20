@@ -305,11 +305,23 @@ public final class Payment extends AggregateRoot {
       BigDecimal amount,
       String idempotencyKey,
       Clock clock) {
+    return hostedCheckout(id, reservationId, amount, idempotencyKey, clock, "MERCADO_PAGO");
+  }
+
+  public static Payment hostedCheckout(
+      PaymentId id,
+      ReservationId reservationId,
+      BigDecimal amount,
+      String idempotencyKey,
+      Clock clock,
+      String processor) {
+    if (!Set.of("MERCADO_PAGO", "FICTIONAL_GATEWAY").contains(processor))
+      throw new BusinessRuleException("Unsupported hosted processor");
     var result =
         new Payment(
             id,
             reservationId,
-            "MERCADO_PAGO",
+            processor,
             id.value().toString(),
             amount,
             "PENDING",
@@ -429,7 +441,8 @@ public final class Payment extends AggregateRoot {
   }
 
   public Payment settleHostedApproval(Clock clock) {
-    if (!processor.equals("MERCADO_PAGO") || !Set.of("PENDING", "FAILED").contains(paymentStatus))
+    if (!Set.of("MERCADO_PAGO", "FICTIONAL_GATEWAY").contains(processor)
+        || !Set.of("PENDING", "FAILED").contains(paymentStatus))
       throw new BusinessRuleException("Invalid hosted approval");
     var result =
         new Payment(

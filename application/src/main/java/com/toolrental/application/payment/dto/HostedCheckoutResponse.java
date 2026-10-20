@@ -9,13 +9,19 @@ public record HostedCheckoutResponse(
     UUID reservationId,
     String paymentStatus,
     String checkoutUrl,
-    Instant expiresAt) {
+    Instant expiresAt,
+    java.math.BigDecimal amount,
+    String currency,
+    String processor) {
   public static HostedCheckoutResponse from(HostedCheckout value) {
     return new HostedCheckoutResponse(
         value.paymentId(),
         value.reservationId(),
         value.phase(),
         value.checkoutUrl(),
-        value.expiresAt());
+        value.expiresAt(),
+        value.amount(),
+        "COP",
+        value.processor());
   }
 }

@@ -5,6 +5,10 @@ import java.time.Instant;
 import java.util.List;
 
 public interface PaymentGateway {
+  default String processor() {
+    return "MERCADO_PAGO";
+  }
+
   record Checkout(String preferenceId, String url) {}
 
   record Result(

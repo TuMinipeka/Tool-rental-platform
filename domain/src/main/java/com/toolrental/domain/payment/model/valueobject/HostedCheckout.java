@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record HostedCheckout(
     UUID paymentId,
+    String processor,
     UUID reservationId,
     BigDecimal amount,
     Instant expiresAt,

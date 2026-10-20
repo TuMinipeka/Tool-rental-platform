@@ -26,6 +26,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 public class PaymentBeanConfiguration {
   @Bean
+  @org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+      name = "payments.provider",
+      havingValue = "fictional",
+      matchIfMissing = true)
+  com.toolrental.application.payment.usecase.DecideFictionalCheckoutUseCase
+      decideFictionalCheckoutUseCase(
+          WorkflowReferences references,
+          AccessPolicy access,
+          HostedCheckoutRepository checkouts,
+          com.toolrental.domain.payment.port.FictionalPaymentDecision decisions,
+          ReconcileHostedPaymentUseCase reconcile,
+          UnitOfWork work,
+          Clock clock) {
+    return new com.toolrental.application.payment.usecase.DecideFictionalCheckoutUseCase(
+        references, access, checkouts, decisions, reconcile, work, clock);
+  }
+
+  @Bean
   GetHostedCheckoutUseCase getHostedCheckoutUseCase(
       ManagePaymentUseCase payments, HostedCheckoutRepository states) {
     return new GetHostedCheckoutUseCase(payments, states);
@@ -42,9 +60,19 @@ public class PaymentBeanConfiguration {
       Clock clock,
       @org.springframework.beans.factory.annotation.Value("${payments.mercadopago.collector-id:}")
           String collector,
-      RefundRepository refunds) {
+      RefundRepository refunds,
+      @org.springframework.beans.factory.annotation.Value("${payments.provider:fictional}")
+          String provider) {
     return new ReconcileHostedPaymentUseCase(
-        gateway, checkouts, payments, reservations, invoices, work, clock, collector, refunds);
+        gateway,
+        checkouts,
+        payments,
+        reservations,
+        invoices,
+        work,
+        clock,
+        provider.equals("fictional") ? "fictional-demo" : collector,
+        refunds);
   }
 
   @Bean
@@ -56,9 +84,10 @@ public class PaymentBeanConfiguration {
       UnitOfWork work,
       AtomicReservationManagement reservations,
       ReconcileHostedPaymentUseCase reconcile,
-      Clock clock) {
+      Clock clock,
+      PaymentGateway gateway) {
     return new CreateHostedCheckoutUseCase(
-        payments, checkouts, references, access, work, reservations, reconcile, clock);
+        payments, checkouts, references, access, work, reservations, reconcile, clock, gateway);
   }
 
   @Bean

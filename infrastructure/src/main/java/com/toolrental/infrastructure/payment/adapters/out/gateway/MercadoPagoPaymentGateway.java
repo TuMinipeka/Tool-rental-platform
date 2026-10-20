@@ -22,6 +22,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
+@org.springframework.boot.autoconfigure.condition.ConditionalOnProperty(
+    name = "payments.provider",
+    havingValue = "mercadopago")
 public final class MercadoPagoPaymentGateway implements PaymentGateway {
   private final HttpClient http;
   private final ObjectMapper json;

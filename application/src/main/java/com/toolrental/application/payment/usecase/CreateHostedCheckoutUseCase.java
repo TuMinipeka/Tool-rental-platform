@@ -27,6 +27,7 @@ public final class CreateHostedCheckoutUseCase {
   private final AtomicReservationManagement reservations;
   private final ReconcileHostedPaymentUseCase reconcile;
   private final Clock clock;
+  private final com.toolrental.domain.payment.port.PaymentGateway gateway;
 
   public CreateHostedCheckoutUseCase(
       PaymentRepository payments,
@@ -36,7 +37,8 @@ public final class CreateHostedCheckoutUseCase {
       UnitOfWork work,
       AtomicReservationManagement reservations,
       ReconcileHostedPaymentUseCase reconcile,
-      Clock clock) {
+      Clock clock,
+      com.toolrental.domain.payment.port.PaymentGateway gateway) {
     this.payments = payments;
     this.checkouts = checkouts;
     this.references = references;
@@ -45,6 +47,7 @@ public final class CreateHostedCheckoutUseCase {
     this.reservations = reservations;
     this.reconcile = reconcile;
     this.clock = clock;
+    this.gateway = gateway;
   }
 
   public HostedCheckoutResponse execute(UUID actor, ReservationId reservationId, String key) {
@@ -66,14 +69,14 @@ public final class CreateHostedCheckoutUseCase {
                     if (previous.isPresent()) {
                       var stored = previous.get();
                       if (!stored.reservationId().equals(reservationId)
-                          || !stored.processor().equals("MERCADO_PAGO"))
+                          || !stored.processor().equals(gateway.processor()))
                         throw new IdempotencyConflictApplicationException();
                       result.set(stored.id().value());
                       return reservation;
                     }
                     var active =
                         payments.findByReservation(reservationId).stream()
-                            .filter(p -> p.processor().equals("MERCADO_PAGO"))
+                            .filter(p -> p.processor().equals(gateway.processor()))
                             .findFirst();
                     if (active.isPresent()) {
                       result.set(active.get().id().value());
@@ -92,7 +95,8 @@ public final class CreateHostedCheckoutUseCase {
                                 reservationId,
                                 reservation.total().amount(),
                                 key,
-                                clock));
+                                clock,
+                                gateway.processor()));
                     checkouts.initialize(payment.id().value(), reservation.expiresAt());
                     result.set(payment.id().value());
                     return reservation;

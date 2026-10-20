@@ -4,7 +4,7 @@ import { EmptyState } from '../components/EmptyState.jsx'
 import { navigate } from '../lib/navigation.js'
 
 const labels = {
-  DONE: 'Pago verificado y reserva confirmada',
+  DONE: 'Pago ficticio aprobado y reserva confirmada',
   REJECTED: 'Pago rechazado o cancelado',
   REFUND_PENDING: 'Pago recibido después del cierre: reembolso en proceso',
   REFUNDED: 'Pago reembolsado',
@@ -31,8 +31,8 @@ export function PaymentReturnPage({ session }) {
     return () => { active = false; clearTimeout(timer) }
   }, [session, id])
   if (!session) return <EmptyState title="Ingresa para consultar tu pago" text="El retorno del checkout no acredita por sí solo una aprobación." action={() => navigate('/login')} actionText="Ingresar" />
-  return <main className="page-shell page-top"><p className="kicker dark">Mercado Pago · entorno de prueba</p><h1>Estado de tu pago</h1>
+  return <main className="page-shell page-top"><p className="kicker dark">Pasarela ficticia · sin cobros reales</p><h1>Estado de tu pago</h1>
     {error ? <p className="form-error" role="alert">{error}</p> : <p role="status">{state ? labels[state.paymentStatus] || 'Esperando verificación del proveedor' : 'Consultando estado seguro…'}</p>}
-    <p>Los importes y el estado de la reserva se verifican en el servidor. El comprobante es académico y no tiene validez fiscal.</p>
+    <p>No se movió dinero real. Los importes y el estado de la reserva se verifican en el servidor. El comprobante es académico y no tiene validez fiscal.</p>
     <button className="button button-dark" onClick={() => navigate('/cuenta')}>Consultar mis reservas</button></main>
 }

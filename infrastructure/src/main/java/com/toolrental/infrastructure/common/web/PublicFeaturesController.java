@@ -9,19 +9,23 @@ import org.springframework.web.bind.annotation.*;
 public final class PublicFeaturesController {
   private final boolean recovery;
   private final boolean hosted;
+  private final String provider;
 
   public PublicFeaturesController(
       @Value("${auth.password-recovery.enabled:false}") boolean recovery,
       @Value("${payments.mercadopago.access-token:}") String token,
       @Value("${payments.mercadopago.collector-id:}") String collector,
       @Value("${payments.mercadopago.webhook-secret:}") String secret,
-      @Value("${payments.mercadopago.public-url:}") String url) {
+      @Value("${payments.mercadopago.public-url:}") String url,
+      @Value("${payments.provider:fictional}") String provider) {
     this.recovery = recovery;
+    this.provider = provider.equals("fictional") ? "FICTIONAL_GATEWAY" : "MERCADO_PAGO";
     this.hosted =
-        !token.isBlank()
-            && !collector.isBlank()
-            && secret.length() >= 32
-            && url.startsWith("https://");
+        provider.equals("fictional")
+            || (!token.isBlank()
+                && !collector.isBlank()
+                && secret.length() >= 32
+                && url.startsWith("https://"));
   }
 
   @GetMapping
@@ -32,7 +36,7 @@ public final class PublicFeaturesController {
         "hostedCheckout",
         hosted,
         "paymentProvider",
-        "MERCADO_PAGO",
+        provider,
         "currency",
         "COP");
   }

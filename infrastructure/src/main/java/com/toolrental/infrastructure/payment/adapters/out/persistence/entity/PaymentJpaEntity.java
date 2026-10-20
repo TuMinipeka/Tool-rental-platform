@@ -88,6 +88,12 @@ public class PaymentJpaEntity {
   @Column(name = "checkout_retry_at", insertable = false, updatable = false)
   private Instant checkoutRetryAt;
 
+  @Column(name = "fictional_outcome", length = 20, insertable = false, updatable = false)
+  private String fictionalOutcome;
+
+  @Column(name = "fictional_refunded", insertable = false, updatable = false)
+  private boolean fictionalRefunded;
+
   protected PaymentJpaEntity() {}
 
   public PaymentJpaEntity(

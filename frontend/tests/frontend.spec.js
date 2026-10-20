@@ -321,7 +321,8 @@ test('provider return parameters never confirm a pending payment', async ({ page
   await expect(page.getByText('Pago verificado y reserva confirmada')).toHaveCount(0)
 })
 
-test('checkout sends only the reservation and redirects to the hosted provider', async ({ page }) => {
+test('optional external checkout sends only the reservation and redirects to the hosted provider', async ({ page }) => {
+  await page.route('**/api/v1/public/features', route => route.fulfill({ json: { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'MERCADO_PAGO' } }))
   const id = '90000000-0000-0000-0000-000000000001'
   const requests = []
   await page.route('**/api/v1/reservations', route => route.fulfill({ json: [{ id, status: 'PENDING_PAYMENT', period: { startDate: '2027-01-01', returnDate: '2027-01-01' }, total: { amount: 25000 } }] }))
@@ -338,3 +339,24 @@ test('checkout sends only the reservation and redirects to the hosted provider',
   expect(requests[0].body).toEqual({ reservationId: id })
   expect(requests[0].key).toBeTruthy()
 })
+
+for (const [outcome, status, label] of [['APPROVED', 'DONE', 'Pago ficticio aprobado y reserva confirmada'], ['DECLINED', 'REJECTED', 'Pago rechazado o cancelado']]) {
+  test('fictional checkout submits ' + outcome + ' without card data', async ({ page }) => {
+    const id = '90000000-0000-0000-0000-000000000001'
+    let phase = 'READY'
+    await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, reservationId: id, paymentStatus: phase, processor: 'FICTIONAL_GATEWAY', amount: 25000, currency: 'COP', expiresAt: '2027-01-01T12:00:00Z' } }))
+    const decisions = []
+    await page.route('**/api/v1/payments/fictional/checkouts/' + id + '/decision', route => {
+      decisions.push(route.request().postDataJSON()); phase = status
+      return route.fulfill({ json: { paymentId: id, paymentStatus: status } })
+    })
+    await page.goto('/checkout/' + id)
+    await login(page)
+    await expect(page.getByRole('heading', { name: 'Pasarela ficticia' })).toBeVisible()
+    await expect(page.locator('main input')).toHaveCount(0)
+    await page.getByRole('button', { name: outcome === 'APPROVED' ? 'Simular aprobación' : 'Simular rechazo' }).click()
+    await expect(page).toHaveURL(/payment-return/)
+    await expect(page.getByRole('main').getByRole('status')).toHaveText(label)
+    expect(decisions).toEqual([{ outcome }])
+  })
+}

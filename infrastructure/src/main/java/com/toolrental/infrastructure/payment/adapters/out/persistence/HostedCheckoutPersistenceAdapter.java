@@ -14,9 +14,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class HostedCheckoutPersistenceAdapter implements HostedCheckoutRepository {
   private final JdbcTemplate db;
+  private final String processor;
 
-  public HostedCheckoutPersistenceAdapter(JdbcTemplate db) {
+  public HostedCheckoutPersistenceAdapter(
+      JdbcTemplate db, com.toolrental.domain.payment.port.PaymentGateway gateway) {
     this.db = db;
+    this.processor = gateway.processor();
   }
 
   public void initialize(UUID id, Instant expiresAt) {
@@ -29,10 +32,11 @@ public class HostedCheckoutPersistenceAdapter implements HostedCheckoutRepositor
   public Optional<HostedCheckout> find(UUID id) {
     return db
         .query(
-            "SELECT * FROM payments WHERE payment_id=? AND processor='MERCADO_PAGO'",
+            "SELECT * FROM payments WHERE payment_id=? AND processor IN ('MERCADO_PAGO','FICTIONAL_GATEWAY')",
             (r, n) ->
                 new HostedCheckout(
                     r.getObject("payment_id", UUID.class),
+                    r.getString("processor"),
                     r.getObject("reservation_id", UUID.class),
                     r.getBigDecimal("amount"),
                     r.getTimestamp("checkout_expires_at").toInstant(),
@@ -84,10 +88,11 @@ public class HostedCheckoutPersistenceAdapter implements HostedCheckoutRepositor
 
   public List<UUID> due(Instant now, int limit) {
     return db.query(
-        "SELECT payment_id FROM payments WHERE checkout_phase IN "
+        "SELECT payment_id FROM payments WHERE processor=? AND checkout_phase IN "
             + "('CREATING','READY','REVIEW','REFUND_PENDING') AND checkout_attempts<100 "
             + "AND (checkout_retry_at IS NULL OR checkout_retry_at<=?) ORDER BY recorded_at LIMIT ?",
         (r, n) -> r.getObject(1, UUID.class),
+        processor,
         Timestamp.from(now),
         limit);
   }

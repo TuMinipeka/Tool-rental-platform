@@ -1,5 +1,5 @@
 const documentMetadata = [
-  ['Versión del documento', '0.1-draft'],
+  ['Versión del documento', '0.2-draft'],
   ['Fecha de publicación', 'No publicado'],
   ['Entrada en vigencia', 'No aplica hasta su publicación'],
   ['Operador', '[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]'],
@@ -21,7 +21,7 @@ function TermsAndConditionsPage() {
           lanzamiento comercial ni reemplaza una revisión legal o tributaria colombiana.
         </p>
         <div className="legal-status" role="status">
-          <strong>Borrador 0.1</strong>
+          <strong>Borrador 0.2</strong>
           <span>No procesa dinero real ni emite facturas válidas ante la DIAN.</span>
         </div>
       </header>
@@ -135,10 +135,11 @@ function TermsAndConditionsPage() {
           <section>
             <h2>7. Pagos simulados</h2>
             <p>
-              La plataforma simula tarjeta débito, tarjeta crédito y PayPal. El esquema divide el
-              pago en 50 % al confirmar la reserva y 50 % al terminar el alquiler y aceptar la
-              devolución; los ajustes se muestran por separado. Nunca se guardan números completos
-              de tarjeta ni CVV.
+              El MVP usa una pasarela ficticia: el cliente elige aprobar o rechazar una operación
+              académica por el total de la reserva. No hay cobros reales ni conexión con bancos,
+              tarjetas o PayPal. El servidor valida importe, propiedad, disponibilidad y vencimiento;
+              una aprobación repetida no duplica el comprobante. Los ajustes se registran aparte.
+              No se solicitan números de tarjeta, CVV ni contraseñas bancarias.
             </p>
           </section>
 
@@ -234,7 +235,7 @@ function TermsAndConditionsPage() {
               retroactiva precios, protección u otras condiciones ya aceptadas.
             </p>
             <div className="legal-version">
-              <strong>0.1-draft</strong>
+              <strong>0.2-draft</strong>
               <span>Borrador académico inicial</span>
             </div>
           </section>
