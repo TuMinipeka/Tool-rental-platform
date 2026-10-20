@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | Java 21, Maven multimódulo | Implementado | POM raíz y wrapper |
 | Arquitectura hexagonal y DDD | Implementado | ArchUnit y módulos Domain/Application/Infrastructure |
-| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, hasta V304 y `ddl-auto: validate` |
+| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, hasta V305 y `ddl-auto: validate` |
 | Catálogo y equipos | Implementado | Contextos base y disponibilidad |
 | Reserva concurrente | Implementado | `AtomicReservationManagement` y pruebas PostgreSQL |
 | Sesiones y recuperación segura | Sesiones implementadas; recuperación aplazada | Refresh opaco y revocación vigentes; correo y restablecimiento ocultos/deshabilitados en el MVP |
@@ -19,6 +19,6 @@ La suite completa se ejecutó con JDK 21 y PostgreSQL/Testcontainers. Los comand
 
 ## Evidencias del cierre local MVP
 
-Consulta [validación](validation-report.md), [contratos por rol](integration-contracts.md) y [modelo relacional/físico](logical-physical-model.md). El sandbox interno firmado está probado; no acredita una pasarela oficial externa. La publicación pública y las dependencias externas permanecen pendientes en [MVP](mvp.md).
+Consulta [validación](validation-report.md), [contratos por rol](integration-contracts.md) y [modelo relacional/físico](logical-physical-model.md). La pasarela ficticia se valida como simulación académica persistente; no se anuncian cobros externos. La publicación pública y las dependencias externas permanecen pendientes en [MVP](mvp.md).
 
-Decisión vigente del MVP: Mercado Pago COP; PayPal y correo aplazados. La aceptación externa del proveedor sigue pendiente. [Contrato y límites](mercadopago-mvp.md).
+Decisión vigente del MVP: pasarela ficticia COP; PayPal y correo aplazados. La aceptación exige el recorrido académico real; no se requiere proveedor externo. [Contrato y límites](fictional-payments.md).

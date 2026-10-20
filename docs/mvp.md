@@ -2,7 +2,7 @@
 
 ## Decisiones vigentes
 
-Demo pública académica; COP y Mercado Pago Checkout Pro con cuentas oficiales de prueba. **PayPal y correo quedan fuera de este MVP por decisión de Daniel.** La recuperación se conserva en código, pero está oculta y deshabilitada. No se ejecutan cobros reales ni se emiten documentos fiscales.
+Demo pública académica; COP y una pasarela ficticia integrada, sin proveedores ni cobros externos. **PayPal y correo quedan fuera de este MVP por decisión de Daniel.** La recuperación se conserva en código, pero está oculta y deshabilitada. No se ejecutan cobros reales ni se emiten documentos fiscales.
 
 Rama de trabajo: developer/daniel. Se conserva el diseño de Conde y la arquitectura hexagonal de los tres módulos. El enunciado original no se modifica.
 
@@ -11,21 +11,21 @@ Rama de trabajo: developer/daniel. Se conserva el diseño de Conde y la arquitec
 | Tarea | Implementación y aceptación |
 | --- | --- |
 | Clientes y proveedores | CRUD y baja lógica existentes; revocación de sesiones y conservación del historial cubiertas por regresión |
-| Reservas | Retenciones, vencimiento, disponibilidad, confirmación, cancelación y ciclo operativo existentes; nueva aprobación oficial mantiene una transacción local |
-| Pagos y comprobante | Adaptador oficial, checkout alojado, firma, consulta canónica, conciliación, idempotencia y reembolso tardío implementados; **aceptación real del proveedor pendiente de credenciales y callback HTTPS** |
+| Reservas | Retenciones, vencimiento, disponibilidad, confirmación, cancelación y ciclo operativo existentes; la decisión académica mantiene una transacción local |
+| Pagos y comprobante | Pasarela ficticia persistente, decisión autenticada, idempotencia, confirmación y comprobante académico; aceptación mediante recorrido real contra PostgreSQL |
 | Reportes | Cinco consultas con datos persistidos y alcance por rol; profitability significa ingreso reservado, no margen neto |
 | JWT y roles | Sesiones rotativas, CSRF, activación administrativa de proveedor y revocación existentes; conservar pruebas de accesos prohibidos |
-| Documentación y pruebas | Contrato y procedimiento en [pagos del MVP](mercadopago-mvp.md); resultados actuales en [validación](validation-report.md) |
-| Frontend | Checkout oficial y retorno conectado al estado del servidor, sin formulario académico ni PayPal; recuperación oculta y deshabilitada; se conserva el diseño |
+| Documentación y pruebas | Contrato y procedimiento en [pagos del MVP](fictional-payments.md); resultados actuales en [validación](validation-report.md) |
+| Frontend | Pasarela ficticia y retorno conectado al estado del servidor, sin formulario académico ni PayPal; recuperación oculta y deshabilitada; se conserva el diseño |
 
-La implementación no equivale a aceptación externa. El sandbox HMAC anterior solo conserva utilidad de regresión interna; no satisface el requisito oficial y está bloqueado por defecto.
+Se retira expresamente la exigencia anterior de pasarela sandbox oficial. El HMAC antiguo queda como regresión interna bloqueada; el MVP usa una decisión de prueba autenticada y explícita.
 
 ## Responsabilidades de Daniel
 
 | Prioridad | Entrega | Condición de cierre |
 | --- | --- | --- |
 | P0 | Compose aislado, frontend, backend y PostgreSQL | Repetir arranque, integración y evidencia de la revisión actual |
-| P0 | Mercado Pago oficial | Titular proporciona configuración privada; validar compra aprobada/rechazada, callback auténtico y conciliación |
+| P0 | Pasarela ficticia | Aprobar/rechazar, emitir un solo comprobante y completar alquiler contra PostgreSQL real, sin claves externas |
 | P0 | Oracle gratuito, DNS y HTTPS | Cuenta y capacidad disponibles, dominio configurado, certificado válido y ejecución ARM probada |
 | P0 | Respaldo externo | Recepción, retención de siete copias y restauración desde otro servidor |
 | P0 | Evaluadores | Provisionar y rotar accesos privados; nunca publicar usuarios demo conocidos |
@@ -35,10 +35,16 @@ Correo público deja de ser una condición de publicación. Se sustituye por com
 
 ## Publicación condicionada
 
-[Estado verificable](evidence/mvp/status.json) conserva bloqueado el lanzamiento mientras falten requisitos externos. No marcar una compra oficial como probada por pasar un doble HTTP. No abrir la demo general para resolver el callback; usar un entorno HTTPS de aceptación restringido.
+[Estado verificable](evidence/mvp/status.json) conserva bloqueado el lanzamiento mientras falten requisitos externos. El flujo de pago se acredita como simulación, nunca como cobro real. La publicación conserva controles de sesiones, roles y HTTPS.
 
 Las evidencias anteriores de Mailpit y HMAC quedan como históricas, no como comportamiento público vigente. Consulta [despliegue](deployment.md), [contratos](integration-contracts.md) y [enunciado original](../ejercicioDemo.md).
 
-## Validación de esta entrega
+## Apache Tomcat
 
-Código `0692c31`: Maven 100/100 sin omisiones; navegador 78 pruebas correctas y dos omisiones previstas por dispositivo; 21 comprobaciones contra vistas/API/PostgreSQL reales y 17 del perfil seguro sin SMTP. Respaldo restaurado y persistencia tras reinicio verificados con V304. La compra oficial sigue pendiente de las credenciales y el callback auténtico, no de Mailpit ni de un simulador. [Evidencias y límites](validation-report.md).
+Se confirma el uso de **Apache Tomcat integrado en Spring Boot**, desplegado como JAR ejecutable dentro de Docker con Java 21. No se requiere instalar Catalina por separado ni convertir el proyecto a WAR. [Procedimiento y explicación](deployment.md#apache-tomcat-integrado).
+
+## Evidencia vigente
+
+Las pruebas y capturas de esta revisión se registran en [validación](validation-report.md). Las referencias anteriores a Mercado Pago, credenciales de vendedor y aceptación de callback ya no bloquean este MVP. Continúan pendientes los requisitos del servidor público que aún no se hayan verificado.
+
+Validación local concluida: **105 pruebas Java, 82 de navegador y dos omisiones previstas por dispositivo; 19 comprobaciones del recorrido real y 18 del perfil seguro**. Se verificaron Tomcat 10.1.55, JDBC, V305 y restauración local. El destino público conserva los bloqueos externos del checklist.

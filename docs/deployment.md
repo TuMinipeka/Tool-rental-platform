@@ -2,7 +2,7 @@
 
 ## Estado y separación de entornos
 
-La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle. El sandbox interno firmado está probado; no se acredita una pasarela oficial externa. El cierre depende del [MVP](mvp.md).
+La entrega prepara una **demo pública académica**. Actualmente se valida en Docker local. No está publicada en Oracle. La pasarela ficticia persistente está probada y no realiza operaciones financieras externas. El cierre depende del [MVP](mvp.md).
 
 | Entorno | Composición | Datos / acceso |
 | --- | --- | --- |
@@ -23,7 +23,7 @@ docker compose --env-file .env.validation -f compose.validation.yml up --build -
 # Espera a que /status/database responda connected: true.
 Invoke-RestMethod http://localhost:15173/status/database
 node scripts/audit-database.mjs
-node frontend/scripts/verify-live-mvp.mjs
+node frontend/scripts/verify-fictional-mvp.mjs
 node scripts/verify-backup.mjs
 ~~~
 
@@ -56,9 +56,9 @@ Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y complet
 | PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
 | POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
 | JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
-| MERCADOPAGO_ACCESS_TOKEN / COLLECTOR_ID / WEBHOOK_SECRET | Vendedor oficial de prueba y firma; nunca incluir en VITE_* |
+| PAYMENT_PROVIDER | fictional; sin credenciales de pagos externos |
 | BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
-| PAYMENTS_PUBLIC_URL | Origen HTTPS de callback; Compose lo deriva de PUBLIC_HOST |
+
 
 CORS permite exactamente el origen HTTPS configurado; el refresh es HttpOnly/Secure/SameSite=Lax y la API conserva CSRF. Spring procesa cabeceras reenviadas solo detrás del proxy privado. La especificación conserva exclusivamente /api/v1; el alias heredado no se anuncia como contrato nuevo.
 
@@ -74,7 +74,7 @@ Caddy conserva certificados en volúmenes, sirve la SPA y enruta /api, Swagger, 
 
 Todos los campos de publicReleaseGates deben estar verificados en evidence/mvp/status.json, con evidencias actuales. scripts/release.sh falla si falta alguno. Solo entonces habilita Caddy, descarga las imágenes aprobadas y ejecuta Compose con espera de arranque. El Compose público mantiene Caddy bloqueado por defecto aunque alguien omita el script.
 
-Comprobar externamente HTTPS válido, /, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, sandbox/webhook, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
+Comprobar externamente HTTPS válido, /, /status/database, /swagger-ui.html, rutas directas de React, tres roles, renovación/CSRF, pasarela ficticia, factura descargable y reportes. Capturar evidencias sin tokens ni secretos. No cambiar los indicadores a true por haber compilado solamente.
 
 ## Respaldo y recuperación
 
@@ -88,12 +88,35 @@ Antes de actualizar guarda las referencias de imágenes y el respaldo probado. P
 
 ## Límites restantes
 
-Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, aceptación del sandbox oficial, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, validación del flujo ficticio en el destino público, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles ya están verificados localmente. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
 
 ## Migraciones tras integrar Conde
 
-V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V303.
+V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V305.
 
-## Configuración privada del proveedor
+## Apache Tomcat integrado
 
-La ubicación preparada es `.env.mercadopago.local`, ignorada por Git; la plantilla versionada es `.env.mercadopago.example`. Los scripts operativos leen primero `.env.showcase` y luego ese archivo privado. No se han inventado credenciales. Configura la cuenta oficial de vendedor de prueba y el secreto del webhook; consulta [pagos del MVP](mercadopago-mvp.md). El origen HTTPS público se deriva de PUBLIC_HOST. Recuperación y SMTP permanecen deshabilitados.
+La modalidad confirmada es JAR ejecutable con Apache Tomcat integrado. Spring Boot administra el ciclo de vida del servidor al arrancar la aplicación. El backend conserva spring-boot-starter-web, que incorpora Tomcat; no se excluye esa dependencia ni se marca como provided.
+
+| Ejecución | Qué ocurre |
+| --- | --- |
+| `java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar` | Java 21 arranca Spring Boot y Apache Tomcat en 8080 |
+| Dockerfile del backend | Compila el JAR, incorpora un JRE 21 y ejecuta java -jar como usuario no root |
+| Compose público | Mantiene Tomcat y PostgreSQL privados; Caddy expone HTTPS y enruta /api al backend:8080 |
+
+Para comprobarlo localmente:
+
+```powershell
+.\mvnw.cmd clean verify
+docker compose --env-file .env.validation -f compose.validation.yml up -d --build
+node scripts/verify-tomcat.mjs
+node frontend/scripts/verify-fictional-mvp.mjs
+```
+
+El verificador registra la versión real de Tomcat, el comando de arranque y la conexión JDBC en [evidencia de Tomcat](evidence/mvp/tomcat-runtime.json). La instalación de Maven utiliza JDK 21; el Java del PATH puede ser distinto. Docker ya incluye su propio JRE y no depende del Java del host.
+
+Para publicar, completa .env.showcase con dominio, certificados, acceso PostgreSQL exclusivo, secreto JWT e imágenes identificadas por revisión. No se requieren Mercado Pago ni SMTP. En la VM con Docker configura DNS/puertos 80 y 443, provisiona evaluadores privados, verifica respaldo externo y ejecución ARM. Ejecuta `sh scripts/release.sh` solo cuando el checklist del entorno destino esté completo; ese script valida configuración, descarga imágenes y arranca Compose con espera de salud. Después comprueba HTTPS, Swagger, rutas React, sesión y el recorrido ficticio completo.
+
+No se ha aprovisionado una VM ni un dominio en esta entrega. El servidor local no acredita una publicación pública. Las operaciones de actualización/reversión y respaldo descritas arriba siguen vigentes.
+
+El WAR corresponde a otro modo: desplegar dentro de un Tomcat instalado por separado. No es la opción elegida. [Documentación oficial de Spring Boot](https://docs.spring.io/spring-boot/3.5/how-to/deployment/traditional-deployment.html).

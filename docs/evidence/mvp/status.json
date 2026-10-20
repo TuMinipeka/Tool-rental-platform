@@ -1,40 +1,41 @@
 {
-  "updatedAt": "2026-10-20T20:10:58.035304+00:00",
-  "state": "locally-validated-provider-acceptance-pending",
-  "validatedSourceCommit": "0692c3111f966c169d41ed4faf0ef2953a2d8dab",
+  "updatedAt": "2026-10-20T20:36:39.454115+00:00",
+  "state": "validated-locally-public-deployment-pending",
+  "validatedSourceCommit": "8dfab3f54a62893ff95f5c5eccfa912ae447bac7",
   "condeReference": "981a16e",
-  "sourceFingerprint": "8451f65c1caf7aad0532181dfbc364b132008d335e78105eb4b0dc94dbc3c760",
+  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
   "localValidation": {
     "mavenPostgres": true,
     "frontendLintBuild": true,
     "browserTests": true,
     "realRoleViews": true,
-    "officialGatewayAdapterWithIsolatedDoubles": true,
     "passwordRecoveryDisabled": true,
     "showcaseSecurityWithoutSmtp": true,
     "backupRestoreAndPersistence": true,
     "dataMinimums": true,
-    "composeConfiguration": true
+    "composeConfiguration": true,
+    "fictionalPaymentAndRentalLifecycle": true,
+    "embeddedTomcat": true
   },
   "publicReleaseGates": {
     "oracleCapacity": false,
     "dnsAndHttps": false,
-    "officialSandboxAccepted": false,
     "passwordRecoveryDisabled": true,
     "realRoleJourneys": false,
     "credentialsProvisioned": false,
     "offsiteBackupAndRestore": false,
-    "armRuntimeValidated": false
+    "armRuntimeValidated": false,
+    "fictionalPaymentValidated": true
   },
   "limitations": [
-    "Private Mercado Pago test seller credentials and authentic HTTPS callbacks not supplied; only isolated gateway doubles exercised",
     "No Oracle account/capacity or DuckDNS configuration supplied",
     "Public target evaluator credentials not provisioned",
     "No external backup destination supplied; fresh local restore passed",
     "ARM64 base manifests verified previously; Oracle ARM runtime not exercised"
   ],
   "approvedScopeChanges": [
-    "PayPal deferred",
-    "Public email, password recovery and reset deferred; endpoints and UI disabled, no SMTP requirement"
+    "Fictional academic payment replaces official provider requirement",
+    "Embedded Apache Tomcat selected",
+    "PayPal, email and recovery deferred"
   ]
 }

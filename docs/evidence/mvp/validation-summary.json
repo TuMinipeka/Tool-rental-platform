@@ -1,12 +1,12 @@
 {
-  "recordedAt": "2026-10-20T20:10:58.035304+00:00",
-  "validatedSourceCommit": "0692c3111f966c169d41ed4faf0ef2953a2d8dab",
+  "recordedAt": "2026-10-20T20:36:39.454115+00:00",
+  "validatedSourceCommit": "8dfab3f54a62893ff95f5c5eccfa912ae447bac7",
   "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
-  "sourceFingerprint": "8451f65c1caf7aad0532181dfbc364b132008d335e78105eb4b0dc94dbc3c760",
+  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
   "maven": {
     "command": ".\\mvnw.cmd clean verify",
     "java": "21.0.12.1",
-    "finishedAt": "2026-10-20T15:03:32-05:00",
+    "finishedAt": "2026-10-20T15:28:57-05:00",
     "result": "BUILD SUCCESS",
     "suites": [
       {
@@ -115,6 +115,13 @@
         "skipped": 0
       },
       {
+        "suite": "com.toolrental.infrastructure.FictionalPaymentIntegrationTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
         "suite": "com.toolrental.infrastructure.FlywayUpgradeIntegrationTest",
         "tests": 1,
         "failures": 0,
@@ -172,12 +179,12 @@
       }
     ],
     "totals": {
-      "tests": 100,
+      "tests": 105,
       "failures": 0,
       "errors": 0,
       "skipped": 0
     },
-    "logSha256": "839584434e1585a19faccbc24cf99104168711f637689e3c053c9ed36725203b"
+    "logSha256": "31bbef50fc04f1732f760330621db672b5c8799552d63824931115efc87d48e5"
   },
   "frontend": {
     "commands": [
@@ -185,22 +192,22 @@
       "npm run build",
       "npm run test:e2e"
     ],
-    "passed": 78,
+    "passed": 82,
     "failed": 0,
     "skipped": 2,
-    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, hosted redirect and untrusted return parameters",
-    "logSha256": "79cad7f79253e10b576f9da076c31b1edf19606179d864c23d62475fc1dd00cb"
+    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, fictional approval/decline and disabled recovery",
+    "logSha256": "8e30e6a41b32b3c696e8bd60e34d42678ed069fced264e8faa8b987318f46ac4"
   },
   "integration": {
-    "command": "node frontend/scripts/verify-hosted-mvp.mjs",
-    "passed": 21,
-    "scope": "Real isolated frontend/backend/PostgreSQL; no API mocks; external checkout acceptance unavailable without credentials",
-    "evidence": "hosted-integration.json"
+    "command": "node frontend/scripts/verify-fictional-mvp.mjs",
+    "passed": 19,
+    "scope": "Real isolated React/backend/PostgreSQL; fictional approval, decline, invoice and complete rental lifecycle; no API mocks or external financial calls",
+    "evidence": "fictional-integration.json"
   },
   "security": {
     "command": "node scripts/verify-showcase.mjs",
-    "passed": 17,
-    "scope": "Private production+showcase profile without SMTP; no public HTTPS or external payment acceptance",
+    "passed": 18,
+    "scope": "Private production+showcase without SMTP or payment credentials; session cookies, roles, disabled legacy routes and recovery",
     "evidence": "secure-profile.json"
   },
   "operationalCommands": [
@@ -209,18 +216,17 @@
     "node scripts/verify-configuration.mjs"
   ],
   "localImages": {
-    "tool-rental-mvp-backend:working": "sha256:1706e501ecb04aa865d100ec1819e5f59a14f016291ab71a975f02d0f6e43072",
-    "tool-rental-mvp-frontend:working": "sha256:f2175aa0e65cab5f612240ec6ddf5402a69ab592fdfd41b297cf980186f12f21"
+    "tool-rental-mvp-backend:working": "sha256:ef2eb6622bfd74cf0cde96380547bdc08b4de22938a83a87af3e7323d632eb9f",
+    "tool-rental-mvp-frontend:working": "sha256:722d971bd63820843f7fb7669de3ab1ab13b60eed131e0cf21f7c689b6d3ab4a"
   },
   "publicDeploymentPerformed": false,
-  "officialProviderAcceptancePassed": false,
   "privateConfiguration": {
-    "path": ".env.mercadopago.local",
+    "path": ".env.validation",
     "gitIgnored": true,
-    "credentialsSupplied": false
+    "scope": "Local isolated fictitious data only; public target uses private .env.showcase"
   },
   "scopeDecisions": {
-    "provider": "Mercado Pago Checkout Pro",
+    "provider": "Persistent fictional academic gateway",
     "currency": "COP",
     "liveCharges": false,
     "paypal": "deferred",
@@ -234,6 +240,19 @@
     {
       "evidence": "arm-manifests.json",
       "scope": "Base image architecture manifests; no Oracle ARM runtime acceptance"
+    },
+    {
+      "evidence": "hosted-integration.json",
+      "scope": "Previous external-provider preparation; superseded by fictional payment scope"
     }
-  ]
+  ],
+  "tomcat": {
+    "command": "node scripts/verify-tomcat.mjs",
+    "serverVersion": "Apache Tomcat/10.1.55",
+    "mode": "embedded executable JAR",
+    "internalPort": 8080,
+    "databaseConnected": true,
+    "evidence": "tomcat-runtime.json"
+  },
+  "externalPaymentCredentialsRequired": false
 }

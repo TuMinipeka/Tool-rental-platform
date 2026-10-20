@@ -1,0 +1,14 @@
+{
+  "testedAt": "2026-10-20T20:33:55.080Z",
+  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
+  "entrypoint": [
+    "java",
+    "-jar",
+    "infrastructure-0.1.0-SNAPSHOT.jar"
+  ],
+  "serverVersion": "Server version: Apache Tomcat/10.1.55",
+  "internalPort": 8080,
+  "databaseConnected": true,
+  "standaloneWarRequired": false,
+  "publicDeploymentPerformed": false
+}

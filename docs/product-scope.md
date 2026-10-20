@@ -1,6 +1,6 @@
 # Alcance del producto
 
-> Alcance vigente del MVP: Mercado Pago Checkout Pro en COP; PayPal y correo aplazados. Recuperación oculta y deshabilitada. El resto de este documento también describe producto futuro; consulta [MVP](mvp.md) para aceptación actual.
+> Alcance vigente del MVP: pasarela ficticia persistente en COP; PayPal y correo aplazados. Recuperación oculta y deshabilitada. El resto de este documento también describe producto futuro; consulta [MVP](mvp.md) para aceptación actual.
 
 ## Propósito
 
@@ -142,3 +142,7 @@ Estos documentos orientan una simulación académica y no sustituyen asesoría l
 ## Decisión de alcance del MVP — 20 de octubre de 2026
 
 Para el cierre académico se selecciona Mercado Pago Checkout Pro en COP, exclusivamente con cuentas oficiales de prueba. PayPal y correo se aplazan, incluida recuperación y restablecimiento de contraseña: quedan ocultos y deshabilitados. Esta decisión sustituye los requisitos anteriores de esos medios para el MVP; no elimina capacidades del producto futuro. El adaptador oficial requiere aceptación con credenciales y webhook auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
+
+## Decisión posterior del MVP — pasarela ficticia
+
+Daniel sustituye la exigencia de Mercado Pago/sandbox oficial por una pasarela ficticia para acelerar la publicación académica. No requiere cuentas externas ni mueve dinero. La aprobación/rechazo es explícita, autenticada, persistida y sometida a las reglas de reserva. Se confirma Apache Tomcat integrado en el JAR de Spring Boot. Esta decisión prevalece sobre las menciones anteriores a proveedores oficiales; una pasarela real permanece como producto futuro.

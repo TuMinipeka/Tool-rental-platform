@@ -13,7 +13,7 @@
 ## Pendientes antes de producción
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
-2. Validar el adaptador Mercado Pago Checkout Pro con cuentas oficiales de prueba, callback HTTPS auténtico y conciliación; no confundir pruebas aisladas con aceptación externa.
+2. MVP: validar pasarela ficticia, aprobación/rechazo y comprobante contra PostgreSQL. La integración de una pasarela real queda fuera del cierre académico por decisión de Daniel.
 3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
 4. Fuera del MVP: recuperación por SMTP, reputación del dominio, plantillas y telemetría; mantener la función oculta y deshabilitada.
 5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.

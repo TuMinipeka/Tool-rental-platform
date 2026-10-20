@@ -25,10 +25,10 @@ El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módu
 | --- | --- | --- |
 | Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación y CSRF; recuperación deshabilitada en el MVP | MFA y proveedores de identidad externos |
 | Reservas | Retención atómica con vencimiento, confirmación automática, cancelación, entrega, devolución, extensión y mora | Optimización logística avanzada |
-| Dinero | Mercado Pago Checkout Pro en COP, conciliación, comprobante académico y reembolso tardío; aceptación externa pendiente | Cobros reales, PayPal e impuestos definitivos |
+| Dinero | Pasarela ficticia COP, aprobación/rechazo, comprobante académico y reembolso ficticio idempotente | Cobros reales, PayPal e impuestos definitivos |
 | Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway hasta V304 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway hasta V305 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -74,15 +74,16 @@ $env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
 $env:DB_USERNAME = 'tool_rental'
 $env:DB_PASSWORD = '<secret>'
 $env:JWT_SECRET = '<mínimo-32-bytes>'
-$env:MERCADOPAGO_ACCESS_TOKEN = '<private-test-seller-token>'
-$env:MERCADOPAGO_COLLECTOR_ID = '<test-seller-id>'
-$env:MERCADOPAGO_WEBHOOK_SECRET = '<private-webhook-secret>'
-$env:PAYMENTS_PUBLIC_URL = 'https://app.example'
+$env:PAYMENT_PROVIDER = 'fictional'
 $env:CORS_ALLOWED_ORIGINS = 'https://app.example'
 .\mvnw.cmd -pl infrastructure -am spring-boot:run
 ```
 
 No actives los perfiles `local,demo` sobre datos reales. Las credenciales se suministran mediante variables o un gestor de secretos.
+
+## Apache Tomcat integrado
+
+El backend se empaqueta como JAR ejecutable. `java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar` inicia Spring Boot y su Apache Tomcat integrado en el puerto 8080. El Dockerfile ejecuta ese mismo comando con Java 21; no se instala otro Tomcat ni se usa un WAR. Caddy recibe HTTPS y dirige la API al Tomcat privado. Consulta [el procedimiento de despliegue](docs/deployment.md#apache-tomcat-integrado).
 
 ## Arquitectura
 
@@ -154,7 +155,7 @@ Rutas principales:
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
 - `GET /api/v1/public/features`: capacidades vigentes; recuperación deshabilitada.
 - `POST /api/v1/auth/supplier-registration` y activación administrativa del usuario.
-- `POST /api/v1/payments/checkouts`, checkout oficial alojado, webhook Mercado Pago y descarga del comprobante académico.
+- `POST /api/v1/payments/checkouts`, checkout ficticio y decisión autenticada y descarga del comprobante académico.
 - `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.
 - `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.
 - `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
@@ -165,9 +166,9 @@ La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en 
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout oficial en payments.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos ficticios persistidos.
 
-Consulta [pagos del MVP](docs/mercadopago-mvp.md): configuración privada, retorno, conciliación y aceptación externa pendiente. PayPal y correo están aplazados por decisión de alcance.
+Consulta [pagos del MVP](docs/fictional-payments.md): simulación explícita, retorno, permisos y persistencia sin claves externas. PayPal y correo están aplazados por decisión de alcance.
 
 Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 

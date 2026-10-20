@@ -99,6 +99,8 @@ erDiagram
         integer checkout_attempts
         timestamp_with_time_zone checkout_lease_until
         timestamp_with_time_zone checkout_retry_at
+        character_varying fictional_outcome
+        boolean fictional_refunded
     }
     refunds {
         uuid refund_id PK

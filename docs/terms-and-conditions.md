@@ -4,7 +4,7 @@
 
 | Campo | Valor |
 | --- | --- |
-| Versión del documento | `0.1-draft` |
+| Versión del documento | `0.2-draft` |
 | Fecha de publicación | No publicado |
 | Fecha de entrada en vigencia | No aplica hasta su publicación |
 | Operador de la plataforma | `[LEGAL_NAME_OR_ACADEMIC_PROJECT_NAME]` |
@@ -66,15 +66,9 @@ Los documentos del ambiente actual son simulaciones y deben mostrar `Simulación
 
 ## 7. Pagos simulados
 
-La plataforma simula pagos con tarjeta débito, tarjeta crédito y PayPal. Visa y Mastercard pueden mostrarse como redes simuladas. El proyecto no está afiliado a esas marcas ni transmite pagos reales.
+El MVP ofrece una pasarela ficticia por el importe total de la reserva. El cliente autenticado puede elegir aprobar o rechazar una operación de prueba. El backend comprueba propiedad, vencimiento y disponibilidad, conserva la decisión y evita comprobantes duplicados.
 
-El esquema de cobro es:
-
-1. 50% del total mostrado cuando el proveedor confirma la reserva.
-2. 50% restante cuando termina el alquiler y se acepta la devolución.
-3. Ajustes discriminados por extensiones aprobadas, daños, pérdidas, reembolsos o correcciones.
-
-La plataforma no guarda números completos de tarjeta ni CVV. Utiliza tokens simulados y metadatos limitados como red, últimos cuatro dígitos y expiración.
+No se contactan bancos ni proveedores financieros ni se mueve dinero. No se solicitan PAN, CVV, contraseñas de PayPal ni otros datos bancarios. Los comprobantes y reembolsos son académicos. Los ajustes posteriores se muestran por separado.
 
 ## 8. Plan Opcional de Protección por Daños
 
@@ -145,7 +139,7 @@ Los cambios materiales crean una nueva versión. La plataforma conserva versione
 
 | Versión | Estado | Resumen |
 | --- | --- | --- |
-| `0.1-draft` | Borrador académico | Alcance inicial de reservas, pagos simulados, IVA, protección opcional, daños, datos personales y canales del consumidor. |
+| `0.2-draft` | Borrador académico | Alcance inicial de reservas, pagos simulados, IVA, protección opcional, daños, datos personales y canales del consumidor. |
 
 ## Referencias oficiales
 

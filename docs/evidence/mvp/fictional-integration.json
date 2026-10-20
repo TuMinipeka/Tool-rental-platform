@@ -1,0 +1,84 @@
+{
+  "testedAt": "2026-10-20T20:33:52.730Z",
+  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
+  "scope": "Real isolated React, Spring Boot/Tomcat and PostgreSQL; fictional payment; no API mocks or external financial calls",
+  "checks": [
+    {
+      "name": "Tomcat/backend and PostgreSQL are reachable",
+      "passed": true
+    },
+    {
+      "name": "Fictional checkout works without external credentials",
+      "passed": true
+    },
+    {
+      "name": "Recovery remains disabled",
+      "passed": true
+    },
+    {
+      "name": "Three real roles authenticate",
+      "passed": true
+    },
+    {
+      "name": "One inclusive day costs the server total of 25000 COP",
+      "passed": true
+    },
+    {
+      "name": "An overlapping payment hold is rejected",
+      "passed": true
+    },
+    {
+      "name": "Browser opens the fictional checkout without requesting card data",
+      "passed": true
+    },
+    {
+      "name": "Supplier cannot decide a customer payment",
+      "passed": true
+    },
+    {
+      "name": "Fictional approval confirms the real persisted reservation",
+      "passed": true
+    },
+    {
+      "name": "Repeated fictional approval creates only one academic invoice",
+      "passed": true
+    },
+    {
+      "name": "Academic document is downloadable and carries a DIAN disclaimer",
+      "passed": true
+    },
+    {
+      "name": "Supplier completes real delivery, rental, return and closure after fictional payment",
+      "passed": true
+    },
+    {
+      "name": "Fictional rejection releases the held equipment unit",
+      "passed": true
+    },
+    {
+      "name": "Supplier report is sourced from the backend",
+      "passed": true
+    },
+    {
+      "name": "Administrator can read actual users",
+      "passed": true
+    },
+    {
+      "name": "Customer is denied administrative users",
+      "passed": true
+    },
+    {
+      "name": "Web storage contains no access tokens",
+      "passed": true
+    },
+    {
+      "name": "Web storage contains no access tokens",
+      "passed": true
+    },
+    {
+      "name": "Web storage contains no access tokens",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

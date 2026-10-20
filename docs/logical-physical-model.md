@@ -38,6 +38,6 @@ El render usa Mermaid 11.12.0 y Chrome mediante Playwright; requiere conexión p
 
 V210 hace que invoices.reservation_id referencie reservations, no rentals. El webhook aprobado emite la factura académica antes de iniciar el alquiler. Existe como máximo una factura por reserva; sus líneas e instantáneas siguen siendo históricas. El diagrama relacional exportado refleja la FK real; las ilustraciones conceptuales históricas no sustituyen el DDL vigente.
 
-## Ampliación V304
+## Ampliación V304–V305
 
-El DDL, Mermaid, SVG y PNG se regeneraron desde la base aislada con V304: 25 tablas, 148 restricciones y 66 índices. Las ocho columnas del checkout pertenecen a payments; no se añaden relaciones ni contextos. La tabla de migraciones demo contiene 57 versiones aplicadas.
+El DDL, Mermaid, SVG y PNG se regeneraron desde la base aislada con V305: 25 tablas, 149 restricciones y 66 índices. Las columnas del checkout y de las decisiones ficticias pertenecen a payments; no se añaden relaciones ni contextos. La tabla de migraciones demo contiene 58 versiones aplicadas.

@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict WNnMPodbNZlFavVovtrsOdHD96JhhWMSLghx5WB8qXVWOouk7AkLVVKvTFajJWN
+\restrict n0ezQvhcgNERzD10MfeMweOc5rf37fcNZtShsq7TPAB6xiQKF2qbZsb9qbX1b8l
 
 -- Dumped from database version 17.11
 -- Dumped by pg_dump version 17.11
@@ -256,10 +256,13 @@ CREATE TABLE public.payments (
     checkout_attempts integer DEFAULT 0 NOT NULL,
     checkout_lease_until timestamp with time zone,
     checkout_retry_at timestamp with time zone,
+    fictional_outcome character varying(20),
+    fictional_refunded boolean DEFAULT false NOT NULL,
     CONSTRAINT ck_payments_adjustment_reference CHECK (((((payment_stage)::text = 'ADJUSTMENT'::text) AND (adjustment_type IS NOT NULL) AND (adjustment_reference IS NOT NULL)) OR (((payment_stage)::text <> 'ADJUSTMENT'::text) AND (adjustment_type IS NULL) AND (adjustment_reference IS NULL)))),
     CONSTRAINT ck_payments_amount_positive CHECK ((amount > (0)::numeric)),
     CONSTRAINT ck_payments_card_details CHECK (((((payment_method)::text = ANY ((ARRAY['CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying])::text[])) AND ((card_network)::text = ANY ((ARRAY['VISA'::character varying, 'MASTERCARD'::character varying])::text[])) AND ((card_last_four)::text ~ '^[0-9]{4}$'::text) AND ((card_expiry_month >= 1) AND (card_expiry_month <= 12)) AND (card_expiry_year >= 2026)) OR (((payment_method)::text = ANY ((ARRAY['PAYPAL'::character varying, 'ADMINISTRATIVE'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[])) AND (card_network IS NULL) AND (card_last_four IS NULL) AND (card_expiry_month IS NULL) AND (card_expiry_year IS NULL)))),
-    CONSTRAINT ck_payments_checkout CHECK (((checkout_phase IS NULL) OR (((processor)::text = 'MERCADO_PAGO'::text) AND (checkout_expires_at IS NOT NULL) AND ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying, 'REFUNDED'::character varying, 'DONE'::character varying, 'REJECTED'::character varying])::text[]))))),
+    CONSTRAINT ck_payments_checkout CHECK (((checkout_phase IS NULL) OR (((processor)::text = ANY ((ARRAY['MERCADO_PAGO'::character varying, 'FICTIONAL_GATEWAY'::character varying])::text[])) AND (checkout_expires_at IS NOT NULL) AND ((checkout_phase)::text = ANY ((ARRAY['CREATING'::character varying, 'READY'::character varying, 'REVIEW'::character varying, 'REFUND_PENDING'::character varying, 'REFUNDED'::character varying, 'DONE'::character varying, 'REJECTED'::character varying])::text[]))))),
+    CONSTRAINT ck_payments_fictional_outcome CHECK ((((fictional_outcome IS NULL) OR (((processor)::text = 'FICTIONAL_GATEWAY'::text) AND ((fictional_outcome)::text = ANY ((ARRAY['APPROVED'::character varying, 'DECLINED'::character varying])::text[])))) AND ((NOT fictional_refunded) OR (((processor)::text = 'FICTIONAL_GATEWAY'::text) AND ((fictional_outcome)::text = 'APPROVED'::text))))),
     CONSTRAINT ck_payments_method CHECK (((payment_method)::text = ANY ((ARRAY['ADMINISTRATIVE'::character varying, 'CREDIT_CARD'::character varying, 'DEBIT_CARD'::character varying, 'PAYPAL'::character varying, 'HOSTED_CHECKOUT'::character varying])::text[]))),
     CONSTRAINT ck_payments_processor_not_blank CHECK ((btrim((processor)::text) <> ''::text)),
     CONSTRAINT ck_payments_reference_not_blank CHECK ((btrim((external_reference)::text) <> ''::text)),
@@ -1029,7 +1032,7 @@ CREATE UNIQUE INDEX ux_payments_confirmed_stage ON public.payments USING btree (
 -- Name: ux_payments_hosted_reservation; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX ux_payments_hosted_reservation ON public.payments USING btree (reservation_id) WHERE (((processor)::text = 'MERCADO_PAGO'::text) AND ((payment_stage)::text = 'FULL_PAYMENT'::text));
+CREATE UNIQUE INDEX ux_payments_hosted_reservation ON public.payments USING btree (reservation_id) WHERE (((processor)::text = ANY ((ARRAY['MERCADO_PAGO'::character varying, 'FICTIONAL_GATEWAY'::character varying])::text[])) AND ((payment_stage)::text = 'FULL_PAYMENT'::text));
 
 
 --
@@ -1326,4 +1329,4 @@ ALTER TABLE ONLY public.user_sessions
 -- PostgreSQL database dump complete
 --
 
-\unrestrict WNnMPodbNZlFavVovtrsOdHD96JhhWMSLghx5WB8qXVWOouk7AkLVVKvTFajJWN
+\unrestrict n0ezQvhcgNERzD10MfeMweOc5rf37fcNZtShsq7TPAB6xiQKF2qbZsb9qbX1b8l
