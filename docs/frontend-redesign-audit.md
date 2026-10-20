@@ -102,6 +102,7 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - El registro público crea exclusivamente cuentas de cliente conforme al contrato actual. Solicita nombre, correo, contraseña de 12 caracteres, confirmación, tipo y número de documento, además de aceptación explícita de los Términos y Condiciones.
 - La opción de proveedor conduce al proceso autorizado de `/publicar`; no muestra ni envía teléfono, nacimiento, datos bancarios, archivos o información empresarial que el endpoint público todavía no admite.
 - Ambas rutas usan la referencia como dirección visual, conservan la identidad existente y se reorganizan en una sola columna en móvil sin desplazamiento horizontal.
+- Los accesos protegidos, incluida la continuación de una cotización, redirigen a estas rutas públicas mediante `returnTo`. El cambio entre login y registro conserva el destino y ya no expone el modal de autenticación heredado.
 - Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La comprobación manual cubrió navegación, visibilidad de contraseña, rechazo local de contraseñas distintas y propagación del error real cuando el backend no está levantado.
 
 ### Método de pago académico
