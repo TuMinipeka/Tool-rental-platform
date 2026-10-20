@@ -54,7 +54,7 @@ public class PaymentController {
     this.webhookVerifier = webhookVerifier;
   }
 
-  @PostMapping("/checkouts")
+  @PostMapping("/internal/checkouts")
   @ResponseStatus(HttpStatus.CREATED)
   public PaymentResponse createCheckout(
       Principal principal,

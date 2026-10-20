@@ -74,6 +74,17 @@ public final class Refund extends AggregateRoot {
         id, paymentId, terminationId, amount, status, idempotencyKey, recordedAt, confirmedAt);
   }
 
+  public Refund confirm(Instant now) {
+    if (status.equals("CONFIRMED")) return this;
+    if (!status.equals("PENDING"))
+      throw new BusinessRuleException("Only a pending refund can be confirmed");
+    var result =
+        new Refund(
+            id, paymentId, terminationId, amount, "CONFIRMED", idempotencyKey, recordedAt, now);
+    result.recordEvent(new RefundChanged(id, now));
+    return result;
+  }
+
   public RefundId id() {
     return id;
   }

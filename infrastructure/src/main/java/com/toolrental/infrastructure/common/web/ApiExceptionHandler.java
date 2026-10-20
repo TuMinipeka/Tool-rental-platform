@@ -56,6 +56,13 @@ public class ApiExceptionHandler {
     return problem(HttpStatus.CONFLICT, "IDEMPOTENCY_CONFLICT", ex.getMessage(), request);
   }
 
+  @ExceptionHandler(
+      com.toolrental.infrastructure.payment.exception.PaymentGatewayInfrastructureException.class)
+  ResponseEntity<ProblemDetail> gateway(RuntimeException ex, HttpServletRequest request) {
+    return problem(
+        HttpStatus.SERVICE_UNAVAILABLE, "PAYMENT_PROVIDER_UNAVAILABLE", ex.getMessage(), request);
+  }
+
   @ExceptionHandler(ApplicationException.class)
   ResponseEntity<ProblemDetail> missing(RuntimeException ex, HttpServletRequest request) {
     return problem(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage(), request);

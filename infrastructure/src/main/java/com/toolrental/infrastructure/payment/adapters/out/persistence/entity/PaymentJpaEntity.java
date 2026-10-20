@@ -63,6 +63,31 @@ public class PaymentJpaEntity {
   @Column(name = "adjustment_reference")
   private UUID adjustmentReference;
 
+  // Checkout orchestration writes use the atomic JDBC adapter; JPA must preserve these columns.
+  @Column(name = "checkout_expires_at", insertable = false, updatable = false)
+  private Instant checkoutExpiresAt;
+
+  @Column(name = "checkout_preference_id", insertable = false, updatable = false, length = 200)
+  private String checkoutPreferenceId;
+
+  @Column(name = "checkout_url", insertable = false, updatable = false, length = 2000)
+  private String checkoutUrl;
+
+  @Column(name = "provider_payment_id", insertable = false, updatable = false, length = 200)
+  private String providerPaymentId;
+
+  @Column(name = "checkout_phase", insertable = false, updatable = false, length = 30)
+  private String checkoutPhase;
+
+  @Column(name = "checkout_attempts", insertable = false, updatable = false)
+  private int checkoutAttempts;
+
+  @Column(name = "checkout_lease_until", insertable = false, updatable = false)
+  private Instant checkoutLeaseUntil;
+
+  @Column(name = "checkout_retry_at", insertable = false, updatable = false)
+  private Instant checkoutRetryAt;
+
   protected PaymentJpaEntity() {}
 
   public PaymentJpaEntity(

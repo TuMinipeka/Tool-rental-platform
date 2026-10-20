@@ -1,3 +1,4 @@
+import { useFeatures } from './lib/features.js'
 import { createPointerMotion } from './lib/pointerMotion.js'
 import { AsyncBoundary } from './components/AsyncBoundary.jsx'
 import { heroImageSizes, heroImageSource, imageAttributes } from './lib/responsiveImages.js'
@@ -15,6 +16,7 @@ import { navigate } from './lib/navigation.js'
 import { money } from './lib/format.js'
 import { serviceLocations } from './lib/locations.js'
 
+const PaymentReturnPage = lazy(() => import('./pages/PaymentReturnPage.jsx').then(module => ({ default: module.PaymentReturnPage })))
 const TermsAndConditionsPage = lazy(() => import('./TermsAndConditionsPage.jsx'))
 const loadAccountPages = () => import('./pages/AccountPages.jsx')
 const PasswordResetPage = lazy(() => loadAccountPages().then(module => ({ default: module.PasswordResetPage })))
@@ -117,6 +119,7 @@ function ToolDetailPage({id,onReserve,catalogTools,dataMode}){const tool=catalog
 
 
 function App(){
+  const { passwordRecovery } = useFeatures()
   const [path,setPath]=useState(window.location.pathname)
   const [session,setSession]=useState(readSession())
   const [authOpen,setAuthOpen]=useState(false)
@@ -213,7 +216,8 @@ function App(){
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
   else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
-  else if(path==='/password-reset')page=<PasswordResetPage/>
+  else if(path==='/password-reset')page=passwordRecovery?<PasswordResetPage/>:<EmptyState title="Recuperación no disponible" text="La recuperación de contraseña está fuera de esta entrega del MVP." action={()=>navigate('/login')} actionText="Volver al ingreso"/>
+  else if(path==='/payment-return')page=<PaymentReturnPage session={session}/>
   else if(path==='/login')page=<AuthPage mode="login" onAuthenticated={login}/>
   else if(path==='/registro/proveedor')page=<AuthPage mode="supplier" onAuthenticated={login}/>
   else if(path==='/registro')page=<AuthPage mode="register" onAuthenticated={login}/>

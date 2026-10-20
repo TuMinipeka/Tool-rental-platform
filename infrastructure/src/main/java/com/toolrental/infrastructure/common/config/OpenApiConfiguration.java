@@ -33,7 +33,31 @@ public class OpenApiConfiguration {
   }
 
   @Bean
-  OpenApiCustomizer onlyVersionOnePaths() {
-    return openApi -> openApi.getPaths().keySet().removeIf(path -> !path.startsWith("/api/v1/"));
+  OpenApiCustomizer onlyVersionOnePaths(
+      @org.springframework.beans.factory.annotation.Value("${auth.password-recovery.enabled:false}")
+          boolean recovery,
+      @org.springframework.beans.factory.annotation.Value("${payments.internal-enabled:false}")
+          boolean internal) {
+    return openApi -> {
+      openApi
+          .getPaths()
+          .keySet()
+          .removeIf(
+              path ->
+                  !path.startsWith("/api/v1/")
+                      || (!recovery
+                          && (path.endsWith("/auth/password-recovery")
+                              || path.endsWith("/auth/password-reset")))
+                      || (!internal
+                          && (path.contains("/payments/sandbox/")
+                              || path.contains("/payments/internal/")
+                              || path.endsWith("/payments/simulations"))));
+      if (!internal) {
+        var base = openApi.getPaths().get("/api/v1/payments");
+        if (base != null) base.setPost(null);
+        var status = openApi.getPaths().get("/api/v1/payments/{id}/status");
+        if (status != null) status.setPatch(null);
+      }
+    };
   }
 }

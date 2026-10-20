@@ -12,6 +12,7 @@ import com.toolrental.domain.payment.model.valueobject.PaymentId;
 import com.toolrental.domain.payment.port.repository.PaymentRepository;
 import com.toolrental.domain.rental.model.valueobject.RentalId;
 import com.toolrental.domain.rental.port.repository.RentalRepository;
+import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -104,9 +105,7 @@ public final class SimulatePaymentUseCase {
         });
   }
 
-  private void validateStage(
-      String stage,
-      com.toolrental.domain.reservation.model.valueobject.ReservationId reservationId) {
+  private void validateStage(String stage, ReservationId reservationId) {
     if (!Set.of("FIRST_HALF", "FINAL_HALF").contains(stage))
       throw new BusinessRuleException("Invalid payment stage");
     if (payments.hasConfirmedStage(reservationId, stage))

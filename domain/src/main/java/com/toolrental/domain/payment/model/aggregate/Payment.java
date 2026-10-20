@@ -69,8 +69,8 @@ public final class Payment extends AggregateRoot {
     if (("CONFIRMED".equals(paymentStatus) || "REFUNDED".equals(paymentStatus))
         && confirmedAt == null)
       throw new BusinessRuleException("Confirmed payment requires confirmation time");
-    if (!Set.of("ADMINISTRATIVE", "CREDIT_CARD", "DEBIT_CARD", "PAYPAL").contains(paymentMethod))
-      throw new BusinessRuleException("Invalid payment method");
+    if (!Set.of("ADMINISTRATIVE", "CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "HOSTED_CHECKOUT")
+        .contains(paymentMethod)) throw new BusinessRuleException("Invalid payment method");
     if (!Set.of("ADMINISTRATIVE", "FIRST_HALF", "FINAL_HALF", "FULL_PAYMENT", "ADJUSTMENT")
         .contains(paymentStage)) throw new BusinessRuleException("Invalid payment stage");
     if (idempotencyKey == null || idempotencyKey.isBlank() || idempotencyKey.length() > 200)
@@ -299,6 +299,35 @@ public final class Payment extends AggregateRoot {
     return result;
   }
 
+  public static Payment hostedCheckout(
+      PaymentId id,
+      ReservationId reservationId,
+      BigDecimal amount,
+      String idempotencyKey,
+      Clock clock) {
+    var result =
+        new Payment(
+            id,
+            reservationId,
+            "MERCADO_PAGO",
+            id.value().toString(),
+            amount,
+            "PENDING",
+            Instant.now(clock),
+            null,
+            "HOSTED_CHECKOUT",
+            "FULL_PAYMENT",
+            idempotencyKey,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null);
+    result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
+    return result;
+  }
+
   public PaymentId id() {
     return id;
   }
@@ -396,6 +425,32 @@ public final class Payment extends AggregateRoot {
             adjustmentType,
             adjustmentReference);
     result.recordEvent(new PaymentChanged(id, now));
+    return result;
+  }
+
+  public Payment settleHostedApproval(Clock clock) {
+    if (!processor.equals("MERCADO_PAGO") || !Set.of("PENDING", "FAILED").contains(paymentStatus))
+      throw new BusinessRuleException("Invalid hosted approval");
+    var result =
+        new Payment(
+            id,
+            reservationId,
+            processor,
+            externalReference,
+            amount,
+            "CONFIRMED",
+            recordedAt,
+            Instant.now(clock),
+            paymentMethod,
+            paymentStage,
+            idempotencyKey,
+            cardNetwork,
+            cardLastFour,
+            cardExpiryMonth,
+            cardExpiryYear,
+            adjustmentType,
+            adjustmentReference);
+    result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
     return result;
   }
 

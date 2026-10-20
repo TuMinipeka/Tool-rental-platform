@@ -37,7 +37,7 @@ function toApiError(response, payload) {
   const message =
     payload?.message ||
     payload?.detail ||
-    `La operación no pudo completarse (${response.status}).`
+    `La operaciÃ³n no pudo completarse (${response.status}).`
   return new ApiError(message, response.status, payload)
 }
 
@@ -49,7 +49,7 @@ async function fetchApi(path, options = {}) {
     })
   } catch (cause) {
     throw new ApiError(
-      'No fue posible conectar con el servicio. Revisa que el backend esté activo.',
+      'No fue posible conectar con el servicio. Revisa que el backend estÃ© activo.',
       0,
       cause,
     )
@@ -187,8 +187,10 @@ export const api = {
       { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
       { authenticated: true })
   },
+  features() { return request('/public/features', {}) },
+  checkout(id) { return request('/payments/checkouts/' + encodeURIComponent(id), {}, { authenticated: true }) },
   createCheckout(reservationId, idempotencyKey) {
-    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId, paymentMethod: 'PAYPAL' }) }, { authenticated: true })
+    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId }) }, { authenticated: true })
   },
   invoiceDocument(id) { return request('/invoices/' + encodeURIComponent(id) + '/document', {}, { authenticated: true, responseType: 'text' }) },
   operationalReport(kind, from, to) { return request('/reports/' + kind + '?' + new URLSearchParams({ from, to }), {}, { authenticated: true }) },
@@ -257,9 +259,9 @@ export function normalizeCatalogTool(tool, index = 0) {
     stock: tool.operationalUnitCount,
     color: colors[index % colors.length],
     accent: demoMode
-      ? 'Demostración'
+      ? 'DemostraciÃ³n'
       : tool.operationalUnitCount > 0
-        ? 'Catálogo real'
+        ? 'CatÃ¡logo real'
         : 'Sin existencias',
     description: tool.description,
     imageUrl: tool.imageUrls?.[0] || null,

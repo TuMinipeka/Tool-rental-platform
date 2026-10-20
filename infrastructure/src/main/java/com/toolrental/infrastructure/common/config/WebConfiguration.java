@@ -20,6 +20,8 @@ public class WebConfiguration implements WebMvcConfigurer {
         .excludePathPatterns(
             "/api/auth/**",
             "/api/public/**",
+            "/api/payments/mercadopago/webhooks",
+            "/api/v1/payments/mercadopago/webhooks",
             "/api/payments/sandbox/webhooks",
             "/api/v1/auth/**",
             "/api/v1/public/**",
