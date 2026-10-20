@@ -8,7 +8,7 @@ Tool Rental Platform es una simulación universitaria realista de un mercado col
 
 La fase 0 define el contrato del producto. Una capacidad descrita aquí no está implementada hasta que el estado del repositorio lo indique expresamente.
 
-Estado académico actual: el backend ya implementa retención atómica, vencimiento, checkout interno idempotente, webhook HMAC, confirmación automática, comprobante descargable y reportes por rol. La integración con una pasarela sandbox oficial externa, los impuestos definitivos y la facturación electrónica siguen fuera del estado implementado.
+Estado académico actual: el backend implementa retención atómica, vencimiento, pasarela ficticia persistente e idempotente, confirmación automática, comprobante descargable y reportes por rol. Los recorridos de cliente, proveedor y administrador se verifican con [Playwright CLI](browser-verification.md). La pasarela oficial externa, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
 
 ## Actores confirmados
 
@@ -141,7 +141,7 @@ Estos documentos orientan una simulación académica y no sustituyen asesoría l
 
 ## Decisión de alcance del MVP — 20 de octubre de 2026
 
-Para el cierre académico se selecciona Mercado Pago Checkout Pro en COP, exclusivamente con cuentas oficiales de prueba. PayPal y correo se aplazan, incluida recuperación y restablecimiento de contraseña: quedan ocultos y deshabilitados. Esta decisión sustituye los requisitos anteriores de esos medios para el MVP; no elimina capacidades del producto futuro. El adaptador oficial requiere aceptación con credenciales y webhook auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
+**Decisión histórica sustituida por la siguiente sección:** se había seleccionado Mercado Pago Checkout Pro en COP, exclusivamente con cuentas oficiales de prueba. PayPal y correo se aplazan, incluida recuperación y restablecimiento de contraseña: quedan ocultos y deshabilitados. Esta decisión sustituye los requisitos anteriores de esos medios para el MVP; no elimina capacidades del producto futuro. El adaptador oficial requiere aceptación con credenciales y webhook auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
 
 ## Decisión posterior del MVP — pasarela ficticia
 

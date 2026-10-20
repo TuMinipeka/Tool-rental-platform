@@ -47,4 +47,6 @@ Se confirma el uso de **Apache Tomcat integrado en Spring Boot**, desplegado com
 
 Las pruebas y capturas de esta revisión se registran en [validación](validation-report.md). Las referencias anteriores a Mercado Pago, credenciales de vendedor y aceptación de callback ya no bloquean este MVP. Continúan pendientes los requisitos del servidor público que aún no se hayan verificado.
 
-Validación local concluida: **105 pruebas Java, 82 de navegador y dos omisiones previstas por dispositivo; 19 comprobaciones del recorrido real y 18 del perfil seguro**. Se verificaron Tomcat 10.1.55, JDBC, V305 y restauración local. El destino público conserva los bloqueos externos del checklist.
+Validación local concluida: **105 pruebas Java, 88 de navegador y dos omisiones previstas por dispositivo; 91 comprobaciones del recorrido real con Playwright CLI y 18 del perfil seguro**. Se verificaron Tomcat 10.1.55, JDBC, V305 y restauración local. El destino público conserva los bloqueos externos del checklist.
+
+La [verificación por roles](browser-verification.md) documenta acciones de cliente, proveedor y administrador, contratos REST y limitaciones. El [README](../README.md#funcionamiento-verificado-con-playwright-cli) contiene capturas del recorrido. Se corrigieron el reinicio de formularios del proveedor y el token CSRF desactualizado al cerrar sesión.

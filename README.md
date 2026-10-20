@@ -17,6 +17,108 @@
 [Despliegue reproducible](docs/deployment.md) · [Contratos por rol](docs/integration-contracts.md) · [Modelo relacional y físico](docs/logical-physical-model.md) · [Evidencias](docs/validation-report.md)
 
 
+## Funcionamiento verificado con Playwright CLI
+
+Recorridos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. Las cuentas, herramientas, documentos e importes mostrados son datos académicos. El pago es ficticio: no se introducen tarjetas ni se mueve dinero.
+
+| Perfil | Acciones verificadas |
+| --- | --- |
+| Cliente | Registro, consulta y búsqueda del catálogo, cotización, reserva, aprobación/rechazo del pago, cancelación, descarga de comprobante, renovación y cierre de sesión |
+| Proveedor | Registro sujeto a activación, publicación y unidades propias, entrega, alquiler, devolución y cierre; cinco reportes con alcance autorizado |
+| Administrador | Consulta operativa, activación y desactivación de proveedores; revocación inmediata del acceso al desactivar |
+| Contratos REST adicionales | Extensiones, daños y valoración, retracto en revisión, reembolsos registrados, políticas, tarifas y consultas administrativas |
+
+La [matriz de verificación](docs/browser-verification.md) distingue interfaz, REST y pruebas automatizadas; incluye límites y pasos para repetir el recorrido. Los resultados y las huellas de las imágenes están en [la evidencia JSON](docs/evidence/mvp/role-workflows.json).
+
+### Cliente: reserva y pago académico
+
+**Cotización de un día con recogida por el cliente.** El servidor valida disponibilidad y calcula el importe final.
+
+![Cotización del cliente con fechas y tarifa de 25.000 COP](docs/evidence/mvp/screenshots/qa-customer-quote.png)
+
+**Pasarela ficticia.** El cliente propietario puede simular aprobación o rechazo; otros usuarios reciben acceso denegado.
+
+![Pasarela ficticia con importe persistido y opciones de aprobación o rechazo](docs/evidence/mvp/screenshots/qa-fictional-checkout.png)
+
+**Aprobación persistida.** Repetir la decisión conserva un solo comprobante; una decisión contradictoria devuelve conflicto.
+
+![Pago ficticio aprobado y reserva confirmada por el backend](docs/evidence/mvp/screenshots/qa-payment-approved.png)
+
+### Proveedor: operación y reportes
+
+**Alquiler completado.** Se programó y completó la entrega, se inició el alquiler y se registró la devolución antes de cerrarlo.
+
+![Reserva del proveedor con entrega completada, devolución registrada y alquiler cerrado](docs/evidence/mvp/screenshots/qa-supplier-completed-rental.png)
+
+**Reporte consultado en el backend.** El ingreso reservado no se presenta como margen contable.
+
+![Reporte de ingresos por moneda con datos reales de la base aislada](docs/evidence/mvp/screenshots/qa-supplier-report.png)
+
+### Administrador: permisos y activación
+
+**Proveedor activado por administración.** El registro inicial queda suspendido; la baja posterior revoca su sesión.
+
+![Cuenta de proveedor activada mediante el panel administrativo](docs/evidence/mvp/screenshots/qa-admin-supplier-activation.png)
+
+<details>
+<summary>Más evidencias: catálogo, inventario, rechazo, comprobante y acceso restringido</summary>
+
+**Búsqueda de una publicación persistida.**
+
+![Catálogo filtrado por la herramienta creada durante la prueba](docs/evidence/mvp/screenshots/qa-catalog-search.png)
+
+**Herramienta publicada por el proveedor y registro de su unidad física.**
+
+![Publicación creada desde el formulario del proveedor](docs/evidence/mvp/screenshots/qa-supplier-publication.png)
+
+![Formulario de unidad física después de guardar correctamente](docs/evidence/mvp/screenshots/qa-supplier-equipment.png)
+
+**Rechazo del pago ficticio.** La prueba comprobó después que la unidad podía reservarse nuevamente.
+
+![Resultado rechazado del pago ficticio](docs/evidence/mvp/screenshots/qa-payment-declined.png)
+
+**Comprobante descargado.** Documento académico, sin validez fiscal ante la DIAN.
+
+![Contenido del comprobante generado por el backend y descargado por el cliente](docs/evidence/mvp/screenshots/qa-academic-invoice.png)
+
+**Cliente sin autorización administrativa.**
+
+![Acceso al panel administrativo denegado para un cliente](docs/evidence/mvp/screenshots/qa-customer-admin-denied.png)
+
+**Catálogo en móvil.**
+
+![Catálogo filtrado en una pantalla móvil sin desbordamiento horizontal](docs/evidence/mvp/screenshots/qa-mobile-catalog.png)
+
+**Catálogo público completo y cuenta nueva sin reservas.**
+
+![Catálogo público conectado al backend](docs/evidence/mvp/screenshots/qa-public-catalog.png)
+
+![Cuenta de cliente recién registrada y sin reservas](docs/evidence/mvp/screenshots/qa-customer-empty-account.png)
+
+**Reserva y comprobante en la cuenta del cliente.**
+
+![Reserva pendiente de pago con importe registrado en el servidor](docs/evidence/mvp/screenshots/qa-customer-reservation.png)
+
+![Listado de comprobantes académicos con descarga autorizada](docs/evidence/mvp/screenshots/qa-customer-invoice.png)
+
+![Reserva cancelada desde la cuenta del cliente](docs/evidence/mvp/screenshots/qa-customer-cancellation.png)
+
+**Publicación y solicitud de incorporación del proveedor.**
+
+![Formulario del proveedor después de guardar una herramienta](docs/evidence/mvp/screenshots/qa-supplier-inventory.png)
+
+![Solicitud de proveedor recibida y pendiente de activación](docs/evidence/mvp/screenshots/qa-supplier-registration.png)
+
+**Administración y rechazo de acceso.**
+
+![Usuarios consultados en el panel administrativo](docs/evidence/mvp/screenshots/qa-admin-dashboard.png)
+
+![Cuenta de proveedor desactivada y sin acceso operativo](docs/evidence/mvp/screenshots/qa-admin-account-disabled.png)
+
+![Ingreso rechazado al introducir una contraseña incorrecta](docs/evidence/mvp/screenshots/qa-login-error.png)
+
+</details>
+
 ## Estado actual
 
 El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módulos Maven conservan las dependencias hacia dentro: `infrastructure → application → domain`. El modelo contiene **25 tablas y 25 contextos organizativos**; las transacciones coordinan las reglas que atraviesan reservas, pagos, sesiones, devoluciones y reembolsos.

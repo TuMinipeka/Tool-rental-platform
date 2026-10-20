@@ -1,0 +1,528 @@
+{
+  "testedAt": "2026-10-20T21:22:29.646Z",
+  "tool": "Playwright CLI via npx playwright cli",
+  "scope": "Real isolated React, Spring Boot and PostgreSQL; no API mocks",
+  "checks": [
+    {
+      "name": "Public catalog contains real tools",
+      "passed": true
+    },
+    {
+      "name": "Anonymous administrative request returns 401",
+      "passed": true
+    },
+    {
+      "name": "Three roles login through real forms",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot list users",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot create equipment",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads real users",
+      "passed": true
+    },
+    {
+      "name": "Supplier creates a tool through real UI",
+      "passed": true
+    },
+    {
+      "name": "Successful tool form has no misleading error",
+      "passed": true
+    },
+    {
+      "name": "Supplier registers physical unit through real UI",
+      "passed": true
+    },
+    {
+      "name": "Successful unit form has no misleading error",
+      "passed": true
+    },
+    {
+      "name": "Required terms consent is not preselected",
+      "passed": true
+    },
+    {
+      "name": "Customer self-registration grants only CUSTOMER",
+      "passed": true
+    },
+    {
+      "name": "Registered customer session survives direct tool URL navigation",
+      "passed": true
+    },
+    {
+      "name": "Customer creates reservation through catalog and quote",
+      "passed": true
+    },
+    {
+      "name": "Inclusive one-day server price is COP 25000",
+      "passed": true
+    },
+    {
+      "name": "Overlapping held unit returns 409",
+      "passed": true
+    },
+    {
+      "name": "Duplicated reservation unit returns 400 or 409",
+      "passed": true
+    },
+    {
+      "name": "Fictional checkout does not request bank or card data",
+      "passed": true
+    },
+    {
+      "name": "Another customer cannot decide payment",
+      "passed": true
+    },
+    {
+      "name": "Supplier cannot decide payment",
+      "passed": true
+    },
+    {
+      "name": "UI approval confirms persisted reservation",
+      "passed": true
+    },
+    {
+      "name": "Contradictory payment decision returns 409",
+      "passed": true
+    },
+    {
+      "name": "Duplicate approval issues a single academic invoice",
+      "passed": true
+    },
+    {
+      "name": "Customer downloads academic invoice through UI",
+      "passed": true
+    },
+    {
+      "name": "Invoice is explicitly academic and not DIAN",
+      "passed": true
+    },
+    {
+      "name": "Customer requests extension at frozen tariff via REST",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot approve own extension",
+      "passed": true
+    },
+    {
+      "name": "Supplier approves extension atomically via REST",
+      "passed": true
+    },
+    {
+      "name": "Extension preserves original date and updates effective date",
+      "passed": true
+    },
+    {
+      "name": "On-time return has no late fee",
+      "passed": true
+    },
+    {
+      "name": "Supplier registers damage only after return via REST",
+      "passed": true
+    },
+    {
+      "name": "Supplier records explicit damage assessment via REST",
+      "passed": true
+    },
+    {
+      "name": "Supplier completes delivery, rental, return and closure through UI",
+      "passed": true
+    },
+    {
+      "name": "Supplier report income loads real data",
+      "passed": true
+    },
+    {
+      "name": "Supplier report most-rented-tools loads real data",
+      "passed": true
+    },
+    {
+      "name": "Supplier report frequent-customers loads real data",
+      "passed": true
+    },
+    {
+      "name": "Supplier report availability loads real data",
+      "passed": true
+    },
+    {
+      "name": "Supplier report profitability loads real data",
+      "passed": true
+    },
+    {
+      "name": "Declined payment releases held unit",
+      "passed": true
+    },
+    {
+      "name": "Customer cancels unpaid reservation through UI",
+      "passed": true
+    },
+    {
+      "name": "No-show cannot be declared before grace period",
+      "passed": true
+    },
+    {
+      "name": "Supplier failure requires recorded failed delivery",
+      "passed": true
+    },
+    {
+      "name": "Withdrawal enters review without penalty",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot resolve administrative withdrawal",
+      "passed": true
+    },
+    {
+      "name": "Administrator rejection restores confirmed reservation",
+      "passed": true
+    },
+    {
+      "name": "Confirmed cancellation over 48 hours refunds full paid amount",
+      "passed": true
+    },
+    {
+      "name": "Repeated commercial cancellation creates one refund ledger entry",
+      "passed": true
+    },
+    {
+      "name": "Refund ledger does not claim a bank transfer",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot read another customer refund",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /users via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /roles via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /user-roles via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /customers via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /suppliers via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /categories via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /tools via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /tool-images via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /equipment-units via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /reservations via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /reservation-items via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /rentals via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /unit-deliveries via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /unit-returns via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /damage-reports via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /payments via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /invoices via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /invoice-items via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /reservation-terminations via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /commercial-configuration/cancellation-policies via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Administrator reads /commercial-configuration/delivery-rates via authorized REST",
+      "passed": true
+    },
+    {
+      "name": "Session listing exposes an authenticated list",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI advertises only versioned API and omits recovery",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot enter administrative UI",
+      "passed": true
+    },
+    {
+      "name": "Supplier registration is suspended without issuing a session",
+      "passed": true
+    },
+    {
+      "name": "Suspended supplier cannot authenticate",
+      "passed": true
+    },
+    {
+      "name": "Administrator activates supplier through real UI",
+      "passed": true
+    },
+    {
+      "name": "Activated supplier dashboard shows only own empty inventory",
+      "passed": true
+    },
+    {
+      "name": "Other supplier cannot edit owner publication",
+      "passed": true
+    },
+    {
+      "name": "Administrator deactivation immediately revokes supplier token",
+      "passed": true
+    },
+    {
+      "name": "Incorrect password is rejected",
+      "passed": true
+    },
+    {
+      "name": "Forgot-password control is hidden",
+      "passed": true
+    },
+    {
+      "name": "Catalog search locates persisted supplier publication",
+      "passed": true
+    },
+    {
+      "name": "Mobile catalog has no horizontal overflow",
+      "passed": true
+    },
+    {
+      "name": "Recovery endpoint is disabled",
+      "passed": true
+    },
+    {
+      "name": "Legacy simulation endpoint is disabled",
+      "passed": true
+    },
+    {
+      "name": "Customer remains active before reload after unrelated account deactivation",
+      "passed": true
+    },
+    {
+      "name": "Refresh cookie restores customer session after reload",
+      "passed": true
+    },
+    {
+      "name": "Access token is not stored in web storage",
+      "passed": true
+    },
+    {
+      "name": "Logout is accepted by server with current CSRF token",
+      "passed": true
+    },
+    {
+      "name": "Logout revokes previous access token",
+      "passed": true
+    },
+    {
+      "name": "No uncaught application JavaScript errors during role workflows",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "qa-public-catalog.png",
+      "sha256": "424c4a730f7bf505b917860b15bd3769468d1f2b6364a41e41f0796b8e63ced4",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-supplier-inventory.png",
+      "sha256": "abdfd429546bebf396a4bdb705adb91dc144db7f6d1f1ff4ab34f85395982221",
+      "width": 474,
+      "height": 757
+    },
+    {
+      "filename": "qa-supplier-publication.png",
+      "sha256": "d737ebaa0b4f2bbdb633494cdd4307cd48d3b5eba6094bdc067baf7acbd92749",
+      "width": 787,
+      "height": 118
+    },
+    {
+      "filename": "qa-supplier-equipment.png",
+      "sha256": "778b7ba48f75169fb15906d7000fd3ddcc4868dd45cb202a8e4d725b199a49a8",
+      "width": 474,
+      "height": 583
+    },
+    {
+      "filename": "qa-customer-empty-account.png",
+      "sha256": "66cbc33db3875a417936964bea12ce815046db5279c9123d1b4eba53441f8a07",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-customer-quote.png",
+      "sha256": "9eaa1650199bfe55d25f6e46cc52b96c7c92f12c3f108f4a979228ea751c414c",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-customer-reservation.png",
+      "sha256": "a1f372b148595301c864dd9590b37241cd978262081452347ec902d83eaac225",
+      "width": 926,
+      "height": 753
+    },
+    {
+      "filename": "qa-fictional-checkout.png",
+      "sha256": "2cf52120a2718c32b0db74afcbe551b16c847800ec5429f596750524f52f8271",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-payment-approved.png",
+      "sha256": "56f9c540cf16f659caa6929469ba3e571f44d586ab0309ecc98c0d3040eee2cd",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-customer-invoice.png",
+      "sha256": "d9e8fdfbb9819b4b1835292dae074d0b93badd8e425b04fa079c9b6a2b02c9e1",
+      "width": 926,
+      "height": 780
+    },
+    {
+      "filename": "qa-academic-invoice.png",
+      "sha256": "f8aecce7a910e557293f609f14311c03c8c7aadcc6f849ad714942f90684a5fe",
+      "width": 1424,
+      "height": 275
+    },
+    {
+      "filename": "qa-supplier-completed-rental.png",
+      "sha256": "2f936e365fe3b644722abcabc96ec7794db453fcdd1952eba663763c2c455594",
+      "width": 1278,
+      "height": 305
+    },
+    {
+      "filename": "qa-supplier-report.png",
+      "sha256": "2035ae4e668e317c3b5c3ecce9ebdf5b512bfc5649ba73b0f650952c14f3ffba",
+      "width": 1280,
+      "height": 355
+    },
+    {
+      "filename": "qa-payment-declined.png",
+      "sha256": "7e9897561f3acf9c3b3d9117d02eabca69742363d30f64fbad2501cec39b41ef",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-customer-cancellation.png",
+      "sha256": "b2cb7f90e2d71bd88deaed3176b9d51826c8e25d0615cfad381444fb2c31280b",
+      "width": 924,
+      "height": 121
+    },
+    {
+      "filename": "qa-customer-admin-denied.png",
+      "sha256": "c52da24453da348addd7995673e762254d5a02961a07ea28d575baf918d56273",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-admin-dashboard.png",
+      "sha256": "2d72259e7c1c87f565590e58905f2b5801199988b05a26fafe059d47ced4b3cc",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-supplier-registration.png",
+      "sha256": "6693eb15143ce717fc3408d42c013f11a41aeac4999042c6d70a64d361630e16",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-admin-supplier-activation.png",
+      "sha256": "21c253652d4ca4883485d6f2dfc45f434b57f524b4bca1efe1765748d606f692",
+      "width": 756,
+      "height": 118
+    },
+    {
+      "filename": "qa-admin-account-disabled.png",
+      "sha256": "c6f43ace7c5d465ed0f610dd37495fc4e456be7d33c7ad25a541572e93a33fd6",
+      "width": 756,
+      "height": 118
+    },
+    {
+      "filename": "qa-login-error.png",
+      "sha256": "216993bc116a395897b91f9fbfd036372024a8a4e745fed2b7bbc5621c42ca4e",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-catalog-search.png",
+      "sha256": "55717b692d2517522bd3262a63f3f206d1af51a87f649609f7d1120f769d3a47",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "filename": "qa-mobile-catalog.png",
+      "sha256": "51f9b8cb09c74629a6a3522762468b66691229f5923da8cf4dd64dcb203e2d84",
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "failures": [],
+  "fixture": {
+    "toolId": "fae7dbba-534b-4fe9-9c21-b073d79a66e2",
+    "unitId": "63b1d84b-9520-402c-a7ac-eaa268cca182",
+    "name": "QA Taladro 1792531349646",
+    "nonce": "1792531349646"
+  },
+  "refreshDiagnostics": [
+    {
+      "status": 200,
+      "code": null
+    }
+  ],
+  "completed": true,
+  "sourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
+  "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
+  "publicDeploymentPerformed": false
+}

@@ -1,12 +1,12 @@
 {
-  "recordedAt": "2026-10-20T20:36:39.454115+00:00",
-  "validatedSourceCommit": "8dfab3f54a62893ff95f5c5eccfa912ae447bac7",
+  "recordedAt": "2026-10-20T21:24:57.539005+00:00",
+  "validatedSourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
   "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
-  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
+  "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
   "maven": {
     "command": ".\\mvnw.cmd clean verify",
     "java": "21.0.12.1",
-    "finishedAt": "2026-10-20T15:28:57-05:00",
+    "finishedAt": "2026-10-20T16:06:24-05:00",
     "result": "BUILD SUCCESS",
     "suites": [
       {
@@ -184,7 +184,7 @@
       "errors": 0,
       "skipped": 0
     },
-    "logSha256": "31bbef50fc04f1732f760330621db672b5c8799552d63824931115efc87d48e5"
+    "logSha256": "65764fce6d4027156e10ff5102bb8129e7c6e3f1d708a0c543c2139e8b0f4fc9"
   },
   "frontend": {
     "commands": [
@@ -192,17 +192,19 @@
       "npm run build",
       "npm run test:e2e"
     ],
-    "passed": 82,
+    "passed": 88,
     "failed": 0,
     "skipped": 2,
-    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, fictional approval/decline and disabled recovery",
-    "logSha256": "8e30e6a41b32b3c696e8bd60e34d42678ed069fced264e8faa8b987318f46ac4"
+    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, supplier forms and CSRF renewal on logout after login/refresh",
+    "logSha256": "8682baa8f9c4a9d2e20bb3974bcee65e0234122cb914568e3ff10b15c681187e"
   },
   "integration": {
-    "command": "node frontend/scripts/verify-fictional-mvp.mjs",
-    "passed": 19,
-    "scope": "Real isolated React/backend/PostgreSQL; fictional approval, decline, invoice and complete rental lifecycle; no API mocks or external financial calls",
-    "evidence": "fictional-integration.json"
+    "command": "node frontend/scripts/verify-role-workflows.mjs",
+    "passed": 91,
+    "screenshots": 23,
+    "scope": "Real isolated React, Spring Boot and PostgreSQL; no API mocks",
+    "evidence": "role-workflows.json",
+    "authRateLimitUnchanged": true
   },
   "security": {
     "command": "node scripts/verify-showcase.mjs",
@@ -217,7 +219,7 @@
   ],
   "localImages": {
     "tool-rental-mvp-backend:working": "sha256:ef2eb6622bfd74cf0cde96380547bdc08b4de22938a83a87af3e7323d632eb9f",
-    "tool-rental-mvp-frontend:working": "sha256:722d971bd63820843f7fb7669de3ab1ab13b60eed131e0cf21f7c689b6d3ab4a"
+    "tool-rental-mvp-frontend:working": "sha256:b97e991f8c672e086776242ff67a5cf9cd997124c6e6c80f3776f149a9e1682e"
   },
   "publicDeploymentPerformed": false,
   "privateConfiguration": {
@@ -254,5 +256,10 @@
     "databaseConnected": true,
     "evidence": "tomcat-runtime.json"
   },
-  "externalPaymentCredentialsRequired": false
+  "externalPaymentCredentialsRequired": false,
+  "previousIntegrationEvidence": {
+    "evidence": "fictional-integration.json",
+    "passed": 19,
+    "scope": "Earlier subset of the real fictional payment and rental lifecycle"
+  }
 }

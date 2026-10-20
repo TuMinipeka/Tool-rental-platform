@@ -61,10 +61,14 @@ npm run test:e2e
 npm run dev
 ```
 
-`npm ci` respeta el lockfile; `build` produce `frontend/dist`. Vite sirve desarrollo en 5173. La base consume `/api/v1`, mantiene el access token en memoria y usa la cookie refresh con CSRF; los paneles operativos completos continúan pendientes.
+`npm ci` respeta el lockfile; `build` produce `frontend/dist`. Vite sirve desarrollo en 5173. La base consume `/api/v1`, mantiene el access token en memoria y usa la cookie refresh con CSRF; los paneles consumen los contratos disponibles del backend; la cobertura y los límites están en la verificación por roles.
 
 Las pruebas E2E requieren Chrome y utilizan respuestas API de prueba sin mutar la base. El procedimiento de Lighthouse, axe, capturas, memoria y entrega Nginx está en [rendimiento y accesibilidad](frontend-quality.md). Sus informes se generan fuera de `dist` y del contexto Docker.
 
 ## Evidencia y límites
 
 Consulta el [reporte de validación](validation-report.md). Empaquetar con `-DskipTests` no acredita persistencia, concurrencia ni preparación de producción.
+
+## Recorridos contra la aplicación real
+
+Con la composición aislada activa, ejecuta desde la raíz `node frontend/scripts/verify-role-workflows.mjs`. Usa Playwright CLI, crea datos académicos y registra capturas verificables. Consulta [la matriz por roles y contratos](browser-verification.md) antes de ejecutarlo. Estas pruebas se complementan con la suite de frontend aislada; no son intercambiables.

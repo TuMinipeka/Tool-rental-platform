@@ -1,9 +1,9 @@
 {
-  "updatedAt": "2026-10-20T20:36:39.454115+00:00",
+  "updatedAt": "2026-10-20T21:24:57.539005+00:00",
   "state": "validated-locally-public-deployment-pending",
-  "validatedSourceCommit": "8dfab3f54a62893ff95f5c5eccfa912ae447bac7",
+  "validatedSourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
   "condeReference": "981a16e",
-  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
+  "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
   "localValidation": {
     "mavenPostgres": true,
     "frontendLintBuild": true,
@@ -15,7 +15,10 @@
     "dataMinimums": true,
     "composeConfiguration": true,
     "fictionalPaymentAndRentalLifecycle": true,
-    "embeddedTomcat": true
+    "embeddedTomcat": true,
+    "browserRoleWorkflows": true,
+    "serverLogoutRevocation": true,
+    "supplierFormsAfterPersistence": true
   },
   "publicReleaseGates": {
     "oracleCapacity": false,
