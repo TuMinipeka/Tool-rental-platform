@@ -4,10 +4,12 @@ import com.toolrental.application.common.service.WorkflowReferences;
 import com.toolrental.application.invoice.usecase.IssueAcademicInvoiceUseCase;
 import com.toolrental.application.payment.usecase.CreateSandboxCheckoutUseCase;
 import com.toolrental.application.payment.usecase.ManagePaymentUseCase;
+import com.toolrental.application.payment.usecase.OperationalReportUseCase;
 import com.toolrental.application.payment.usecase.ProcessSandboxWebhookUseCase;
 import com.toolrental.application.payment.usecase.SimulatePaymentUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
+import com.toolrental.domain.payment.port.OperationalReportingPort;
 import com.toolrental.domain.payment.port.repository.PaymentRepository;
 import com.toolrental.domain.rental.port.repository.RentalRepository;
 import java.time.Clock;
@@ -16,6 +18,12 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 public class PaymentBeanConfiguration {
+  @Bean
+  OperationalReportUseCase operationalReportUseCase(
+      OperationalReportingPort reports, AccessPolicy access, UnitOfWork work, Clock clock) {
+    return new OperationalReportUseCase(reports, access, work, clock);
+  }
+
   @Bean
   SimulatePaymentUseCase simulatePaymentUseCase(
       PaymentRepository payments,

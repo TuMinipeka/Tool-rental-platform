@@ -332,7 +332,50 @@ class PostgresIntegrationTest {
             header()
                 .string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
         .andExpect(
-            content().string(org.hamcrest.Matchers.containsString("Simulaci&oacute;n acad&eacute;mica")));
+            content()
+                .string(
+                    org.hamcrest.Matchers.containsString("Simulaci&oacute;n acad&eacute;mica")));
+  }
+
+  @Test
+  void operationalReportsExposeRealDataWithinRoleScope() throws Exception {
+    var reservationId = pending();
+    confirm.execute(reservationId, new SupplierId(supplier));
+    db.update(
+        """
+        insert into payments (
+          payment_id, reservation_id, processor, external_reference, amount, payment_status,
+          recorded_at, confirmed_at, payment_method, payment_stage, idempotency_key
+        ) values (?, ?, 'ACADEMIC_TEST', ?, 20, 'CONFIRMED', now(), now(),
+                  'ADMINISTRATIVE', 'ADMINISTRATIVE', ?)
+        """,
+        UUID.randomUUID(),
+        reservationId.value(),
+        "report-payment-" + reservationId.value(),
+        "report-idempotency-" + reservationId.value());
+
+    var today = LocalDate.now(ZoneId.of("America/Bogota"));
+    var period = "?from=" + today.minusDays(1) + "&to=" + today.plusDays(3);
+    var income = call(supplier, get("/api/reports/income" + period), null, 200);
+    assertThat(income.get(0).get("grossIncome").decimalValue()).isEqualByComparingTo("20");
+    assertThat(income.get(0).get("netIncome").decimalValue()).isEqualByComparingTo("20");
+
+    var mostRented = call(supplier, get("/api/reports/most-rented-tools" + period), null, 200);
+    assertThat(mostRented.get(0).get("toolId").asText()).isEqualTo(tool.toString());
+    assertThat(mostRented.get(0).get("reservationCount").asLong()).isEqualTo(1);
+    assertThat(mostRented.get(0).get("bookedRevenue").decimalValue()).isEqualByComparingTo("20");
+
+    var customers = call(supplier, get("/api/reports/frequent-customers" + period), null, 200);
+    assertThat(customers.get(0).get("customerId").asText()).isEqualTo(customer.toString());
+
+    var availability = call(supplier, get("/api/reports/availability" + period), null, 200);
+    assertThat(availability.get(0).get("reservedUnits").asLong()).isEqualTo(1);
+    assertThat(availability.get(0).get("availableUnits").asLong()).isZero();
+
+    var profitability = call(supplier, get("/api/reports/profitability" + period), null, 200);
+    assertThat(profitability.get(0).get("bookedRevenue").decimalValue()).isEqualByComparingTo("20");
+    call(admin, get("/api/reports/income" + period + "&supplierId=" + supplier), null, 200);
+    call(customer, get("/api/reports/income" + period), null, 403);
   }
 
   String sandboxSignature(String timestamp, String eventId, String reference, String outcome)
