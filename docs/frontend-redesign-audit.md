@@ -102,3 +102,13 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - La opción de proveedor conduce al proceso autorizado de `/publicar`; no muestra ni envía teléfono, nacimiento, datos bancarios, archivos o información empresarial que el endpoint público todavía no admite.
 - Ambas rutas usan la referencia como dirección visual, conservan la identidad existente y se reorganizan en una sola columna en móvil sin desplazamiento horizontal.
 - Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La comprobación manual cubrió navegación, visibilidad de contraseña, rechazo local de contraseñas distintas y propagación del error real cuando el backend no está levantado.
+
+### Método de pago académico
+
+- `/pago` adopta la composición de la referencia: hero técnico, progreso del proceso, selector de método, captura mínima y resumen de la reserva.
+- La pantalla ofrece únicamente los métodos admitidos por el contrato vigente: tarjeta de crédito, tarjeta débito y PayPal, todos identificados como simulación académica.
+- Para tarjetas solo solicita red, últimos cuatro dígitos y vencimiento. No solicita ni conserva número completo, CVV o credenciales externas; PayPal tampoco presenta un inicio de sesión ficticio.
+- El resumen usa la herramienta, fechas, duración y subtotal de la cotización activa. Registra la primera mitad del valor base y mantiene entrega e impuestos como pendientes de cálculo.
+- La acción permanece deshabilitada hasta completar los campos aplicables y aceptar expresamente el carácter simulado de la operación. El envío continúa integrado con `POST /api/v1/payments/simulations` cuando existe una reserva persistida.
+- Sin una cotización activa se muestra un estado vacío que conduce al catálogo, en vez de fabricar una reserva. PSE, cupones, reseñas y garantías no acreditadas de la imagen de referencia se excluyeron por no existir en el contrato actual.
+- Validación ejecutada: `npm run lint` y `npm run build`, ambos correctos. La revisión manual cubrió tarjeta, PayPal, habilitación de la acción y vistas de `1680 × 945` y `390 × 844`, sin desplazamiento horizontal.
