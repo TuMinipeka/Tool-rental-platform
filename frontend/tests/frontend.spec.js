@@ -360,3 +360,35 @@ for (const [outcome, status, label] of [['APPROVED', 'DONE', 'Pago ficticio apro
     expect(decisions).toEqual([{ outcome }])
   })
 }
+
+
+test('supplier tool and equipment forms reset only after successful persistence', async ({ page }) => {
+  await mockApi(page, { roles: ['SUPPLIER'] })
+  await page.route('**/api/v1/categories', route => route.fulfill({ json: [{ id: 'qa-category', name: 'QA Category' }] }))
+  const tools = []
+  await page.route('**/api/v1/tools', async route => {
+    if (route.request().method() === 'POST') {
+      const body = route.request().postDataJSON()
+      tools.push({ ...body, id: 'qa-tool', dailyRate: { amount: body.dailyRate, currency: body.currency } })
+      await route.fulfill({ status: 201, json: tools[0] })
+    } else await route.fulfill({ json: tools })
+  })
+  await page.route('**/api/v1/equipment-units', route => route.fulfill({ json: route.request().method() === 'POST' ? { id: 'qa-unit', ...route.request().postDataJSON() } : [] }))
+  await page.goto('/panel/proveedor')
+  await login(page)
+  const form = page.locator('.operations-form form')
+  await form.locator('[name=categoryId]').selectOption('qa-category')
+  await form.locator('[name=name]').fill('QA Drill')
+  await form.locator('[name=description]').fill('QA persisted inventory')
+  await form.locator('[name=dailyRate]').fill('25000')
+  await form.getByRole('button', { name: 'Guardar herramienta' }).click()
+  await expect(page.getByRole('heading', { name: 'QA Drill' })).toBeVisible()
+  await expect(form.locator('[name=name]')).toHaveValue('')
+  await expect(page.locator('main [role=alert]')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Registrar unidad', exact: true }).first().click()
+  await form.locator('[name=toolId]').selectOption('qa-tool')
+  await form.locator('[name=inventoryCode]').fill('QA-CODE')
+  await form.getByRole('button', { name: 'Registrar unidad', exact: true }).click()
+  await expect(form.locator('[name=inventoryCode]')).toHaveValue('')
+  await expect(page.locator('main [role=alert]')).toHaveCount(0)
+})
