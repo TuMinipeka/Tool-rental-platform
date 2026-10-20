@@ -87,7 +87,8 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 
 ### Catálogo y Cómo funciona — referencias adicionales
 
-- `/catalogo` reproduce la composición de la referencia adicional: hero técnico oscuro, buscador flotante, filtros laterales, cuadrícula de cinco columnas en escritorio y paginación funcional.
+- `/catalogo` reproduce la composición de la referencia adicional: hero técnico oscuro, buscador flotante, filtros laterales, cuadrícula de cuatro columnas en escritorio y paginación funcional.
+- La cuadrícula de escritorio se amplió a cuatro columnas para priorizar la lectura del nombre, precio y fotografía de cada herramienta. El hero reserva una zona independiente para texto e imagen y mantiene el buscador fuera del contenido editorial, sin superposiciones.
 - Las 29 imágenes entregadas en `infrastructure/src/main/resources/images` se exponen como recursos estáticos del frontend; el registro 29 conserva el recurso visual existente porque el archivo `29` no está presente en la carpeta de origen.
 - Las fotografías del catálogo usan encuadre contenido y espacio interior estable para mostrar herramientas completas sin recortes por zoom. El catálogo demostrativo permanece etiquetado y no añade reseñas, verificaciones ni disponibilidad ficticias.
 - `/como-funciona` reproduce la estructura editorial de la referencia adicional con hero dividido, cuatro pasos, beneficios verificables, perfiles de uso y CTA final. El texto sigue el flujo realmente implementado y declara el pago académico.
