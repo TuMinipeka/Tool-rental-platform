@@ -1,6 +1,8 @@
 package com.toolrental.infrastructure.invoice.config;
 
 import com.toolrental.application.common.service.WorkflowReferences;
+import com.toolrental.application.invoice.usecase.DownloadInvoiceUseCase;
+import com.toolrental.application.invoice.usecase.IssueAcademicInvoiceUseCase;
 import com.toolrental.application.invoice.usecase.ManageInvoiceUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
@@ -28,5 +30,24 @@ public class InvoiceBeanConfiguration {
       InvoiceItemRepository lines) {
     return new ManageInvoiceUseCase(
         repository, work, access, references, clock, rentals, customers, suppliers, lines);
+  }
+
+  @Bean
+  IssueAcademicInvoiceUseCase issueAcademicInvoiceUseCase(
+      InvoiceRepository invoices,
+      InvoiceItemRepository lines,
+      CustomerRepository customers,
+      SupplierRepository suppliers,
+      Clock clock) {
+    return new IssueAcademicInvoiceUseCase(invoices, lines, customers, suppliers, clock);
+  }
+
+  @Bean
+  DownloadInvoiceUseCase downloadInvoiceUseCase(
+      InvoiceRepository invoices,
+      InvoiceItemRepository lines,
+      WorkflowReferences references,
+      UnitOfWork work) {
+    return new DownloadInvoiceUseCase(invoices, lines, references, work);
   }
 }

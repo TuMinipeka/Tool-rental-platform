@@ -1,14 +1,21 @@
 package com.toolrental.infrastructure.payment.adapters.in.rest.controllers;
 
+import com.toolrental.application.payment.command.CreateSandboxCheckoutCommand;
+import com.toolrental.application.payment.command.ProcessSandboxWebhookCommand;
 import com.toolrental.application.payment.command.RegisterPaymentCommand;
 import com.toolrental.application.payment.command.SimulatePaymentCommand;
 import com.toolrental.application.payment.dto.PaymentResponse;
+import com.toolrental.application.payment.usecase.CreateSandboxCheckoutUseCase;
 import com.toolrental.application.payment.usecase.ManagePaymentUseCase;
+import com.toolrental.application.payment.usecase.ProcessSandboxWebhookUseCase;
 import com.toolrental.application.payment.usecase.SimulatePaymentUseCase;
 import com.toolrental.domain.payment.model.valueobject.PaymentId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.infrastructure.common.web.Actor;
+import com.toolrental.infrastructure.payment.adapters.in.rest.SandboxWebhookVerifier;
 import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.PaymentRequest;
+import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.SandboxCheckoutRequest;
+import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.SandboxWebhookRequest;
 import com.toolrental.infrastructure.payment.adapters.in.rest.dtos.SimulatedPaymentRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -20,6 +27,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,10 +37,50 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentController {
   private final ManagePaymentUseCase useCase;
   private final SimulatePaymentUseCase simulation;
+  private final CreateSandboxCheckoutUseCase checkout;
+  private final ProcessSandboxWebhookUseCase webhook;
+  private final SandboxWebhookVerifier webhookVerifier;
 
-  public PaymentController(ManagePaymentUseCase useCase, SimulatePaymentUseCase simulation) {
+  public PaymentController(
+      ManagePaymentUseCase useCase,
+      SimulatePaymentUseCase simulation,
+      CreateSandboxCheckoutUseCase checkout,
+      ProcessSandboxWebhookUseCase webhook,
+      SandboxWebhookVerifier webhookVerifier) {
     this.useCase = useCase;
     this.simulation = simulation;
+    this.checkout = checkout;
+    this.webhook = webhook;
+    this.webhookVerifier = webhookVerifier;
+  }
+
+  @PostMapping("/checkouts")
+  @ResponseStatus(HttpStatus.CREATED)
+  public PaymentResponse createCheckout(
+      Principal principal,
+      @RequestHeader("Idempotency-Key") String idempotencyKey,
+      @Valid @RequestBody SandboxCheckoutRequest request) {
+    return checkout.execute(
+        Actor.id(principal),
+        new CreateSandboxCheckoutCommand(
+            new ReservationId(request.reservationId()),
+            request.paymentMethod(),
+            idempotencyKey,
+            request.cardNetwork(),
+            request.cardLastFour(),
+            request.cardExpiryMonth(),
+            request.cardExpiryYear()));
+  }
+
+  @PostMapping("/sandbox/webhooks")
+  public PaymentResponse processWebhook(
+      @RequestHeader("X-Sandbox-Timestamp") String timestamp,
+      @RequestHeader("X-Sandbox-Signature") String signature,
+      @Valid @RequestBody SandboxWebhookRequest request) {
+    webhookVerifier.verify(timestamp, signature, request);
+    return webhook.execute(
+        new ProcessSandboxWebhookCommand(
+            request.eventId(), request.externalReference(), request.outcome()));
   }
 
   @PostMapping("/simulations")

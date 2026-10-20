@@ -1,7 +1,10 @@
 package com.toolrental.infrastructure.payment.config;
 
 import com.toolrental.application.common.service.WorkflowReferences;
+import com.toolrental.application.invoice.usecase.IssueAcademicInvoiceUseCase;
+import com.toolrental.application.payment.usecase.CreateSandboxCheckoutUseCase;
 import com.toolrental.application.payment.usecase.ManagePaymentUseCase;
+import com.toolrental.application.payment.usecase.ProcessSandboxWebhookUseCase;
 import com.toolrental.application.payment.usecase.SimulatePaymentUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
@@ -22,6 +25,26 @@ public class PaymentBeanConfiguration {
       UnitOfWork work,
       Clock clock) {
     return new SimulatePaymentUseCase(payments, rentals, references, access, work, clock);
+  }
+
+  @Bean
+  CreateSandboxCheckoutUseCase createSandboxCheckoutUseCase(
+      PaymentRepository payments,
+      WorkflowReferences references,
+      AccessPolicy access,
+      UnitOfWork work,
+      Clock clock) {
+    return new CreateSandboxCheckoutUseCase(payments, references, access, work, clock);
+  }
+
+  @Bean
+  ProcessSandboxWebhookUseCase processSandboxWebhookUseCase(
+      PaymentRepository payments,
+      com.toolrental.domain.reservation.port.repository.AtomicReservationManagement reservations,
+      IssueAcademicInvoiceUseCase invoices,
+      UnitOfWork work,
+      Clock clock) {
+    return new ProcessSandboxWebhookUseCase(payments, reservations, invoices, work, clock);
   }
 
   @Bean

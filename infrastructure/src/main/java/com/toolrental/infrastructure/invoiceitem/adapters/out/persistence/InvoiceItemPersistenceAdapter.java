@@ -1,5 +1,6 @@
 package com.toolrental.infrastructure.invoiceitem.adapters.out.persistence;
 
+import com.toolrental.domain.invoice.model.valueobject.InvoiceId;
 import com.toolrental.domain.invoiceitem.model.aggregate.InvoiceItem;
 import com.toolrental.domain.invoiceitem.model.valueobject.InvoiceItemId;
 import com.toolrental.domain.invoiceitem.port.repository.InvoiceItemRepository;
@@ -28,6 +29,12 @@ public class InvoiceItemPersistenceAdapter implements InvoiceItemRepository {
 
   public List<InvoiceItem> findAll() {
     return rows.findAll().stream().map(mapper::toDomain).toList();
+  }
+
+  public List<InvoiceItem> findByInvoice(InvoiceId invoiceId) {
+    return rows.findByIdInvoiceIdOrderByIdLineNumber(invoiceId.value()).stream()
+        .map(mapper::toDomain)
+        .toList();
   }
 
   public InvoiceItem save(InvoiceItem value) {

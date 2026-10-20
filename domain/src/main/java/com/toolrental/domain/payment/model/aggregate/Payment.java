@@ -71,8 +71,8 @@ public final class Payment extends AggregateRoot {
       throw new BusinessRuleException("Confirmed payment requires confirmation time");
     if (!Set.of("ADMINISTRATIVE", "CREDIT_CARD", "DEBIT_CARD", "PAYPAL").contains(paymentMethod))
       throw new BusinessRuleException("Invalid payment method");
-    if (!Set.of("ADMINISTRATIVE", "FIRST_HALF", "FINAL_HALF", "ADJUSTMENT").contains(paymentStage))
-      throw new BusinessRuleException("Invalid payment stage");
+    if (!Set.of("ADMINISTRATIVE", "FIRST_HALF", "FINAL_HALF", "FULL_PAYMENT", "ADJUSTMENT")
+        .contains(paymentStage)) throw new BusinessRuleException("Invalid payment stage");
     if (idempotencyKey == null || idempotencyKey.isBlank() || idempotencyKey.length() > 200)
       throw new BusinessRuleException("Invalid idempotency key");
     var cardPayment = Set.of("CREDIT_CARD", "DEBIT_CARD").contains(paymentMethod);
@@ -252,6 +252,42 @@ public final class Payment extends AggregateRoot {
             confirmedAt,
             paymentMethod,
             paymentStage,
+            idempotencyKey,
+            cardNetwork,
+            cardLastFour,
+            cardExpiryMonth,
+            cardExpiryYear,
+            null,
+            null);
+    result.recordEvent(new PaymentChanged(id, Instant.now(clock)));
+    return result;
+  }
+
+  public static Payment sandboxCheckout(
+      PaymentId id,
+      ReservationId reservationId,
+      String externalReference,
+      BigDecimal amount,
+      Instant recordedAt,
+      String paymentMethod,
+      String idempotencyKey,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear,
+      Clock clock) {
+    var result =
+        new Payment(
+            id,
+            reservationId,
+            "ACADEMIC_SANDBOX",
+            externalReference,
+            amount,
+            "PENDING",
+            recordedAt,
+            null,
+            paymentMethod,
+            "FULL_PAYMENT",
             idempotencyKey,
             cardNetwork,
             cardLastFour,

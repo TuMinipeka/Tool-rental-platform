@@ -18,6 +18,8 @@ public interface PaymentRepository {
 
   Optional<Payment> findByIdempotencyKey(String idempotencyKey);
 
+  Optional<Payment> findByProcessorAndExternalReference(String processor, String externalReference);
+
   boolean hasConfirmedStage(
       com.toolrental.domain.reservation.model.valueobject.ReservationId reservationId,
       String paymentStage);

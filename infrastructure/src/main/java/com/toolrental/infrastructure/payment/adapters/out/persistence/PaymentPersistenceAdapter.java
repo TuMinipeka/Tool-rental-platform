@@ -45,6 +45,12 @@ public class PaymentPersistenceAdapter implements PaymentRepository {
     return rows.findByIdempotencyKey(idempotencyKey).map(mapper::toDomain);
   }
 
+  public Optional<Payment> findByProcessorAndExternalReference(
+      String processor, String externalReference) {
+    return rows.findByProcessorAndExternalReference(processor, externalReference)
+        .map(mapper::toDomain);
+  }
+
   public boolean hasConfirmedStage(ReservationId reservationId, String paymentStage) {
     return rows.existsByReservationIdAndPaymentStageAndPaymentStatus(
         reservationId.value(), paymentStage, "CONFIRMED");

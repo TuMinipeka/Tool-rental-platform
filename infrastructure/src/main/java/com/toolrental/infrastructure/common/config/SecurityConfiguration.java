@@ -91,6 +91,8 @@ public class SecurityConfiguration {
                         "/api/v1/auth/refresh",
                         "/api/v1/auth/logout",
                         "/api/v1/auth/csrf",
+                        "/api/payments/sandbox/webhooks",
+                        "/api/v1/payments/sandbox/webhooks",
                         "/api/public/**",
                         "/api/v1/public/**",
                         "/v3/api-docs/**",

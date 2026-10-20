@@ -12,17 +12,24 @@ import com.toolrental.application.reservation.command.RequestReservationCommand;
 import com.toolrental.application.reservation.usecase.CancelReservationUseCase;
 import com.toolrental.application.reservation.usecase.ConfirmReservationUseCase;
 import com.toolrental.application.reservation.usecase.RequestReservationUseCase;
+import com.toolrental.domain.common.model.valueobject.Money;
 import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservation.port.repository.ReservationRepository;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import com.toolrental.domain.user.port.SecureTokenService;
 import jakarta.persistence.EntityManagerFactory;
+import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Currency;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -80,6 +87,8 @@ class PostgresIntegrationTest {
   @Autowired ConfirmReservationUseCase confirm;
   @Autowired CancelReservationUseCase cancel;
   @Autowired SecureTokenService tokenService;
+  @Autowired ReservationRepository reservationRepository;
+  @Autowired Clock clock;
   UUID admin, supplier, customer, category, tool, unit;
 
   @BeforeEach
@@ -133,13 +142,27 @@ class PostgresIntegrationTest {
 
   ReservationId pending() {
     var start = LocalDate.now(ZoneId.of("America/Bogota")).plusDays(1);
-    return request
-        .execute(
-            new RequestReservationCommand(
-                new CustomerId(customer),
-                new ReservationPeriod(start, start.plusDays(1)),
-                List.of(new EquipmentUnitId(unit))))
-        .id();
+    var reservation =
+        Reservation.request(
+            new CustomerId(customer),
+            new ReservationPeriod(start, start.plusDays(1)),
+            List.of(
+                new ReservationLine(
+                    new EquipmentUnitId(unit),
+                    new SupplierId(supplier),
+                    new Money(new BigDecimal("10"), Currency.getInstance("COP")))),
+            clock);
+    reservationRepository.addRequest(reservation);
+    return reservation.id();
+  }
+
+  com.toolrental.application.reservation.dto.ReservationResponse held() {
+    var start = LocalDate.now(ZoneId.of("America/Bogota")).plusDays(1);
+    return request.execute(
+        new RequestReservationCommand(
+            new CustomerId(customer),
+            new ReservationPeriod(start, start.plusDays(1)),
+            List.of(new EquipmentUnitId(unit))));
   }
 
   @Test
@@ -149,7 +172,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(34);
+        .isEqualTo(35);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
@@ -238,6 +261,91 @@ class PostgresIntegrationTest {
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/api/v1/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
+  }
+
+  @Test
+  void signedSandboxWebhookConfirmsHoldAndIssuesDownloadableAcademicInvoice() throws Exception {
+    var reservation = held();
+    assertThat(reservation.status().name()).isEqualTo("PENDING_PAYMENT");
+    assertThat(reservation.expiresAt()).isAfter(Instant.now());
+    assertThatThrownBy(this::held).isInstanceOf(AvailabilityConflictApplicationException.class);
+
+    var payment =
+        call(
+            customer,
+            post("/api/payments/checkouts").header("Idempotency-Key", "full-checkout-1"),
+            Map.of(
+                "reservationId",
+                reservation.id().value(),
+                "paymentMethod",
+                "CREDIT_CARD",
+                "cardNetwork",
+                "VISA",
+                "cardLastFour",
+                "4242",
+                "cardExpiryMonth",
+                12,
+                "cardExpiryYear",
+                2030),
+            201);
+    assertThat(payment.get("amount").decimalValue()).isEqualByComparingTo("20");
+    assertThat(payment.get("paymentStatus").asText()).isEqualTo("PENDING");
+
+    var eventId = "event-approved-1";
+    var reference = payment.get("externalReference").asText();
+    var outcome = "APPROVED";
+    var timestamp = Long.toString(Instant.now().getEpochSecond());
+    var webhookBody =
+        Map.of("eventId", eventId, "externalReference", reference, "outcome", outcome);
+    call(
+        null,
+        post("/api/payments/sandbox/webhooks")
+            .header("X-Sandbox-Timestamp", timestamp)
+            .header("X-Sandbox-Signature", "invalid"),
+        webhookBody,
+        401);
+    var signature = sandboxSignature(timestamp, eventId, reference, outcome);
+    var confirmedPayment =
+        call(
+            null,
+            post("/api/payments/sandbox/webhooks")
+                .header("X-Sandbox-Timestamp", timestamp)
+                .header("X-Sandbox-Signature", signature),
+            webhookBody,
+            200);
+    assertThat(confirmedPayment.get("paymentStatus").asText()).isEqualTo("CONFIRMED");
+    assertThat(
+            db.queryForObject(
+                "select reservation_status from reservations where reservation_id=?",
+                String.class,
+                reservation.id().value()))
+        .isEqualTo("CONFIRMED");
+    assertThat(db.queryForObject("select count(*) from invoices", Integer.class)).isEqualTo(1);
+
+    var invoices = call(customer, get("/api/invoices"), null, 200);
+    var invoiceId = invoices.get(0).get("invoiceId").asText();
+    mvc.perform(
+            get("/api/invoices/" + invoiceId + "/document")
+                .with(jwt().jwt(token -> token.subject(customer.toString()))))
+        .andExpect(status().isOk())
+        .andExpect(
+            header()
+                .string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
+        .andExpect(
+            content().string(org.hamcrest.Matchers.containsString("Simulaci&oacute;n acad&eacute;mica")));
+  }
+
+  String sandboxSignature(String timestamp, String eventId, String reference, String outcome)
+      throws Exception {
+    var payload = timestamp + "." + eventId + "." + reference + "." + outcome;
+    var mac = javax.crypto.Mac.getInstance("HmacSHA256");
+    mac.init(
+        new javax.crypto.spec.SecretKeySpec(
+            "local-sandbox-webhook-secret-change-me-2026"
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8),
+            "HmacSHA256"));
+    return java.util.HexFormat.of()
+        .formatHex(mac.doFinal(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
   }
 
   @Test
@@ -629,22 +737,18 @@ class PostgresIntegrationTest {
             "select return_date from reservations where reservation_id=?",
             LocalDate.class,
             first.value());
-    var boundary =
-        request
-            .execute(
-                new RequestReservationCommand(
-                    new CustomerId(customer),
-                    new ReservationPeriod(inclusiveReturn, inclusiveReturn),
-                    List.of(new EquipmentUnitId(unit))))
-            .id();
-    assertThatThrownBy(() -> confirm.execute(boundary, new SupplierId(supplier)))
+    assertThatThrownBy(
+            () ->
+                request.execute(
+                    new RequestReservationCommand(
+                        new CustomerId(customer),
+                        new ReservationPeriod(inclusiveReturn, inclusiveReturn),
+                        List.of(new EquipmentUnitId(unit)))))
         .isInstanceOf(AvailabilityConflictApplicationException.class);
     assertThat(
             db.queryForObject(
-                "select reservation_status from reservations where reservation_id=?",
-                String.class,
-                boundary.value()))
-        .isEqualTo("PENDING");
+                "select count(*) from reservations where customer_id=?", Integer.class, customer))
+        .isEqualTo(1);
     call(
         supplier,
         post("/api/equipment-units"),
