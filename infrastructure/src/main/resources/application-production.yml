@@ -7,27 +7,20 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  mail:
-    host: ${SMTP_HOST}
-    port: ${SMTP_PORT}
-    username: ${SMTP_USERNAME}
-    password: ${SMTP_PASSWORD}
-    properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
-      mail.smtp.starttls.required: true
+
 auth:
   jwt:
     secret: ${JWT_SECRET}
   cookie:
     secure: true
   password-recovery:
-    delivery: smtp
-    sender: ${PASSWORD_RECOVERY_SENDER}
-    reset-url: ${PASSWORD_RECOVERY_RESET_URL}
+    enabled: false
+    delivery: disabled
+
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
 payments:
+  internal-enabled: false
   sandbox:
-    webhook-secret: ${SANDBOX_WEBHOOK_SECRET}
+    webhook-secret: ${SANDBOX_WEBHOOK_SECRET:disabled-internal-verifier-secret-not-a-public-route}

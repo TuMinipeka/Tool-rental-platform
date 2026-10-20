@@ -30,15 +30,13 @@ services:
       SHOWCASE_DATABASE_NAME: ${POSTGRES_DB}
       DB_MAX_POOL_SIZE: 5
       DB_MIN_IDLE: 1
-      SANDBOX_WEBHOOK_SECRET: ${SANDBOX_WEBHOOK_SECRET:?Set private sandbox verifier secret}
       JWT_SECRET: ${JWT_SECRET:?Set random JWT secret}
       CORS_ALLOWED_ORIGINS: https://${PUBLIC_HOST:?Set DuckDNS host}
-      SMTP_HOST: ${SMTP_HOST:?Pending Conde SMTP delivery}
-      SMTP_PORT: ${SMTP_PORT:-587}
-      SMTP_USERNAME: ${SMTP_USERNAME:?Set verified SMTP account}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:?Set SMTP secret}
-      PASSWORD_RECOVERY_SENDER: ${PASSWORD_RECOVERY_SENDER:?Set verified sender}
-      PASSWORD_RECOVERY_RESET_URL: https://${PUBLIC_HOST}/password-reset
+      PASSWORD_RECOVERY_ENABLED: "false"
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:?Set test seller access token}
+      MERCADOPAGO_COLLECTOR_ID: ${MERCADOPAGO_COLLECTOR_ID:?Set test seller identifier}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:?Set official webhook secret}
+      PAYMENTS_PUBLIC_URL: https://${PUBLIC_HOST}
       JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=65 -XX:+ExitOnOutOfMemoryError
       SERVER_FORWARD_HEADERS_STRATEGY: framework
     networks: [database,edge]

@@ -26,3 +26,5 @@ tmp/
 # Public showcase template and private operational artifacts
 !.env.showcase.example
 backups/
+
+!.env.mercadopago.example
