@@ -41,7 +41,7 @@ function Icon({name,size=20}) {
 }
 function navigate(path){window.history.pushState({},'',path);window.dispatchEvent(new PopStateEvent('popstate'));const reducedMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;window.scrollTo({top:0,behavior:reducedMotion?'auto':'smooth'})}
 function Brand(){return <button className="brand" onClick={()=>navigate('/')} aria-label="Ir al inicio"><span className="brand-symbol"><i/><i/><i/></span><span>tool<em>rental</em></span></button>}
-function ToolVisual({tool,compact=false,priority=false}){return <div className={`tool-visual tool-${tool.color} ${compact?'compact':''}`}>{tool.imageUrl?<img src={tool.imageUrl} alt={tool.name} loading={priority?'eager':'lazy'} decoding="async"/>:<><div className="visual-grid"/><div className="tool-silhouette" aria-hidden="true"><span/><span/><span/></div></>}<b>{tool.category}</b><small>TR—{tool.id.slice(0,3).toUpperCase()}</small></div>}
+function ToolVisual({tool,compact=false,priority=false}){const [failedUrl,setFailedUrl]=useState(null);const showImage=Boolean(tool.imageUrl&&tool.imageUrl!==failedUrl);return <div className={`tool-visual tool-${tool.color} ${compact?'compact':''}`}>{showImage?<img src={tool.imageUrl} alt={tool.name} loading={priority?'eager':'lazy'} decoding="async" onError={()=>setFailedUrl(tool.imageUrl)}/>:<><div className="visual-grid"/><div className="tool-silhouette" aria-hidden="true"><span/><span/><span/></div></>}<b>{tool.category}</b><small>TR—{tool.id.slice(0,3).toUpperCase()}</small></div>}
 
 function Header({session,onOpenAuth,path,location,onLocationChange}){
   const [open,setOpen]=useState(false); const go=(path)=>{setOpen(false);navigate(path)}
@@ -152,7 +152,7 @@ function App(){
     window.addEventListener('tool-rental-session',updateSession)
     api.restoreSession().catch(()=>null)
     api.listCatalog().then(items=>{
-      if(items.length){setCatalogTools(items.map(normalizeCatalogTool));setDataMode('api')}
+      if(items.length){setCatalogTools(items.map(normalizeCatalogTool));setDataMode(import.meta.env.VITE_DEMO_MODE==='true'?'demo':'api')}
     }).catch(()=>setDataMode('demo'))
     return()=>{window.removeEventListener('popstate',update);window.removeEventListener('open-auth',open);window.removeEventListener('tool-rental-session',updateSession)}
   },[])

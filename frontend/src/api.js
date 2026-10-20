@@ -1,5 +1,6 @@
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const apiPrefix = '/api/v1'
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 
 let activeSession = null
 let csrfToken = null
@@ -232,7 +233,11 @@ export function normalizeCatalogTool(tool, index = 0) {
     reviews: null,
     stock: tool.operationalUnitCount,
     color: colors[index % colors.length],
-    accent: tool.operationalUnitCount > 0 ? 'Catálogo real' : 'Sin existencias',
+    accent: demoMode
+      ? 'Demostración'
+      : tool.operationalUnitCount > 0
+        ? 'Catálogo real'
+        : 'Sin existencias',
     description: tool.description,
     imageUrl: tool.imageUrls?.[0] || null,
     source: 'api',
