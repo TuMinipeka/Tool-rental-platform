@@ -281,7 +281,7 @@ function App(){
   else page=<ErrorPage/>
   const minimal=path==='/reserva-confirmada'
   const authRoute=['/login','/registro'].includes(path)
-  const footerHidden=authRoute||path==='/pago'||path.startsWith('/panel/')||path==='/cuenta'
+  const footerHidden=authRoute||path==='/pago'||path==='/como-funciona'||path.startsWith('/panel/')||path==='/cuenta'
   return <div className={`app ${path==='/'?'home-route':''}`}>{!minimal&&<Header path={path} session={session} onOpenAuth={()=>navigate('/login')} location={location} onLocationChange={changeLocation}/>}<div className="page-content page-enter" key={path}>{page}</div>{!minimal&&!footerHidden&&<Footer/>}{authOpen&&<AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/>}</div>
 }
 export default App
