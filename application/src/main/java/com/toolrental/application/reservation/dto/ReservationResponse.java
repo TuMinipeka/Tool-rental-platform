@@ -31,6 +31,7 @@ public record ReservationResponse(
     CancellationPolicyId cancellationPolicyId,
     LocalDate effectiveReturnDate,
     List<String> allowedActions,
+    Instant expiresAt,
     Instant createdAt) {
   public ReservationResponse {
     items = List.copyOf(items);
@@ -53,15 +54,17 @@ public record ReservationResponse(
         r.cancellationPolicyId(),
         r.effectiveReturnDate(),
         allowedActions(r),
+        r.expiresAt(),
         r.createdAt());
   }
 
   private static List<String> allowedActions(Reservation reservation) {
     return switch (reservation.status()) {
       case PENDING -> List.of("CANCEL");
+      case PENDING_PAYMENT -> List.of("PAY", "CANCEL");
       case CONFIRMED -> List.of("CANCEL", "REQUEST_WITHDRAWAL", "REQUEST_EXTENSION");
       case CANCELLATION_REVIEW -> List.of();
-      case REJECTED, CANCELLED, NO_SHOW -> List.of();
+      case REJECTED, CANCELLED, PAYMENT_FAILED, EXPIRED, NO_SHOW -> List.of();
     };
   }
 }

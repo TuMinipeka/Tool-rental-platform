@@ -20,6 +20,8 @@ import java.util.function.Function;
  * to avoid races. Business rules execute in application/domain, not in the adapter.
  */
 public interface AtomicReservationManagement {
+  Reservation create(Reservation reservation, Function<Context, Reservation> operation);
+
   Reservation execute(ReservationId id, Function<Context, Reservation> operation);
 
   interface Context {
@@ -33,7 +35,7 @@ public interface AtomicReservationManagement {
 
     boolean isSupplierActive(SupplierId id);
 
-    /** Checks confirmed reservations with inclusive dates, excluding the current reservation. */
+    /** Checks active holds and confirmed reservations, with inclusive dates. */
     boolean isOccupied(EquipmentUnitId id, ReservationPeriod period);
   }
 }

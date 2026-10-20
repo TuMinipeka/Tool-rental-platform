@@ -57,7 +57,7 @@ class FlywayUpgradeIntegrationTest {
               .defaultSchema(schema)
               .cleanDisabled(true)
               .load();
-      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(8);
+      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(9);
       assertThat(upgraded.info().current().getVersion().getVersion()).isEqualTo("208");
       assertThat(checksums(upgraded)).containsAllEntriesOf(originalChecksums);
       assertThat(upgraded.validateWithResult().validationSuccessful).isTrue();

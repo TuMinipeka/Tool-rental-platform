@@ -12,6 +12,8 @@ import com.toolrental.domain.reservation.port.repository.ReservationRepository;
 import com.toolrental.domain.tool.port.repository.ToolRepository;
 import com.toolrental.infrastructure.common.config.ClockConfiguration;
 import java.time.Clock;
+import java.time.Duration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -42,9 +44,27 @@ public class ReservationBeanConfiguration {
       com.toolrental.domain.cancellationpolicy.port.repository.CancellationPolicyRepository
           policies,
       com.toolrental.domain.deliveryrate.port.repository.DeliveryRateRepository deliveryRates,
+      AtomicReservationManagement management,
+      @Value("${reservation.payment-hold-duration:PT15M}") Duration paymentHoldDuration,
       Clock clock) {
     return new RequestReservationUseCase(
-        reservations, equipmentUnits, tools, participants, policies, deliveryRates, clock);
+        reservations,
+        equipmentUnits,
+        tools,
+        participants,
+        policies,
+        deliveryRates,
+        management,
+        paymentHoldDuration,
+        clock);
+  }
+
+  @Bean
+  public com.toolrental.application.reservation.usecase.ExpireReservationHoldsUseCase
+      expireReservationHoldsUseCase(
+          ReservationRepository reservations, AtomicReservationManagement management, Clock clock) {
+    return new com.toolrental.application.reservation.usecase.ExpireReservationHoldsUseCase(
+        reservations, management, clock);
   }
 
   @Bean

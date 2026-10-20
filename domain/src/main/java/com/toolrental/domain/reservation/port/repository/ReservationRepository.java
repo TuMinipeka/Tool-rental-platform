@@ -4,6 +4,7 @@ import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.ReservationId;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,6 @@ public interface ReservationRepository {
   List<Reservation> findByCustomer(CustomerId customerId);
 
   List<Reservation> findBySupplier(SupplierId supplierId);
+
+  List<Reservation> findExpiredPaymentHolds(Instant now);
 }

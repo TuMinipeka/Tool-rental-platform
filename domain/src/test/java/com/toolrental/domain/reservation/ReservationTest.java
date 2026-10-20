@@ -20,6 +20,7 @@ import com.toolrental.domain.tool.model.valueobject.ToolId;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
@@ -149,6 +150,28 @@ class ReservationTest {
                 clock));
     assertEquals(ReservationStatus.PENDING, r.status());
     assertTrue(r.confirmation().isEmpty());
+  }
+
+  @Test
+  void paymentHoldFreezesRatesAndExpiresDeterministically() {
+    var held = pending().holdWithRates(List.of(item()), Duration.ofMinutes(15), clock);
+    assertEquals(ReservationStatus.PENDING_PAYMENT, held.status());
+    assertEquals(clock.instant().plus(Duration.ofMinutes(15)), held.expiresAt());
+    assertEquals(ReservationStatus.CONFIRMED, held.confirmPayment(clock).status());
+
+    var afterExpiration = Clock.offset(clock, Duration.ofMinutes(16));
+    assertThrows(BusinessRuleException.class, () -> held.confirmPayment(afterExpiration));
+    var expired = held.expire(afterExpiration);
+    assertEquals(ReservationStatus.EXPIRED, expired.status());
+    assertThrows(BusinessRuleException.class, () -> expired.confirmPayment(clock));
+  }
+
+  @Test
+  void declinedPaymentReleasesTheHold() {
+    var held = pending().holdWithRates(List.of(item()), Duration.ofMinutes(15), clock);
+    var failed = held.failPayment(clock);
+    assertEquals(ReservationStatus.PAYMENT_FAILED, failed.status());
+    assertThrows(BusinessRuleException.class, () -> failed.failPayment(clock));
   }
 
   @Test

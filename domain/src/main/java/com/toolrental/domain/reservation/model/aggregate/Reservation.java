@@ -8,6 +8,8 @@ import com.toolrental.domain.customer.model.valueobject.CustomerId;
 import com.toolrental.domain.deliveryrate.model.valueobject.DeliveryRateId;
 import com.toolrental.domain.reservation.event.ReservationCancelled;
 import com.toolrental.domain.reservation.event.ReservationConfirmed;
+import com.toolrental.domain.reservation.event.ReservationExpired;
+import com.toolrental.domain.reservation.event.ReservationPaymentFailed;
 import com.toolrental.domain.reservation.event.ReservationRejected;
 import com.toolrental.domain.reservation.event.ReservationRequested;
 import com.toolrental.domain.reservation.model.valueobject.DeliveryAddress;
@@ -19,6 +21,7 @@ import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Currency;
@@ -124,6 +127,13 @@ public final class Reservation extends AggregateRoot {
     if ((status == ReservationStatus.PENDING || status == ReservationStatus.REJECTED)
         && confirmation != null)
       throw new BusinessRuleException("Reservation status is incompatible with confirmation");
+    if (status == ReservationStatus.PENDING_PAYMENT && expiresAt == null)
+      throw new BusinessRuleException("Payment hold requires an expiration time");
+    if ((status == ReservationStatus.PENDING_PAYMENT
+            || status == ReservationStatus.PAYMENT_FAILED
+            || status == ReservationStatus.EXPIRED)
+        && confirmation != null)
+      throw new BusinessRuleException("Reservation status is incompatible with confirmation");
   }
 
   public static Reservation request(
@@ -197,8 +207,68 @@ public final class Reservation extends AggregateRoot {
     return confirmed;
   }
 
+  public Reservation holdWithRates(
+      List<ReservationLine> currentRates, Duration holdDuration, Clock clock) {
+    requirePending();
+    if (holdDuration == null || holdDuration.isZero() || holdDuration.isNegative())
+      throw new BusinessRuleException("Payment hold duration must be positive");
+    var currentItems = validate(currentRates);
+    var ids =
+        items.stream()
+            .map(ReservationLine::equipmentUnitId)
+            .collect(java.util.stream.Collectors.toSet());
+    var currentIds =
+        currentItems.stream()
+            .map(ReservationLine::equipmentUnitId)
+            .collect(java.util.stream.Collectors.toSet());
+    if (!ids.equals(currentIds) || !supplierId().equals(currentItems.getFirst().supplierId()))
+      throw new BusinessRuleException("Payment hold cannot change units or supplier");
+    return copyWith(
+        currentItems,
+        ReservationStatus.PENDING_PAYMENT,
+        null,
+        Instant.now(clock).plus(holdDuration));
+  }
+
+  public Reservation confirmPayment(Clock clock) {
+    if (status != ReservationStatus.PENDING_PAYMENT)
+      throw new BusinessRuleException("Reservation is not awaiting payment");
+    if (!Instant.now(clock).isBefore(expiresAt))
+      throw new BusinessRuleException("Payment hold has expired");
+    var event = new ReservationConfirmed(id, Instant.now(clock));
+    var confirmed = copyWith(items, ReservationStatus.CONFIRMED, event.occurredOn(), expiresAt);
+    confirmed.recordEvent(event);
+    return confirmed;
+  }
+
+  public Reservation failPayment(Clock clock) {
+    if (status != ReservationStatus.PENDING_PAYMENT)
+      throw new BusinessRuleException("Reservation is not awaiting payment");
+    var failed = copyWith(items, ReservationStatus.PAYMENT_FAILED, null, expiresAt);
+    failed.recordEvent(new ReservationPaymentFailed(id, Instant.now(clock)));
+    return failed;
+  }
+
+  public Reservation expire(Clock clock) {
+    if (status != ReservationStatus.PENDING_PAYMENT)
+      throw new BusinessRuleException("Reservation is not awaiting payment");
+    if (Instant.now(clock).isBefore(expiresAt))
+      throw new BusinessRuleException("Payment hold has not expired");
+    var expired = copyWith(items, ReservationStatus.EXPIRED, null, expiresAt);
+    expired.recordEvent(new ReservationExpired(id, Instant.now(clock)));
+    return expired;
+  }
+
   private Reservation copyWith(
       List<ReservationLine> currentItems, ReservationStatus next, Instant confirmedAt) {
+    return copyWith(currentItems, next, confirmedAt, expiresAt);
+  }
+
+  private Reservation copyWith(
+      List<ReservationLine> currentItems,
+      ReservationStatus next,
+      Instant confirmedAt,
+      Instant nextExpiresAt) {
     return new Reservation(
         id,
         customerId,
@@ -207,7 +277,7 @@ public final class Reservation extends AggregateRoot {
         createdAt,
         next,
         confirmedAt,
-        expiresAt,
+        nextExpiresAt,
         scheduledFulfillmentAt,
         fulfillmentMethod,
         deliveryAddress,
@@ -302,6 +372,7 @@ public final class Reservation extends AggregateRoot {
 
   public void cancel(Clock clock) {
     if (status != ReservationStatus.PENDING
+        && status != ReservationStatus.PENDING_PAYMENT
         && status != ReservationStatus.CONFIRMED
         && status != ReservationStatus.CANCELLATION_REVIEW)
       throw new BusinessRuleException("A terminal reservation cannot change state");

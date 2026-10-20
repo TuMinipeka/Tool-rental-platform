@@ -15,11 +15,13 @@ import com.toolrental.domain.deliveryrate.port.repository.DeliveryRateRepository
 import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
 import com.toolrental.domain.reservation.model.aggregate.Reservation;
 import com.toolrental.domain.reservation.model.valueobject.FulfillmentMethod;
+import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
 import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.tool.port.repository.ToolRepository;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Duration;
 import java.util.Currency;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,6 +34,8 @@ public final class RequestReservationUseCase {
   private final Clock clock;
   private final CancellationPolicyRepository policies;
   private final DeliveryRateRepository deliveryRates;
+  private final AtomicReservationManagement management;
+  private final Duration paymentHoldDuration;
 
   public RequestReservationUseCase(
       ReservationRepository r,
@@ -46,6 +50,8 @@ public final class RequestReservationUseCase {
     this.clock = Objects.requireNonNull(clock);
     policies = null;
     deliveryRates = null;
+    management = null;
+    paymentHoldDuration = null;
   }
 
   public RequestReservationUseCase(
@@ -55,6 +61,8 @@ public final class RequestReservationUseCase {
       ParticipantsPort p,
       CancellationPolicyRepository policies,
       DeliveryRateRepository deliveryRates,
+      AtomicReservationManagement management,
+      Duration paymentHoldDuration,
       Clock clock) {
     reservations = Objects.requireNonNull(r);
     equipmentUnits = Objects.requireNonNull(u);
@@ -62,6 +70,8 @@ public final class RequestReservationUseCase {
     participants = Objects.requireNonNull(p);
     this.policies = Objects.requireNonNull(policies);
     this.deliveryRates = Objects.requireNonNull(deliveryRates);
+    this.management = Objects.requireNonNull(management);
+    this.paymentHoldDuration = Objects.requireNonNull(paymentHoldDuration);
     this.clock = Objects.requireNonNull(clock);
   }
 
@@ -118,7 +128,36 @@ public final class RequestReservationUseCase {
             policyId,
             deliveryFee,
             clock);
-    reservations.addRequest(reservation);
-    return ReservationResponse.from(reservation);
+    if (management == null) {
+      reservations.addRequest(reservation);
+      return ReservationResponse.from(reservation);
+    }
+    var held =
+        management.create(
+            reservation,
+            context -> {
+              if (!context.isCustomerActive(reservation.customerId()))
+                throw new CustomerNotFoundApplicationException(reservation.customerId());
+              var currentItems =
+                  reservation.items().stream()
+                      .map(
+                          item -> {
+                            var unit = context.equipmentUnit(item.equipmentUnitId());
+                            var tool = context.tool(unit.toolId());
+                            if (!unit.isOperational() || !tool.published())
+                              throw new BusinessRuleException("Equipment unit is not rentable");
+                            if (!tool.supplierId().equals(reservation.supplierId())
+                                || !context.isSupplierActive(tool.supplierId()))
+                              throw new SupplierNotFoundApplicationException(tool.supplierId());
+                            if (context.isOccupied(unit.id(), reservation.period()))
+                              throw new com.toolrental.application.common.exception
+                                  .AvailabilityConflictApplicationException();
+                            return new ReservationLine(
+                                unit.id(), tool.supplierId(), tool.dailyRate());
+                          })
+                      .toList();
+              return reservation.holdWithRates(currentItems, paymentHoldDuration, clock);
+            });
+    return ReservationResponse.from(held);
   }
 }
