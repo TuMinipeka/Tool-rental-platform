@@ -57,6 +57,8 @@ public final class ManageToolUseCase {
     return work.execute(
         () -> {
           access.requireActive(actor);
+          if (access.isAdministrator(actor))
+            return repository.findAll().stream().map(ToolResponse::from).toList();
           return repository.findAll().stream()
               .filter(value -> value.published() || value.supplierId().value().equals(actor))
               .map(ToolResponse::from)

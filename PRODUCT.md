@@ -37,9 +37,9 @@ La plataforma organiza el alquiler alrededor de unidades físicas y fechas concr
 - El frontend utiliza React 19, JavaScript y Vite, separado del reactor Maven del backend.
 - El backend expone REST con JWT Bearer, PostgreSQL, OpenAPI y Swagger UI.
 - El pago vigente es una simulación académica dividida 50/50. Nunca solicita ni almacena número completo de tarjeta o CVV; usa únicamente método, red, vencimiento, últimos cuatro dígitos e idempotencia.
-- La recuperación de contraseña devuelve actualmente un token académico; el envío por correo está pendiente.
-- La renovación y revocación persistente de JWT están pendientes.
-- Continúan abiertas las políticas de cancelación, retrasos, extensiones, entrega, protección, privacidad definitiva, impuestos y pasarela externa.
+- La recuperación de contraseña usa un token opaco y un puerto SMTP; el despliegue productivo del correo sigue pendiente.
+- Las sesiones JWT rotativas y su revocación persistente están implementadas. El frontend conserva el access token solo en memoria y usa una cookie HttpOnly para renovar.
+- Cancelación, inasistencia, extensiones y entrega tienen reglas versionadas. Continúan abiertas la protección, privacidad definitiva, impuestos, ajustes financieros y pasarela externa.
 - Las acciones destructivas deben respetar el historial: retirar una publicación o una unidad es preferible a eliminar registros que ya participan en operaciones.
 
 ## Brand Commitments
@@ -58,7 +58,7 @@ La plataforma organiza el alquiler alrededor de unidades físicas y fechas concr
 - Arquitectura: `docs/backend-architecture.md`.
 - Borrador legal: `docs/terms-and-conditions.md`.
 - Cinco referencias visuales se conservan en `plantillas/`.
-- El frontend actual contiene una primera experiencia navegable con datos demostrativos. No existen todavía fotografías de producto aprobadas, testimonios, métricas comerciales verificadas ni identidad gráfica definitiva.
+- El frontend contiene una experiencia navegable con catálogo, acceso, sesión rotativa, solicitud de reserva y términos públicos. Conserva datos demostrativos cuando la API no está disponible. No existen todavía fotografías de producto aprobadas, testimonios ni métricas comerciales verificadas.
 
 ## Product Principles
 

@@ -99,9 +99,9 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Test
   void appliesEverySchemaAndDemoMigrationToAnEmptyPostgresDatabase() {
-    assertEquals("300", flyway.info().current().getVersion().getVersion());
+    assertEquals("301", flyway.info().current().getVersion().getVersion());
     assertEquals(
-        52,
+        53,
         java.util.Arrays.stream(flyway.info().applied())
             .filter(info -> info.getVersion() != null)
             .count());
@@ -131,7 +131,27 @@ class PostgreSqlPersistenceIntegrationTest {
 
   @Test
   void readsMigratedDataThroughTheRepositoryAdapter() {
-    assertEquals(5, categoryRepository.findAll().size());
+    assertEquals(11, categoryRepository.findAll().size());
+  }
+
+  @Test
+  void providesThirtyDemoToolsAndOneAccountPerPrimaryRole() {
+    assertEquals(30, jdbcTemplate.queryForObject("SELECT count(*) FROM tools", Integer.class));
+    assertEquals(
+        30, jdbcTemplate.queryForObject("SELECT count(*) FROM equipment_units", Integer.class));
+    assertEquals(
+        3,
+        jdbcTemplate.queryForObject(
+            """
+            SELECT count(*)
+            FROM users account
+            JOIN user_roles assignment ON assignment.user_id = account.user_id
+            JOIN roles role ON role.role_id = assignment.role_id
+            WHERE (account.email = 'cliente@toolrental.local' AND role.code = 'CUSTOMER')
+               OR (account.email = 'proveedor@toolrental.local' AND role.code = 'SUPPLIER')
+               OR (account.email = 'admin@toolrental.local' AND role.code = 'ADMIN')
+            """,
+            Integer.class));
   }
 
   @Test

@@ -27,8 +27,9 @@ public class EquipmentUnitBeanConfiguration {
           com.toolrental.application.common.service.WorkflowReferences references,
           Clock clock,
           com.toolrental.application.equipmentunit.usecase.RegisterEquipmentUnitUseCase
-              registration) {
+              registration,
+          com.toolrental.domain.tool.port.repository.ToolRepository tools) {
     return new com.toolrental.application.equipmentunit.usecase.ManageEquipmentUnitUseCase(
-        repository, work, access, references, clock, registration);
+        repository, work, access, references, clock, registration, tools);
   }
 }

@@ -52,6 +52,13 @@ El access token dura 15 minutos y se conserva en memoria del cliente. El refresh
 
 `POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La respuesta conserva modalidad, desglose, política, fecha efectiva y acciones permitidas.
 
+## Catálogo operativo por rol
+
+- `GET /api/v1/tools` devuelve todas las herramientas al administrador. Para un proveedor autenticado devuelve las publicaciones visibles y sus propios borradores; el frontend del panel selecciona las herramientas cuyo `supplierId` coincide con el actor.
+- `POST /api/v1/tools` exige rol `SUPPLIER` y crea la herramienta para el actor autenticado. Las actualizaciones y el retiro validan propiedad o administración en el caso de uso.
+- `GET /api/v1/equipment-units` devuelve todas las unidades al administrador y únicamente las unidades pertenecientes a herramientas propias al proveedor. La selección se aplica en Application mediante los puertos de unidades y herramientas; no depende de un filtro del navegador.
+- `POST /api/v1/equipment-units` exige rol `SUPPLIER` y valida que la herramienta pertenezca al actor.
+
 ## Terminaciones
 
 Todas las operaciones directas requieren `Idempotency-Key`:

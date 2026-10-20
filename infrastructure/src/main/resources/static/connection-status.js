@@ -31,7 +31,7 @@
       symbol.textContent = '!'
       const instant = new Date(status.checkedAt)
       checkedAt.dateTime = instant.toISOString()
-      checkedAt.textContent = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'medium', timeZone: 'America/Bogota' }).format(instant) + ' · Bogotá'
+      checkedAt.textContent = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'medium', timeZone: 'America/Bogota' }).format(instant) + ' · Bucaramanga'
     } catch {
       panel.dataset.state = 'disconnected'
       label.textContent = 'SIN VERIFICACIÓN'

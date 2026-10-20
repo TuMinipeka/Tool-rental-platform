@@ -9,7 +9,9 @@ import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
 import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
 import com.toolrental.domain.equipmentunit.model.valueobject.OperationalStatus;
 import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
 import java.time.Clock;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +22,7 @@ public final class ManageEquipmentUnitUseCase {
   private final WorkflowReferences references;
   private final Clock clock;
   private final RegisterEquipmentUnitUseCase registration;
+  private final ToolRepository tools;
 
   public ManageEquipmentUnitUseCase(
       EquipmentUnitRepository repository,
@@ -27,13 +30,15 @@ public final class ManageEquipmentUnitUseCase {
       AccessPolicy access,
       WorkflowReferences references,
       Clock clock,
-      RegisterEquipmentUnitUseCase registration) {
+      RegisterEquipmentUnitUseCase registration,
+      ToolRepository tools) {
     this.repository = repository;
     this.work = work;
     this.access = access;
     this.references = references;
     this.clock = clock;
     this.registration = registration;
+    this.tools = tools;
   }
 
   private EquipmentUnit load(EquipmentUnitId id) {
@@ -54,8 +59,20 @@ public final class ManageEquipmentUnitUseCase {
   public List<EquipmentUnitResponse> list(UUID actor) {
     return work.execute(
         () -> {
-          access.requireAdministrator(actor);
-          return repository.findAll().stream().map(EquipmentUnitResponse::from).toList();
+          access.requireActive(actor);
+          var units = repository.findAll();
+          if (access.isAdministrator(actor))
+            return units.stream().map(EquipmentUnitResponse::from).toList();
+
+          access.requireRole(actor, "SUPPLIER");
+          var ownedToolIds = new HashSet<com.toolrental.domain.tool.model.valueobject.ToolId>();
+          tools.findAll().stream()
+              .filter(tool -> tool.supplierId().value().equals(actor))
+              .forEach(tool -> ownedToolIds.add(tool.id()));
+          return units.stream()
+              .filter(unit -> ownedToolIds.contains(unit.toolId()))
+              .map(EquipmentUnitResponse::from)
+              .toList();
         });
   }
 
