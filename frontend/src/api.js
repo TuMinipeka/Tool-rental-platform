@@ -182,6 +182,32 @@ export const api = {
   listReservations() {
     return request('/reservations', {}, { authenticated: true })
   },
+  listTools() {
+    return request('/tools', {}, { authenticated: true })
+  },
+  createTool(tool) {
+    return request(
+      '/tools',
+      { method: 'POST', body: JSON.stringify(tool) },
+      { authenticated: true },
+    )
+  },
+  listEquipmentUnits() {
+    return request('/equipment-units', {}, { authenticated: true })
+  },
+  createEquipmentUnit(unit) {
+    return request(
+      '/equipment-units',
+      { method: 'POST', body: JSON.stringify(unit) },
+      { authenticated: true },
+    )
+  },
+  listCategories() {
+    return request('/categories', {}, { authenticated: true })
+  },
+  listUsers() {
+    return request('/users', {}, { authenticated: true })
+  },
   simulatePayment(payment) {
     return request(
       '/payments/simulations',

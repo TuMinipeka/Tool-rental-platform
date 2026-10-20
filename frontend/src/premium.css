@@ -2189,6 +2189,151 @@ select:focus-visible,
   line-height: 1.6;
 }
 
+.operations-metrics {
+  margin-top: 38px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+}
+
+.provider-workspace,
+.admin-workspace {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: minmax(320px,.75fr) minmax(0,1.25fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.admin-workspace {
+  grid-template-columns: 1.2fr .8fr;
+}
+
+.operations-form,
+.operations-table {
+  border: 1px solid #d3d9dd;
+  background: var(--white);
+  box-shadow: var(--shadow-soft);
+}
+
+.form-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #d3d9dd;
+}
+
+.form-tabs button {
+  min-height: 50px;
+  border: 0;
+  color: #68747e;
+  background: #eef1f3;
+  cursor: pointer;
+}
+
+.form-tabs button.active {
+  color: var(--black);
+  background: var(--yellow);
+  font-weight: 800;
+}
+
+.form-tabs button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.operations-form form {
+  padding: 26px;
+  display: grid;
+  gap: 16px;
+}
+
+.operations-form h2 {
+  margin: 0 0 5px;
+  font-size: 30px;
+}
+
+.operations-form .form-field {
+  margin: 0;
+}
+
+.operations-form textarea,
+.operations-form select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #ccd3d8;
+  color: var(--black);
+  background: var(--white);
+  outline: 0;
+}
+
+.operations-form textarea {
+  min-height: 105px;
+  resize: vertical;
+}
+
+.operations-form textarea:focus,
+.operations-form select:focus {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.check-field input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--black);
+}
+
+.form-hint {
+  padding: 14px;
+  display: flex;
+  gap: 10px;
+  color: #265461;
+  background: #e0f8fc;
+}
+
+.form-hint p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.operations-table > article {
+  min-height: 112px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid #e0e4e7;
+}
+
+.operations-table h3 {
+  margin: 9px 0 4px;
+}
+
+.operations-table p {
+  max-width: 620px;
+  margin: 0;
+  overflow: hidden;
+  color: #6d7882;
+  font-size: 12px;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+}
+
+.operations-table > article > strong {
+  flex: 0 0 auto;
+  text-align: right;
+}
+
 .provider-entry-hero,
 .how-hero {
   min-height: 590px;
@@ -2499,6 +2644,7 @@ select:focus-visible,
   .detail-info { grid-column: 1; }
   .booking-card { grid-column: 2; grid-row: 1 / span 2; }
   .operations-grid { grid-template-columns: 1fr 1fr; }
+  .provider-workspace,.admin-workspace { grid-template-columns: 1fr; }
   .coverage-section > .page-shell { grid-template-columns: 1fr; }
 }
 
@@ -2516,6 +2662,7 @@ select:focus-visible,
   .profile-card { text-align: left; }
   .profile-avatar { margin-left: 0; }
   .provider-entry-steps { grid-template-columns: 1fr 1fr; }
+  .operations-metrics { grid-template-columns: 1fr 1fr; }
   .provider-entry-steps article:nth-child(3) { border-left: 1px solid #d7dde1; }
   .provider-entry-steps article:nth-child(n+3) { border-top: 0; }
   .about-story { grid-template-columns: 1fr; gap: 30px; }
@@ -2546,6 +2693,9 @@ select:focus-visible,
   .reservation-row > div:last-child { text-align: left; }
   .account-cta { padding: 28px 22px; }
   .operations-grid,.provider-entry-steps,.values-section > div,.coverage-cards { grid-template-columns: 1fr; }
+  .operations-metrics { grid-template-columns: 1fr; }
+  .operations-table > article { align-items: flex-start; flex-direction: column; }
+  .operations-table > article > strong { text-align: left; }
   .provider-entry-steps article + article,.values-section article + article,.coverage-cards article + article { border-top: 0; border-left: 1px solid #d4dade; }
   .provider-entry-hero h1,.how-hero h1,.about-hero h1 { font-size: clamp(50px,15vw,72px); }
   .provider-entry-hero .page-shell > div,.about-hero .page-shell > div { align-items: stretch; flex-direction: column; }
