@@ -43,3 +43,32 @@ Las pruebas automáticas crean datos ficticios en una base exclusiva. No prueban
 [status.json](evidence/mvp/status.json) distingue validación local de aceptación pública. El script de publicación y Caddy permanecen bloqueados. Los indicadores públicos solo se habilitan con evidencia del entorno destino; no por compilar. El procedimiento está en [despliegue](deployment.md).
 
 Los contratos consumidos están en [integración](integration-contracts.md). La autoridad de importes, permisos, disponibilidad y transiciones pertenece al backend. Se conserva el [enunciado original](../ejercicioDemo.md).
+
+## Auditoría de las tareas originales de Conde
+
+Revisión: 20 de octubre de 2026. Referencia remota `developer/conde@981a16e`; integrada en `developer/daniel@59bb9c2`. Se contrastó este seguimiento con la sección «Tarea 2» del archivo original conservado en esa referencia de Git, los casos de uso y las pruebas. Las marcas de tarea completada del documento original no sustituyen la aceptación del alcance aprobado.
+
+| Tarea original | Resultado verificado | Pendiente / límite |
+| --- | --- | --- |
+| 1. CRUD de clientes y proveedores | Implementados registro, consulta, actualización y baja lógica; se conserva el perfil y se revocan sesiones | Cierre backend de los perfiles verificado; no implica que toda operación futura de producto tenga pantalla |
+| 2. Reservas | Retención atómica, vencimiento, disponibilidad, confirmación por evento interno, cancelación, entrega y devolución implementados | La confirmación desde un proveedor sandbox oficial depende de la tarea 3 |
+| 3. Pagos y facturación | Checkout interno idempotente, HMAC, pago total, confirmación y comprobante HTML académico | **Parcial para el MVP aprobado:** falta proveedor sandbox oficial, checkout del proveedor, callback auténtico, rechazo/duplicados y conciliación verificados; la simulación interna no satisface el requisito confirmado por Daniel |
+| 4. Reportes y estadísticas | Cinco endpoints con consultas persistidas, alcance de proveedor/administrador y 403 para cliente | profitability representa ingreso reservado, no utilidad neta; no hay costos contables en el modelo |
+| 5. JWT y roles | Registro de proveedor suspendido, activación administrativa, restricciones, validaciones y revocación probados | Los accesos privados del entorno público se provisionan durante el despliegue; no reutilizar usuarios demo |
+| 6. Documentación y pruebas backend | Conde entregó contratos y documentación en 981a16e; existen pruebas de onboarding, pago firmado, reportes y persistencia | La validación PostgreSQL que su documento dejaba pendiente fue cerrada por Daniel; faltan pruebas de la futura pasarela oficial y SMTP público |
+| 7. Mejoras frontend e integración posterior | El documento original de Conde aún las marca pendientes; Daniel ya conectó los recorridos y reportes actuales preservando su diseño | No atribuir a Conde las integraciones posteriores de Daniel ni declarar terminadas mejoras adicionales sin criterios concretos de aceptación |
+
+### Evidencias de implementación
+
+- [CRUD de cliente](../application/src/main/java/com/toolrental/application/customer/usecase/ManageCustomerUseCase.java) y [proveedor](../application/src/main/java/com/toolrental/application/supplier/usecase/ManageSupplierUseCase.java): registro, actualización y baja lógica.
+- [Checkout](../application/src/main/java/com/toolrental/application/payment/usecase/CreateSandboxCheckoutUseCase.java): crea una referencia local sandbox_; no invoca un adquirente externo. [Verificador](../infrastructure/src/main/java/com/toolrental/infrastructure/payment/adapters/in/rest/SandboxWebhookVerifier.java): HMAC propio con vigencia de cinco minutos.
+- [Pruebas PostgreSQL/HTTP](../infrastructure/src/test/java/com/toolrental/infrastructure/PostgresIntegrationTest.java): onboarding y baja, firma inválida, confirmación, comprobante y alcance de reportes. La prueba PostgreSQL adicional conserva restricciones y concurrencia.
+- [Recorrido real ya ejecutado](evidence/mvp/live-integration.json): 43 comprobaciones de integración sin mocks, incluyendo el sandbox interno y Mailpit. [Reporte de pruebas](validation-report.md): alcance, fecha y límites de las suites.
+
+### Dictamen de despliegue
+
+**No está completo el cierre público del MVP.** La pasarela oficial sigue siendo obligatoria por decisión expresa de Daniel. La recuperación está implementada, pero requiere configurar y demostrar recepción por SMTP público. Son dependencias de aceptación, no errores de compilación ni ausencia del flujo académico.
+
+Además de esas tareas funcionales, Daniel debe cerrar capacidad Oracle gratuita, DNS/HTTPS, ejecución ARM, respaldo externo restaurado y accesos privados del destino. No se desplegará públicamente mientras falten estas evidencias. Protección, fiscalidad definitiva y otras capacidades futuras de product-scope no se declaran implementadas por haber completado el ciclo académico.
+
+Revalidación de esta auditoría: `mvnw.cmd clean verify` con Java 21.0.12.1 y PostgreSQL/Testcontainers terminó el 20 de octubre a las 14:27:35 (America/Bogota): 83 pruebas, cero fallos, errores u omisiones; Spotless satisfactorio. Se conserva la huella del log privado en [evidencia consolidada](evidence/mvp/validation-summary.json). Los recorridos frontend se consultaron en su evidencia previa; no se presentan como repetidos en esta auditoría. La conexión JDBC local volvió a responder connected=true.

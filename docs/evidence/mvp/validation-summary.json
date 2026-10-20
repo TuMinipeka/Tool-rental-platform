@@ -185,5 +185,27 @@
     "node scripts/verify-configuration.mjs",
     "node scripts/verify-arm-images.mjs"
   ],
-  "publicDeploymentPerformed": false
+  "publicDeploymentPerformed": false,
+  "condeTaskAudit": {
+    "auditedAt": "2026-10-20T19:27:56.004824+00:00",
+    "sourceCommit": "59bb9c2b136ea3315904390797564153a00a6cd2",
+    "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
+    "command": ".\\mvnw.cmd clean verify",
+    "finishedAt": "2026-10-20T14:27:35-05:00",
+    "result": "BUILD SUCCESS",
+    "java": "21.0.12.1",
+    "totals": {
+      "tests": 83,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "logSha256": "ba881bc338281e60cf15f33e602128891c152f660e09174a888ebb135e45ea9f",
+    "frontendJourneysRepeated": false,
+    "publicDeploymentAuthorizedByChecklist": false,
+    "blockingFunctionalAcceptance": [
+      "Official external sandbox provider integration",
+      "Public SMTP delivery acceptance"
+    ]
+  }
 }

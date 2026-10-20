@@ -27,3 +27,7 @@ Las [capturas](evidence/mvp/screenshots/) contienen únicamente datos académico
 No se acredita pasarela oficial externa, cobro bancario, SMTP público, copia externa, DNS/HTTPS público ni ejecución en Oracle. La facturación es académica y profitability representa ingreso reservado, no margen contable. El perfil público desactiva credenciales conocidas; las cuentas privadas probadas localmente no sustituyen provisionar accesos en el destino.
 
 La composición aislada permanece en http://localhost:15173. [MVP](mvp.md), [despliegue](deployment.md) y [status.json](evidence/mvp/status.json) separan estos resultados del cierre público. No se alteró el historial aplicado para integrar migraciones inferiores: se usó una base demo nueva.
+
+## Revalidación de tareas de Conde
+
+El 20 de octubre de 2026 a las 14:27:35 (America/Bogota) se repitió clean verify sobre 59bb9c2: 83 pruebas, cero fallos, errores u omisiones, PostgreSQL/Testcontainers y Spotless satisfactorios. La [auditoría en MVP](mvp.md#auditoría-de-las-tareas-originales-de-conde) diferencia las siete tareas originales y las aceptaciones pendientes. No se repitieron las suites de navegador ni se habilitó el despliegue público; sigue faltando pasarela oficial y SMTP público, además de los requisitos operativos del destino.
