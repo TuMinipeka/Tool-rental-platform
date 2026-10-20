@@ -398,3 +398,51 @@
   .coverage-section{padding-block:52px}
   .coverage-section h2{font-size:46px}
 }
+
+/* About page: 40 percent more compact */
+.about-hero{min-height:360px}
+.about-hero .page-shell{padding-block:38px}
+.about-hero h1{max-width:650px;margin:8px 0 12px;font-size:clamp(48px,4.7vw,66px);line-height:.9}
+.about-hero .page-shell>p:not(.kicker){max-width:540px;font-size:13px;line-height:1.45}
+.about-hero .page-shell>div{margin-top:15px}
+.about-hero .button{min-height:42px;padding-inline:20px;font-size:11px}
+.about-story{padding-block:40px 28px;gap:30px}
+.about-story article+article{padding-left:30px}
+.about-story h2{margin:7px 0 10px;font-size:clamp(36px,3.3vw,46px)}
+.about-story article>p:last-child{font-size:12px;line-height:1.5}
+.values-section{padding-bottom:40px}
+.values-section>.kicker{margin-bottom:12px}
+.values-section>div{gap:10px}
+.values-section article{min-height:104px;padding:16px}
+.values-section h3{margin:15px 0 4px;font-size:15px}
+.values-section p{font-size:11px;line-height:1.4}
+.coverage-section{padding-block:42px}
+.coverage-section>.page-shell{gap:38px}
+.coverage-section h2{margin:8px 0 12px;font-size:clamp(40px,3.8vw,52px)}
+.coverage-section p:not(.kicker){font-size:12px;line-height:1.45}
+.coverage-cards{gap:9px}
+.coverage-cards article{min-height:106px;padding:15px}
+.coverage-cards h3{font-size:15px}
+.coverage-cards p{font-size:11px}
+
+@media(max-width:820px){
+  .about-hero{min-height:400px}
+  .about-hero h1{font-size:54px}
+  .about-story{gap:20px}
+  .about-story article+article{padding-top:20px}
+}
+
+@media(max-width:620px){
+  .about-hero{min-height:480px}
+  .about-hero .page-shell{padding-block:34px}
+  .about-hero h1{font-size:clamp(40px,12vw,48px)}
+  .about-hero .page-shell>p:not(.kicker){font-size:12px}
+  .about-story{padding-block:34px 24px}
+  .about-story h2{font-size:34px}
+  .values-section{padding-bottom:34px}
+  .values-section article{min-height:92px;padding:14px}
+  .coverage-section{padding-block:36px}
+  .coverage-section>.page-shell{gap:24px}
+  .coverage-section h2{font-size:38px}
+  .coverage-cards article{min-height:88px;padding:13px}
+}
