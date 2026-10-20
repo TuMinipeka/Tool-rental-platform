@@ -1,16 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { api, normalizeCatalogTool, readSession, saveSession } from './api.js'
+import { demoCatalog } from './demoCatalog.js'
 import TermsAndConditionsPage from './TermsAndConditionsPage.jsx'
 import { prioritizeFeaturedTools, resolveToolVisual } from './toolVisuals.js'
 
-const tools = [
-  { id:'rotomartillo', name:'Rotomartillo SDS Max 1.500 W', category:'Demolición', price:85000, location:'Bucaramanga, Santander', rating:null, reviews:null, stock:3, color:'orange', accent:'Demostración', description:'Potencia profesional para perforación y demolición de concreto. Incluye maletín, cincel y empuñadura auxiliar.' },
-  { id:'mezcladora', name:'Mezcladora de concreto 160 L', category:'Concreto', price:120000, location:'Floridablanca, Santander', rating:null, reviews:null, stock:2, color:'yellow', accent:'Demostración', description:'Mezcladora portátil con motor eléctrico y tambor basculante para obras, remodelaciones y acabados.' },
-  { id:'cortadora', name:'Cortadora de baldosa 1.200 mm', category:'Corte', price:62000, location:'Girón, Santander', rating:null, reviews:null, stock:4, color:'blue', accent:'Demostración', description:'Guía reforzada y rodel de tungsteno para cortes rectos limpios en cerámica y porcelanato.' },
-  { id:'hidrolavadora', name:'Hidrolavadora profesional 2.200 PSI', category:'Limpieza', price:74000, location:'Piedecuesta, Santander', rating:null, reviews:null, stock:5, color:'green', accent:'Demostración', description:'Equipo compacto de alta presión con manguera de ocho metros y boquillas intercambiables.' },
-  { id:'generador', name:'Generador eléctrico 3.2 kW', category:'Energía', price:145000, location:'Bucaramanga, Santander', rating:null, reviews:null, stock:2, color:'red', accent:'Demostración', description:'Generador a gasolina con regulación automática de voltaje para equipos y herramientas de obra.' },
-  { id:'escalera', name:'Escalera multipropósito 4 × 4', category:'Altura', price:48000, location:'Floridablanca, Santander', rating:null, reviews:null, stock:6, color:'silver', accent:'Demostración', description:'Escalera articulada en aluminio con seguros reforzados y múltiples configuraciones de trabajo.' },
-]
+const tools = demoCatalog
 const money = new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0})
 const toDateInput=value=>{
   const date=new Date(value)
@@ -25,7 +19,8 @@ const defaultStartDate = toDateInput(nextDay)
 const defaultReturnDate = toDateInput(fourthDay)
 const serviceLocations = ['Bucaramanga', 'Floridablanca', 'Girón', 'Piedecuesta']
 const storedLocation = typeof window === 'undefined' ? null : window.localStorage.getItem('tool-rental-location')
-const defaultLocation = serviceLocations.includes(storedLocation) ? storedLocation : serviceLocations[0]
+const requestedLocation = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('municipio')
+const defaultLocation = serviceLocations.includes(requestedLocation) ? requestedLocation : serviceLocations.includes(storedLocation) ? storedLocation : serviceLocations[0]
 
 function Icon({name,size=20}) {
   const paths = {
@@ -51,7 +46,7 @@ function Header({session,onOpenAuth,path,location,onLocationChange}){
 }
 function Footer(){return <footer className="site-footer"><div className="footer-lead"><Brand/><h2>Tu proyecto empieza con la herramienta correcta.</h2><button className="button button-lime" onClick={()=>navigate('/catalogo')}>Explorar catálogo <Icon name="arrow"/></button></div><div className="footer-links"><div><strong>Plataforma</strong><button onClick={()=>navigate('/catalogo')}>Catálogo</button><button onClick={()=>navigate('/como-funciona')}>Cómo funciona</button><button onClick={()=>navigate('/cuenta')}>Mi cuenta</button></div><div><strong>Compañía</strong><button onClick={()=>navigate('/nosotros')}>Sobre nosotros</button><button onClick={()=>navigate('/informacion/contacto')}>Contacto</button><button onClick={()=>navigate('/informacion/faq')}>Preguntas frecuentes</button></div><div><strong>Legal</strong><button onClick={()=>navigate('/terms-and-conditions')}>Términos y condiciones</button><button onClick={()=>navigate('/informacion/privacidad')}>Privacidad</button></div></div><div className="footer-bottom"><span>© 2026 Tool Rental · Proyecto académico</span><span>Hecho para construir en Colombia</span></div></footer>}
 
-function SearchBar({location,onLocationChange}){const [term,setTerm]=useState('');return <form className="search-bar" onSubmit={event=>{event.preventDefault();const params=new URLSearchParams();if(term.trim())params.set('q',term.trim());params.set('municipio',location);navigate(`/catalogo?${params}`)}}><div><Icon name="search"/><label htmlFor="home-search">¿Qué necesitas?</label><input id="home-search" value={term} onChange={event=>setTerm(event.target.value)} placeholder="Ej. rotomartillo, mezcladora, cortadora..."/></div><i/><label className="search-location"><Icon name="pin"/><span><small>Ubicación</small><select value={location} onChange={event=>onLocationChange(event.target.value)}>{serviceLocations.map(city=><option key={city}>{city}, Santander</option>)}</select></span></label><button aria-label="Buscar"><span>Buscar</span><Icon name="arrow"/></button></form>}
+function SearchBar({location,onLocationChange}){const [term,setTerm]=useState('');return <form className="search-bar" onSubmit={event=>{event.preventDefault();const params=new URLSearchParams();if(term.trim())params.set('q',term.trim());params.set('municipio',location);navigate(`/catalogo?${params}`)}}><div><Icon name="search"/><label htmlFor="home-search">¿Qué necesitas?</label><input id="home-search" value={term} onChange={event=>setTerm(event.target.value)} placeholder="Ej. rotomartillo, mezcladora, cortadora..."/></div><i/><label className="search-location"><Icon name="pin"/><span><small>Ubicación</small><select value={location} onChange={event=>onLocationChange(event.target.value)}>{serviceLocations.map(city=><option key={city} value={city}>{city}, Santander</option>)}</select></span></label><button aria-label="Buscar"><span>Buscar</span><Icon name="arrow"/></button></form>}
 function HeroArtwork({location}){
   const imageRef=useRef(null)
   const ringRef=useRef(null)
@@ -131,11 +126,17 @@ function App(){
   const [catalogTools,setCatalogTools]=useState(tools)
   const [dataMode,setDataMode]=useState('demo')
   const [location,setLocation]=useState(defaultLocation)
+  const displayedCatalogTools=useMemo(()=>dataMode==='demo'?catalogTools.map(tool=>({...tool,location:`${location}, Santander` })):catalogTools,[catalogTools,dataMode,location])
 
   const changeLocation=nextLocation=>{
     if(!serviceLocations.includes(nextLocation))return
     setLocation(nextLocation)
     window.localStorage.setItem('tool-rental-location',nextLocation)
+    const currentUrl=new URL(window.location.href)
+    if(currentUrl.pathname==='/'||currentUrl.pathname==='/catalogo'){
+      currentUrl.searchParams.set('municipio',nextLocation)
+      window.history.replaceState({},'',`${currentUrl.pathname}?${currentUrl.searchParams}`)
+    }
   }
 
   useEffect(()=>{
@@ -208,9 +209,9 @@ function App(){
   }
 
   let page
-  if(path==='/')page=<HomePage catalogTools={catalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
-  else if(path==='/catalogo')page=<CatalogPage catalogTools={catalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
-  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools} dataMode={dataMode}/>
+  if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
+  else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
+  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={displayedCatalogTools} dataMode={dataMode}/>
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
   else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
