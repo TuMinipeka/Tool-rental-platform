@@ -175,6 +175,7 @@ Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca ed
 | Modelo y datos | [conceptual-model.md](docs/conceptual-model.md) · [fourth-normal-form.md](docs/fourth-normal-form.md) · [data-sources.md](docs/data-sources.md) |
 | Alcance y cobertura | [product-scope.md](docs/product-scope.md) · [requirements-coverage.md](docs/requirements-coverage.md) · [pendientes.md](docs/pendientes.md) |
 | Operación | [deployment.md](docs/deployment.md) · [build-and-test.md](docs/build-and-test.md) · [database-migrations.md](docs/database-migrations.md) |
+| Rendimiento y accesibilidad del frontend | [Auditoría, mediciones y pruebas](docs/frontend-quality.md) |
 | Condiciones | [terms-and-conditions.md](docs/terms-and-conditions.md) |
 
 Los nombres de código y commits se mantienen en inglés. La documentación para el equipo se conserva en español.

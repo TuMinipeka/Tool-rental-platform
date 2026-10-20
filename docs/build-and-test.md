@@ -57,10 +57,13 @@ cd frontend
 npm ci
 npm run lint
 npm run build
+npm run test:e2e
 npm run dev
 ```
 
 `npm ci` respeta el lockfile; `build` produce `frontend/dist`. Vite sirve desarrollo en 5173. La base consume `/api/v1`, mantiene el access token en memoria y usa la cookie refresh con CSRF; los paneles operativos completos continúan pendientes.
+
+Las pruebas E2E requieren Chrome y utilizan respuestas API de prueba sin mutar la base. El procedimiento de Lighthouse, axe, capturas, memoria y entrega Nginx está en [rendimiento y accesibilidad](frontend-quality.md). Sus informes se generan fuera de `dist` y del contexto Docker.
 
 ## Evidencia y límites
 

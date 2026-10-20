@@ -56,6 +56,7 @@ Do not add speculative empty classes or abstractions. Empty adapter directories 
 ## Quality and documentation
 
 - For frontend interface design, interaction, and motion work, consult `.agents/skills/emil-design-eng/SKILL.md` and apply the guidance relevant to the task.
+- For frontend optimization, prioritize `.agents/skills/performance/SKILL.md` and `.agents/skills/web-quality-audit/SKILL.md`; apply `.agents/skills/vercel-react-best-practices/SKILL.md` to React changes and `.agents/skills/webapp-testing/SKILL.md` to browser verification. Preserve visual design, animations, content, and functionality. Require equivalent before/after measurements before claiming performance improvements.
 - Add tests in the layer that owns each new behavior. Persistence and concurrency require real integration tests.
 - Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS before completion.
 - Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.

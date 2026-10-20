@@ -1,0 +1,264 @@
+import { test, expect } from '@playwright/test'
+import AxeBuilder from '@axe-core/playwright'
+import { catalog, mockApi } from './fixtures.js'
+
+test.beforeEach(async ({ page }) => { await mockApi(page) })
+
+async function login(page) {
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
+  await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
+  await dialog.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  await expect(dialog).toHaveCount(0)
+}
+
+for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/no-existe']) {
+  test(`renders ${path} without runtime errors or horizontal overflow`, async ({ page }) => {
+    const errors = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.goto(path)
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
+    await expect(page.getByRole('main')).toHaveCount(1)
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
+    expect(errors).toEqual([])
+  })
+}
+
+test('search keeps municipality and filters the catalog', async ({ page }) => {
+  await page.goto('/?municipio=Gir%C3%B3n')
+  await page.getByLabel('¿Qué necesitas?').fill('Rotomartillo')
+  await page.getByRole('button', { name: 'Buscar', exact: true }).click()
+  await expect(page).toHaveURL(/catalogo\?q=Rotomartillo&municipio=Gir/)
+  await expect(page.locator('.tool-card')).toHaveCount(1)
+  await page.getByRole('textbox', { name: 'Buscar herramienta o categoría' }).fill('no-match-qa')
+  await expect(page.getByRole('main')).toHaveCount(1)
+  await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeVisible()
+  await page.getByRole('button', { name: 'Limpiar filtros' }).click()
+  await expect(page.locator('.tool-card')).toHaveCount(catalog.length)
+})
+
+test('mobile menu remains keyboard accessible and closes after navigation', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile menu only')
+  await page.goto('/')
+  const menu = page.getByRole('button', { name: 'Abrir menú' })
+  await menu.click()
+  await expect(page.getByRole('button', { name: 'Cerrar menú' })).toHaveAttribute('aria-expanded', 'true')
+  await page.locator('#main-navigation').getByRole('button', { name: 'Catálogo', exact: true }).click()
+  await expect(page).toHaveURL(/\/catalogo(?:\?|$)/)
+  await expect(menu).toHaveAttribute('aria-expanded', 'false')
+})
+
+test('featured carousel retains next and previous pages', async ({ page }) => {
+  await page.goto('/')
+  const first = await page.locator('.featured-tool-card h3').first().textContent()
+  await page.getByRole('button', { name: 'Ver equipos siguientes' }).click()
+  await expect(page.locator('.featured-tool-card h3').first()).not.toHaveText(first)
+  await page.getByRole('button', { name: 'Ver equipos anteriores' }).click()
+  await expect(page.locator('.featured-tool-card h3').first()).toHaveText(first)
+})
+
+test('dialog traps focus, supports Escape, and returns focus to its trigger', async ({ page }) => {
+  await page.goto('/')
+  const trigger = page.getByRole('button', { name: 'Ingresar', exact: true })
+  await trigger.click()
+  const dialog = page.getByRole('dialog')
+  await expect(dialog).toHaveAttribute('aria-labelledby', 'auth-title')
+  const first = dialog.getByRole('button', { name: 'Cerrar acceso' })
+  await first.focus()
+  await page.keyboard.press('Shift+Tab')
+  await expect(dialog.getByRole('button', { name: 'Regístrate' })).toBeFocused()
+  await page.keyboard.press('Tab')
+  await expect(first).toBeFocused()
+  await page.keyboard.press('Escape')
+  await expect(dialog).toHaveCount(0)
+  await expect(trigger).toBeFocused()
+})
+
+test('login and password recovery keep their working contracts', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByRole('button', { name: '¿Olvidaste tu contraseña?' }).click()
+  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
+  await dialog.getByRole('button', { name: 'Solicitar recuperación' }).click()
+  await expect(dialog.getByText('Solicitud aceptada')).toBeVisible()
+  await dialog.getByRole('button', { name: 'Volver al ingreso' }).click()
+  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
+  await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
+  await dialog.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
+  expect(await page.evaluate(() => JSON.stringify({ ...localStorage, ...sessionStorage }))).not.toContain('qa-access-token')
+})
+
+test('reservation dates stay inclusive and checkout keeps logistics', async ({ page }) => {
+  await page.goto(`/herramienta/${catalog[1].toolId}`)
+  const start = page.getByLabel('Fecha de inicio')
+  const end = page.getByLabel('Fecha de devolución')
+  const date = await start.inputValue()
+  await end.fill(date)
+  await expect(page.locator('.booking-summary')).toContainText('1 día')
+  await page.getByRole('button', { name: 'Comprobar disponibilidad' }).click()
+  await expect(page).toHaveURL(/\/cotizacion$/)
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Recoger con el proveedor/ })).toBeVisible()
+  await expect(page.getByRole('button', { name: /Entrega del proveedor/ })).toBeVisible()
+})
+
+test('catalog failures retain the explicitly identified demo experience', async ({ page }) => {
+  await mockApi(page, { unavailable: true })
+  await page.goto('/catalogo')
+  await expect(page.locator('.data-notice')).toContainText(/demostrativ|muestra/i)
+  await expect(page.locator('.tool-card').first()).toBeVisible()
+})
+
+test('registration still sends customer profile fields', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  const dialog = page.getByRole('dialog')
+  await dialog.getByRole('button', { name: 'Regístrate' }).click()
+  await page.waitForTimeout(900)
+  expect((await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()).violations).toEqual([])
+  await dialog.getByLabel('Nombre completo').fill('QA Customer')
+  await dialog.getByLabel('Número', { exact: true }).fill('12345678')
+  await dialog.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
+  await dialog.getByLabel(/^Contraseña/).fill('qa-password-123456')
+  const submission = page.waitForRequest(request => request.url().endsWith('/auth/register'))
+  await dialog.getByRole('button', { name: 'Crear cuenta' }).click()
+  expect((await submission).postDataJSON()).toMatchObject({ personType: 'NATURAL_PERSON', documentType: 'CC', documentNumber: '12345678', displayName: 'QA Customer' })
+  await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
+})
+
+test('authenticated checkout creates a request without collecting payment', async ({ page }) => {
+  await page.goto(`/herramienta/${catalog[1].toolId}`)
+  await login(page)
+  const date = await page.getByLabel('Fecha de inicio').inputValue()
+  await page.getByRole('button', { name: 'Comprobar disponibilidad' }).click()
+  await page.getByRole('textbox', { name: 'Fecha y hora programada' }).fill(`${date}T09:00`)
+  await page.waitForTimeout(900)
+  const accessibility = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()
+  expect(accessibility.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([])
+  const payments = []
+  page.on('request', request => { if (request.url().includes('/payments/')) payments.push(request.url()) })
+  const submission = page.waitForRequest(request => request.method() === 'POST' && request.url().endsWith('/api/v1/reservations'))
+  await page.getByRole('button', { name: 'Crear solicitud', exact: true }).click()
+  expect((await submission).postDataJSON()).toMatchObject({ fulfillmentMethod: 'CUSTOMER_PICKUP', deliveryAddressLine: null })
+  await expect(page).toHaveURL(/\/reserva-confirmada$/)
+  expect(payments).toEqual([])
+})
+
+for (const [role, path] of [['SUPPLIER', '/panel/proveedor'], ['ADMIN', '/panel/admin']]) {
+  test(`authenticated ${role} dashboard keeps rendering after code splitting`, async ({ page }) => {
+    await mockApi(page, { roles: [role] })
+    await page.goto('/')
+    await login(page)
+    const errors = []
+    page.on('pageerror', error => errors.push(error.message))
+    await page.evaluate(path => { history.pushState({}, '', path); dispatchEvent(new PopStateEvent('popstate')) }, path)
+    await expect(page.locator('.operations-metrics')).toBeVisible()
+    await expect(page.getByRole('main')).toHaveCount(1)
+    expect(errors).toEqual([])
+  })
+}
+
+test('public pages and authentication pass automated accessibility checks', async ({ page }) => {
+  for (const path of ['/', '/catalogo', '/nosotros', '/terms-and-conditions']) {
+    await page.goto(path)
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()
+    await page.waitForTimeout(900) // Audit the settled state, after the existing entry/reveal animations.
+    const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()
+    expect(audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => n.target) }))).toEqual([])
+  }
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Ingresar', exact: true }).click()
+  await expect(page.getByRole('dialog')).toBeVisible()
+  await page.waitForTimeout(900)
+  const audit = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa', 'best-practice']).analyze()
+  expect(audit.violations.map(v => ({ id: v.id, nodes: v.nodes.map(n => ({ target: n.target, summary: n.failureSummary })) }))).toEqual([])
+})
+
+test('secondary routes are downloaded on demand', async ({ page }) => {
+  const scripts = []
+  page.on('request', request => { if (request.resourceType() === 'script') scripts.push(request.url()) })
+  await page.goto('/')
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  expect(scripts.some(url => /TermsAndConditionsPage|RentalPages|AccountPages|InformationPages/.test(url))).toBe(false)
+  await page.getByRole('button', { name: 'Términos y condiciones', exact: true }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Términos y Condiciones')
+  expect(scripts.some(url => url.includes('TermsAndConditionsPage'))).toBe(true)
+})
+
+test('hero and featured card reuse one responsive image download', async ({ page }) => {
+  const images = new Set()
+  page.on('request', request => {
+    if (request.url().includes('/assets/optimized/hero-rotary-hammer-1200-')) images.add(request.url())
+  })
+  await page.goto('/')
+  await expect.poll(() => page.locator('.hero-artwork img').evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true)
+  await page.locator('.featured-section').scrollIntoViewIfNeeded()
+  await expect.poll(() => page.locator('.featured-tool-card img').first().evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true)
+  expect(images.size).toBe(1)
+})
+
+test('optimized images fall back to original PNGs when unavailable', async ({ page }) => {
+  await page.route('**/assets/optimized/*.webp', route => route.fulfill({ status: 404, body: '' }))
+  await page.goto('/')
+  const image = page.locator('.hero-artwork img')
+  await expect.poll(() => image.evaluate(node => node.complete && node.naturalWidth > 0 && node.currentSrc.endsWith('.png'))).toBe(true)
+})
+
+test('a failed route download offers recovery and preserves navigation', async ({ page }) => {
+  await page.route('**/assets/TermsAndConditionsPage-*.js', route => route.fulfill({ status: 503, body: '' }))
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Términos y condiciones', exact: true }).click()
+  await expect(page.getByRole('alert')).toContainText('No pudimos abrir este contenido')
+  await expect(page.getByRole('button', { name: 'Recargar página' })).toBeVisible()
+  await expect(page.getByRole('banner')).toBeVisible()
+  await expect(page.getByRole('main')).toHaveCount(1)
+})
+
+test('normal motion remains enabled and reduced-motion preference is respected', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Mouse parallax is intentionally excluded on touch devices')
+  await page.goto('/')
+  await page.waitForTimeout(1000)
+  const artwork = page.locator('.hero-artwork')
+  const image = artwork.locator('img')
+  const initial = await image.evaluate(el => getComputedStyle(el).transform)
+  const point = await artwork.evaluate(node => {
+    const box = node.getBoundingClientRect()
+    for (const xFactor of [.85, .7, .5]) {
+      const x = Math.min(innerWidth - 20, box.x + box.width * xFactor)
+      const y = box.y + box.height * .5
+      if (node.contains(document.elementFromPoint(x, y))) return { x, y }
+    }
+    return null
+  })
+  expect(point).not.toBeNull()
+  await page.mouse.move(point.x, point.y)
+  await expect.poll(() => image.evaluate(el => getComputedStyle(el).transform)).not.toBe(initial)
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/')
+  const reduced = await image.evaluate(el => getComputedStyle(el).transform)
+  await page.mouse.move(0, 0)
+  await page.mouse.move(point.x, point.y)
+  await expect.poll(() => image.evaluate(el => getComputedStyle(el).transform)).toBe(reduced)
+})
+
+test('card motion preserves mouse feedback, touch scrolling, and keyboard navigation', async ({ page }, testInfo) => {
+  await page.goto('/catalogo')
+  const card = page.locator('.tool-card').first()
+  await card.scrollIntoViewIfNeeded()
+  if (testInfo.project.name === 'mobile') {
+    await card.dispatchEvent('pointermove', { pointerType: 'touch', clientX: 100, clientY: 100 })
+    expect(await card.evaluate(node => node.style.transform)).toBe('')
+  } else {
+    const box = await card.boundingBox()
+    await page.mouse.move(box.x + box.width * .6, box.y + box.height * .5)
+    await expect.poll(() => card.evaluate(node => node.style.transform)).toContain('perspective')
+    await page.mouse.move(2, 2)
+    await expect.poll(() => card.evaluate(node => node.style.transform)).toBe('')
+  }
+  await card.focus()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/\/herramienta\//)
+})

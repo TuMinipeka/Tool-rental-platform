@@ -8,6 +8,7 @@
 | Datos | Flyway aditivo, JPA validate y 25 tablas | Usuario migrador separado, backup y recuperación ensayada |
 | Negocio | Políticas versionadas, extensiones, mora y liquidación | Validación legal/fiscal y pasarela real |
 | Operación | Dockerfiles, Compose, health JDBC y documentación | CI/CD, métricas, trazas, alertas, SLO y runbooks |
+| Frontend | Assets responsivos sin pérdida, chunks por funcionalidad, gzip/caché, Playwright y axe | RUM de producción, navegadores/dispositivos reales y lector de pantalla; consultar [la evidencia de laboratorio](frontend-quality.md) |
 
 ## Variables críticas
 
