@@ -13,7 +13,15 @@
   .catalog-hero img{right:8%;bottom:-31%;width:47%;max-height:430px}
   .catalog-side-copy{top:76px}
   .catalog-search-dock{margin-top:-34px}
-  .catalog-body{grid-template-columns:235px minmax(0,1fr);gap:18px}
+  .catalog-body{grid-template-columns:270px minmax(0,1fr);gap:20px}
+  .catalog-filters{padding:20px}
+  .catalog-filters h2{margin-bottom:10px;padding-bottom:14px;font-size:21px}
+  .filter-section{padding:15px 0}
+  .filter-section>strong{margin-bottom:10px;font-size:13px}
+  .filter-section label{min-height:30px;grid-template-columns:22px 1fr auto;font-size:12px}
+  .filter-section input[type=checkbox]{width:16px;height:16px}
+  .filter-range{margin-top:5px;font-size:10px}
+  .filter-info p{font-size:11px;line-height:1.55}
   .catalog-reference-page .catalog-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
   .catalog-tool-card .tool-card-media{height:180px;min-height:180px!important}
   .catalog-tool-card .tool-visual>img{padding:20px 14px 8px}
