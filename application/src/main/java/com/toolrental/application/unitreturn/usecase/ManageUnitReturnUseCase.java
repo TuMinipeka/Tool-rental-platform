@@ -90,8 +90,8 @@ public final class ManageUnitReturnUseCase {
                   .findById(new RentalId(reservation.id().value()))
                   .orElseThrow(
                       () ->
-                          new com.toolrental.application.common.exception
-                              .ReferenceNotFoundApplicationException("Rental"));
+                          new BusinessRuleException(
+                              "Rental must be started before a return can be registered"));
           WorkflowReferences.require(
               !"CANCELLED".equals(rental.rentalStatus()), "Rental is cancelled");
           var delivery =

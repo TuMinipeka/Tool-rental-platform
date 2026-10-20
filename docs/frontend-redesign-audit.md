@@ -75,6 +75,7 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - El panel de proveedor consulta herramientas, categorías y unidades reales; permite crear herramientas sin fotografías falsas y registrar unidades físicas propias. El backend limita el listado de unidades al inventario del proveedor, mientras el administrador conserva la vista total.
 - El panel administrativo calcula usuarios, unidades y categorías desde endpoints protegidos, sin métricas comerciales inventadas.
 - Se eliminó el acceso demostrativo que fabricaba una sesión cuando fallaba la autenticación.
+- El registro de una devolución antes de iniciar el alquiler responde como conflicto de estado (`409`) en lugar de ocultarlo como recurso inexistente (`404`), conforme al contrato de integración.
 
 ### Validación ejecutada
 
@@ -82,4 +83,4 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - `npm.cmd run build`: correcto.
 - Vite sirvió inicio, catálogo, detalle, sobre nosotros, cómo funciona, cuenta, publicar, panel de proveedor, términos y ruta desconocida con respuesta HTTP 200 del fallback SPA.
 - Revisión headless en Edge a 1600 × 1000 y 390 × 844; se corrigieron el ancho del buscador y el desbordamiento del hero móvil detectados en la primera pasada.
-- La suite Maven completa queda para la fase de calidad porque este avance no cambia Java, persistencia ni contratos del backend.
+- `mvnw.cmd clean verify`: correcto; 74 pruebas superadas (`25 domain`, `16 application`, `33 infrastructure`), incluidas arquitectura, migraciones Flyway, persistencia, concurrencia y PostgreSQL real con Testcontainers.
