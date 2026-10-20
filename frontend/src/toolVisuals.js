@@ -10,14 +10,22 @@ const equipmentVisuals = [
   { pattern: /vibrador de concreto/, src: '/assets/tools/equipment/concrete-vibrator.png' },
   { pattern: /generador|planta electrica/, src: '/assets/tools/equipment/portable-generator.png' },
   { pattern: /clavadora/, src: '/assets/tools/equipment/pneumatic-nail-gun.png' },
-  { pattern: /mezcladora/, src: '/assets/tools/equipment/concrete-mixer.png' },
+  { pattern: /mezcladora|concrete mixer/, src: '/assets/tools/equipment/concrete-mixer.png' },
   { pattern: /cortadora de (baldosa|ceramica)/, src: '/assets/tools/equipment/manual-tile-cutter.png' },
   { pattern: /torre de iluminacion/, src: '/assets/tools/equipment/mobile-light-tower.png' },
-  { pattern: /compresor/, src: '/assets/tools/equipment/air-compressor.png' },
+  { pattern: /compresor|air compressor/, src: '/assets/tools/equipment/air-compressor.png' },
   { pattern: /placa vibratoria|compactadora de placa/, src: '/assets/tools/equipment/plate-compactor.png' },
   { pattern: /brilladora|pulidora industrial|pulidora de piso/, src: '/assets/tools/equipment/floor-polisher.png' },
   { pattern: /soldador/, src: '/assets/tools/equipment/inverter-welder.png' },
-  { pattern: /rotomartillo|demoledor|martillo combinado/, src: '/assets/hero-rotary-hammer-1200.png' },
+  { pattern: /rotomartillo|rotary hammer|demoledor|martillo combinado/, src: '/assets/hero-rotary-hammer-1200.png' },
+]
+
+const featuredOrder = [
+  /rotomartillo|rotary hammer/,
+  /mezcladora|concrete mixer/,
+  /cortadora de (baldosa|ceramica)/,
+  /hidrolavadora/,
+  /generador/,
 ]
 
 function normalizeName(value = '') {
@@ -30,4 +38,13 @@ function normalizeName(value = '') {
 export function resolveToolVisual(tool) {
   const name = normalizeName(tool?.name)
   return equipmentVisuals.find(({ pattern }) => pattern.test(name))?.src ?? null
+}
+
+export function prioritizeFeaturedTools(tools) {
+  const remaining = [...tools]
+  const prioritized = featuredOrder.flatMap(pattern => {
+    const index = remaining.findIndex(tool => pattern.test(normalizeName(tool?.name)))
+    return index < 0 ? [] : remaining.splice(index, 1)
+  })
+  return [...prioritized, ...remaining]
 }
