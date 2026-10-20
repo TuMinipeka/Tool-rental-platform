@@ -72,6 +72,8 @@ La auditoría contrasta el frontend React, el contrato REST, la seguridad de ses
 - Cómo funciona explica solicitud, confirmación del proveedor y pago académico 50/50 sin fingir el flujo sandbox futuro.
 - Mi cuenta usa identidad de sesión y `GET /api/v1/reservations`; las secciones sin integración muestran un estado pendiente en vez de cifras o documentos falsos.
 - Los paneles de proveedor y administración comprueban roles antes de renderizar y no presentan operaciones demostrativas como reales.
+- El panel de proveedor consulta herramientas, categorías y unidades reales; permite crear herramientas sin fotografías falsas y registrar unidades físicas propias. El backend limita el listado de unidades al inventario del proveedor, mientras el administrador conserva la vista total.
+- El panel administrativo calcula usuarios, unidades y categorías desde endpoints protegidos, sin métricas comerciales inventadas.
 - Se eliminó el acceso demostrativo que fabricaba una sesión cuando fallaba la autenticación.
 
 ### Validación ejecutada
