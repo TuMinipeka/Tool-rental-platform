@@ -1,5 +1,9 @@
 # Reporte de validación del MVP
 
+## Aceptación crítica de API del 21 de octubre de 2026
+
+La comprobación actual de Swagger, Insomnia y Apache Tomcat está en [pruebas del sistema](system-tests.md): 41 peticiones y 61 comprobaciones aprobadas mediante Inso CLI, persistencia consultada directamente en PostgreSQL aislado y dos pruebas focalizadas de OpenAPI. Esta verificación no sustituye ni amplía el alcance de las regresiones históricas descritas a continuación.
+
 > Gestión de herramientas, imágenes y persistencia: [contratos y verificación actual](provider-persistence.md). Las evidencias anteriores conservan su revisión histórica.
 
 > Integración actual de Conde: [cambios y validaciones pendientes](integration-review.md). Las capturas y recorridos previos son evidencia histórica y no acreditan automáticamente los cambios nuevos.
@@ -62,7 +66,3 @@ Se retiene el elemento de los formularios antes de esperar la respuesta del serv
 La simulación de pagos está aceptada localmente conforme al alcance autorizado; no se exige una compra externa. PayPal y correo están aplazados, recuperación permanece oculta y deshabilitada, y SMTP no bloquea el arranque.
 
 Faltan capacidad gratuita Oracle, DNS/HTTPS, ejecución ARM, restauración desde respaldo externo y accesos privados del destino. Después deberán repetirse allí los recorridos por rol. Los [manifiestos ARM anteriores](evidence/mvp/arm-manifests.json) acreditan imágenes base, no una VM ejecutándose. [MVP](mvp.md), [estado](evidence/mvp/status.json) y [despliegue](deployment.md) mantienen bloqueada la publicación hasta contar con evidencia del entorno público.
-# Aceptación crítica de API del 21 de octubre de 2026
-
-La comprobación actual de Swagger, Insomnia y Apache Tomcat está en [pruebas del sistema](system-tests.md): 41 peticiones y 61 comprobaciones aprobadas mediante Inso CLI, persistencia consultada directamente en PostgreSQL aislado y dos pruebas focalizadas de OpenAPI. Esta verificación no sustituye ni amplía el alcance de las regresiones históricas descritas a continuación.
-
