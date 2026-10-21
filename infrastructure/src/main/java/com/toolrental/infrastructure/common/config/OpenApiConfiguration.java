@@ -34,8 +34,6 @@ public class OpenApiConfiguration {
 
   @Bean
   OpenApiCustomizer onlyVersionOnePaths(
-      @org.springframework.beans.factory.annotation.Value("${auth.password-recovery.enabled:false}")
-          boolean recovery,
       @org.springframework.beans.factory.annotation.Value("${payments.internal-enabled:false}")
           boolean internal) {
     return openApi -> {
@@ -45,9 +43,6 @@ public class OpenApiConfiguration {
           .removeIf(
               path ->
                   !path.startsWith("/api/v1/")
-                      || (!recovery
-                          && (path.endsWith("/auth/password-recovery")
-                              || path.endsWith("/auth/password-reset")))
                       || (!internal
                           && (path.contains("/payments/sandbox/")
                               || path.contains("/payments/internal/")

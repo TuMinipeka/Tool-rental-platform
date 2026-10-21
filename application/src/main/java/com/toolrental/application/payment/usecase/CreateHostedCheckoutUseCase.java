@@ -2,6 +2,7 @@ package com.toolrental.application.payment.usecase;
 
 import com.toolrental.application.common.exception.IdempotencyConflictApplicationException;
 import com.toolrental.application.common.service.WorkflowReferences;
+import com.toolrental.application.payment.command.CreateHostedCheckoutCommand;
 import com.toolrental.application.payment.dto.HostedCheckoutResponse;
 import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.port.AccessPolicy;
@@ -15,6 +16,7 @@ import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
 import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -51,6 +53,15 @@ public final class CreateHostedCheckoutUseCase {
   }
 
   public HostedCheckoutResponse execute(UUID actor, ReservationId reservationId, String key) {
+    return execute(
+        actor,
+        new CreateHostedCheckoutCommand(
+            reservationId, "HOSTED_CHECKOUT", key, null, null, null, null));
+  }
+
+  public HostedCheckoutResponse execute(UUID actor, CreateHostedCheckoutCommand command) {
+    var reservationId = command.reservationId();
+    var key = command.idempotencyKey();
     if (key == null || key.isBlank() || key.length() > 200)
       throw new IllegalArgumentException("Invalid idempotency key");
     UUID id =
@@ -69,7 +80,12 @@ public final class CreateHostedCheckoutUseCase {
                     if (previous.isPresent()) {
                       var stored = previous.get();
                       if (!stored.reservationId().equals(reservationId)
-                          || !stored.processor().equals(gateway.processor()))
+                          || !stored.processor().equals(gateway.processor())
+                          || !stored.paymentMethod().equals(command.paymentMethod())
+                          || !Objects.equals(stored.cardNetwork(), command.cardNetwork())
+                          || !Objects.equals(stored.cardLastFour(), command.cardLastFour())
+                          || !Objects.equals(stored.cardExpiryMonth(), command.cardExpiryMonth())
+                          || !Objects.equals(stored.cardExpiryYear(), command.cardExpiryYear()))
                         throw new IdempotencyConflictApplicationException();
                       result.set(stored.id().value());
                       return reservation;
@@ -79,6 +95,13 @@ public final class CreateHostedCheckoutUseCase {
                             .filter(p -> p.processor().equals(gateway.processor()))
                             .findFirst();
                     if (active.isPresent()) {
+                      var stored = active.get();
+                      if (!stored.paymentMethod().equals(command.paymentMethod())
+                          || !Objects.equals(stored.cardNetwork(), command.cardNetwork())
+                          || !Objects.equals(stored.cardLastFour(), command.cardLastFour())
+                          || !Objects.equals(stored.cardExpiryMonth(), command.cardExpiryMonth())
+                          || !Objects.equals(stored.cardExpiryYear(), command.cardExpiryYear()))
+                        throw new IdempotencyConflictApplicationException();
                       result.set(active.get().id().value());
                       return reservation;
                     }
@@ -96,7 +119,12 @@ public final class CreateHostedCheckoutUseCase {
                                 reservation.total().amount(),
                                 key,
                                 clock,
-                                gateway.processor()));
+                                gateway.processor(),
+                                command.paymentMethod(),
+                                command.cardNetwork(),
+                                command.cardLastFour(),
+                                command.cardExpiryMonth(),
+                                command.cardExpiryYear()));
                     checkouts.initialize(payment.id().value(), reservation.expiresAt());
                     result.set(payment.id().value());
                     return reservation;

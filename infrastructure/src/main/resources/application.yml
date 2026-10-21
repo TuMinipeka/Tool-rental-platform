@@ -32,12 +32,6 @@ auth:
   cookie:
     secure: ${AUTH_COOKIE_SECURE:false}
     same-site: ${AUTH_COOKIE_SAME_SITE:Lax}
-  password-recovery:
-    enabled: ${PASSWORD_RECOVERY_ENABLED:false}
-    delivery: ${PASSWORD_RECOVERY_DELIVERY:disabled}
-    ttl: ${PASSWORD_RESET_TTL:PT15M}
-    sender: ${PASSWORD_RECOVERY_SENDER:no-reply@toolrental.local}
-    reset-url: ${PASSWORD_RECOVERY_RESET_URL:http://localhost:5173/password-reset}
 
 app:
   cors:
@@ -53,15 +47,6 @@ payments:
     public-url: ${PAYMENTS_PUBLIC_URL:}
   sandbox:
     webhook-secret: ${SANDBOX_WEBHOOK_SECRET:local-sandbox-webhook-secret-change-me-2026}
-
-spring.mail:
-  host: ${SMTP_HOST:localhost}
-  port: ${SMTP_PORT:1025}
-  username: ${SMTP_USERNAME:}
-  password: ${SMTP_PASSWORD:}
-  properties.mail.smtp:
-    auth: ${SMTP_AUTH:false}
-    starttls.enable: ${SMTP_STARTTLS:false}
 
 springdoc:
   api-docs:

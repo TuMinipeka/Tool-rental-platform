@@ -102,7 +102,11 @@ async function request(path, options = {}, behavior = {}) {
   }
 
   const response = await fetchApi(`${apiPrefix}${path}`, { ...options, headers })
-  const payload = behavior.responseType === 'text' && response.ok ? await response.text() : await parseResponse(response)
+  const payload = behavior.responseType === 'text' && response.ok
+    ? await response.text()
+    : behavior.responseType === 'blob' && response.ok
+      ? await response.blob()
+      : await parseResponse(response)
 
   if (response.status === 401 && authenticated && retry) {
     try {
@@ -125,6 +129,7 @@ export const api = {
     const query = new URLSearchParams()
     if (params.query) query.set('query', params.query)
     if (params.categoryId) query.set('categoryId', params.categoryId)
+    if (params.serviceCity) query.set('serviceCity', params.serviceCity)
     return request(`/public/catalog${query.size ? `?${query}` : ''}`)
   },
   getCatalogTool(toolId) {
@@ -142,20 +147,13 @@ export const api = {
   },
   registerSupplier(account) { return request('/auth/supplier-registration', { method: 'POST', body: JSON.stringify(account) }) },
   updateUserStatus(id, status) { return request('/users/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }, { authenticated: true }) },
+  updateUser(id, profile) { return request('/users/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(profile) }, { authenticated: true }) },
+  createUser(user) { return request('/users', { method: 'POST', body: JSON.stringify(user) }, { authenticated: true }) },
+  currentUser() { return request('/users/me', {}, { authenticated: true }) },
+  updateCurrentUser(profile) { return request('/users/me/profile', { method: 'PATCH', body: JSON.stringify(profile) }, { authenticated: true }) },
+  changePassword(passwords) { return request('/users/me/password', { method: 'PATCH', body: JSON.stringify(passwords) }, { authenticated: true }) },
   register(account) {
     return request('/auth/register', { method: 'POST', body: JSON.stringify(account) })
-  },
-  recoverPassword(email) {
-    return request('/auth/password-recovery', {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    })
-  },
-  resetPassword(token, newPassword) {
-    return request('/auth/password-reset', {
-      method: 'POST',
-      body: JSON.stringify({ token, newPassword }),
-    })
   },
   async logout() {
     try {
@@ -178,18 +176,22 @@ export const api = {
       { authenticated: true },
     )
   },
+  getReservation(id) {
+    return request('/reservations/' + encodeURIComponent(id), {}, { authenticated: true })
+  },
   reservationAction(id, action, idempotencyKey) {
     return request('/reservations/' + encodeURIComponent(id) + '/' + action,
       { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
       { authenticated: true })
   },
+  requestReservationExtension(id, requestedReturnDate, idempotencyKey) { return request('/reservation-extensions/reservations/' + encodeURIComponent(id), { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ requestedReturnDate }) }, { authenticated: true }) },
   features() { return request('/public/features', {}) },
   decideFictionalPayment(id, outcome) { return request('/payments/fictional/checkouts/' + encodeURIComponent(id) + '/decision', { method: 'POST', body: JSON.stringify({ outcome }) }, { authenticated: true }) },
   checkout(id) { return request('/payments/checkouts/' + encodeURIComponent(id), {}, { authenticated: true }) },
-  createCheckout(reservationId, idempotencyKey) {
-    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId }) }, { authenticated: true })
+  createCheckout(reservationId, idempotencyKey, paymentMethod) {
+    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId, ...paymentMethod }) }, { authenticated: true })
   },
-  invoiceDocument(id) { return request('/invoices/' + encodeURIComponent(id) + '/document', {}, { authenticated: true, responseType: 'text' }) },
+  invoiceDocument(id, disposition = 'inline') { return request('/invoices/' + encodeURIComponent(id) + '/document?' + new URLSearchParams({ disposition }), {}, { authenticated: true, responseType: 'blob' }) },
   operationalReport(kind, from, to) { return request('/reports/' + kind + '?' + new URLSearchParams({ from, to }), {}, { authenticated: true }) },
   deliveryEntry(reservationId, equipmentUnitId) { return request('/unit-deliveries/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
   returnEntry(reservationId, equipmentUnitId) { return request('/unit-returns/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
@@ -211,10 +213,12 @@ export const api = {
   createTool(tool) {
     return request(
       '/tools',
-      { method: 'POST', body: JSON.stringify(tool) },
+      { method: 'POST', body: JSON.stringify({ serviceCity: 'Bucaramanga', ...tool }) },
       { authenticated: true },
     )
   },
+  updateTool(id, tool) { return request('/tools/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(tool) }, { authenticated: true }) },
+  deleteTool(id) { return request('/tools/' + encodeURIComponent(id), { method: 'DELETE' }, { authenticated: true }) },
   listEquipmentUnits() {
     return request('/equipment-units', {}, { authenticated: true })
   },
@@ -231,6 +235,13 @@ export const api = {
   listUsers() {
     return request('/users', {}, { authenticated: true })
   },
+  listSuppliers() { return request('/suppliers', {}, { authenticated: true }) },
+  createSupplier(supplier) { return request('/suppliers', { method: 'POST', body: JSON.stringify(supplier) }, { authenticated: true }) },
+  updateSupplier(id, supplier) { return request('/suppliers/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(supplier) }, { authenticated: true }) },
+  deleteSupplier(id) { return request('/suppliers/' + encodeURIComponent(id), { method: 'DELETE' }, { authenticated: true }) },
+  listRoles() { return request('/roles', {}, { authenticated: true }) },
+  listUserRoles() { return request('/user-roles', {}, { authenticated: true }) },
+  assignUserRole(userId, roleId) { return request('/user-roles', { method: 'POST', body: JSON.stringify({ userId, roleId }) }, { authenticated: true }) },
   simulatePayment(payment) {
     return request(
       '/payments/simulations',
@@ -250,7 +261,7 @@ export function normalizeCatalogTool(tool, index = 0) {
     category: tool.categoryName,
     price: Number(tool.dailyRate),
     deposit: 0,
-    location: null,
+    location: tool.serviceCity,
     rating: null,
     reviews: null,
     stock: tool.operationalUnitCount,

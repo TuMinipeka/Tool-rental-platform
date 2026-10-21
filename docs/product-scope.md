@@ -1,6 +1,6 @@
 # Alcance del producto
 
-> Alcance vigente del MVP: pasarela ficticia persistente en COP; PayPal y correo aplazados. Recuperación oculta y deshabilitada. El resto de este documento también describe producto futuro; consulta [MVP](mvp.md) para aceptación actual.
+> Alcance vigente del MVP: pagos académicos en COP con Visa, Mastercard, PSE, Mercado Pago y PayPal configurados con datos fijos no editables. El correo y la recuperación de contraseña no forman parte del contrato público. Consulta [MVP](mvp.md) para aceptación actual.
 
 ## Propósito
 
@@ -8,7 +8,7 @@ Tool Rental Platform es una simulación universitaria realista de un mercado col
 
 La fase 0 define el contrato del producto. Una capacidad descrita aquí no está implementada hasta que el estado del repositorio lo indique expresamente.
 
-Estado académico actual: el backend implementa retención atómica, vencimiento, pasarela ficticia persistente e idempotente, confirmación automática, comprobante descargable y reportes por rol. Los recorridos de cliente, proveedor y administrador se verifican con [Playwright CLI](browser-verification.md). La pasarela oficial externa, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
+Estado académico actual: el backend implementa registro directo de clientes y proveedores, retención atómica, vencimiento, proveedor académico persistente, conciliación idempotente, confirmación automática, comprobante descargable y reportes por rol. Los proveedores financieros externos, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
 
 ## Actores confirmados
 
@@ -27,14 +27,16 @@ Supplier realiza las actividades de entrega, devolución y gestión de daños en
 El software debe ofrecer finalmente todas las siguientes capacidades funcionales e integradas:
 
 1. Identidad, autenticación y autorización para los tres roles.
-2. Catálogo, categorías, imágenes, unidades físicas, publicación y disponibilidad.
+2. Catálogo, categorías, imágenes, unidades físicas, publicación, ciudad de servicio, filtrado por municipio y disponibilidad.
 3. Orden pendiente de pago, retención temporal atómica de inventario, expiración y prevención de reservas superpuestas.
 4. Activación del alquiler, programación y evidencia de entrega, registro de devolución y comparación de condiciones.
 5. Protección opcional, evidencias de daños, valoración, notificación al cliente, disputas y cargos adicionales justificados.
 6. Procesamiento mediante una pasarela sandbox oficial, webhooks verificados y reembolsos idempotentes.
-7. Facturación simulada con precios e impuestos discriminados.
+7. Facturación simulada con identificación de la herramienta y su ciudad de servicio, precios e impuestos discriminados.
 8. Administración, reportes operativos, auditoría y aceptación de documentos legales.
 9. Interfaz React adaptable que consuma el contrato REST/OpenAPI publicado.
+
+El registro público de proveedor solicita identidad, documento y razón social, crea la cuenta en estado activo y abre una sesión con rol `SUPPLIER`; no requiere aprobación administrativa previa.
 
 ## Decisiones tecnológicas
 
@@ -54,13 +56,13 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 
 ## Reglas de reserva y pago
 
-- Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica.
+- Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica. La interfaz abre el paso `/pago` únicamente después de recibir el identificador persistido y la misma reserva queda consultable en `/cuenta`.
 - La orden tiene un vencimiento explícito. El pago rechazado, cancelado o vencido libera la retención de inventario de manera idempotente.
-- Una confirmación auténtica recibida y verificada mediante webhook del proveedor sandbox convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
+- La decisión académica registrada por el backend convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
 - El checkout sandbox cobra el total aprobado y mostrado. Daños, extensiones u otros ajustes posteriores se discriminan como operaciones separadas.
 - Extensiones, daños, pérdidas u otros ajustes autorizados son cargos separados y discriminados; nunca se ocultan en el saldo restante.
-- Los medios objetivo son tarjeta y PayPal mediante SDK o campos alojados/tokenizados del proveedor seleccionado. La selección y credenciales sandbox continúan pendientes de configuración.
-- La plataforma solo guarda referencias tokenizadas y metadatos mínimos autorizados. Nunca recibe ni guarda PAN completo, CVV o contraseña de PayPal.
+- El paso de pago permite escoger Visa, Mastercard, PSE, Mercado Pago o PayPal y siempre muestra el total persistido de la reserva. Los datos visibles son fijos, pertenecen al ambiente de prueba y no se pueden editar.
+- La plataforma solo guarda el medio, la red, los últimos cuatro dígitos y el vencimiento cuando aplica. Nunca persiste el PAN completo, CVV o contraseña de una cuenta.
 - Los estados distinguen como mínimo transacciones pendientes, aprobadas, rechazadas, canceladas y reembolsadas.
 - Cada pago y reembolso debe ser idempotente y auditable.
 
@@ -72,7 +74,7 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 - Deben registrarse o congelarse la tarifa de IVA, método de base gravable, resultado de redondeo y versión de la regla legal usada, para que cambios posteriores no alteren históricos.
 - Antes de aceptar, el checkout muestra alquiler, entrega, protección opcional, descuentos, base gravable, IVA, ajustes y total final.
 - Los precios deben ser claros y no revelar cargos obligatorios únicamente después de confirmar.
-- El proyecto actual solo emite documentos académicos con la leyenda `Simulación académica - documento no válido como factura ante la DIAN` hasta contar con integración real y configuración del contribuyente.
+- El proyecto actual solo emite documentos académicos con la leyenda `Documento académico - no válido como factura ante la DIAN` hasta contar con integración real y configuración del contribuyente.
 
 ## Protección opcional por daños
 
@@ -141,8 +143,4 @@ Estos documentos orientan una simulación académica y no sustituyen asesoría l
 
 ## Decisión de alcance del MVP — 20 de octubre de 2026
 
-**Decisión histórica sustituida por la siguiente sección:** se había seleccionado Mercado Pago Checkout Pro en COP, exclusivamente con cuentas oficiales de prueba. PayPal y correo se aplazan, incluida recuperación y restablecimiento de contraseña: quedan ocultos y deshabilitados. Esta decisión sustituye los requisitos anteriores de esos medios para el MVP; no elimina capacidades del producto futuro. El adaptador oficial requiere aceptación con credenciales y webhook auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
-
-## Decisión posterior del MVP — pasarela ficticia
-
-Daniel sustituye la exigencia de Mercado Pago/sandbox oficial por una pasarela ficticia para acelerar la publicación académica. No requiere cuentas externas ni mueve dinero. La aprobación/rechazo es explícita, autenticada, persistida y sometida a las reglas de reserva. Se confirma Apache Tomcat integrado en el JAR de Spring Boot. Esta decisión prevalece sobre las menciones anteriores a proveedores oficiales; una pasarela real permanece como producto futuro.
+Se selecciona el proveedor académico persistente en COP con Visa, Mastercard, PSE, Mercado Pago y PayPal. La interfaz muestra datos fijos no editables y el backend conserva el medio, el resultado y los metadatos mínimos permitidos. El correo, la recuperación y el restablecimiento de contraseña quedan fuera del contrato vigente. Consulta [MVP](mvp.md) y [contrato de pagos](fictional-payments.md).

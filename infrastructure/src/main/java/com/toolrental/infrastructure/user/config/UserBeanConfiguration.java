@@ -47,10 +47,24 @@ public class UserBeanConfiguration {
       RoleRepository roles,
       UserRoleRepository assignments,
       PasswordHasher passwords,
+      AuthenticationTokenProvider tokens,
       UnitOfWork work,
-      Clock clock) {
+      Clock clock,
+      UserSessionRepository sessions,
+      SecureTokenService secrets,
+      @Value("${auth.jwt.refresh-ttl:P30D}") Duration refreshTtl) {
     return new RegisterSupplierAccountUseCase(
-        users, suppliers, roles, assignments, passwords, work, clock);
+        users,
+        suppliers,
+        roles,
+        assignments,
+        passwords,
+        tokens,
+        work,
+        clock,
+        sessions,
+        secrets,
+        refreshTtl);
   }
 
   @Bean

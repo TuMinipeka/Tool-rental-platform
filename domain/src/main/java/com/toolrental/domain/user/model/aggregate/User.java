@@ -110,4 +110,10 @@ public final class User extends AggregateRoot {
     result.recordEvent(new UserChanged(id, Instant.now(clock)));
     return result;
   }
+
+  public User updateProfile(String newEmail, String newDisplayName, Clock clock) {
+    var result = new User(id, newEmail, newDisplayName, passwordHash, accountStatus, registeredAt);
+    result.recordEvent(new UserChanged(id, Instant.now(clock)));
+    return result;
+  }
 }

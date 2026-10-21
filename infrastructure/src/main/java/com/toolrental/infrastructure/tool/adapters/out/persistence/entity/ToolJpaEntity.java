@@ -28,6 +28,9 @@ public class ToolJpaEntity {
   @Column(name = "description", nullable = false, length = 2000)
   private String description;
 
+  @Column(name = "service_city", nullable = false, length = 120)
+  private String serviceCity;
+
   @Column(name = "current_daily_rate", nullable = false, precision = 19, scale = 4)
   private BigDecimal currentDailyRate;
 
@@ -48,6 +51,7 @@ public class ToolJpaEntity {
       UUID categoryId,
       String name,
       String description,
+      String serviceCity,
       BigDecimal currentDailyRate,
       String rateCurrency,
       String publicationStatus,
@@ -57,6 +61,7 @@ public class ToolJpaEntity {
     this.categoryId = categoryId;
     this.name = name;
     this.description = description;
+    this.serviceCity = serviceCity;
     this.currentDailyRate = currentDailyRate;
     this.rateCurrency = rateCurrency;
     this.publicationStatus = publicationStatus;
@@ -81,6 +86,10 @@ public class ToolJpaEntity {
 
   public String getDescription() {
     return description;
+  }
+
+  public String getServiceCity() {
+    return serviceCity;
   }
 
   public BigDecimal getCurrentDailyRate() {

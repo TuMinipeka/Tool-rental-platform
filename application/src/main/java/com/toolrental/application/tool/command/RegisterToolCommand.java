@@ -11,6 +11,7 @@ public record RegisterToolCommand(
     CategoryId categoryId,
     String name,
     String description,
+    String serviceCity,
     Money dailyRate,
     Set<URI> imageUrls) {
   public RegisterToolCommand {

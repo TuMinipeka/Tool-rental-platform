@@ -7,10 +7,12 @@ import com.toolrental.application.invoice.usecase.ManageInvoiceUseCase;
 import com.toolrental.domain.common.port.AccessPolicy;
 import com.toolrental.domain.common.port.UnitOfWork;
 import com.toolrental.domain.customer.port.repository.CustomerRepository;
+import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
 import com.toolrental.domain.invoice.port.repository.InvoiceRepository;
 import com.toolrental.domain.invoiceitem.port.repository.InvoiceItemRepository;
 import com.toolrental.domain.rental.port.repository.RentalRepository;
 import com.toolrental.domain.supplier.port.repository.SupplierRepository;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
 import java.time.Clock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,8 +40,11 @@ public class InvoiceBeanConfiguration {
       InvoiceItemRepository lines,
       CustomerRepository customers,
       SupplierRepository suppliers,
+      EquipmentUnitRepository equipmentUnits,
+      ToolRepository tools,
       Clock clock) {
-    return new IssueAcademicInvoiceUseCase(invoices, lines, customers, suppliers, clock);
+    return new IssueAcademicInvoiceUseCase(
+        invoices, lines, customers, suppliers, equipmentUnits, tools, clock);
   }
 
   @Bean

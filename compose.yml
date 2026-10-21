@@ -31,7 +31,7 @@ services:
       args:
         JAVA_VERSION: 21
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-local,demo}
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-tool_rental}
       DB_USERNAME: ${POSTGRES_USER:-tool_rental}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
@@ -40,14 +40,14 @@ services:
       DB_CONNECTION_TIMEOUT_MS: ${DB_CONNECTION_TIMEOUT_MS:-30000}
       JWT_SECRET: ${JWT_SECRET:-local-development-secret-change-before-production-2026}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173}
-      PASSWORD_RECOVERY_ENABLED: "false"
-      PASSWORD_RECOVERY_DELIVERY: disabled
-      PAYMENT_PROVIDER: fictional
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-fictional}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
+      MERCADOPAGO_COLLECTOR_ID: ${MERCADOPAGO_COLLECTOR_ID:-}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:-}
+      PAYMENTS_PUBLIC_URL: ${PAYMENTS_PUBLIC_URL:-}
     depends_on:
       postgres:
         condition: service_healthy
-      mailpit:
-        condition: service_started
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
     restart: unless-stopped
@@ -59,14 +59,6 @@ services:
       start_period: 90s
       retries: 12
 
-  mailpit:
-    image: ${MAILPIT_IMAGE:-axllent/mailpit:v1.27}
-    ports:
-      - "127.0.0.1:${MAILPIT_SMTP_PORT:-1025}:1025"
-      - "127.0.0.1:${MAILPIT_WEB_PORT:-8025}:8025"
-    restart: unless-stopped
-    logging: *logging
-
   frontend:
     build:
       context: ./frontend
@@ -75,7 +67,7 @@ services:
         NODE_IMAGE: ${NODE_IMAGE:-node:24.22.0-alpine}
         NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.30.6-alpine-slim}
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
-        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-false}
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-true}
     ports:
       - "127.0.0.1:${FRONTEND_PORT:-5173}:80"
     healthcheck:

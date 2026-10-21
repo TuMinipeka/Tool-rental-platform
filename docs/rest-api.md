@@ -22,7 +22,7 @@ Los errores tienen `Content-Type: application/problem+json`:
 
 | Estado | Uso |
 | --- | --- |
-| 400 | JSON, parámetros o token de recuperación inválidos |
+| 400 | JSON o parámetros inválidos |
 | 401 | Credencial ausente, JWT inválido o sesión revocada |
 | 403 | Rol o propiedad insuficiente, incluido CSRF |
 | 404 | Recurso inexistente |
@@ -36,7 +36,7 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 | Método | Ruta | Acceso |
 | --- | --- | --- |
 | POST | `/api/v1/auth/register` | Público; devuelve access JSON y refresh cookie |
-| POST | `/api/v1/auth/supplier-registration` | Público; crea proveedor `SUSPENDED`, sin sesión |
+| POST | `/api/v1/auth/supplier-registration` | Público; crea proveedor `ACTIVE`, devuelve access JSON y refresh cookie |
 | POST | `/api/v1/auth/login` | Público; devuelve access JSON y refresh cookie |
 | GET | `/api/v1/auth/csrf` | Público; inicializa cookie CSRF |
 | POST | `/api/v1/auth/refresh` | Refresh cookie + `X-XSRF-TOKEN` |
@@ -44,25 +44,25 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 | POST | `/api/v1/auth/logout-all` | Bearer + `X-XSRF-TOKEN` |
 | GET | `/api/v1/auth/sessions` | Bearer |
 | DELETE | `/api/v1/auth/sessions/{id}` | Bearer |
-| POST | `/api/v1/auth/password-recovery` | Público; respuesta 202 genérica |
-| POST | `/api/v1/auth/password-reset` | Público; token opaco y nueva contraseña |
 
-El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La recuperación nunca devuelve el token: el puerto SMTP entrega el enlace; Mailpit lo captura en desarrollo.
+El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La API pública no ofrece recuperación ni restablecimiento de contraseña sin sesión; un usuario autenticado puede cambiar su propia contraseña con `PATCH /api/v1/users/me/password`, suministrando la actual, y el cambio revoca todas sus sesiones.
 
-El administrador activa una solicitud de proveedor mediante `PATCH /api/v1/users/{id}/status` con `{"status":"ACTIVE"}`. Antes de esa transición el login es rechazado. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
+`GET /api/v1/users/me` consulta el perfil autenticado y `PATCH /api/v1/users/me/profile` actualiza nombre y correo sin aceptar un identificador de actor en el cuerpo.
+
+El proveedor queda activo al completar el formulario público y puede entrar directamente a su panel. El administrador conserva `PATCH /api/v1/users/{id}/status` para gestionar estados. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
 
 ## Reservas y cotización
 
 `POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La creación bloquea y vuelve a comprobar las unidades en la misma transacción, responde `PENDING_PAYMENT` con `expiresAt` y evita retenciones superpuestas. Un proceso programado cambia retenciones vencidas a `EXPIRED`.
 
-## Checkout sandbox y comprobante académico
+## Pago académico y comprobante
 
-- `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key` y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` sin recibir PAN ni CVV.
-- `POST /api/v1/payments/sandbox/webhooks` es público exclusivamente para el sandbox interno y exige `X-Sandbox-Timestamp` y `X-Sandbox-Signature`. La firma es HMAC-SHA256 de `timestamp.eventId.externalReference.outcome`; se rechazan mensajes de más de cinco minutos.
-- `APPROVED` confirma pago y reserva en una transacción y emite un comprobante académico `PAID`; `DECLINED` marca pago y reserva como fallidos y libera la retención.
-- `GET /api/v1/invoices/{id}/document` devuelve HTML descargable y siempre muestra que es una simulación sin validez ante la DIAN.
+- `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key`, un medio permitido y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` sin aceptar un importe del navegador.
+- `POST /api/v1/payments/fictional/checkouts/{id}/decision` conserva `APPROVED` o `DECLINED` para el cliente propietario y procesa la decisión de forma idempotente.
+- Una aprobación confirma pago y reserva dentro del límite transaccional y emite un comprobante. Un rechazo libera la retención; una aprobación tardía inicia el reembolso idempotente.
+- `GET /api/v1/invoices/{id}/document?disposition=inline|attachment` devuelve el PDF para vista previa o descarga sin presentarlo como factura válida ante la DIAN.
 
-El secreto `SANDBOX_WEBHOOK_SECRET` debe tener al menos 32 bytes y es obligatorio en producción. Este sandbox interno es demostrativo; no representa integración con un adquirente ni transferencia real de fondos.
+El proveedor académico no requiere claves financieras externas. Los datos fijos se definen en la interfaz, no se pueden modificar y el backend persiste únicamente metadatos mínimos del medio elegido.
 
 ## Reportes operativos
 
@@ -114,8 +114,8 @@ Todas las operaciones directas requieren `Idempotency-Key`:
 - `GET /api/v1/refunds/payments/{id}` consulta reembolsos.
 - Los endpoints existentes de pagos muestran ajustes `PENDING` de terminación, extensión o mora.
 
-## Contrato vigente del MVP: pasarela ficticia
+## Contrato vigente del MVP: medios fijos de prueba
 
-La entrada actual de POST /api/v1/payments/checkouts es {"reservationId":"UUID"} con Idempotency-Key y Principal autenticado. No recibe método, PAN, CVV ni datos de PayPal. GET /api/v1/payments/checkouts/{id} informa el estado de conciliación. La decisión autenticada usa POST /api/v1/payments/fictional/checkouts/{id}/decision con outcome APPROVED o DECLINED. No hay proveedor ni webhook externo en el MVP. Los ejemplos anteriores de simulación/HMAC son históricos y están deshabilitados por defecto.
+La entrada de `POST /api/v1/payments/checkouts` incluye `reservationId`, `paymentMethod` y, solo para Visa o Mastercard, red, últimos cuatro dígitos y vencimiento. Requiere `Idempotency-Key` y `Principal` autenticado; no recibe el importe, PAN completo, CVV ni contraseñas. `GET /api/v1/payments/checkouts/{id}` informa el estado de conciliación.
 
-Recuperación y restablecimiento salen del MVP y devuelven 404 FEATURE_DISABLED; OpenAPI los omite. GET /api/v1/public/features comparte las capacidades con el navegador. Véase [pagos del MVP](fictional-payments.md) para configuración, estados y aceptación externa pendiente.
+Recuperación y restablecimiento no tienen rutas públicas y OpenAPI no los anuncia. `GET /api/v1/public/features` comparte con el navegador la disponibilidad del checkout. Véase [pagos académicos](fictional-payments.md) para configuración, estados y límites.

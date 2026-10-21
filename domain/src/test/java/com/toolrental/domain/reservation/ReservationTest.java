@@ -216,6 +216,7 @@ class ReservationTest {
                 CategoryId.generate(),
                 "Equipment",
                 "Description",
+                "Bucaramanga",
                 money("1"),
                 Set.of(URI.create("file:///tmp/foto")),
                 clock));

@@ -1,5 +1,7 @@
 # Reporte de validación del MVP
 
+> Integración actual de Conde: [cambios y validaciones pendientes](integration-review.md). Las capturas y recorridos previos son evidencia histórica y no acreditan automáticamente los cambios nuevos.
+
 Validación del 20 de octubre de 2026 sobre la revisión `8e68b8b`, incluida la corrección de formularios y cierre de sesión, rama developer/daniel. Se conserva la integración de Conde hasta 981a16e. **Aplicación integrada y validada localmente con pasarela ficticia; publicación pública pendiente.** El cambio de alcance elimina la dependencia de una pasarela sandbox oficial.
 
 | Comprobación | Resultado | Evidencia y límite |

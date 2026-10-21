@@ -53,6 +53,7 @@ public class ToolController {
             new CategoryId(request.categoryId()),
             request.name(),
             request.description(),
+            request.serviceCity(),
             new com.toolrental.domain.common.model.valueobject.Money(
                 request.dailyRate(), Currency.getInstance(request.currency())),
             request.imageUrls().stream()
@@ -72,6 +73,7 @@ public class ToolController {
         new ToolId(id),
         request.name(),
         request.description(),
+        request.serviceCity(),
         request.dailyRate(),
         request.currency(),
         request.published());

@@ -14,7 +14,7 @@ async function login(page) {
   await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 }
 
-for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/registro/proveedor', '/password-reset', '/no-existe']) {
+for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nosotros', '/como-funciona', '/terms-and-conditions', '/cuenta', '/panel/proveedor', '/panel/admin', '/cotizacion', '/pago', '/reserva-confirmada', '/login', '/registro', '/registro/proveedor', '/no-existe']) {
   test(`renders ${path} without runtime errors or horizontal overflow`, async ({ page }) => {
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
@@ -27,25 +27,21 @@ for (const path of ['/', '/catalogo', `/herramienta/${catalog[1].toolId}`, '/nos
 }
 
 test('search keeps municipality and filters the catalog', async ({ page }) => {
-  await page.goto('/?municipio=Gir%C3%B3n')
+  await page.goto('/?municipio=Floridablanca')
   await page.getByLabel('¿Qué necesitas?').fill('Rotomartillo')
   await page.getByRole('button', { name: 'Buscar', exact: true }).click()
-  await expect(page).toHaveURL(/catalogo\?q=Rotomartillo&municipio=Gir/)
+  await expect(page).toHaveURL(/catalogo\?q=Rotomartillo&municipio=Floridablanca/)
   await expect(page.locator('.tool-card')).toHaveCount(1)
   await page.getByRole('textbox', { name: 'Buscar herramienta o categoría' }).fill('no-match-qa')
   await expect(page.getByRole('main')).toHaveCount(1)
   await expect(page.getByRole('button', { name: 'Limpiar filtros' })).toBeVisible()
   await page.getByRole('button', { name: 'Limpiar filtros' }).click()
-  await expect(page.locator('.tool-card')).toHaveCount(10)
+  await expect(page.locator('.tool-card')).toHaveCount(8)
 })
 
-test('catalog pagination, municipality, and price filters retain their contracts', async ({ page }, testInfo) => {
+test('catalog municipality and price filters retain their contracts', async ({ page }, testInfo) => {
   await page.goto('/catalogo')
-  const firstName = await page.locator('.tool-title-link').first().textContent()
-  const pagination = page.getByRole('navigation', { name: 'Paginación' })
-  await pagination.getByRole('button', { name: '→', exact: true }).click()
-  await expect(page.locator('.tool-title-link').first()).not.toHaveText(firstName)
-  await expect(page.locator('.tool-card')).toHaveCount(10)
+  await expect(page.locator('.tool-card')).toHaveCount(8)
   if (testInfo.project.name === 'desktop') {
     await page.getByRole('combobox', { name: 'Ubicación', exact: true }).selectOption('Girón')
     await expect(page).toHaveURL(/municipio=Gir/)
@@ -54,7 +50,7 @@ test('catalog pagination, municipality, and price filters retain their contracts
     await price.press('Home')
     await expect(page.locator('.tool-card')).toHaveCount(0)
     await page.getByRole('button', { name: 'Limpiar filtros' }).click()
-    await expect(page.locator('.tool-card')).toHaveCount(10)
+    await expect(page.locator('.tool-card')).toHaveCount(7)
   }
 })
 
@@ -152,9 +148,9 @@ test('authenticated checkout creates a request without collecting payment', asyn
   const payments = []
   page.on('request', request => { if (request.url().includes('/payments/')) payments.push(request.url()) })
   const submission = page.waitForRequest(request => request.method() === 'POST' && request.url().endsWith('/api/v1/reservations'))
-  await page.getByRole('button', { name: 'Crear solicitud', exact: true }).click()
+  await page.getByRole('button', { name: 'Crear reserva y pagar', exact: true }).click()
   expect((await submission).postDataJSON()).toMatchObject({ fulfillmentMethod: 'CUSTOMER_PICKUP', deliveryAddressLine: null })
-  await expect(page).toHaveURL(/\/reserva-confirmada$/)
+  await expect(page).toHaveURL(/\/pago\?reservationId=qa-reservation$/)
   expect(payments).toEqual([])
 })
 
@@ -166,7 +162,7 @@ for (const [role, path] of [['SUPPLIER', '/panel/proveedor'], ['ADMIN', '/panel/
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
     await page.evaluate(path => { history.pushState({}, '', path); dispatchEvent(new PopStateEvent('popstate')) }, path)
-    await expect(page.locator('.operations-metrics')).toBeVisible()
+    await expect(page.locator('.dashboard-metrics')).toBeVisible()
     await expect(page.getByRole('main')).toHaveCount(1)
     expect(errors).toEqual([])
   })
@@ -301,12 +297,6 @@ test('cancellation preserves the idempotency key and waits for server success', 
 })
 
 
-test('recovery route stays disabled even with a token in the URL', async ({ page }) => {
-  await page.goto('/password-reset?token=untrusted-token')
-  await expect(page.getByRole('heading', { name: 'Recuperación no disponible' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Guardar nueva contraseña' })).toHaveCount(0)
-})
-
 test('provider return parameters never confirm a pending payment', async ({ page }) => {
   const id = '90000000-0000-0000-0000-000000000001'
   await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, paymentStatus: 'READY' } }))
@@ -321,8 +311,8 @@ test('provider return parameters never confirm a pending payment', async ({ page
   await expect(page.getByText('Pago verificado y reserva confirmada')).toHaveCount(0)
 })
 
-test('optional external checkout sends only the reservation and redirects to the hosted provider', async ({ page }) => {
-  await page.route('**/api/v1/public/features', route => route.fulfill({ json: { passwordRecovery: false, hostedCheckout: true, paymentProvider: 'MERCADO_PAGO' } }))
+test('optional external checkout sends payment metadata and redirects to the hosted provider', async ({ page }) => {
+  await page.route('**/api/v1/public/features', route => route.fulfill({ json: { hostedCheckout: true, paymentProvider: 'MERCADO_PAGO' } }))
   const id = '90000000-0000-0000-0000-000000000001'
   const requests = []
   await page.route('**/api/v1/reservations', route => route.fulfill({ json: [{ id, status: 'PENDING_PAYMENT', period: { startDate: '2027-01-01', returnDate: '2027-01-01' }, total: { amount: 25000 } }] }))
@@ -333,34 +323,14 @@ test('optional external checkout sends only the reservation and redirects to the
   await page.route('https://www.mercadopago.com.co/**', route => route.fulfill({ contentType: 'text/html', body: '<h1>Checkout de prueba aislado</h1>' }))
   await page.goto('/cuenta')
   await login(page)
-  await page.getByRole('button', { name: 'Continuar en Mercado Pago' }).click()
+  await page.getByRole('button', { name: 'Elegir medio de pago' }).click()
+  await page.getByRole('button', { name: 'Pagar con Visa', exact: true }).click()
   await expect(page).toHaveURL(/https:\/\/www.mercadopago.com.co\/checkout\//)
   expect(requests).toHaveLength(1)
-  expect(requests[0].body).toEqual({ reservationId: id })
+  expect(requests[0].body).toMatchObject({ reservationId: id, paymentMethod: 'CREDIT_CARD', cardNetwork: 'VISA', cardLastFour: '1111' })
+  expect(Object.keys(requests[0].body)).not.toEqual(expect.arrayContaining(['cardNumber', 'cvv', 'password']))
   expect(requests[0].key).toBeTruthy()
 })
-
-for (const [outcome, status, label] of [['APPROVED', 'DONE', 'Pago ficticio aprobado y reserva confirmada'], ['DECLINED', 'REJECTED', 'Pago rechazado o cancelado']]) {
-  test('fictional checkout submits ' + outcome + ' without card data', async ({ page }) => {
-    const id = '90000000-0000-0000-0000-000000000001'
-    let phase = 'READY'
-    await page.route('**/api/v1/payments/checkouts/' + id, route => route.fulfill({ json: { paymentId: id, reservationId: id, paymentStatus: phase, processor: 'FICTIONAL_GATEWAY', amount: 25000, currency: 'COP', expiresAt: '2027-01-01T12:00:00Z' } }))
-    const decisions = []
-    await page.route('**/api/v1/payments/fictional/checkouts/' + id + '/decision', route => {
-      decisions.push(route.request().postDataJSON()); phase = status
-      return route.fulfill({ json: { paymentId: id, paymentStatus: status } })
-    })
-    await page.goto('/checkout/' + id)
-    await login(page)
-    await expect(page.getByRole('heading', { name: 'Pasarela ficticia' })).toBeVisible()
-    await expect(page.locator('main input')).toHaveCount(0)
-    await page.getByRole('button', { name: outcome === 'APPROVED' ? 'Simular aprobación' : 'Simular rechazo' }).click()
-    await expect(page).toHaveURL(/payment-return/)
-    await expect(page.getByRole('main').getByRole('status')).toHaveText(label)
-    expect(decisions).toEqual([{ outcome }])
-  })
-}
-
 
 test('supplier tool and equipment forms reset only after successful persistence', async ({ page }) => {
   await mockApi(page, { roles: ['SUPPLIER'] })
@@ -369,23 +339,25 @@ test('supplier tool and equipment forms reset only after successful persistence'
   await page.route('**/api/v1/tools', async route => {
     if (route.request().method() === 'POST') {
       const body = route.request().postDataJSON()
-      tools.push({ ...body, id: 'qa-tool', dailyRate: { amount: body.dailyRate, currency: body.currency } })
+      tools.push({ ...body, supplierId: 'qa-customer', id: 'qa-tool', dailyRate: { amount: body.dailyRate, currency: body.currency } })
       await route.fulfill({ status: 201, json: tools[0] })
     } else await route.fulfill({ json: tools })
   })
   await page.route('**/api/v1/equipment-units', route => route.fulfill({ json: route.request().method() === 'POST' ? { id: 'qa-unit', ...route.request().postDataJSON() } : [] }))
   await page.goto('/panel/proveedor')
   await login(page)
+  await page.getByRole('button', { name: 'Herramientas', exact: true }).click()
   const form = page.locator('.operations-form form')
   await form.locator('[name=categoryId]').selectOption('qa-category')
   await form.locator('[name=name]').fill('QA Drill')
   await form.locator('[name=description]').fill('QA persisted inventory')
   await form.locator('[name=dailyRate]').fill('25000')
+  await form.locator('[name=serviceCity]').selectOption('Bucaramanga')
   await form.getByRole('button', { name: 'Guardar herramienta' }).click()
   await expect(page.getByRole('heading', { name: 'QA Drill' })).toBeVisible()
   await expect(form.locator('[name=name]')).toHaveValue('')
   await expect(page.locator('main [role=alert]')).toHaveCount(0)
-  await page.getByRole('button', { name: 'Registrar unidad', exact: true }).first().click()
+  await page.getByRole('button', { name: 'Unidad física', exact: true }).click()
   await form.locator('[name=toolId]').selectOption('qa-tool')
   await form.locator('[name=inventoryCode]').fill('QA-CODE')
   await form.getByRole('button', { name: 'Registrar unidad', exact: true }).click()

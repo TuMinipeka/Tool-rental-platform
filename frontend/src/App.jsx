@@ -1,4 +1,3 @@
-import { useFeatures } from './lib/features.js'
 import { createPointerMotion } from './lib/pointerMotion.js'
 import { AsyncBoundary } from './components/AsyncBoundary.jsx'
 import { heroImageSizes, heroImageSource, imageAttributes } from './lib/responsiveImages.js'
@@ -16,15 +15,13 @@ import { navigate } from './lib/navigation.js'
 import { money } from './lib/format.js'
 import { serviceLocations } from './lib/locations.js'
 
-const FictionalCheckoutPage = lazy(() => import('./pages/FictionalCheckoutPage.jsx').then(module => ({ default: module.FictionalCheckoutPage })))
 const PaymentReturnPage = lazy(() => import('./pages/PaymentReturnPage.jsx').then(module => ({ default: module.PaymentReturnPage })))
 const TermsAndConditionsPage = lazy(() => import('./TermsAndConditionsPage.jsx'))
 const loadAccountPages = () => import('./pages/AccountPages.jsx')
-const PasswordResetPage = lazy(() => loadAccountPages().then(module => ({ default: module.PasswordResetPage })))
 const AuthPage = lazy(() => loadAccountPages().then(module => ({ default: module.AuthPage })))
 const AuthModal = lazy(() => loadAccountPages().then(module => ({ default: module.AuthModal })))
-const AccountPage = lazy(() => loadAccountPages().then(module => ({ default: module.AccountPage })))
-const BusinessDashboard = lazy(() => loadAccountPages().then(module => ({ default: module.BusinessDashboard })))
+const AccountPage = lazy(() => import('./pages/AccountWorkspacePage.jsx').then(module => ({ default: module.AccountWorkspacePage })))
+const BusinessDashboard = lazy(() => import('./pages/BusinessDashboardPage.jsx').then(module => ({ default: module.BusinessDashboardPage })))
 const ProviderEntryPage = lazy(() => loadAccountPages().then(module => ({ default: module.ProviderEntryPage })))
 const QuotePage = lazy(() => import('./pages/RentalPages.jsx').then(module => ({ default: module.QuotePage })))
 const PaymentPage = lazy(() => import('./pages/RentalPages.jsx').then(module => ({ default: module.PaymentPage })))
@@ -53,12 +50,21 @@ const defaultReturnDate = toDateInput(fourthDay)
 const storedLocation = typeof window === 'undefined' ? null : window.localStorage.getItem('tool-rental-location')
 const requestedLocation = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('municipio')
 const defaultLocation = serviceLocations.includes(requestedLocation) ? requestedLocation : serviceLocations.includes(storedLocation) ? storedLocation : serviceLocations[0]
+const featuredCategories = [
+  { category: 'Demolición', description: 'Rompedores, demoledores y más.', icon: 'hammer' },
+  { category: 'Concreto', description: 'Mezcladoras, vibradores y equipos.', icon: 'mixer' },
+  { category: 'Corte', description: 'Cortadoras, sierras y discos.', icon: 'saw' },
+  { category: 'Limpieza', description: 'Aspiradoras e hidrolavadoras.', icon: 'cleaning' },
+  { category: 'Energía', description: 'Generadores y plantas.', icon: 'bolt' },
+]
 
 function Header({session,onOpenAuth,path,location,onLocationChange}){
   const [open,setOpen]=useState(false); const go=(path)=>{setOpen(false);navigate(path)}
   const active=target=>path===target||path.startsWith(`${target}/`)
   const initials=(session?.displayName||session?.email||'Mi cuenta').split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase()
-  return <header className="site-header"><div className="nav-shell"><Brand/><nav id="main-navigation" className={`nav-links ${open?'open':''}`}><button className={active('/catalogo')?'active':''} aria-current={active('/catalogo')?'page':undefined} onClick={()=>go('/catalogo')}>Catálogo</button><button className={active('/como-funciona')?'active':''} aria-current={active('/como-funciona')?'page':undefined} onClick={()=>go('/como-funciona')}>Cómo funciona</button><button className={active('/nosotros')?'active':''} aria-current={active('/nosotros')?'page':undefined} onClick={()=>go('/nosotros')}>Sobre nosotros</button>{session&&<button className={active('/cuenta')?'active':''} aria-current={active('/cuenta')?'page':undefined} onClick={()=>go('/cuenta')}>Mi cuenta</button>}</nav><div className="nav-actions"><label className="location-action" aria-label="Municipio de servicio"><Icon name="pin" size={17}/><select value={location} onChange={event=>onLocationChange(event.target.value)}>{serviceLocations.map(city=><option key={city}>{city}</option>)}</select></label>{session?<button className="avatar-button" onClick={()=>navigate('/cuenta')} aria-label="Abrir mi cuenta">{initials}</button>:<button className="login-action" onPointerEnter={loadAccountPages} onFocus={loadAccountPages} onClick={onOpenAuth}><Icon name="user" size={18}/> Ingresar</button>}<button className="publish-action" onClick={()=>go('/publicar')}>Publica tu herramienta <Icon name="arrow" size={17}/></button><button className="menu-action" onClick={()=>setOpen(!open)} aria-label={open?'Cerrar menú':'Abrir menú'} aria-expanded={open} aria-controls="main-navigation"><Icon name={open?'close':'menu'}/></button></div></div></header>
+  const dashboardPath=session?.roles?.includes('ADMIN')?'/panel/admin':session?.roles?.includes('SUPPLIER')?'/panel/proveedor':null
+  const staff=Boolean(dashboardPath)
+  return <header className="site-header"><div className="nav-shell"><Brand to={dashboardPath||'/'}/><nav id="main-navigation" className={`nav-links ${open?'open':''}`}>{staff?<button className={active(dashboardPath)?'active':''} aria-current={active(dashboardPath)?'page':undefined} onClick={()=>go(dashboardPath)}>Dashboard</button>:<><button className={active('/catalogo')?'active':''} aria-current={active('/catalogo')?'page':undefined} onClick={()=>go('/catalogo')}>Catálogo</button><button className={active('/como-funciona')?'active':''} aria-current={active('/como-funciona')?'page':undefined} onClick={()=>go('/como-funciona')}>Cómo funciona</button><button className={active('/nosotros')?'active':''} aria-current={active('/nosotros')?'page':undefined} onClick={()=>go('/nosotros')}>Sobre nosotros</button></>}{session&&<button className={active('/cuenta')?'active':''} aria-current={active('/cuenta')?'page':undefined} onClick={()=>go('/cuenta')}>Mi cuenta</button>}</nav><div className="nav-actions">{!staff&&<label className="location-action" aria-label="Municipio de servicio"><Icon name="pin" size={17}/><select value={location} onChange={event=>onLocationChange(event.target.value)}>{serviceLocations.map(city=><option key={city}>{city}</option>)}</select></label>}{session?<button className="avatar-button" onClick={()=>navigate('/cuenta')} aria-label="Abrir mi cuenta">{initials}</button>:<button className="login-action" onPointerEnter={loadAccountPages} onFocus={loadAccountPages} onClick={onOpenAuth}><Icon name="user" size={18}/> Ingresar</button>}{!staff&&<button className="publish-action" onClick={()=>go('/publicar')}>Publica tu herramienta <Icon name="arrow" size={17}/></button>}<button className="menu-action" onClick={()=>setOpen(!open)} aria-label={open?'Cerrar menú':'Abrir menú'} aria-expanded={open} aria-controls="main-navigation"><Icon name={open?'close':'menu'}/></button></div></div></header>
 }
 function Footer(){return <footer className="site-footer"><div className="footer-lead"><Brand/><h2>Tu proyecto empieza con la herramienta correcta.</h2><button className="button button-lime" onClick={()=>navigate('/catalogo')}>Explorar catálogo <Icon name="arrow"/></button></div><div className="footer-links"><div><strong>Plataforma</strong><button onClick={()=>navigate('/catalogo')}>Catálogo</button><button onClick={()=>navigate('/como-funciona')}>Cómo funciona</button><button onClick={()=>navigate('/cuenta')}>Mi cuenta</button></div><div><strong>Compañía</strong><button onClick={()=>navigate('/nosotros')}>Sobre nosotros</button><button onClick={()=>navigate('/informacion/contacto')}>Contacto</button><button onClick={()=>navigate('/informacion/faq')}>Preguntas frecuentes</button></div><div><strong>Legal</strong><button onClick={()=>navigate('/terms-and-conditions')}>Términos y condiciones</button><button onClick={()=>navigate('/informacion/privacidad')}>Privacidad</button></div></div><div className="footer-bottom"><span>© 2026 Tool Rental · Proyecto académico</span><span>Hecho para construir en Colombia</span></div></footer>}
 
@@ -80,9 +86,9 @@ function FeaturedSection({catalogTools,dataMode}){const pageSize=5;const [startI
 function HomePage({catalogTools,dataMode,location,onLocationChange}){return <main>
   <section className="home-hero"><div className="hero-noise"/><div className="hero-content page-shell"><div className="hero-copy"><p className="kicker"><span/> Equipos profesionales, sin comprarlos</p><h1><span className="hero-line"><b>Haz</b> más.</span><span className="hero-line hero-line-accent">Compra <em>menos.</em></span></h1><p className="hero-subtitle">Encuentra herramientas cerca de tu proyecto, consulta fechas y crea una solicitud trazable.</p><div className="hero-actions"><button className="button button-lime" onClick={()=>navigate('/catalogo')}>Explorar equipos <Icon name="arrow"/></button><button className="hero-secondary" onClick={()=>navigate('/como-funciona')}>Cómo funciona <span>↗</span></button></div><div className="trust-row"><span><Icon name="calendar" size={20}/><b>Fechas inclusivas<small>Cálculo consistente</small></b></span><span><Icon name="shield" size={20}/><b>Sesiones protegidas<small>Renovación segura</small></b></span><span><Icon name="box" size={20}/><b>Inventario consultable<small>Datos del catálogo</small></b></span><span><Icon name="check" size={20}/><b>Estados trazables<small>Seguimiento real</small></b></span></div></div><HeroArtwork location={location}/><div className="hero-search"><SearchBar location={location} onLocationChange={onLocationChange}/></div></div><div className="scroll-note"><span/> DESLIZA PARA EXPLORAR</div></section>
   <div className="industrial-marquee" aria-hidden="true"><div>PERFORA <i/> CONSTRUYE <i/> LIMPIA <i/> ELEVA <i/> REPARA <i/> PERFORA <i/> CONSTRUYE <i/> LIMPIA <i/> ELEVA <i/> REPARA <i/></div></div>
-  <section className="category-section page-shell" data-reveal><div className="section-title-row"><div><p className="kicker dark"><span/> Encuentra lo que buscas</p><h2>Herramientas para<br/><em>cada proyecto.</em></h2></div><button className="text-link" onClick={()=>navigate('/catalogo')}>Ver todo el catálogo <Icon name="arrow"/></button></div><div className="category-tiles">{[['Demolición','Rompedores, demoledores y más.'],['Concreto','Mezcladoras, vibradores y equipos.'],['Corte','Cortadoras, sierras y discos.'],['Limpieza','Aspiradoras e hidrolavadoras.'],['Energía','Generadores y plantas.']].map(([category,description],index)=>{const count=catalogTools.filter(tool=>tool.category===category).length;return <button key={category} onClick={()=>navigate(`/catalogo?categoria=${encodeURIComponent(category)}&municipio=${encodeURIComponent(location)}`)} title={`${category}: ${dataMode==='api'?`${count} equipos disponibles`:'explorar muestra'}`}><span className={`category-icon category-${index+1}`}><i/><b/></span><span className="category-index" aria-hidden="true">0{index+1}</span><strong>{category}</strong><small>{description}</small><Icon name="arrow"/></button>})}</div></section>
+  <section className="category-section page-shell" data-reveal><div className="section-title-row"><div><p className="kicker dark"><span/> Encuentra lo que buscas</p><h2>Herramientas para<br/><em>cada proyecto.</em></h2></div><button className="text-link" onClick={()=>navigate('/catalogo')}>Ver todo el catálogo <Icon name="arrow"/></button></div><div className="category-tiles">{featuredCategories.map(({category,description,icon},index)=>{const count=catalogTools.filter(tool=>tool.category===category).length;return <button key={category} onClick={()=>navigate(`/catalogo?categoria=${encodeURIComponent(category)}&municipio=${encodeURIComponent(location)}`)} title={`${category}: ${dataMode==='api'?`${count} equipos disponibles`:'explorar muestra'}`}><span className={`category-icon category-${index+1}`}><Icon name={icon} size={42}/></span><span className="category-index" aria-hidden="true">0{index+1}</span><strong>{category}</strong><small>{description}</small><Icon name="arrow"/></button>})}</div></section>
   <FeaturedSection catalogTools={catalogTools} dataMode={dataMode}/>
-  <section className="steps-section page-shell" data-reveal><div className="steps-intro"><p className="kicker dark"><span/> Así de simple</p><h2>Cómo funciona.</h2><p>La reserva retiene la unidad mientras completas el pago ficticio. No se realizan cobros externos.</p></div><div className="steps-list">{[['01','Busca','Explora el catálogo y consulta las fechas.'],['02','Solicita','Elige recogida o entrega y crea la solicitud.'],['03','Confirma','Simula el pago; el servidor valida y confirma la reserva.'],['04','Haz más','Sigue entrega, uso y devolución desde tu cuenta.']].map(x=><article key={x[0]}><span>{x[0]}</span><div><h3>{x[1]}</h3><p>{x[2]}</p></div><Icon name="arrow"/></article>)}</div></section>
+  <section className="steps-section page-shell" data-reveal><div className="steps-intro"><p className="kicker dark"><span/> Así de simple</p><h2>Cómo funciona.</h2><p>La reserva retiene la unidad mientras completas el checkout de prueba en Mercado Pago.</p></div><div className="steps-list">{[['01','Busca','Explora el catálogo y consulta las fechas.'],['02','Solicita','Elige recogida o entrega y crea la solicitud.'],['03','Confirma','Paga con una cuenta de prueba; el servidor verifica y confirma la reserva.'],['04','Haz más','Sigue entrega, uso y devolución desde tu cuenta.']].map(x=><article key={x[0]}><span>{x[0]}</span><div><h3>{x[1]}</h3><p>{x[2]}</p></div><Icon name="arrow"/></article>)}</div></section>
   <section className="supplier-cta" data-reveal><div className="page-shell"><p className="kicker"><span/> Para proveedores</p><h2>Tu equipo puede<br/><em>seguir produciendo.</em></h2><p>Conoce el proceso para operar como proveedor y administrar únicamente tus propios recursos.</p><button className="button button-light" onClick={()=>navigate('/publicar')}>Publica tu herramienta <Icon name="arrow"/></button></div><div className="cta-orbit" aria-hidden="true"><span>PUBLICA</span><b>ACTIVA</b><small>ADMINISTRA</small></div></section>
   </main>}
 const toolCardMotion=createPointerMotion((node,x,y)=>{node.style.transform=`perspective(900px) rotateX(${y*-3}deg) rotateY(${x*4}deg) translateY(-6px)`},node=>{node.style.transform=""})
@@ -120,7 +126,6 @@ function ToolDetailPage({id,onReserve,catalogTools,dataMode}){const tool=catalog
 
 
 function App(){
-  const { passwordRecovery } = useFeatures()
   const [path,setPath]=useState(window.location.pathname)
   const [session,setSession]=useState(readSession())
   const [authOpen,setAuthOpen]=useState(false)
@@ -128,7 +133,7 @@ function App(){
   const [catalogTools,setCatalogTools]=useState(requireLiveApi ? [] : tools)
   const [dataMode,setDataMode]=useState(requireLiveApi ? 'loading' : 'demo')
   const [location,setLocation]=useState(defaultLocation)
-  const displayedCatalogTools=useMemo(()=>dataMode==='demo'?catalogTools.map(tool=>({...tool,location:`${location}, Santander` })):catalogTools,[catalogTools,dataMode,location])
+  const displayedCatalogTools=useMemo(()=>catalogTools.filter(tool=>tool.location===location),[catalogTools,location])
 
   const changeLocation=nextLocation=>{
     if(!serviceLocations.includes(nextLocation))return
@@ -171,12 +176,11 @@ function App(){
   },[path,catalogTools.length])
 
   const reserve=async selection=>{
-    if(selection.tool.source==='api'){
-      try{
-        const availability=await api.getAvailability(selection.tool.id,selection.startDate,selection.returnDate)
-        selection={...selection,equipmentUnitIds:availability.availableEquipmentUnitIds}
-      }catch(error){selection={...selection,availabilityError:error.message}}
-    }
+    try{
+      const availability=await api.getAvailability(selection.tool.id,selection.startDate,selection.returnDate)
+      const equipmentUnitIds=Array.isArray(availability.availableEquipmentUnitIds)?availability.availableEquipmentUnitIds:[]
+      selection={...selection,equipmentUnitIds,availabilityError:equipmentUnitIds.length?'':'No hay unidades disponibles para las fechas seleccionadas.'}
+    }catch(error){selection={...selection,equipmentUnitIds:[],availabilityError:error.message}}
     setReservation(selection)
     navigate('/cotizacion')
   }
@@ -185,40 +189,30 @@ function App(){
     setSession(authenticated)
     setAuthOpen(false)
   }
-  const logout=async()=>{
+  const logout=async(target='/')=>{
     await api.logout().catch(()=>null)
-    saveSession(null);setSession(null);navigate('/')
+    saveSession(null);setSession(null);navigate(target)
   }
   const continueQuote=async logistics=>{
     if(!session){navigate('/login?returnTo=%2Fcotizacion');return}
-    if(reservation?.tool.source==='api'&&reservation.equipmentUnitIds?.length&&!session?.demo){
-      try{
-        const equipmentUnitIds=[reservation.equipmentUnitIds[0]]
-        const quote=await api.quoteReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,fulfillmentMethod:logistics.fulfillmentMethod,deliveryCountryCode:logistics.deliveryCountryCode})
-        const created=await api.createReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,...logistics,scheduledFulfillmentAt:new Date(logistics.scheduledFulfillmentAt).toISOString()})
-        setReservation(current=>({...current,quote,reservationId:created.id?.value||created.id,reservationStatus:created.status,expiresAt:created.expiresAt,serverTotal:created.total}))
-      }catch(error){setReservation(current=>({...current,apiError:error.message}));return}
-    }
-    navigate('/reserva-confirmada')
+    if(!reservation?.equipmentUnitIds?.length){setReservation(current=>({...current,apiError:current?.availabilityError||'No hay una unidad disponible para crear la reserva.'}));return}
+    try{
+      const equipmentUnitIds=[reservation.equipmentUnitIds[0]]
+      const quote=await api.quoteReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,fulfillmentMethod:logistics.fulfillmentMethod,deliveryCountryCode:logistics.deliveryCountryCode})
+      const created=await api.createReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,...logistics,scheduledFulfillmentAt:new Date(logistics.scheduledFulfillmentAt).toISOString()})
+      const reservationId=created.id?.value||created.id
+      if(!reservationId)throw new Error('El servidor no devolvió el identificador de la reserva.')
+      setReservation(current=>({...current,quote,persistedReservation:created,reservationId,reservationStatus:created.status,expiresAt:created.expiresAt,serverTotal:created.total,apiError:''}))
+      navigate(`/pago?reservationId=${encodeURIComponent(reservationId)}`)
+    }catch(error){setReservation(current=>({...current,apiError:error.message}))}
   }
-  const pay=async payment=>{
-    if(reservation?.reservationId&&!session?.demo){
-      try{
-        await api.simulatePayment({reservationId:reservation.reservationId,paymentStage:'FIRST_HALF',idempotencyKey:crypto.randomUUID(),simulationOutcome:'APPROVE',...payment})
-      }catch(error){setReservation(current=>({...current,apiError:error.message}));return}
-    }
-    navigate('/reserva-confirmada')
-  }
-
   let page
   if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
   else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
-  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={displayedCatalogTools} dataMode={dataMode}/>
+  else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools} dataMode={dataMode}/>
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
-  else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
+  else if(path==='/pago')page=<PaymentPage reservation={reservation} session={session}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
-  else if(path==='/password-reset')page=passwordRecovery?<PasswordResetPage/>:<EmptyState title="Recuperación no disponible" text="La recuperación de contraseña está fuera de esta entrega del MVP." action={()=>navigate('/login')} actionText="Volver al ingreso"/>
-  else if(path.startsWith('/checkout/'))page=<FictionalCheckoutPage session={session} paymentId={path.split('/')[2]}/>
   else if(path==='/payment-return')page=<PaymentReturnPage session={session}/>
   else if(path==='/login')page=<AuthPage mode="login" onAuthenticated={login}/>
   else if(path==='/registro/proveedor')page=<AuthPage mode="supplier" onAuthenticated={login}/>
@@ -234,7 +228,7 @@ function App(){
   else if(path==='/403')page=<ErrorPage code="403"/>
   else page=<ErrorPage/>
   const minimal=path==='/reserva-confirmada'
-  const authRoute=['/login','/registro','/registro/proveedor','/password-reset'].includes(path)
+  const authRoute=['/login','/registro','/registro/proveedor'].includes(path)
   const footerHidden=authRoute||path==='/pago'||path==='/como-funciona'||path.startsWith('/panel/')||path==='/cuenta'
   return <div className={`app ${path==='/'?'home-route':''}`}><a className="skip-link" href="#main-content">Saltar al contenido</a>{!minimal&&<Header path={path} session={session} onOpenAuth={()=>navigate('/login')} location={location} onLocationChange={changeLocation}/>}<div className="page-content page-enter" id="main-content" tabIndex={-1} key={path}><AsyncBoundary key={path}>{dataMode==='error'&&<p className="data-notice" role="alert">No pudimos cargar el catálogo del servidor. Reintenta en unos minutos; no se mostrarán datos de respaldo.</p>}<Suspense fallback={<RouteLoading/>}>{page}</Suspense></AsyncBoundary></div>{!minimal&&!footerHidden&&<Footer/>}{authOpen&&<AsyncBoundary as="section"><Suspense fallback={<div className="modal-backdrop"><p className="auth-modal" role="status">Cargando acceso…</p></div>}><AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/></Suspense></AsyncBoundary>}</div>
 }

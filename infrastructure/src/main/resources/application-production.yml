@@ -13,15 +13,12 @@ auth:
     secret: ${JWT_SECRET}
   cookie:
     secure: true
-  password-recovery:
-    enabled: false
-    delivery: disabled
 
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
 payments:
-  provider: fictional
+  provider: ${PAYMENT_PROVIDER:fictional}
   internal-enabled: false
   sandbox:
     webhook-secret: ${SANDBOX_WEBHOOK_SECRET:disabled-internal-verifier-secret-not-a-public-route}

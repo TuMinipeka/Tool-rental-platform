@@ -1,20 +1,23 @@
 import { useFeatures } from '../lib/features.js'
 import { useRef, useState } from 'react'
 import { api } from '../api.js'
-import { entityId } from '../lib/records.js'
 import { navigate } from '../lib/navigation.js'
+import { entityId } from '../lib/records.js'
+
+const nextIsoDate=value=>{const date=new Date(`${value}T00:00:00Z`);date.setUTCDate(date.getUTCDate()+1);return date.toISOString().slice(0,10)}
 
 export function ReservationActions({ reservation, supplier = false, onChanged }) {
-  const { hostedCheckout, paymentProvider } = useFeatures()
+  const { hostedCheckout } = useFeatures()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const [checkout, setCheckout] = useState(null)
-  const checkoutKey = useRef(null)
   const cancellationKey = useRef(null)
+  const extensionKey = useRef(null)
+  const [extensionOpen,setExtensionOpen] = useState(false)
   const id = entityId(reservation.id ?? reservation.reservationId)
   const pending = reservation.status === 'PENDING'
   const cancellable = !supplier && ['PENDING', 'PENDING_PAYMENT', 'CONFIRMED'].includes(reservation.status)
   const payable = !supplier && reservation.status === 'PENDING_PAYMENT'
+  const extendable = !supplier && reservation.status === 'CONFIRMED'
   if (!(supplier && pending) && !cancellable) return null
   const perform = async action => {
     setBusy(true)
@@ -27,31 +30,22 @@ export function ReservationActions({ reservation, supplier = false, onChanged })
       setError(reason.message + (reason.code ? ' (' + reason.code + ')' : ''))
     } finally { setBusy(false) }
   }
-  const requestCheckout = async () => {
-    setBusy(true); setError(''); checkoutKey.current ??= crypto.randomUUID()
-    try {
-      const result = await api.createCheckout(id, checkoutKey.current)
-      setCheckout(result)
-      if (result.checkoutUrl && result.paymentStatus === 'READY') {
-        const target = new URL(result.checkoutUrl, window.location.origin)
-        if (result.processor === 'FICTIONAL_GATEWAY' && paymentProvider === 'FICTIONAL_GATEWAY') {
-          if (target.origin !== window.location.origin || target.pathname !== '/checkout/' + result.paymentId) throw new Error('La dirección de la pasarela ficticia es inválida.')
-          navigate(target.pathname)
-          return
-        }
-        if (target.protocol !== 'https:' || !['www.mercadopago.com.co', 'www.mercadopago.com', 'mercadopago.com.co'].includes(target.hostname)) throw new Error('El proveedor devolvió una dirección de pago inválida.')
-        window.location.assign(target.href)
-      }
-    }
-    catch (reason) { setError(reason.message) }
-    finally { setBusy(false) }
+  const requestExtension=async event=>{
+    event.preventDefault()
+    const formElement=event.currentTarget
+    const requestedReturnDate=new FormData(formElement).get('requestedReturnDate')
+    setBusy(true);setError('');extensionKey.current??=crypto.randomUUID()
+    try{await api.requestReservationExtension(id,requestedReturnDate,extensionKey.current);setExtensionOpen(false);await onChanged()}
+    catch(reason){setError(reason.message+(reason.code?' ('+reason.code+')':''))}
+    finally{setBusy(false)}
   }
   return <div className="reservation-actions" aria-busy={busy}>
     {supplier && pending && <><button className="button button-dark" disabled={busy} onClick={() => perform('confirmation')}>Confirmar solicitud</button><button className="button button-ghost" disabled={busy} onClick={() => perform('rejection')}>Rechazar solicitud</button></>}
-    {payable && <button className="button button-dark" disabled={busy || !hostedCheckout} onClick={requestCheckout}>{paymentProvider === 'FICTIONAL_GATEWAY' ? 'Pagar en pasarela ficticia' : 'Continuar en Mercado Pago'}</button>}
+    {payable && <button className="button button-dark" disabled={busy || !hostedCheckout} onClick={() => navigate(`/pago?reservationId=${encodeURIComponent(id)}`)}>Elegir medio de pago</button>}
     {payable && !hostedCheckout && <p role="status">La pasarela no está disponible en este entorno.</p>}
-    {checkout && <p role="status">Estado del checkout: {checkout.paymentStatus}. La confirmación depende del estado persistido en el servidor. Si requiere revisión, no crees otra reserva para repetir el pago.</p>}
     {cancellable && <button className="button button-ghost" disabled={busy} onClick={() => perform('cancellation')}>Solicitar cancelación</button>}
+    {extendable&&<button className="button button-ghost" disabled={busy} onClick={()=>setExtensionOpen(value=>!value)}>{extensionOpen?'Cerrar extensión':'Solicitar extensión'}</button>}
+    {extensionOpen&&<form className="reservation-extension-form" onSubmit={requestExtension}><label><span>Nueva fecha de devolución</span><input name="requestedReturnDate" type="date" min={nextIsoDate(reservation.effectiveReturnDate||reservation.period?.returnDate)} required/></label><button className="button button-dark" disabled={busy}>Enviar solicitud</button></form>}
     {error && <p className="form-error" role="alert">{error}</p>}
   </div>
 }

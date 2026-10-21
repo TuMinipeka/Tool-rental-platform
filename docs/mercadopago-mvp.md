@@ -1,7 +1,27 @@
-# Referencia histórica: adaptador Mercado Pago
+# Mercado Pago Checkout Pro en pruebas
 
-**Fuera del MVP vigente.** Daniel eligió una [pasarela ficticia](fictional-payments.md), sin credenciales externas ni cobros reales, para acelerar el despliegue. No completar ni cargar .env.mercadopago.local para publicar esta demo. El archivo privado se conserva intacto, ignorado por Git.
+El proveedor de pagos vigente es Mercado Pago Checkout Pro en COP, limitado a cuentas y credenciales oficiales de prueba. La aplicación crea la preferencia en el backend, redirige al `init_point` validado y confirma el resultado únicamente después de consultarlo en la API de Mercado Pago.
 
-El código del adaptador y sus pruebas se conservan como referencia técnica y para preservar el historial aplicado de V304. Solo se ensambla al seleccionar explícitamente payments.provider=mercadopago en un entorno de desarrollo; production usa fictional. Las pruebas con servidor HTTP aislado no acreditan ninguna compra oficial.
+## Configuración privada
 
-La publicación ya no depende de una cuenta de Mercado Pago ni de un callback auténtico. [MVP](mvp.md), [despliegue](deployment.md) y [validación](validation-report.md) describen el alcance actual. Una integración financiera real requiere una entrega y aceptación separadas.
+Las credenciales se suministran exclusivamente como variables de entorno del backend. No existe endpoint ni pantalla para consultarlas o modificarlas:
+
+```env
+PAYMENT_PROVIDER=mercadopago
+MERCADOPAGO_ACCESS_TOKEN=
+MERCADOPAGO_COLLECTOR_ID=
+MERCADOPAGO_WEBHOOK_SECRET=
+PAYMENTS_PUBLIC_URL=https://tu-dominio.example
+```
+
+El adaptador consulta `/users/me` antes del primer checkout y rechaza cuentas que no tengan la marca `test_user` o cuyo identificador no coincida con `MERCADOPAGO_COLLECTOR_ID`. También rechaza pagos con `live_mode=true`, otra moneda, otro vendedor, referencia distinta o importe diferente al persistido.
+
+`PAYMENTS_PUBLIC_URL` debe ser un origen HTTPS accesible desde Internet. El webhook que se configura en Mercado Pago es:
+
+```text
+https://tu-dominio.example/api/v1/payments/mercadopago/webhooks
+```
+
+La firma `x-signature` se valida con `MERCADOPAGO_WEBHOOK_SECRET`. El retorno del navegador nunca confirma por sí solo un pago. Las preferencias, búsquedas, consultas y reembolsos usan idempotencia y se concilian contra el estado persistido.
+
+No se deben usar vendedores, compradores, tarjetas ni datos bancarios reales. La aceptación con credenciales auténticas de prueba y un webhook HTTPS sigue pendiente hasta que el operador complete el archivo privado `.env`; esas claves nunca se versionan.

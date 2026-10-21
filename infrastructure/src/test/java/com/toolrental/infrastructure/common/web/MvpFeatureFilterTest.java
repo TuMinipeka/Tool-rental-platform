@@ -9,14 +9,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 class MvpFeatureFilterTest {
   @Test
-  void disabledRecoveryAndManualPaymentsReturnStableProblemDetailsForBothAliases()
-      throws Exception {
-    var filter = new MvpFeatureFilter(false, false, new ObjectMapper());
+  void disabledManualPaymentsReturnStableProblemDetailsForBothAliases() throws Exception {
+    var filter = new MvpFeatureFilter(false, new ObjectMapper());
     for (var prefix : java.util.List.of("/api", "/api/v1"))
       for (var route :
           java.util.List.of(
-              "/auth/password-reset",
-              "/auth/password-recovery",
               "/payments/simulations",
               "/payments/internal/checkouts",
               "/payments/sandbox/webhooks",
@@ -38,7 +35,7 @@ class MvpFeatureFilterTest {
 
   @Test
   void hostedCheckoutAndPaymentQueriesStillReachAuthentication() throws Exception {
-    var filter = new MvpFeatureFilter(false, false, new ObjectMapper());
+    var filter = new MvpFeatureFilter(false, new ObjectMapper());
     for (var method : java.util.List.of("POST", "GET")) {
       var passed = new java.util.concurrent.atomic.AtomicBoolean();
       filter.doFilter(

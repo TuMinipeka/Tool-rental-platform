@@ -1,6 +1,5 @@
 package com.toolrental.infrastructure.user.adapters.in.rest.controllers;
 
-import com.toolrental.application.supplier.dto.SupplierRegistrationResponse;
 import com.toolrental.application.user.command.RegisterAccountCommand;
 import com.toolrental.application.user.command.RegisterSupplierAccountCommand;
 import com.toolrental.application.user.dto.AuthenticationResponse;
@@ -43,8 +42,8 @@ public final class AuthenticationController {
   }
 
   @PostMapping("/supplier-registration")
-  public ResponseEntity<SupplierRegistrationResponse> registerSupplier(
-      @Valid @RequestBody SupplierAccountRegistrationRequest request) {
+  public ResponseEntity<AuthenticationResponse> registerSupplier(
+      HttpServletRequest http, @Valid @RequestBody SupplierAccountRegistrationRequest request) {
     var result =
         supplierRegistration.execute(
             new RegisterSupplierAccountCommand(
@@ -53,8 +52,11 @@ public final class AuthenticationController {
                 request.password(),
                 request.documentType(),
                 request.documentNumber(),
-                request.businessName()));
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(result);
+                request.businessName()),
+            clientLabel(http));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .header(HttpHeaders.SET_COOKIE, cookies.issue(result.refreshToken()).toString())
+        .body(result.authentication());
   }
 
   @PostMapping("/login")

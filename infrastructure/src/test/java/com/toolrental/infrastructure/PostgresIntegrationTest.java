@@ -21,7 +21,6 @@ import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.reservation.port.repository.ReservationRepository;
 import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
 import com.toolrental.domain.supplier.model.valueobject.SupplierId;
-import com.toolrental.domain.user.port.SecureTokenService;
 import jakarta.persistence.EntityManagerFactory;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -94,7 +93,6 @@ class PostgresIntegrationTest {
   @Autowired RequestReservationUseCase request;
   @Autowired ConfirmReservationUseCase confirm;
   @Autowired CancelReservationUseCase cancel;
-  @Autowired SecureTokenService tokenService;
   @Autowired ReservationRepository reservationRepository;
   @Autowired Clock clock;
 
@@ -146,7 +144,7 @@ class PostgresIntegrationTest {
     db.update("insert into suppliers values (?,'ID','S-1','Supplier Original')", supplier);
     db.update("insert into categories values (?,'Drills','Full category description')", category);
     db.update(
-        "insert into tools values (?,?,?,'Drill','Power drill',10,'COP','PUBLISHED')",
+        "insert into tools (tool_id,supplier_id,category_id,name,description,current_daily_rate,rate_currency,publication_status,service_city) values (?,?,?,'Drill','Power drill',10,'COP','PUBLISHED','Bucaramanga')",
         tool,
         supplier,
         category);
@@ -204,7 +202,7 @@ class PostgresIntegrationTest {
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(37);
+        .isEqualTo(39);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
@@ -230,7 +228,6 @@ class PostgresIntegrationTest {
   void authenticationRecoveryPublicCatalogAndOpenApiUseThePublishedContracts() throws Exception {
     String email = "new.customer@example.com";
     String initialPassword = "InitialPass123!";
-    String changedPassword = "ChangedPass123!";
     var registration =
         call(
             null,
@@ -263,40 +260,26 @@ class PostgresIntegrationTest {
     call(
         null, get("/api/reservations").header("Authorization", "Bearer " + accessToken), null, 200);
 
-    var recovery = call(null, post("/api/v1/auth/password-recovery"), Map.of("email", email), 202);
-    assertThat(recovery.has("recoveryToken")).isFalse();
-    String resetToken = "integration-reset-token";
-    db.update(
-        "insert into password_reset_tokens (password_reset_token_id,user_id,token_hash,created_at,expires_at) values (?,?,?,now(),now()+interval '15 minutes')",
-        UUID.randomUUID(),
-        UUID.fromString(registration.get("userId").asText()),
-        tokenService.hash(resetToken));
-    call(
-        null,
-        post("/api/v1/auth/password-reset"),
-        Map.of("token", resetToken, "newPassword", changedPassword),
-        204);
-    call(
-        null,
-        get("/api/v1/reservations").header("Authorization", "Bearer " + accessToken),
-        null,
-        401);
-    call(
-        null,
-        post("/api/v1/auth/password-reset"),
-        Map.of("token", resetToken, "newPassword", changedPassword),
-        400);
-    call(null, post("/api/auth/login"), Map.of("email", email, "password", initialPassword), 401);
-    call(
-        null, post("/api/v1/auth/login"), Map.of("email", email, "password", changedPassword), 200);
-
     assertThat(call(null, get("/api/public/catalog"), null, 200).toString()).contains("Drill");
     assertThat(call(null, get("/api/v1/public/catalog"), null, 200).toString()).contains("Drill");
+    assertThat(
+            call(null, get("/api/v1/public/catalog").param("serviceCity", "Bucaramanga"), null, 200)
+                .get(0)
+                .get("serviceCity")
+                .asText())
+        .isEqualTo("Bucaramanga");
+    assertThat(
+            call(
+                null,
+                get("/api/v1/public/catalog").param("serviceCity", "Floridablanca"),
+                null,
+                200))
+        .isEmpty();
     assertThat(call(null, get("/v3/api-docs"), null, 200).get("openapi").asText()).startsWith("3.");
   }
 
   @Test
-  void supplierOnboardingAndProfileDeactivationEnforceJwtRolesAndSessionRevocation()
+  void directSupplierRegistrationAndProfileDeactivationEnforceJwtRolesAndSessionRevocation()
       throws Exception {
     String supplierEmail = "candidate.supplier@example.com";
     String supplierPassword = "SupplierPass123!";
@@ -314,25 +297,11 @@ class PostgresIntegrationTest {
             "SUPPLIER-9001",
             "businessName",
             "Candidate Tools");
-    var registration = call(null, post("/api/auth/supplier-registration"), supplierRequest, 202);
+    var registration = call(null, post("/api/auth/supplier-registration"), supplierRequest, 201);
     var candidateId = UUID.fromString(registration.get("userId").asText());
-    assertThat(registration.get("accountStatus").asText()).isEqualTo("SUSPENDED");
-    call(
-        null,
-        post("/api/auth/login"),
-        Map.of("email", supplierEmail, "password", supplierPassword),
-        401);
+    assertThat(registration.get("roles").toString()).contains("SUPPLIER");
     call(customer, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 403);
-    call(admin, patch("/api/users/" + candidateId + "/status"), Map.of("status", "ACTIVE"), 200);
-
-    var supplierLogin =
-        call(
-            null,
-            post("/api/auth/login"),
-            Map.of("email", supplierEmail, "password", supplierPassword),
-            200);
-    assertThat(supplierLogin.get("roles").toString()).contains("SUPPLIER");
-    var supplierToken = supplierLogin.get("accessToken").asText();
+    var supplierToken = registration.get("accessToken").asText();
     var today = LocalDate.now(ZoneId.of("America/Bogota"));
     call(
         null,
@@ -458,20 +427,20 @@ class PostgresIntegrationTest {
     call(
         null,
         post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
-        Map.of("reservationId", held.id().value()),
+        Map.of("reservationId", held.id().value(), "paymentMethod", "HOSTED_CHECKOUT"),
         401);
     var checkout =
         call(
             customer,
             post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
-            Map.of("reservationId", held.id().value()),
+            Map.of("reservationId", held.id().value(), "paymentMethod", "HOSTED_CHECKOUT"),
             200);
     var id = UUID.fromString(checkout.path("paymentId").asText());
     assertThat(checkout.path("checkoutUrl").asText()).startsWith("https://www.mercadopago.com.co/");
     call(
         customer,
         post("/api/v1/payments/checkouts").header("Idempotency-Key", "official-1"),
-        Map.of("reservationId", held.id().value()),
+        Map.of("reservationId", held.id().value(), "paymentMethod", "HOSTED_CHECKOUT"),
         200);
     call(supplier, get("/api/v1/payments/checkouts/" + id), null, 200);
     org.mockito.Mockito.verify(gateway, org.mockito.Mockito.times(1))
@@ -830,16 +799,13 @@ class PostgresIntegrationTest {
     var invoices = call(customer, get("/api/invoices"), null, 200);
     var invoiceId = invoices.get(0).get("invoiceId").asText();
     mvc.perform(
-            get("/api/invoices/" + invoiceId + "/document")
+            get("/api/invoices/" + invoiceId + "/document?disposition=attachment")
                 .with(jwt().jwt(token -> token.subject(customer.toString()))))
         .andExpect(status().isOk())
         .andExpect(
             header()
                 .string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
-        .andExpect(
-            content()
-                .string(
-                    org.hamcrest.Matchers.containsString("Simulaci&oacute;n acad&eacute;mica")));
+        .andExpect(content().string(org.hamcrest.Matchers.startsWith("%PDF-")));
   }
 
   @Test
@@ -1334,6 +1300,8 @@ class PostgresIntegrationTest {
                 "Saw",
                 "description",
                 "Circular saw",
+                "serviceCity",
+                "Floridablanca",
                 "dailyRate",
                 15,
                 "currency",
@@ -1352,6 +1320,8 @@ class PostgresIntegrationTest {
             "Updated saw",
             "description",
             "Updated description",
+            "serviceCity",
+            "Piedecuesta",
             "dailyRate",
             18,
             "currency",

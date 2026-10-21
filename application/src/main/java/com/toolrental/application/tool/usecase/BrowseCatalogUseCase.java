@@ -29,7 +29,8 @@ public final class BrowseCatalogUseCase {
     this.work = work;
   }
 
-  public java.util.List<CatalogToolResponse> list(UUID categoryId, String query) {
+  public java.util.List<CatalogToolResponse> list(
+      UUID categoryId, String query, String serviceCity) {
     return work.execute(
         () -> {
           var categoryNames =
@@ -44,6 +45,8 @@ public final class BrowseCatalogUseCase {
                       java.util.stream.Collectors.groupingBy(
                           unit -> unit.toolId().value(), java.util.stream.Collectors.counting()));
           var normalizedQuery = query == null ? "" : query.trim().toLowerCase(Locale.ROOT);
+          var normalizedCity =
+              serviceCity == null ? "" : serviceCity.trim().toLowerCase(Locale.ROOT);
           Predicate<com.toolrental.domain.tool.model.aggregate.Tool> categoryFilter =
               tool -> categoryId == null || categoryId.equals(tool.categoryId().value());
           Predicate<com.toolrental.domain.tool.model.aggregate.Tool> textFilter =
@@ -51,9 +54,17 @@ public final class BrowseCatalogUseCase {
                   normalizedQuery.isBlank()
                       || tool.name().toLowerCase(Locale.ROOT).contains(normalizedQuery)
                       || tool.description().toLowerCase(Locale.ROOT).contains(normalizedQuery);
+          Predicate<com.toolrental.domain.tool.model.aggregate.Tool> cityFilter =
+              tool ->
+                  normalizedCity.isBlank()
+                      || tool.serviceCity().toLowerCase(Locale.ROOT).equals(normalizedCity);
           return tools.findAll().stream()
               .filter(
-                  tool -> tool.published() && categoryFilter.test(tool) && textFilter.test(tool))
+                  tool ->
+                      tool.published()
+                          && categoryFilter.test(tool)
+                          && textFilter.test(tool)
+                          && cityFilter.test(tool))
               .map(
                   tool ->
                       CatalogToolResponse.from(
@@ -63,6 +74,10 @@ public final class BrowseCatalogUseCase {
               .sorted(Comparator.comparing(CatalogToolResponse::name))
               .toList();
         });
+  }
+
+  public java.util.List<CatalogToolResponse> list(UUID categoryId, String query) {
+    return list(categoryId, query, null);
   }
 
   public CatalogToolResponse find(ToolId id) {
