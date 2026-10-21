@@ -12,11 +12,11 @@ El diseño de Conde es la referencia de interfaz. Esta guía consolida reglas a�
 
 ## Pantalla de carga inicial
 
-`frontend/index.html` incluye en línea una pantalla de carga con SVG y CSS, sin imágenes ni video, para que se pinte antes que el bundle de React. Sobre fondo `#101318`, un martillo minimalista golpea tres veces un clavo terco; un rayo amarillo y cian lo parte en dos y las mitades se vuelven a unir con rebote.
+`frontend/index.html` incluye en línea una pantalla de carga con SVG y CSS, sin imágenes ni video, para que se pinte antes que el bundle de React. Sobre fondo `#101318`, una cinta métrica amarilla sale de su carcasa mientras la lectura en centímetros aumenta junto al texto «Tomando medidas».
 
-- Primera visita de la sesión del navegador: permanece al menos un ciclo completo (2,6 s) y luego se desvanece en 320 ms.
-- Visitas posteriores en la misma sesión: solo aparece si la carga tarda más de 450 ms y se retira al renderizar la aplicación.
-- Movimiento reducido: se muestra estática y se retira en cuanto la aplicación renderiza.
-- `src/lib/bootSplash.js` la libera; `tests/boot-splash.spec.js` verifica los tres comportamientos.
+- No impone un tiempo mínimo. El contenido aparece a los 300 ms para no parpadear en cargas rápidas.
+- La cinta avanza rápido al principio y luego cada vez más lento durante 10 s: una carga lenta sigue desenrollando la cinta sin detenerse. La lectura es decorativa y no representa un porcentaje de progreso.
+- Al renderizar la aplicación, `src/lib/bootSplash.js` recoge la cinta de golpe en 260 ms y desvanece la pantalla en 220 ms.
+- Movimiento reducido: la cinta se muestra estática y la pantalla solo se desvanece.
 
 Las fotografías deben tener permiso de uso y evitar datos personales identificables. Conserva las [condiciones de imágenes](tool-image-requirements.md). Los [resultados previos de calidad](frontend-quality.md) identifican la versión medida y no describen automáticamente este MVP.
