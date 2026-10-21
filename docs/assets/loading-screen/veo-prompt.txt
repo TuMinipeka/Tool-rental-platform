@@ -1,0 +1,14 @@
+Crea una animación gráfica minimalista premium de 6 segundos, horizontal 16:9. Usa initial-frame.png como fotograma inicial y final-frame.png como fotograma final. Respeta fielmente las siluetas y la composición de ambas referencias.
+
+Fondo negro puro #000000, uniforme e inmóvil. Un único martillo de silueta plana, completamente amarillo eléctrico #FFD600, permanece centrado, con mucho espacio negro alrededor. Mantén idéntico diseño, proporciones y escala. No conviertas el martillo en un objeto realista ni tridimensional.
+
+SECUENCIA:
+0,0–0,4 s: muestra el martillo intacto del primer fotograma.
+0,4–3,2 s: realiza tres martillazos breves, claros y rítmicos. El martillo gira como una sola pieza alrededor del extremo inferior del mango, con arcos controlados de aproximadamente 15–20 grados. La cabeza golpea un punto invisible; no añadas suelo, clavos ni manos. Cada golpe tiene una aceleración corta hacia el impacto y un pequeño rebote amortiguado. Conserva el encuadre y evita desplazamientos acumulados.
+3,2–3,6 s: el martillo regresa a la posición inicial y queda inmóvil un instante.
+3,6–4,4 s: un único rayo angular cian #00D9FF, acompañado por un acento amarillo #FFD600, entra desde arriba a la derecha y atraviesa la unión entre cabeza y mango. Parte el martillo en exactamente dos fragmentos amarillos, con bordes de fractura complementarios. Los fragmentos se separan ligeramente y se detienen de forma suave, coincidiendo con la segunda referencia. Añade solo unas pocas chispas geométricas pequeñas junto al corte y un resplandor muy contenido.
+4,4–6,0 s: conserva estable el fotograma final: cabeza arriba a la izquierda, mango abajo a la derecha y rayo bicolor en la separación central.
+
+Cámara completamente fija: sin zoom, paneo, cambio de ángulo ni temblor de pantalla. Estética gráfica bidimensional, siluetas nítidas, rellenos uniformes y movimiento limpio. Mantén el amarillo como único color del martillo; el cian aparece en el rayo y las chispas. El fondo sigue siendo negro durante todo el clip. Sin audio.
+
+PROHIBIDO: texto, letras, números, logos, marcas, personas, manos, escenarios, cuadrículas, herramientas adicionales, piezas extra, explosiones, humo, texturas fotográficas, render 3D, deformación del martillo o cambios de color del fondo. No fundir una imagen con otra: anima los golpes y la separación de las piezas de forma continua.
