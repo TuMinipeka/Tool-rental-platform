@@ -3380,7 +3380,7 @@ select:focus-visible,
   .how-timeline article { grid-template-columns: 55px 1fr; padding-inline: 12px; }
 }
 
-/* Landing page calibrated against landingpages/Landingpage1.png. */
+/* Landing page visual calibration styles. */
 .home-route .nav-shell {
   width: min(1480px, calc(100% - 48px));
   height: 64px;
