@@ -18,11 +18,12 @@ async page => {
   }
   try {
     const name = 'QA Catalog Sync ' + Date.now()
-    const customer = await login('cliente@toolrental.local', '/catalogo?q=' + encodeURIComponent(name) + '&municipio=Bucaramanga')
+    const customer = await login('cliente@toolrental.local', '/catalogo?q=' + encodeURIComponent(name) + '&municipio=Bucaramanga&existencias=todas')
     await customer.getByRole('button', { name: 'Limpiar filtros' }).waitFor()
     const supplier = await login('proveedor@toolrental.local', '/panel/proveedor')
     await supplier.getByRole('button', { name: 'Herramientas', exact: true }).click()
     const form = supplier.locator('.operations-form form')
+    await form.locator('[name=initialQuantity]').fill('0')
     await form.locator('[name=categoryId]').selectOption({ index: 1 })
     await form.locator('[name=name]').fill(name)
     await form.locator('[name=description]').fill('Real browser publication above the former price ceiling')

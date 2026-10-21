@@ -68,6 +68,7 @@ async page => {
     result.records.customerId = customer.userId
     await supplier.page.getByRole('button', { name: 'Herramientas', exact: true }).click()
     const form = supplier.page.locator('.operations-form form'), name = 'QA Persistent Drill ' + nonce
+    await form.locator('[name=initialQuantity]').fill('0')
     await form.locator('[name=categoryId]').selectOption({ index: 1 }); await form.locator('[name=name]').fill(name)
     await form.locator('[name=description]').fill('Created in browser and verified in PostgreSQL'); await form.locator('[name=dailyRate]').fill('25000'); await form.locator('[name=published]').uncheck()
     const created = supplier.page.waitForResponse(r => r.url().endsWith('/api/v1/tools') && r.request().method() === 'POST')

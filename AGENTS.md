@@ -58,7 +58,9 @@ Do not add speculative empty classes or abstractions. Empty adapter directories 
 - For frontend interface design, interaction, and motion work, consult `.agents/skills/emil-design-eng/SKILL.md` and apply the guidance relevant to the task.
 - For frontend optimization, prioritize `.agents/skills/performance/SKILL.md` and `.agents/skills/web-quality-audit/SKILL.md`; apply `.agents/skills/vercel-react-best-practices/SKILL.md` to React changes and `.agents/skills/webapp-testing/SKILL.md` to browser verification. Preserve visual design, animations, content, and functionality. Require equivalent before/after measurements before claiming performance improvements.
 - Add tests in the layer that owns each new behavior. Persistence and concurrency require real integration tests.
-- Run `mvnw.cmd clean verify` on Windows or `./mvnw clean verify` on Linux/macOS before completion.
+- Deliver the corresponding frontend workflow with each user-facing feature; do not report a backend-only change as a completed product feature.
+- Prioritize the runnable presentation build. Validate critical affected paths with focused checks, including real persistence when relevant. Avoid routine full regression runs; use Maven `clean verify` when a broad backend change requires it or the user requests it.
+- Rebuild the running local frontend after changing it and verify the served version, so refreshing the user's URL shows the delivered feature.
 - Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.
 - Update documentation whenever a rule, contract, structure, technology, or implementation status changes.
 - Do not describe templates or planned work as implemented.

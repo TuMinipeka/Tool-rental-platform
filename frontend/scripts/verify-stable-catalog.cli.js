@@ -5,7 +5,7 @@ async page => {
   const candidates = catalog.filter(tool => tool.dailyRate > 230000).slice(0, 2)
   const result = { testedAt: new Date().toISOString(), readOnly: true, checks: [], screenshots: [] }
   for (const [index, tool] of candidates.entries()) {
-    await page.goto('http://localhost:5173/catalogo?' + new URLSearchParams({ q: tool.name, municipio: tool.serviceCity }))
+    await page.goto('http://localhost:5173/catalogo?' + new URLSearchParams({ q: tool.name, municipio: tool.serviceCity, existencias: 'todas' }))
     await page.getByRole('link', { name: tool.name, exact: true }).waitFor()
     result.checks.push({ toolId: tool.toolId, visibleAboveFormerCeiling: true, municipality: tool.serviceCity, price: tool.dailyRate })
     if (tool.imageUrls.length) {

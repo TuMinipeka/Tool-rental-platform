@@ -1,0 +1,22 @@
+{
+  "testedAt": "2026-10-21T04:15:13.687Z",
+  "baseCommit": "3f7fceac4ff944a636c5d73d2a5ca9d658442eba",
+  "database": "tool_rental_demo_conde_mvp",
+  "databaseHostPort": 5433,
+  "origin": "http://localhost:8080",
+  "counts": {
+    "users": 51,
+    "tools": 53,
+    "published": 33,
+    "images": 27,
+    "units": 51
+  },
+  "checks": {
+    "nativeBackendUsesSameDatabase": true,
+    "demoSeedApplied": true,
+    "allPublishedToolsReachTheApi": true,
+    "pricesAndImagesMatchPostgres": true
+  },
+  "readOnly": true,
+  "completed": true
+}

@@ -133,14 +133,14 @@ export const api = {
     if (params.query) query.set('query', params.query)
     if (params.categoryId) query.set('categoryId', params.categoryId)
     if (params.serviceCity) query.set('serviceCity', params.serviceCity)
-    return request(`/public/catalog${query.size ? `?${query}` : ''}`)
+    return request(`/public/catalog${query.size ? `?${query}` : ''}`, { cache: 'no-store' })
   },
   getCatalogTool(toolId) {
     return request(`/public/catalog/${toolId}`)
   },
   getAvailability(toolId, startDate, returnDate) {
     const query = new URLSearchParams({ startDate, returnDate })
-    return request(`/public/catalog/${toolId}/availability?${query}`)
+    return request(`/public/catalog/${toolId}/availability?${query}`, { cache: 'no-store' })
   },
   login(email, password) {
     return request('/auth/login', {

@@ -10,6 +10,7 @@ import { OperationalReportsPanel } from '../components/OperationalReportsPanel.j
 import { money } from '../lib/format.js'
 import { serviceLocations } from '../lib/locations.js'
 import { entityId } from '../lib/records.js'
+import { navigate } from '../lib/navigation.js'
 
 const currentDate = new Date().toISOString().slice(0, 10)
 const yearStart = `${currentDate.slice(0, 4)}-01-01`
@@ -28,6 +29,9 @@ function ToolForm({ categories, editing, onCancel, onSaved, showError }) {
     event.preventDefault()
     const formElement = event.currentTarget
     const form = new FormData(formElement)
+    const createdUnits = []
+    const quantity = editing ? 0 : Number(form.get('initialQuantity'))
+    let saved
     setBusy(true)
     try {
       const values = {
@@ -38,13 +42,28 @@ function ToolForm({ categories, editing, onCancel, onSaved, showError }) {
         currency: 'COP',
         published: form.get('published') === 'on',
       }
-      const saved = editing
+      saved = editing
         ? await api.updateTool(entityId(editing.id), values)
         : await api.createTool({ ...values, categoryId: form.get('categoryId'), imageUrls: [] })
-      onSaved(saved)
+      if (!editing) {
+        for (let index = 0; index < quantity; index++) {
+          createdUnits.push(await api.createEquipmentUnit({
+            toolId: entityId(saved.id),
+            inventoryCode: 'TR-' + crypto.randomUUID(),
+            serialNumber: null,
+            currentCondition: form.get('initialCondition'),
+            status: 'OPERATIONAL',
+          }))
+        }
+      }
+      onSaved(saved, createdUnits)
       formElement.reset()
     } catch (reason) {
-      showError(reason.message)
+      if (saved && !editing) {
+        onSaved(saved, createdUnits)
+        formElement.reset()
+        showError(`La herramienta se guardó en el servidor, pero solo se registraron ${createdUnits.length} de ${quantity} unidades. Usa Agregar existencias para completar el inventario. ${reason.message}`)
+      } else showError(reason.message)
     } finally {
       setBusy(false)
     }
@@ -56,6 +75,7 @@ function ToolForm({ categories, editing, onCancel, onSaved, showError }) {
     <label className="form-field"><span>Descripción</span><textarea name="description" required maxLength="2000" defaultValue={editing?.description || ''}/></label>
     <div className="two-fields"><label className="form-field"><span>Ciudad</span><select name="serviceCity" required defaultValue={editing?.serviceCity || serviceLocations[0]}>{serviceLocations.map(city => <option key={city}>{city}</option>)}</select></label><label className="form-field"><span>Tarifa diaria COP</span><input name="dailyRate" type="number" min="0" step="1" required defaultValue={Number(editing?.dailyRate?.amount ?? 0) || ''}/></label></div>
     <label className="check-field"><input name="published" type="checkbox" defaultChecked={editing?.published ?? true}/><span>Visible en el catálogo</span></label>
+    {!editing && <><div className="two-fields"><label className="form-field"><span>Cantidad de unidades físicas</span><input name="initialQuantity" type="number" min="0" max="100" step="1" required defaultValue="1"/><small>Registra cuántas unidades reales tienes para alquilar. Cero guarda la herramienta sin existencias.</small></label><label className="form-field"><span>Condición inicial</span><select name="initialCondition" defaultValue="GOOD"><option value="NEW">Nueva</option><option value="GOOD">Buena</option><option value="FAIR">Aceptable</option></select></label></div><p>Al guardar se registra la herramienta y cada unidad en el servidor. Después puedes adjuntar las fotografías.</p></>}
     <button className="button button-lime" disabled={busy}>{busy ? 'Guardando…' : editing ? 'Guardar cambios' : 'Crear herramienta'} <Icon name="arrow" size={16}/></button>
   </form>
 }
@@ -67,11 +87,13 @@ function ProviderTools({ data, setData, showError }) {
   const [pendingPublication, setPendingPublication] = useState(null)
   const [unitBusy, setUnitBusy] = useState(false)
   const [notice, setNotice] = useState('')
-  const saveTool = saved => {
-    setData(current => ({ ...current, tools: current.tools.some(tool => String(entityId(tool.id)) === String(entityId(saved.id))) ? current.tools.map(tool => String(entityId(tool.id)) === String(entityId(saved.id)) ? saved : tool) : [saved, ...current.tools] }))
+  const [unitToolId, setUnitToolId] = useState('')
+  const addStock = tool => { setUnitToolId(String(entityId(tool.id))); setUnitMode(true) }
+  const saveTool = (saved, createdUnits = []) => {
+    setData(current => ({ ...current, units: [...createdUnits, ...current.units], tools: current.tools.some(tool => String(entityId(tool.id)) === String(entityId(saved.id))) ? current.tools.map(tool => String(entityId(tool.id)) === String(entityId(saved.id)) ? saved : tool) : [saved, ...current.tools] }))
     setEditing(null)
     setImageTool(saved)
-    setNotice('Herramienta guardada. Puedes añadir sus imágenes.')
+    setNotice(`Herramienta guardada en el servidor${createdUnits.length ? ` con ${createdUnits.length} unidades físicas` : ''}. Puedes añadir sus imágenes y abrir la publicación desde Mis herramientas.`)
     showError('')
   }
   const changePublication = async tool => {
@@ -97,8 +119,8 @@ function ProviderTools({ data, setData, showError }) {
     } catch (reason) { showError(reason.message) } finally { setUnitBusy(false) }
   }
   return <div className="provider-tools-workspace">{notice && <p role="status" className="account-success">{notice}</p>}<div className="dashboard-management-grid">
-    <section className="operations-form dashboard-editor"><div className="form-tabs"><button className={!unitMode ? 'active' : ''} onClick={() => setUnitMode(false)}>Herramienta</button><button className={unitMode ? 'active' : ''} disabled={!data.tools.length} onClick={() => setUnitMode(true)}>Unidad física</button></div>{unitMode ? <form onSubmit={createUnit}><div className="dashboard-form-title"><div><p>Inventario</p><h2>Registrar unidad</h2></div></div><label className="form-field"><span>Herramienta</span><select name="toolId" required>{data.tools.map(tool => <option key={String(entityId(tool.id))} value={String(entityId(tool.id))}>{tool.name}</option>)}</select></label><label className="form-field"><span>Código de inventario</span><input name="inventoryCode" required maxLength="120"/></label><label className="form-field"><span>Serial</span><input name="serialNumber" maxLength="160"/></label><label className="form-field"><span>Condición</span><select name="currentCondition" defaultValue="GOOD"><option value="NEW">Nueva</option><option value="GOOD">Buena</option><option value="FAIR">Aceptable</option></select></label><button className="button button-lime" disabled={unitBusy}>Registrar unidad <Icon name="arrow" size={16}/></button></form> : <ToolForm categories={data.categories} editing={editing} onCancel={() => setEditing(null)} onSaved={saveTool} showError={showError}/>}</section>
-    <section className="operations-table dashboard-list"><div className="panel-heading"><div><p className="kicker dark"><span/> Catálogo propio</p><h2>Mis herramientas</h2><p>Administra todas tus publicaciones, incluidas las que no están visibles.</p></div><strong>{data.tools.length}</strong></div>{!data.tools.length ? <div className="account-empty"><Icon name="box" size={30}/><h3>No hay herramientas registradas</h3></div> : data.tools.map(tool => <article key={String(entityId(tool.id))}><div><span className={`status-pill ${tool.published ? 'green' : 'amber'}`}>{tool.published ? 'Publicada' : 'No publicada'}</span><h3>{tool.name}</h3><p>{tool.serviceCity} · {money.format(Number(tool.dailyRate?.amount ?? 0))} por día</p></div><div className="row-actions"><button className="button button-ghost" onClick={() => { setEditing(tool); setUnitMode(false) }}>Editar</button><button className="button button-ghost" onClick={() => setImageTool(tool)}>Imágenes</button><button className={tool.published ? 'danger-action' : 'button button-dark'} disabled={pendingPublication !== null} onClick={() => changePublication(tool)}>{pendingPublication === entityId(tool.id) ? 'Guardando…' : tool.published ? 'Retirar' : 'Publicar'}</button></div></article>)}</section>
+    <section className="operations-form dashboard-editor"><div className="form-tabs"><button className={!unitMode ? 'active' : ''} onClick={() => setUnitMode(false)}>Herramienta</button><button className={unitMode ? 'active' : ''} disabled={!data.tools.length} onClick={() => setUnitMode(true)}>Unidad física</button></div>{unitMode ? <form key={unitToolId} onSubmit={createUnit}><div className="dashboard-form-title"><div><p>Inventario</p><h2>Registrar unidad</h2></div></div><label className="form-field"><span>Herramienta</span><select name="toolId" defaultValue={unitToolId||undefined} required>{data.tools.map(tool => <option key={String(entityId(tool.id))} value={String(entityId(tool.id))}>{tool.name}</option>)}</select></label><label className="form-field"><span>Código de inventario</span><input name="inventoryCode" required maxLength="120"/></label><label className="form-field"><span>Serial</span><input name="serialNumber" maxLength="160"/></label><label className="form-field"><span>Condición</span><select name="currentCondition" defaultValue="GOOD"><option value="NEW">Nueva</option><option value="GOOD">Buena</option><option value="FAIR">Aceptable</option></select></label><button className="button button-lime" disabled={unitBusy}>Registrar unidad <Icon name="arrow" size={16}/></button></form> : <ToolForm categories={data.categories} editing={editing} onCancel={() => setEditing(null)} onSaved={saveTool} showError={showError}/>}</section>
+    <section className="operations-table dashboard-list"><div className="panel-heading"><div><p className="kicker dark"><span/> Catálogo propio</p><h2>Mis herramientas</h2><p>Administra todas tus publicaciones, incluidas las que no están visibles.</p></div><strong>{data.tools.length}</strong></div>{!data.tools.length ? <div className="account-empty"><Icon name="box" size={30}/><h3>No hay herramientas registradas</h3></div> : data.tools.map(tool => <article key={String(entityId(tool.id))}><div><span className={`status-pill ${tool.published ? 'green' : 'amber'}`}>{tool.published ? 'Publicada' : 'No publicada'}</span><h3>{tool.name}</h3><p>{tool.serviceCity} · {money.format(Number(tool.dailyRate?.amount ?? 0))} por día</p><p>Guardada en servidor · {data.units.filter(unit=>String(entityId(unit.toolId))===String(entityId(tool.id))&&unit.status==='OPERATIONAL').length} unidades operativas · ID {String(entityId(tool.id)).slice(0,8)}</p></div><div className="row-actions"><button className="button button-ghost" disabled={!tool.published} onClick={()=>navigate(`/catalogo?${new URLSearchParams({q:tool.name,municipio:tool.serviceCity,existencias:'todas'})}`)}>Ver en catálogo</button><button className="button button-ghost" onClick={()=>addStock(tool)}>Agregar existencias</button><button className="button button-ghost" onClick={() => { setEditing(tool); setUnitMode(false) }}>Editar</button><button className="button button-ghost" onClick={() => setImageTool(tool)}>Imágenes</button><button className={tool.published ? 'danger-action' : 'button button-dark'} disabled={pendingPublication !== null} onClick={() => changePublication(tool)}>{pendingPublication === entityId(tool.id) ? 'Guardando…' : tool.published ? 'Retirar' : 'Publicar'}</button></div></article>)}</section>
   </div>{imageTool && <ToolImageManager key={String(entityId(imageTool.id))} tool={imageTool} onChanged={saved => setData(current => ({ ...current, tools: current.tools.map(item => String(entityId(item.id)) === String(entityId(saved.id)) ? saved : item) }))} onClose={() => setImageTool(null)}/>}
   <EquipmentUnitManager units={data.units} tools={data.tools} onChanged={saved => setData(current => ({ ...current, units: current.units.map(unit => String(entityId(unit.id)) === String(entityId(saved.id)) ? saved : unit) }))}/>
   </div>

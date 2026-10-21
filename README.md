@@ -14,6 +14,10 @@
 
 ## Gestión del proveedor y persistencia
 
+**Actualización del recorrido proveedor → cliente:** el formulario registra también las unidades físicas indicadas; el panel confirma el ID guardado y ofrece **Ver en catálogo** y **Agregar existencias**. El catálogo muestra todas las coincidencias por defecto y oculta inicialmente las herramientas sin unidades operativas. [Uso y validación crítica](docs/provider-persistence.md#publicación-lista-para-alquilar).
+
+![Herramienta recién creada que recibe el cliente, con imagen y dos unidades físicas](docs/evidence/supplier-stock/customer-publication.png)
+
 La web local se abre en **http://localhost:5173** y utiliza PostgreSQL Docker en **localhost:5433**. El perfil `local,demo` carga el seed automáticamente en instalaciones vacías. Se corrigieron el límite de precio implícito del catálogo y la actualización de publicaciones; en el equipo de Daniel, DBeaver ya tiene la conexión **Tool Rental - Docker 5433**. [Inicio local, consultas y diagnóstico](docs/provider-persistence.md#base-estable-y-dbeaver).
 
 ![Publicación nueva con precio e imagen persistidos, recibida por un cliente sin recargar la aplicación](docs/evidence/catalog-sync/customer-new-publication.png)

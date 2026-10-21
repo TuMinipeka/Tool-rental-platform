@@ -44,7 +44,7 @@ export function usePublicCatalog() {
     window.addEventListener(catalogChangeKey, refresh)
     window.addEventListener('storage', storageChanged)
     document.addEventListener('visibilitychange', refreshVisible)
-    const interval = window.setInterval(refreshVisible, 30000)
+    const interval = window.setInterval(refreshVisible, 10000)
     refresh()
     return () => {
       active = false

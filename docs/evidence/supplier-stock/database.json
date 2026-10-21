@@ -1,0 +1,10 @@
+{
+  "toolId": "086cb4db-d7bd-4fd5-b90f-fe3cb2b0c125",
+  "price": 25000,
+  "published": "PUBLISHED",
+  "images": 1,
+  "units": 2,
+  "operationalUnits": 1,
+  "reservationStatus": "PENDING_PAYMENT",
+  "reservedUnitBelongsToTool": true
+}

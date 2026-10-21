@@ -17,12 +17,44 @@ La arquitectura conserva Java 21, tres módulos, 25 contextos y 25 tablas. No se
 ## Uso del panel
 
 1. Ingresa como proveedor y abre **Dashboard → Herramientas**.
-2. Completa categoría, nombre, descripción, municipio, tarifa y visibilidad; pulsa **Crear herramienta**.
+2. Completa categoría, nombre, descripción, municipio, tarifa, visibilidad y **Cantidad de unidades físicas**; pulsa **Crear herramienta**. La cantidad inicial es una unidad y debe corresponder al inventario real.
 3. Se abre la sección de imágenes de la herramienta guardada. Puedes subir JPEG/PNG o añadir una URL HTTP(S).
-4. Cada herramienta ofrece **Editar**, **Imágenes** y **Publicar/Retirar**. Retirar conserva sus datos e historial.
-5. Usa **Unidad física** para registrar existencias. La lista inferior permite editar serial, condición y estado operativo. Una unidad retirada definitivamente no admite reactivación.
+4. Cada herramienta ofrece **Ver en catálogo**, **Agregar existencias**, **Editar**, **Imágenes** y **Publicar/Retirar**. El listado confirma el identificador guardado y las unidades operativas. Retirar conserva sus datos e historial.
+5. Usa **Agregar existencias** para registrar unidades de una herramienta ya creada: el formulario selecciona esa herramienta. La lista inferior permite editar serial, condición y estado operativo. Una unidad retirada definitivamente no admite reactivación.
 
 Publicar una herramienta no inventa existencias. La disponibilidad depende de sus unidades operativas y de las reservas; una publicación sin unidades no puede reservarse.
+
+### Publicación lista para alquilar
+
+La revisión posterior encontró la publicación del usuario `saddsa`, con su precio y fotografía en la base estable, pero sin unidades físicas. El problema de presentación se agravaba porque el catálogo paginaba diez resultados por defecto. Se corrigió el recorrido visible:
+
+| Antes | Después | Motivo |
+| --- | --- | --- |
+| Crear herramienta sin indicar existencias | Cantidad inicial y condición en el mismo formulario | Registrar explícitamente los equipos que realmente se alquilan. |
+| Confirmación sin detalle de inventario | ID persistido y contador de unidades operativas en Mis herramientas | Distinguir registro guardado de inventario pendiente. |
+| Diez coincidencias en la vista inicial | Todas las coincidencias por defecto; paginación de 10/24 opcional | Evitar que una publicación quede escondida en otra página. |
+| Sin acceso desde el proveedor al resultado público | Ver en catálogo con búsqueda y municipio de la publicación | Comprobar directamente la herramienta publicada. |
+| Equipos sin unidades mezclados con los utilizables | Solo herramientas con existencias activado inicialmente | Consultar las agotadas desmarcando ese filtro, sin borrarlas. |
+
+El catálogo vuelve a consultar el servidor cada **10 segundos** mientras esté visible, al recuperar foco y tras cambios del proveedor. Sus lecturas omiten la caché HTTP. Los destacados también excluyen herramientas sin unidades operativas. El municipio sigue siendo un filtro explícito.
+
+La creación utiliza los contratos REST existentes: primero guarda la herramienta y después las unidades declaradas, cada una con un código de inventario único. No es una operación atómica conjunta. Si falla una unidad, el panel conserva la herramienta y las unidades ya guardadas, informa cuántas faltan y permite continuar mediante **Agregar existencias**, evitando pedir que se duplique la herramienta.
+
+Se pueden declarar cero unidades para preparar una publicación sin existencias. Las publicaciones anteriores sin inventario requieren que el proveedor registre su cantidad real; no se generaron unidades inventadas en la base estable. **Ver en catálogo** permite inspeccionarlas con el filtro de existencias desactivado; no habilita su reserva.
+
+Las existencias del catálogo corresponden a unidades operativas. Una reserva exige además disponibilidad para el intervalo elegido: el servidor vuelve a comprobar retenciones y reservas, y evita reservar una unidad ocupada. El número operativo no sustituye esa comprobación por fechas.
+
+### Validación crítica de esta entrega
+
+Se ejecutaron lint, build, dos pruebas de regresión críticas y un recorrido Playwright CLI con React, Spring Boot y PostgreSQL reales. No se repitió la batería amplia de Java: esta entrega modifica frontend y documentación, conservando los contratos y reglas del backend.
+
+El [recorrido real](evidence/supplier-stock/browser.json) verifica creación con dos unidades, imagen, acceso público, llegada a un cliente sin recargar, retirada del catálogo al dejar las unidades en mantenimiento, reactivación y solicitud de reserva persistida. El [cruce SQL](evidence/supplier-stock/database.json) confirma que la unidad reservada pertenece a la herramienta creada.
+
+La [comprobación de la web estable](evidence/supplier-stock/deployed.json) acredita los controles nuevos en **http://localhost:5173**, todas las publicaciones con existencias del municipio y ausencia de desbordamiento horizontal en móvil. Los registros mutantes de QA se guardaron exclusivamente en la base aislada de validación.
+
+![Proveedor: confirmación del guardado y unidades físicas](evidence/supplier-stock/supplier-saved.png)
+
+![Cliente: publicación nueva con fotografía y existencias](evidence/supplier-stock/customer-publication.png)
 
 ## Base estable y DBeaver
 
@@ -33,7 +65,7 @@ La revisión del 20 de octubre de 2026 encontró **52 herramientas guardadas, 32
 | Antes | Después | Motivo |
 | --- | --- | --- |
 | Límite inicial de $230.000 por día | Sin límite inicial; control de precio con rango calculado del catálogo | Mostrar también las publicaciones de $234.567 y $245.678 que ya estaban guardadas. |
-| Consulta única al abrir la aplicación | Revalidación al navegar al catálogo, recuperar foco, regresar a una pestaña visible y cada 30 segundos mientras esté visible | Recibir publicaciones de otros proveedores sin recargar toda la aplicación. |
+| Consulta única al abrir la aplicación | Revalidación al navegar al catálogo, recuperar foco, regresar a una pestaña visible y cada 10 segundos mientras esté visible | Recibir publicaciones de otros proveedores sin recargar toda la aplicación. |
 | Cambios del proveedor sin invalidación | Señal local después de operaciones exitosas y aviso entre pestañas mediante un marcador sin datos personales | Actualizar nombres, fotos, publicación y existencias. |
 | Fallo de API que puede mostrar una muestra | Error explícito con reintento; se conserva la última lectura válida y se advierte que puede estar desactualizada | Evitar confundir contenido de demostración con datos persistidos. La muestra exige `VITE_DEMO_MODE=true`. |
 | DBeaver conectado solamente a `localhost:5432` | Conexión adicional **Tool Rental - Docker 5433** a la misma base de la web | Consultar los datos correctos sin cambiar conexiones de otros proyectos. |

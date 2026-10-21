@@ -42,13 +42,15 @@ Los commits se escriben en inglés: `<type>: :<gitmoji>: <CamelCaseSummary>`. Ej
 
 ## Flujo de implementación
 
+Durante la preparación de la presentación, cada funcionalidad de usuario debe incluir su recorrido frontend y quedar aplicada en la web local. Se priorizan pruebas críticas de las rutas afectadas y la persistencia real cuando corresponda; no se repite por rutina toda la batería de Java, navegador y auditorías. La verificación amplia se reserva para cambios que la necesiten o una petición explícita. Los cambios de frontend deben reconstruirse en el servicio activo antes de entregarse.
+
 1. Describe intención y reglas de negocio.
 2. Identifica agregado responsable y límites transaccionales.
 3. Implementa comportamiento, objetos de valor y eventos en dominio.
 4. Añade puertos estrictamente necesarios y el caso de uso en aplicación.
 5. Incorpora REST/JPA y configuración sin filtrar detalles hacia dentro.
 6. Prueba reglas, errores, rollback y concurrencia cuando correspondan.
-7. Actualiza documentación y ejecuta `clean verify` con JDK 21.
+7. Actualiza documentación, ejecuta las comprobaciones críticas y reconstruye el servicio modificado. Usa JDK 21 y `clean verify` cuando el alcance del cambio de backend lo requiera.
 
 ## Revisión antes de integrar
 
