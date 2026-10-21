@@ -20,4 +20,14 @@ El diseño de Conde es la referencia de interfaz. Esta guía consolida reglas a�
 - Movimiento reducido: la cinta se muestra estática, se respeta el mínimo de 4 s y la interfaz solo aparece con un fundido.
 - `tests/boot-splash.spec.js` verifica el mínimo, el renderizado en segundo plano, la transición y el movimiento reducido. La suite general elimina la pantalla al cargar para que no tape las interacciones.
 
+## Refinamiento minimalista
+
+`frontend/src/refine.css` se carga al final y concentra los ajustes de refinamiento sobre el diseño de Conde, sin cambiar paleta, tipografías ni componentes:
+
+- Texto mínimo de 12 px en tarjetas, filtros, metadatos y pasos; las etiquetas superiores que aportan contexto se muestran en minúsculas y sin línea decorativa.
+- Los títulos usan relleno sólido en lugar de palabras contorneadas.
+- Se retiraron elementos decorativos o repetidos: textos verticales, coordenadas y retícula del hero, franja de beneficios del hero, numeración de categorías, estado repetido en equipos destacados, órbita de la sección de proveedores, botón de favoritos sin funcionalidad, recuadro «Información verificada», bloque «Lo que sí sabemos» del detalle y el cierre duplicado de «Mi cuenta».
+- Las sombras desplazadas sólidas se conservan solo en estados seleccionados; las superficies grandes usan elevación suave.
+- Los paneles operativos muestran títulos compactos y métricas con un único tratamiento neutro.
+
 Las fotografías deben tener permiso de uso y evitar datos personales identificables. Los activos oficiales del catálogo se organizan en `frontend/public/assets/tools/equipment/` con versiones optimizadas. Los [resultados previos de calidad](frontend-quality.md) identifican la versión medida y no describen automáticamente este MVP.

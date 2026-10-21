@@ -7,6 +7,7 @@ import { releaseBootSplashWhenRendered } from './lib/bootSplash.js'
 import './styles.css'
 import './premium.css'
 import './reference-pages.css'
+import './refine.css'
 
 const rootElement = document.getElementById('root')
 

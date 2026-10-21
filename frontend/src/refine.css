@@ -1,0 +1,209 @@
+/*
+ * Refinement layer: loaded last. It quiets decoration, sets a readable type floor and
+ * fixes layout overflow while keeping the established palette, fonts and components.
+ */
+
+/* ---------- Labels that still carry context: quieter, sentence case, no rule ---------- */
+.kicker,
+.catalog-overline {
+  gap: 0;
+  font-family: "Public Sans Variable", "Public Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.kicker > span { display: none; }
+
+/* ---------- Headings: solid fills instead of outlined words ---------- */
+.hero-line-accent { color: var(--white); -webkit-text-stroke: 0; }
+.hero-line-accent em { color: var(--white); }
+.steps-intro h2 em,
+.catalog-heading h1 em,
+.account-hero h1 em,
+.provider-entry-hero h1 em,
+.how-hero h1 em,
+.about-hero h1 em,
+.about-story h2 em,
+.how-process h2 em {
+  color: inherit;
+  -webkit-text-stroke: 0;
+}
+
+/* ---------- Home hero ---------- */
+@media (min-width: 821px) {
+  .home-route .hero-content { height: auto; min-height: 520px; padding-bottom: 96px; }
+  .home-route .hero-copy { padding-top: 34px; }
+}
+.home-route .hero-subtitle { color: #c3ccd3; }
+@media (min-width: 821px) {
+  .home-route .hero-search { bottom: 0; transform: translate(50%, 50%); }
+}
+.home-route .search-bar { box-shadow: 0 18px 40px rgba(16, 19, 24, .16); }
+.home-route .search-bar label,
+.search-bar label { font-size: 11px; letter-spacing: .02em; }
+
+/* ---------- Home categories: contained grid, one icon treatment ---------- */
+@media (min-width: 821px) {
+  .home-route .category-section {
+    width: min(1280px, calc(100% - 80px));
+    padding-top: 128px;
+    grid-template-columns: 340px minmax(0, 1fr);
+  }
+}
+.home-route .category-section .section-title-row { align-self: start; }
+.home-route .category-section .text-link { position: static; margin-top: 22px; }
+.home-route .category-tiles { margin-right: 0; }
+.home-route .category-tiles > button { min-height: 168px; }
+.home-route .category-section .section-title-row h2 { font-size: clamp(34px, 3vw, 40px); line-height: 1; }
+.category-tiles > button > .icon { display: none; }
+.category-tiles .category-icon {
+  --category-color: var(--black);
+  --category-bg: #f1f4f6;
+  box-shadow: none;
+}
+.category-tiles .category-icon::after { display: none; }
+.category-tiles > button:hover .category-icon { --category-bg: var(--yellow); }
+.home-route .category-tiles small { font-size: 13px; line-height: 1.35; }
+.home-route .category-tiles strong { font-size: 16px; }
+
+/* ---------- Featured tools ---------- */
+.featured-tool-body > p { font-size: 12px; }
+.featured-tool-meta { font-size: 13px; }
+.featured-tool-price span { font-size: 13px; }
+
+/* ---------- Home steps band ---------- */
+.home-route .steps-list p { font-size: 14px; line-height: 1.5; }
+.home-route .steps-list article > span { font-size: 13px; }
+
+/* ---------- Supplier call to action: light surface between two dark bands, no orbit ---------- */
+.supplier-cta {
+  color: var(--black);
+  background: var(--soft);
+}
+.supplier-cta::before,
+.supplier-cta::after { display: none; }
+.supplier-cta .page-shell { padding-block: clamp(80px, 9vw, 120px); }
+.supplier-cta h2 { color: var(--black); }
+.supplier-cta h2 em { color: #00879f; }
+.supplier-cta .page-shell > p:not(.kicker) { color: #4f5b66; }
+.supplier-cta .button-light { color: var(--black); background: var(--yellow); }
+@media (max-width: 820px) {
+  .supplier-cta .page-shell { padding-bottom: 80px; }
+}
+
+/* ---------- Catalog: readable cards, one primary action per page ---------- */
+.catalog-search-dock small { font-size: 11px; letter-spacing: .02em; }
+.catalog-search-dock input,
+.catalog-search-dock select { font-size: 14px; }
+.catalog-breadcrumb { font-size: 13px; }
+.filter-section > strong { font-size: 14px; }
+.filter-section label { min-height: 28px; font-size: 13px; }
+.filter-section input[type=checkbox] { width: 15px; height: 15px; }
+.filter-range { font-size: 12px; }
+.catalog-results .catalog-toolbar > strong { font-size: 14px; }
+.catalog-results .catalog-toolbar select { font-size: 13px; }
+.catalog-demo-label { font-size: 11px; }
+
+.catalog-reference-page .catalog-grid { gap: 16px; }
+.catalog-tool-card { box-shadow: none; transition: border-color 160ms ease, box-shadow 200ms ease; }
+.catalog-tool-card:hover { border-color: #c9d3db; box-shadow: 0 12px 28px rgba(16, 19, 24, .08); }
+.catalog-tool-card .tool-card-media { height: 150px; min-height: 150px !important; background: #f4f6f8; }
+.catalog-tool-card .tool-visual::before,
+.catalog-tool-card .tool-visual::after,
+.catalog-tool-card .tool-card-media::before,
+.catalog-tool-card .tool-card-media::after { display: none; }
+.tool-category-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #33414d;
+  background: rgba(255, 255, 255, .92);
+}
+.catalog-tool-card .tool-card-body { padding: 14px 14px 14px; }
+.catalog-tool-card .tool-card-body h3 { min-height: 40px; font-size: 15px; line-height: 1.3; }
+.tool-facts { min-height: 0; margin-top: 8px; gap: 6px 14px; font-size: 12px; color: #5f6c78; }
+.catalog-tool-card .tool-price { margin-top: 14px; padding-top: 12px; flex-wrap: wrap; column-gap: 10px; row-gap: 2px; }
+.catalog-tool-card .tool-price > span,
+.catalog-tool-card .tool-price button { white-space: nowrap; }
+.catalog-tool-card .tool-price > span { font-size: 12px; }
+.catalog-tool-card .tool-price strong { font-size: 18px; }
+.catalog-tool-card .tool-price button {
+  min-height: 34px;
+  padding: 0 4px;
+  color: var(--black);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 700;
+  transition: color 160ms ease;
+}
+.catalog-tool-card .tool-price button:hover { color: #00879f; }
+.catalog-tool-card .tool-price button:focus-visible { outline: 2px solid var(--black); outline-offset: 2px; }
+
+@media (max-width: 760px) {
+  .catalog-tool-card .tool-price button { width: auto; justify-content: flex-start; }
+}
+
+/* ---------- How it works ---------- */
+.how-reference-copy > p:not(.kicker) { font-size: 16px; line-height: 1.5; }
+.how-reference-copy .button { font-size: 13px; }
+.how-process > header > p { font-size: 15px; }
+.how-step-grid h3 { font-size: 17px; }
+.how-step-grid p { max-width: 230px; font-size: 14px; line-height: 1.45; }
+.how-benefits h3 { font-size: 15px; }
+.how-benefits article p { font-size: 13px; }
+.how-audience button strong { font-size: 15px; }
+.how-audience button small { font-size: 13px; }
+.how-cta .button { font-size: 13px; }
+.how-cta .page-shell > div:last-child p { font-size: 13px; }
+
+/* ---------- Mobile refinements ---------- */
+.supplier-cta { min-height: 0; }
+@media (max-width: 560px) {
+  .home-route .hero-line-accent { font-size: .9em; }
+  .home-route .category-tiles > button {
+    min-height: 0;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    column-gap: 14px;
+    align-items: center;
+    text-align: left;
+  }
+  .home-route .category-tiles .category-icon { width: 52px; height: 52px; margin: 0; grid-row: span 2; }
+  .home-route .category-tiles small { display: block; margin: 2px 0 0; }
+}
+
+/* ---------- Operational panels: content first, compact headings, neutral metrics ---------- */
+.staff-dashboard.page-top { padding-top: 44px; }
+.staff-dashboard .operations-heading { margin-bottom: 28px; }
+.staff-dashboard .operations-heading h1 {
+  margin: 6px 0 10px;
+  font-size: clamp(32px, 3vw, 44px);
+  line-height: 1.05;
+  letter-spacing: -.03em;
+}
+.staff-dashboard .operations-heading > p:not(.kicker) { max-width: 640px; font-size: 15px; line-height: 1.5; }
+.dashboard-metric,
+.dashboard-metric:nth-child(n) { border-top: 1px solid #dce1e5; box-shadow: none; }
+.dashboard-metric > span { font-size: 13px; font-weight: 650; letter-spacing: 0; text-transform: none; }
+.dashboard-metric p { font-size: 13px; }
+
+.account-hero,
+.account-hero .page-shell { min-height: 0; }
+.account-hero .page-shell { padding-block: 48px; }
+.account-hero h1 { margin: 8px 0 12px; font-size: clamp(36px, 3.6vw, 54px); line-height: 1; }
+.account-hero img { max-height: 240px; }
+.account-modules button small,
+.account-modules button p { font-size: 13px; line-height: 1.4; }
+
+/* ---------- Tool detail: soft elevation on large surfaces, readable specs ---------- */
+.booking-card { box-shadow: 0 18px 40px rgba(16, 19, 24, .1); }
+.detail-main > .tool-visual,
+.detail-main-visual { box-shadow: none; }
+.detail-specs small { font-size: 12px; }
+.detail-overline { font-size: 12px; letter-spacing: .04em; }
+.booking-summary span,
+.booking-summary strong { font-size: 13px; }
+.fulfillment-preview p { font-size: 13px; }
