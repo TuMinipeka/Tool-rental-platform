@@ -12,8 +12,211 @@
     <link rel="preload" href="/node_modules/@fontsource-variable/public-sans/files/public-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
     <title>Tool Rental | Haz más, compra menos</title>
+    <style>
+      /* Boot splash: inlined so it paints before the JavaScript bundle arrives. */
+      .boot-splash {
+        --bs-bg: #101318;
+        --bs-yellow: #ffd600;
+        --bs-cyan: #00d9ff;
+        --bs-bone: #f4f6f8;
+        --bs-cycle: 2.6s;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        display: grid;
+        place-items: center;
+        background: var(--bs-bg);
+        transition: opacity 320ms cubic-bezier(0.23, 1, 0.32, 1), visibility 0s linear 320ms;
+      }
+      .boot-splash.is-leaving { opacity: 0; visibility: hidden; pointer-events: none; }
+      .boot-splash.is-leaving .bs-stage { transform: scale(0.96); }
+      .boot-splash--quick { animation: bs-appear 220ms ease-out 450ms both; }
+      .bs-stage {
+        display: grid;
+        justify-items: center;
+        gap: 6px;
+        width: min(240px, 60vw);
+        transition: transform 320ms cubic-bezier(0.23, 1, 0.32, 1);
+      }
+      .bs-art { width: 100%; height: auto; overflow: visible; animation: bs-impact var(--bs-cycle) infinite; }
+      .bs-art * { transform-box: view-box; }
+      .bs-swing { transform-origin: 48px 76.5px; animation: bs-swing var(--bs-cycle) infinite; }
+      .bs-boing { transform-origin: 96px 76px; animation: bs-boing var(--bs-cycle) infinite; }
+      .bs-half-a { transform-origin: 96px 76px; animation: bs-half-a var(--bs-cycle) infinite; }
+      .bs-half-b { transform-origin: 96px 76px; animation: bs-half-b var(--bs-cycle) infinite; }
+      .bs-nail { transform-origin: 130px 102px; animation: bs-nail var(--bs-cycle) infinite; }
+      .bs-flash { opacity: 0; animation: bs-flash var(--bs-cycle) infinite; }
+      .bs-bolt {
+        opacity: 0;
+        stroke-dasharray: 120;
+        filter: drop-shadow(0 0 5px var(--bs-cyan)) drop-shadow(0 0 2px var(--bs-yellow));
+        animation: bs-bolt var(--bs-cycle) infinite;
+      }
+      .bs-spark { opacity: 0; transform-box: fill-box; transform-origin: center; animation: bs-spark var(--bs-cycle) infinite; }
+      .bs-brand {
+        margin: 0;
+        color: var(--bs-bone);
+        font: 800 22px/1 "Archivo Variable", "Archivo", system-ui, sans-serif;
+        letter-spacing: -0.03em;
+      }
+      .bs-brand em { color: var(--bs-yellow); font-style: normal; }
+      .bs-caption {
+        margin: 0;
+        color: #8b96a3;
+        font: 600 11px/1.4 "Public Sans Variable", "Public Sans", system-ui, sans-serif;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .bs-caption span { display: inline-block; animation: bs-dot 1.2s infinite; }
+      .bs-caption span:nth-child(2) { animation-delay: 0.15s; }
+      .bs-caption span:nth-child(3) { animation-delay: 0.3s; }
+
+      /* Three stubborn taps, a frustrated shake, then the lightning gag and a springy reassembly. */
+      @keyframes bs-swing {
+        0% { transform: rotate(-34deg); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+        9% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        13% { transform: rotate(-22deg); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+        20% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        24% { transform: rotate(-28deg); animation-timing-function: cubic-bezier(0.6, 0, 0.95, 0.4); }
+        31% { transform: rotate(1deg); }
+        34% { transform: rotate(0deg); }
+        37% { transform: rotate(-5deg); }
+        39% { transform: rotate(4deg); }
+        41% { transform: rotate(-4deg); }
+        43% { transform: rotate(2deg); }
+        45%, 80% { transform: rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        100% { transform: rotate(-34deg); }
+      }
+      @keyframes bs-nail {
+        0%, 8% { transform: translateY(0); }
+        9% { transform: translateY(4px) scaleY(0.85); }
+        11% { transform: translateY(-3px); }
+        13%, 19% { transform: translateY(0); }
+        20% { transform: translateY(4px) scaleY(0.85); }
+        22% { transform: translateY(-3px); }
+        24%, 30% { transform: translateY(0); }
+        31% { transform: translateY(5px) scaleY(0.8); }
+        33% { transform: translateY(-5px); }
+        35%, 48% { transform: translateY(0) rotate(0deg); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        60% { transform: translateY(-58px) rotate(330deg); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+        72% { transform: translateY(0) rotate(720deg); }
+        75% { transform: translateY(3px) rotate(720deg); }
+        78%, 100% { transform: translateY(0) rotate(720deg); }
+      }
+      @keyframes bs-half-a {
+        0%, 47% { transform: none; animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        52% { transform: translate(-15px, 11px) rotate(-22deg); }
+        64% { transform: translate(-17px, 13px) rotate(-25deg); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+        74% { transform: translate(2px, -1px) rotate(3deg); }
+        78%, 100% { transform: none; }
+      }
+      @keyframes bs-half-b {
+        0%, 47% { transform: none; animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        52% { transform: translate(17px, -15px) rotate(19deg); }
+        64% { transform: translate(19px, -16px) rotate(22deg); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.45); }
+        74% { transform: translate(-2px, 1px) rotate(-3deg); }
+        78%, 100% { transform: none; }
+      }
+      @keyframes bs-boing {
+        0%, 74% { transform: none; }
+        77% { transform: scale(1.12, 0.88); }
+        81% { transform: scale(0.95, 1.07); }
+        85%, 100% { transform: none; }
+      }
+      @keyframes bs-bolt {
+        0%, 46% { opacity: 0; stroke-dashoffset: 120; }
+        47% { opacity: 1; stroke-dashoffset: 120; }
+        50% { opacity: 1; stroke-dashoffset: 0; }
+        52% { opacity: 0.25; stroke-dashoffset: 0; }
+        53% { opacity: 1; stroke-dashoffset: 0; }
+        59%, 100% { opacity: 0; stroke-dashoffset: 0; }
+      }
+      @keyframes bs-flash {
+        0%, 47% { opacity: 0; }
+        50% { opacity: 0.6; }
+        62%, 100% { opacity: 0; }
+      }
+      @keyframes bs-spark {
+        0%, 48% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+        50% { opacity: 1; transform: translate(0, 0) scale(1.8); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+        58% { opacity: 1; }
+        66%, 100% { opacity: 0; transform: translate(calc(var(--x) * 1.4), calc(var(--y) * 1.4)) scale(0.6) rotate(90deg); }
+      }
+      @keyframes bs-impact {
+        0%, 30% { transform: none; }
+        31% { transform: translate(0, 1.5px); }
+        32% { transform: translate(-1.5px, 0); }
+        33% { transform: translate(1px, -1px); }
+        34%, 49% { transform: none; }
+        50% { transform: translate(2px, 1px); }
+        51% { transform: translate(-2px, -1px); }
+        52%, 100% { transform: none; }
+      }
+      @keyframes bs-dot { 0%, 60%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+      @keyframes bs-appear { from { opacity: 0; } to { opacity: 1; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .boot-splash *, .boot-splash--quick { animation: none !important; }
+        .bs-caption span { opacity: 1; }
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-splash" class="boot-splash" role="status" aria-live="polite">
+      <div class="bs-stage">
+        <svg class="bs-art" viewBox="0 0 200 140" aria-hidden="true" focusable="false">
+          <defs>
+            <clipPath id="bs-clip-a"><rect x="0" y="0" width="96" height="140" /></clipPath>
+            <clipPath id="bs-clip-b"><rect x="96" y="0" width="104" height="140" /></clipPath>
+            <radialGradient id="bs-glow">
+              <stop offset="0" stop-color="#00d9ff" stop-opacity="0.55" />
+              <stop offset="0.5" stop-color="#ffd600" stop-opacity="0.18" />
+              <stop offset="1" stop-color="#101318" stop-opacity="0" />
+            </radialGradient>
+            <g id="bs-hammer">
+              <rect x="44" y="72" width="80" height="9" rx="4.5" fill="#f4f6f8" />
+              <rect x="44" y="72" width="24" height="9" rx="4.5" fill="#00d9ff" />
+              <rect x="118" y="62" width="24" height="30" rx="4" fill="#ffd600" />
+              <rect x="118" y="86" width="24" height="6" rx="2" fill="#e6c000" />
+            </g>
+          </defs>
+          <circle class="bs-flash" cx="96" cy="76" r="70" fill="url(#bs-glow)" />
+          <line x1="40" y1="112" x2="170" y2="112" stroke="#f4f6f8" stroke-opacity="0.35" stroke-width="2" stroke-linecap="round" />
+          <g class="bs-nail">
+            <rect x="128" y="96" width="4" height="16" rx="1" fill="#00d9ff" />
+            <rect x="121" y="92" width="18" height="4" rx="2" fill="#00d9ff" />
+          </g>
+          <g class="bs-swing">
+            <g class="bs-boing">
+              <g class="bs-half-a"><use href="#bs-hammer" clip-path="url(#bs-clip-a)" /></g>
+              <g class="bs-half-b"><use href="#bs-hammer" clip-path="url(#bs-clip-b)" /></g>
+            </g>
+          </g>
+          <g class="bs-bolt" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="106,0 90,30 103,34 88,58 99,61 96,80" stroke="#00d9ff" stroke-width="7" stroke-opacity="0.55" />
+            <polyline points="106,0 90,30 103,34 88,58 99,61 96,80" stroke="#ffd600" stroke-width="4" />
+            <polyline points="106,0 90,30 103,34 88,58 99,61 96,80" stroke="#f4f6f8" stroke-width="1.5" />
+          </g>
+          <g transform="translate(96 76)">
+            <path class="bs-spark" style="--x:-30px;--y:-20px" d="M0-4 3 0 0 4-3 0Z" fill="#ffd600" />
+            <path class="bs-spark" style="--x:32px;--y:-24px" d="M0-4 3 0 0 4-3 0Z" fill="#00d9ff" />
+            <path class="bs-spark" style="--x:-26px;--y:20px" d="M0-3 2.5 0 0 3-2.5 0Z" fill="#00d9ff" />
+            <path class="bs-spark" style="--x:28px;--y:18px" d="M0-3 2.5 0 0 3-2.5 0Z" fill="#ffd600" />
+            <path class="bs-spark" style="--x:-6px;--y:-34px" d="M0-5 1.2-1.2 5 0 1.2 1.2 0 5-1.2 1.2-5 0-1.2-1.2Z" fill="#f4f6f8" />
+            <path class="bs-spark" style="--x:8px;--y:30px" d="M0-5 1.2-1.2 5 0 1.2 1.2 0 5-1.2 1.2-5 0-1.2-1.2Z" fill="#ffd600" />
+          </g>
+        </svg>
+        <p class="bs-brand">tool<em>rental</em></p>
+        <p class="bs-caption">Afinando herramientas<span>.</span><span>.</span><span>.</span></p>
+      </div>
+    </div>
+    <script>
+      try {
+        if (sessionStorage.getItem('toolrental-splash-seen') === '1') {
+          document.getElementById('boot-splash').classList.add('boot-splash--quick')
+        }
+      } catch (error) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
