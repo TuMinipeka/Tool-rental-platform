@@ -1,10 +1,8 @@
-const SEEN_KEY = 'toolrental-splash-seen'
-// First visit of the browser session: keep the tape on screen long enough to read it (about 60 cm).
-const FIRST_VISIT_MIN_MS = 1800
-// Matches .boot-splash--returning in index.html: before this point the splash content is still invisible.
-const RETURNING_APPEAR_MS = 300
+// The app loads and renders behind the splash during this minimum time on every full page load.
+const MIN_DISPLAY_MS = 4000
 const RETRACT_MS = 260
-const LEAVE_MS = 220
+const LEAVE_MS = 420
+const APP_ENTER_MS = 520
 const SNAP_EASING = 'cubic-bezier(0.77, 0, 0.175, 1)'
 
 let released = false
@@ -22,34 +20,18 @@ export function releaseBootSplashWhenRendered(rootElement) {
   observer.observe(rootElement, { childList: true })
 }
 
-function markSeen() {
-  try {
-    window.sessionStorage.setItem(SEEN_KEY, '1')
-  } catch {
-    // Storage can be unavailable (private mode); the splash still works without it.
-  }
-}
-
 function releaseBootSplash() {
   if (released) return
   released = true
   const splash = document.getElementById('boot-splash')
   if (!splash) return
 
-  const returning = splash.classList.contains('boot-splash--returning')
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  markSeen()
-
-  if (returning) {
-    if (performance.now() < RETURNING_APPEAR_MS || reducedMotion) leave(splash)
-    else retract(splash)
-    return
-  }
-  const wait = reducedMotion ? 0 : Math.max(0, FIRST_VISIT_MIN_MS - performance.now())
+  const wait = Math.max(0, MIN_DISPLAY_MS - performance.now())
   window.setTimeout(() => (reducedMotion ? leave(splash) : retract(splash)), wait)
 }
 
-// Freeze the tape where it is, then snap it back into the case before fading out.
+// Freeze the tape where it is, then snap it back into the case before revealing the app.
 function retract(splash) {
   const tape = splash.querySelector('.ts-tape')
   if (!tape) {
@@ -68,10 +50,14 @@ function retract(splash) {
   window.setTimeout(() => leave(splash), RETRACT_MS)
 }
 
+// Dissolve the splash while the already-rendered app rises into place.
 function leave(splash) {
+  const root = document.documentElement
   const remove = () => splash.remove()
   splash.setAttribute('aria-hidden', 'true')
+  root.classList.add('app-entering')
   splash.classList.add('is-leaving')
-  splash.addEventListener('transitionend', remove, { once: true })
+  splash.addEventListener('transitionend', event => { if (event.target === splash) remove() })
   window.setTimeout(remove, LEAVE_MS + 120)
+  window.setTimeout(() => root.classList.remove('app-entering'), APP_ENTER_MS + 80)
 }

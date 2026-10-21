@@ -3,8 +3,15 @@ import AxeBuilder from '@axe-core/playwright'
 import { catalog, mockApi } from './fixtures.js'
 
 test.beforeEach(async ({ page }) => {
-  // Behave as a returning visitor so the first-visit boot splash does not cover interactions.
-  await page.addInitScript(() => sessionStorage.setItem('toolrental-splash-seen', '1'))
+  // The 4 s boot splash is covered by boot-splash.spec.js; drop it here so it does not cover interactions.
+  await page.addInitScript(() => {
+    new MutationObserver((_, observer) => {
+      const splash = document.getElementById('boot-splash')
+      if (!splash) return
+      splash.remove()
+      observer.disconnect()
+    }).observe(document, { childList: true, subtree: true })
+  })
   await mockApi(page)
 })
 
