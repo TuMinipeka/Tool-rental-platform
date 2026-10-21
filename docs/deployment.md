@@ -1,5 +1,7 @@
 # Despliegue y operación del MVP
 
+> Gestión de herramientas, imágenes y persistencia: [contratos y verificación actual](provider-persistence.md). Las evidencias anteriores conservan su revisión histórica.
+
 ## Estado y separación de entornos
 
 La entrega prepara una **demo pública académica**. Actualmente se ejecuta en Docker local y no está publicada en Oracle. El proveedor vigente es interno, persistente y usa cinco medios con datos fijos; no requiere claves financieras externas. El cierre depende del [MVP](mvp.md).

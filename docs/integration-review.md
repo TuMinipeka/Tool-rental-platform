@@ -1,4 +1,6 @@
-# Integración de developer/conde y auditoría pendiente
+# Integración de developer/conde y seguimiento de auditoría
+
+> Seguimiento: herramientas, imágenes, pagos académicos y persistencia por roles se verificaron posteriormente en [la entrega del proveedor](provider-persistence.md). Esta página conserva la línea base del merge; la migración de bases demo antiguas y el despliegue público mantienen sus límites documentados.
 
 ## Alcance y revisión
 

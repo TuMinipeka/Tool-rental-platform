@@ -1,5 +1,7 @@
 # Contrato REST
 
+> Gestión de herramientas, imágenes y persistencia: [contratos y verificación actual](provider-persistence.md). Las evidencias anteriores conservan su revisión histórica.
+
 ## Convenciones
 
 La API oficial usa `/api/v1`. El alias `/api` es temporal y responde con `Deprecation: true` y `Link` hacia la ruta sucesora. OpenAPI muestra solo `/api/v1`.

@@ -1,6 +1,6 @@
 <div align="center">
 
-> Integración actual de Conde: [cambios y validaciones pendientes](docs/integration-review.md). Las capturas y recorridos previos son evidencia histórica y no acreditan automáticamente los cambios nuevos.
+> Verificación actual: [herramientas, fotografías y persistencia por roles](docs/provider-persistence.md). El [reporte del merge](docs/integration-review.md) conserva la línea base anterior.
 
 ![Tool Rental Platform](docs/assets/readme-banner.svg)
 
@@ -12,6 +12,15 @@
 
 ---
 
+## Gestión del proveedor y persistencia
+
+El proveedor puede crear y editar herramientas, publicar/retirar, adjuntar fotos mediante archivos o URLs y administrar unidades físicas. Se verificaron **67 comprobaciones con navegador y PostgreSQL reales**, además de restauración conjunta de datos e imágenes y recreación de contenedores. [Procedimiento, límites y evidencias](docs/provider-persistence.md).
+
+![Gestión de fotos guardadas por el proveedor](docs/evidence/provider-persistence/supplier-images.png)
+
+![Comprobante PDF obtenido del backend](docs/evidence/provider-persistence/customer-invoice.png)
+
+
 ## Entrega MVP de Daniel/Mayorga
 
 **Estado: integrado, ejecutándose y validado localmente; publicación pública pendiente.** Accede a la composición aislada en http://localhost:15173 después de seguir [despliegue](docs/deployment.md). No hay una demo pública acreditada todavía. El cierre compartido y las dependencias de Conde están en [el MVP](docs/mvp.md).
@@ -21,7 +30,7 @@
 
 ## Funcionamiento verificado con Playwright CLI
 
-Recorridos históricos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. La configuración vigente usa el proveedor académico persistente y medios de pago fijos; esta ampliación queda pendiente de validación manual.
+Recorridos históricos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. La configuración vigente usa el proveedor académico persistente y medios de pago fijos; la verificación actual se detalla en [persistencia del proveedor](docs/provider-persistence.md).
 
 | Perfil | Acciones verificadas |
 | --- | --- |

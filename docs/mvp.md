@@ -12,7 +12,7 @@ Rama de trabajo: developer/daniel. Se conserva el diseño de Conde y la arquitec
 | --- | --- |
 | Clientes y proveedores | CRUD y baja lógica existentes; revocación de sesiones y conservación del historial cubiertas por regresión |
 | Reservas | Retenciones, vencimiento, disponibilidad, confirmación, cancelación y ciclo operativo existentes; la decisión académica mantiene una transacción local |
-| Pagos y comprobante | Cinco medios fijos, conciliación, idempotencia, confirmación y comprobante persistidos; pendiente de revisión manual del nuevo formulario |
+| Pagos y comprobante | Cinco medios fijos, conciliación, idempotencia, confirmación y comprobante persistidos; validación actual mediante navegador real y PostgreSQL documentada |
 | Reportes | Cinco consultas con datos persistidos y alcance por rol; profitability significa ingreso reservado, no margen neto |
 | JWT y roles | Sesiones rotativas, CSRF, registro directo de proveedor y revocación existentes; conservar pruebas de accesos prohibidos |
 | Documentación y pruebas | Contrato vigente en [pagos ficticios](fictional-payments.md); resultados históricos en [validación](validation-report.md) |
@@ -49,8 +49,12 @@ La integración de `developer/conde` en `developer/daniel` requiere nueva acepta
 
 ## Evidencia histórica
 
-Las pruebas y capturas anteriores se registran en [validación](validation-report.md). Los cinco medios fijos y la migración V306 quedan pendientes de revisión manual; la validación automatizada de la integración y sus límites se registran en el reporte actual.
+Las pruebas y capturas anteriores se registran en [validación](validation-report.md). Los cinco medios fijos se verificaron en la auditoría actual; la validación automatizada de la integración y sus límites se registran en el reporte actual.
 
-Validación local concluida: **105 pruebas Java, 88 de navegador y dos omisiones previstas por dispositivo; 91 comprobaciones del recorrido real con Playwright CLI y 18 del perfil seguro**. Se verificaron Tomcat 10.1.55, JDBC, V305 y restauración local. El destino público conserva los bloqueos externos del checklist.
+Validación local concluida: **104 pruebas Java (cero fallos), 88 de navegador y dos omisiones previstas por dispositivo; recorrido real verificado y perfil seguro**. Se verificaron Tomcat 10.1.55, JDBC, migraciones hasta V306.1/V308 y restauración local. El destino público conserva los bloqueos externos del checklist.
 
 La [verificación por roles](browser-verification.md) documenta acciones de cliente, proveedor y administrador, contratos REST y limitaciones. El [README](../README.md#funcionamiento-verificado-con-playwright-cli) contiene capturas del recorrido. Se corrigieron el reinicio de formularios del proveedor y el token CSRF desactualizado al cerrar sesión.
+
+## Cierre de herramientas y persistencia
+
+La [verificación actual](provider-persistence.md) cubre gestión completa del proveedor con fotografías, publicación, unidades y comprobaciones de escritura para los tres roles. Incluye 67 comprobaciones reales y respaldo de base más imágenes; no certifica Oracle, HTTPS público ni respaldo externo. La aprobación de extensiones se verificó por REST y no se presenta como interfaz implementada.

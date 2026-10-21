@@ -46,4 +46,10 @@ Los controladores publican `/api/v1` y un alias `/api`. Un interceptor añade `D
 
 ## Persistencia
 
-Hay 25 entidades JPA para 25 tablas. Flyway conserva V1–V210 y añade V304–V307 para checkout, decisiones académicas, medios fijos y ciudad de servicio; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.
+Hay 25 entidades JPA para 25 tablas. Flyway conserva V1–V210 y añade V304–V308 para checkout, decisiones académicas, medios fijos y ciudad de servicio; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.
+
+## Archivos de herramientas y altas administrativas
+
+`toolimage` define el puerto `ToolImageStorage`; Application coordina autorización, límite de fotos y asociación transaccional, y Infrastructure valida/normaliza los archivos y los guarda en un volumen. Las referencias relativas propias y las URLs HTTP(S) comparten validación de dominio. Un fallo de commit descarta el archivo nuevo; el recolector elimina archivos huérfanos antiguos. PostgreSQL conserva las asociaciones y el respaldo incluye también los bytes.
+
+Las altas administrativas de proveedores y administradores usan `CreateManagedAccountUseCase` para guardar cuenta, rol y perfil dentro de un solo `UnitOfWork`. No generan sesiones ni sustituyen la sesión del administrador. Véase [persistencia y evidencias](provider-persistence.md).

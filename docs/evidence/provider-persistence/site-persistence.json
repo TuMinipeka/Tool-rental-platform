@@ -1,0 +1,379 @@
+{
+  "testedAt": "2026-10-21T03:08:27.818Z",
+  "tool": "Playwright CLI",
+  "realServices": true,
+  "checks": [
+    {
+      "name": "Anonymous tool creation is rejected",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "Terms are not preselected",
+      "passed": true
+    },
+    {
+      "name": "Self registration assigns only its intended role",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "Supplier creates an unpublished tool through UI",
+      "passed": true
+    },
+    {
+      "name": "Draft is absent from public catalog",
+      "passed": true
+    },
+    {
+      "name": "Image bytes are publicly readable",
+      "passed": true
+    },
+    {
+      "name": "Uploaded and external images have stored associations",
+      "passed": true
+    },
+    {
+      "name": "Removing an uploaded image removes its bytes",
+      "passed": true
+    },
+    {
+      "name": "Publishing makes the persisted tool public",
+      "passed": true
+    },
+    {
+      "name": "Withdrawing removes the public tool without deleting history",
+      "passed": true
+    },
+    {
+      "name": "Editing is readable from a fresh API query",
+      "passed": true
+    },
+    {
+      "name": "Physical unit is created and operational",
+      "passed": true
+    },
+    {
+      "name": "Unit status MAINTENANCE is persisted",
+      "passed": true
+    },
+    {
+      "name": "Unit status OPERATIONAL is persisted",
+      "passed": true
+    },
+    {
+      "name": "Tool survives a browser reload",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot update supplier tool",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot access image management",
+      "passed": true
+    },
+    {
+      "name": "Customer cannot list administrative accounts",
+      "passed": true
+    },
+    {
+      "name": "Real quote creates a held reservation at the server price",
+      "passed": true
+    },
+    {
+      "name": "Visa academic approval confirms the stored reservation",
+      "passed": true
+    },
+    {
+      "name": "Payment creates exactly one academic invoice",
+      "passed": true
+    },
+    {
+      "name": "Customer downloads a PDF",
+      "passed": true
+    },
+    {
+      "name": "Rental lifecycle is persisted",
+      "passed": true
+    },
+    {
+      "name": "Real supplier report income",
+      "passed": true
+    },
+    {
+      "name": "Real supplier report most-rented-tools",
+      "passed": true
+    },
+    {
+      "name": "Real supplier report frequent-customers",
+      "passed": true
+    },
+    {
+      "name": "Real supplier report availability",
+      "passed": true
+    },
+    {
+      "name": "Real supplier report profitability",
+      "passed": true
+    },
+    {
+      "name": "Mastercard academic payment is stored",
+      "passed": true
+    },
+    {
+      "name": "PSE academic payment is stored",
+      "passed": true
+    },
+    {
+      "name": "Mercado Pago academic payment is stored",
+      "passed": true
+    },
+    {
+      "name": "PayPal academic payment is stored",
+      "passed": true
+    },
+    {
+      "name": "Customer requests an extension through UI",
+      "passed": true
+    },
+    {
+      "name": "Supplier approval persists the effective return date",
+      "passed": true
+    },
+    {
+      "name": "Customer cancellation is persisted",
+      "passed": true
+    },
+    {
+      "name": "Customer profile update is persisted",
+      "passed": true
+    },
+    {
+      "name": "Password change revokes prior access",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "New password authenticates after persisted change",
+      "passed": true
+    },
+    {
+      "name": "Admin creates supplier account in one transaction",
+      "passed": true
+    },
+    {
+      "name": "Admin supplier edit is readable",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "A different supplier cannot publish the owner tool",
+      "passed": true
+    },
+    {
+      "name": "Supplier deactivation revokes its session",
+      "passed": true
+    },
+    {
+      "name": "Admin profile edit is persisted",
+      "passed": true
+    },
+    {
+      "name": "Admin deactivation is persisted",
+      "passed": true
+    },
+    {
+      "name": "Terms are not preselected",
+      "passed": true
+    },
+    {
+      "name": "Self registration assigns only its intended role",
+      "passed": true
+    },
+    {
+      "name": "Authenticated account has access token",
+      "passed": true
+    },
+    {
+      "name": "Self registered supplier has immediate access",
+      "passed": true
+    },
+    {
+      "name": "New supplier owns no other supplier inventory",
+      "passed": true
+    },
+    {
+      "name": "Mobile public catalog reads the saved supplier tool",
+      "passed": true
+    },
+    {
+      "name": "No uncaught JavaScript errors",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores tool publication and editing",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores both image associations",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores physical unit and activation",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores reservation confirmation",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores delivery rental and return",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores extension and cancellation",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores five academic payments",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores a unique invoice for the main payment",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores the edited customer and password hash",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores managed account roles and deactivation",
+      "passed": true
+    },
+    {
+      "name": "PostgreSQL stores the self registered supplier profile",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    {
+      "filename": "supplier-images.png",
+      "sha256": "2b09c8bba98029deb54a2056babbee4a984f05e7cf01f34745499af0ebf9e8a2"
+    },
+    {
+      "filename": "supplier-inventory.png",
+      "sha256": "21a9dc4d002ea99fd84355c5f02cfee993aea0f76f677a3fd19b86262083488b"
+    },
+    {
+      "filename": "customer-payment.png",
+      "sha256": "127a624cd5f6a241acaf02d59d08fac8ba7cf9328f1529c4f49c8be453030b0c"
+    },
+    {
+      "filename": "customer-invoice.png",
+      "sha256": "8aefaea719959539e80cfe7e30e18175237102f1b89a5354bbe5b61f41efc28f"
+    },
+    {
+      "filename": "supplier-completed-rental.png",
+      "sha256": "3d7039b402709c262f935d5ccbdf0586d18faa63c51bc64dfd268e6337ebe071"
+    },
+    {
+      "filename": "supplier-reports.png",
+      "sha256": "0728c2d0850c866e15a8cae3faa41f03fd6790baffdb87380ab6f6e43be2d7d3"
+    },
+    {
+      "filename": "customer-profile.png",
+      "sha256": "9886aadf55794056d9df00a9ca746bfb6b0e1cdfabe7f3f95e8b6b5535394cb3"
+    },
+    {
+      "filename": "admin-suppliers.png",
+      "sha256": "0563866a341ad1ab36bf634413d4ebdd4ea18878993b8141c3a1054c91a28374"
+    },
+    {
+      "filename": "admin-accounts.png",
+      "sha256": "0f0d5c41c701a4703c38acf3c9508683f7343c0075895ba95fe43b7a18a12cbc"
+    },
+    {
+      "filename": "supplier-registration.png",
+      "sha256": "21836e420e350ce543fd745c4f0b5225b46d40004783d8429c03a83f34cff3d7"
+    },
+    {
+      "filename": "mobile-persisted-catalog.png",
+      "sha256": "53c6d32b095da3617ab3141169faffedab2faf925df37dbad1232b6ec1e9c387"
+    }
+  ],
+  "records": {
+    "customerId": "10ec3621-071f-4ece-8ee3-16f0ac15060b",
+    "toolId": "e844f9de-d886-4d01-9e7d-db6602d9a3cc",
+    "imageReferences": [
+      "/api/v1/public/tool-images/files/7305c15f-e974-4e93-bb81-8b8022334b20.png",
+      "http://localhost:15173/assets/tools/catalog/02.png"
+    ],
+    "unitId": "5212f040-47a0-4e4b-8a8e-784be2150e2c",
+    "reservationId": "982ff47c-81d6-49f0-99ff-9e0fcebbb6e6",
+    "paymentId": "1ecf8c5e-4bb7-4400-8486-30fbdbd50f4b",
+    "invoiceId": "0982fe09-29e1-4ce7-bc42-65fa05a20585",
+    "extensionReservationId": "ce01791a-fcf2-4b34-aef8-ee8e65870e16",
+    "cancelledReservationId": "ac095614-27bd-4076-8c35-2dadab91ddae",
+    "managedSupplierId": "29beaf21-79c8-4137-abc3-d72e9640251b",
+    "managedAdminId": "16506ea5-6973-4f91-9e37-84b34ba54a28",
+    "selfSupplierId": "10edb74f-be0a-49af-b3ee-04dc0eb516e3"
+  },
+  "failures": [],
+  "completed": true,
+  "sourceCommit": "b3ac9f53b0cb70a6edc257841fa92396ee4beb83",
+  "sourceFingerprint": "e26eba334a6d203debef760aa10cf28a5bbcf5362ac8e52097ea18ac7e982c9d",
+  "database": "mvp_supplier_20261020",
+  "gitPublicationPerformed": false,
+  "sqlSnapshot": {
+    "tool": {
+      "id": "e844f9de-d886-4d01-9e7d-db6602d9a3cc",
+      "name": "QA Persistent Drill 1792552107818 Edited",
+      "status": "PUBLISHED",
+      "city": "Bucaramanga"
+    },
+    "imageCount": 2,
+    "unit": {
+      "id": "5212f040-47a0-4e4b-8a8e-784be2150e2c",
+      "status": "OPERATIONAL",
+      "serial": "SERIAL-1792552107818"
+    },
+    "reservation": {
+      "id": "982ff47c-81d6-49f0-99ff-9e0fcebbb6e6",
+      "status": "CONFIRMED"
+    },
+    "rentalCount": 1,
+    "deliveryCount": 1,
+    "returnCount": 1,
+    "approvedExtensions": 1,
+    "cancelledReservation": true,
+    "confirmedPayments": 5,
+    "invoiceCount": 1,
+    "customer": {
+      "id": "10ec3621-071f-4ece-8ee3-16f0ac15060b",
+      "name": "QA Persistent Customer 1792552107818",
+      "hashed": true
+    },
+    "managedSupplierDisabled": true,
+    "managedAdminDisabled": true,
+    "selfSupplier": 1,
+    "managedSupplierRole": 1,
+    "managedAdminRole": 1
+  }
+}

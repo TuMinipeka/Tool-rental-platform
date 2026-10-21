@@ -10,4 +10,4 @@ El diseño de Conde es la referencia de interfaz. Esta guía consolida reglas a�
 - Usar las rutas unificadas de acceso y registro del diseño integrado.
 - Toda optimización necesita evidencia comparable; una integración no acredita por sí sola mejoras de rendimiento.
 
-Las fotografías deben tener permiso de uso y evitar datos personales identificables. Conserva las [condiciones de imágenes](tool-image-requirements.md). Los [resultados previos de calidad](frontend-quality.md) identifican la versión medida y no describen automáticamente este MVP.
+Las fotografías deben tener permiso de uso y evitar datos personales identificables. Los activos oficiales del catálogo se organizan en `frontend/public/assets/tools/equipment/` con versiones optimizadas. Los [resultados previos de calidad](frontend-quality.md) identifican la versión medida y no describen automáticamente este MVP.

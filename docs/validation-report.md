@@ -1,5 +1,7 @@
 # Reporte de validación del MVP
 
+> Gestión de herramientas, imágenes y persistencia: [contratos y verificación actual](provider-persistence.md). Las evidencias anteriores conservan su revisión histórica.
+
 > Integración actual de Conde: [cambios y validaciones pendientes](integration-review.md). Las capturas y recorridos previos son evidencia histórica y no acreditan automáticamente los cambios nuevos.
 
 Validación del 20 de octubre de 2026 sobre la revisión `8e68b8b`, incluida la corrección de formularios y cierre de sesión, rama developer/daniel. Se conserva la integración de Conde hasta 981a16e. **Aplicación integrada y validada localmente con pasarela ficticia; publicación pública pendiente.** El cambio de alcance elimina la dependencia de una pasarela sandbox oficial.
@@ -15,6 +17,12 @@ Validación del 20 de octubre de 2026 sobre la revisión `8e68b8b`, incluida la 
 | Respaldo y persistencia | Conteos iguales en 26 tablas tras restauración y reinicio | [Respaldo con V305](evidence/mvp/backup-restore.json); incluye historial Flyway, sin transferencia externa |
 | Datos y esquema | 25 tablas; 20 de negocio con mínimo 20 filas; 149 restricciones, 66 índices y 58 migraciones demo | [Auditoría](evidence/mvp/database-audit.json); excepciones técnicas justificadas |
 | Compose, Caddy y shell | Configuración válida; publicación incompleta bloqueada | [Configuración](evidence/mvp/configuration.json); no abre servicios públicos |
+
+## Gestión de proveedor y persistencia — 20 de octubre de 2026
+
+Revisión de código `b3ac9f5`: **112 pruebas Java, 84 de navegador y 67 comprobaciones reales de Playwright CLI/PostgreSQL**, con dos omisiones de navegador previstas. Respaldo de base y fotos restaurado, hashes y conteos coincidentes, recreación de contenedores sin pérdida y aplicación habitual disponible en 5173/8080. Se verificó la regresión de carga del perfil. [Resultados detallados](provider-persistence.md) y [resumen verificable](evidence/provider-persistence/validation.json).
+
+La configuración showcase se validó sintácticamente con valores temporales de validación: la plantilla exige secretos y referencias de imágenes externas. No constituye arranque público, configuración de DNS ni validación de Oracle o transferencia externa.
 
 ## Pagos y ciclo de alquiler
 

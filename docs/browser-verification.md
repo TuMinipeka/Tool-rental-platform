@@ -1,5 +1,7 @@
 # Verificación funcional con Playwright CLI
 
+> Gestión de herramientas, imágenes y persistencia: [contratos y verificación actual](provider-persistence.md). Las evidencias anteriores conservan su revisión histórica.
+
 ## Entorno y alcance
 
 Ejecutada el 20 de octubre de 2026 en la composición privada tool-rental-mvp, http://localhost:15173, con frontend React, backend Spring Boot/Tomcat y PostgreSQL reales. No se interceptan respuestas ni se usa el catálogo demo como sustituto de una API caída. Los datos de cada ejecución son ficticios, exclusivos de esta base y llevan un identificador único.

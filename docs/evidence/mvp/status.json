@@ -1,19 +1,25 @@
 {
-  "updatedAt": "2026-10-21T02:08:35.464042+00:00",
-  "state": "conde-merged-functional-acceptance-pending",
-  "validatedSourceCommit": "10a542e",
+  "updatedAt": "2026-10-21T03:12:59.615018+00:00",
+  "state": "validated-locally-public-deployment-pending",
+  "validatedSourceCommit": "b3ac9f53b0cb70a6edc257841fa92396ee4beb83",
   "condeReference": "f762a5c973254661f842ea8ff177b2b11ae4ff5c",
   "localValidation": {
     "mavenPostgres": true,
-    "javaTests": 104,
+    "javaTests": 112,
     "javaFailures": 0,
     "frontendLintBuild": true,
     "browserTests": true,
-    "realRoleJourneysCurrentRevision": false,
-    "existingDemoDatabaseUpgrade": false,
-    "browserPassed": 80,
+    "browserPassed": 84,
     "browserSkipped": 2,
-    "composeConfiguration": true
+    "realRoleJourneysCurrentRevision": true,
+    "liveChecksPassed": 67,
+    "sqlFinalSnapshotVerified": true,
+    "existingDemoDatabaseUpgrade": false,
+    "composeConfiguration": true,
+    "databaseAndImagesRestore": true,
+    "containerRecreation": true,
+    "supplierToolAndImageManagement": true,
+    "profileLoadingRaceRegression": true
   },
   "publicReleaseGates": {
     "oracleCapacity": false,
@@ -23,15 +29,15 @@
     "credentialsProvisioned": false,
     "offsiteBackupAndRestore": false,
     "armRuntimeValidated": false,
-    "fictionalPaymentValidated": false
+    "fictionalPaymentValidated": true
   },
   "limitations": [
     "No Oracle account/capacity or DuckDNS configuration supplied",
     "Public target evaluator credentials not provisioned",
     "No external backup destination supplied; fresh local restore passed",
     "ARM64 base manifests verified previously; Oracle ARM runtime not exercised",
-    "Current Conde changes require real role/payment acceptance; prior evidence is historical",
-    "Existing demo V305 upgrade needs rehearsal due to newly introduced lower-version migrations"
+    "Existing demo V305 upgrade needs rehearsal due to newly introduced lower-version migrations",
+    "Supplier extension approval is verified through REST; the current supplier UI does not expose that control"
   ],
   "approvedScopeChanges": [
     "Fictional academic payment replaces official provider requirement",
@@ -60,5 +66,22 @@
       "serverLogoutRevocation": true,
       "supplierFormsAfterPersistence": true
     }
-  }
+  },
+  "integrationValidationBeforeProviderFix": {
+    "state": "conde-merged-functional-acceptance-pending",
+    "validatedSourceCommit": "10a542e",
+    "localValidation": {
+      "mavenPostgres": true,
+      "javaTests": 104,
+      "javaFailures": 0,
+      "frontendLintBuild": true,
+      "browserTests": true,
+      "realRoleJourneysCurrentRevision": false,
+      "existingDemoDatabaseUpgrade": false,
+      "browserPassed": 80,
+      "browserSkipped": 2,
+      "composeConfiguration": true
+    }
+  },
+  "sourceFingerprint": "e26eba334a6d203debef760aa10cf28a5bbcf5362ac8e52097ea18ac7e982c9d"
 }
