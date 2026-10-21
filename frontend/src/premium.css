@@ -2289,6 +2289,95 @@ select:focus-visible,
   margin-top: 18px;
 }
 
+.profile-security {
+  padding: 28px;
+}
+
+.profile-security > header h2 {
+  margin: 8px 0;
+  font-size: clamp(30px,4vw,44px);
+}
+
+.profile-security > header > p:last-child {
+  margin: 0;
+  color: #687680;
+}
+
+.profile-security > .form-error,
+.profile-security > .account-success {
+  margin-top: 20px;
+}
+
+.account-success {
+  padding: 13px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #116241;
+  background: #e4f6ed;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.profile-security-grid {
+  margin-top: 25px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.profile-security-grid > form {
+  padding: 22px;
+  display: grid;
+  align-content: start;
+  gap: 15px;
+  border: 1px solid #d8e0e5;
+  background: #f8fafb;
+}
+
+.profile-security-grid .form-field {
+  margin: 0;
+}
+
+.profile-form-heading {
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-form-heading > span {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  color: #08778d;
+  background: #dff8fc;
+}
+
+.profile-form-heading h3,
+.profile-form-heading p {
+  margin: 0;
+}
+
+.profile-form-heading p {
+  margin-top: 3px;
+  color: #6c7882;
+  font-size: 10px;
+}
+
+.profile-security-grid .button,
+.invoice-row-actions .button,
+.invoice-preview-dialog .button {
+  transition: transform 140ms cubic-bezier(.23,1,.32,1), opacity 160ms ease;
+}
+
+.profile-security-grid .button:active,
+.invoice-row-actions .button:active,
+.invoice-preview-dialog .button:active {
+  transform: scale(.98);
+}
+
 .account-panel .panel-heading {
   padding: 24px;
 }
@@ -2345,6 +2434,129 @@ select:focus-visible,
   display: grid;
   gap: 4px;
   text-align: right;
+}
+
+.reservation-extension-form {
+  margin-top: 8px;
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d6e0e5;
+  background: #f5f9fa;
+  text-align: left;
+}
+
+.reservation-extension-form label {
+  display: grid;
+  gap: 5px;
+  color: #56636e;
+  font-size: 10px;
+  font-weight: 750;
+}
+
+.reservation-extension-form input {
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid #cbd5dc;
+  background: #fff;
+}
+
+.invoice-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+.invoice-row-actions .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.invoice-preview-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  padding: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(3,13,20,.76);
+  backdrop-filter: blur(8px);
+}
+
+.invoice-preview-dialog {
+  width: min(960px,100%);
+  height: min(820px,calc(100vh - 48px));
+  display: grid;
+  grid-template-rows:auto 1fr auto;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
+  background: #eef2f4;
+  box-shadow: 0 32px 90px rgba(0,0,0,.38);
+}
+
+.invoice-preview-dialog > header,
+.invoice-preview-dialog > footer {
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  color: #fff;
+  background: #07131c;
+}
+
+.invoice-preview-dialog > header span {
+  color: var(--cyan);
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.invoice-preview-dialog > header h2 {
+  margin: 4px 0 0;
+  font-size: 20px;
+}
+
+.invoice-preview-dialog > header > button {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 50%;
+  color: #fff;
+  background: transparent;
+  cursor: pointer;
+}
+
+.invoice-preview-dialog iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #dfe5e8;
+}
+
+.invoice-preview-dialog > footer p {
+  margin: 0;
+  color: #bdc8ce;
+  font-size: 10px;
+}
+
+@media(max-width:760px) {
+  .profile-security-grid { grid-template-columns: 1fr; }
+  .invoice-row-actions { width: 100%; flex-wrap: wrap; }
+  .invoice-preview-backdrop { padding: 0; }
+  .invoice-preview-dialog { width: 100%; height: 100vh; border-radius: 0; }
+  .invoice-preview-dialog > footer { align-items: flex-start; flex-direction: column; }
+}
+
+@media(prefers-reduced-motion:reduce) {
+  .profile-security-grid .button,
+  .invoice-row-actions .button,
+  .invoice-preview-dialog .button { transition: none; }
 }
 
 .account-cta {

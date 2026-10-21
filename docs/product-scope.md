@@ -74,7 +74,7 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 - Deben registrarse o congelarse la tarifa de IVA, método de base gravable, resultado de redondeo y versión de la regla legal usada, para que cambios posteriores no alteren históricos.
 - Antes de aceptar, el checkout muestra alquiler, entrega, protección opcional, descuentos, base gravable, IVA, ajustes y total final.
 - Los precios deben ser claros y no revelar cargos obligatorios únicamente después de confirmar.
-- El proyecto actual solo emite documentos académicos con la leyenda `Simulación académica - documento no válido como factura ante la DIAN` hasta contar con integración real y configuración del contribuyente.
+- El proyecto actual solo emite documentos académicos con la leyenda `Documento académico - no válido como factura ante la DIAN` hasta contar con integración real y configuración del contribuyente.
 
 ## Protección opcional por daños
 

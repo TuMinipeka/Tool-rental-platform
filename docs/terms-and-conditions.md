@@ -62,7 +62,7 @@ Los precios se muestran en pesos colombianos (`COP`) salvo que se admita expresa
 
 La referencia general de IVA utilizada por el proyecto es 19%. El arrendamiento de bienes corporales muebles tiene una regla especial de base gravable en el artículo 1.3.1.7.1 del Decreto 1625 de 2016. Un despliegue real debe validar con un profesional tributario colombiano la base aplicable, exclusiones, responsabilidad frente al IVA, causación y obligaciones de facturación electrónica.
 
-Los documentos del ambiente actual son simulaciones y deben mostrar `Simulación académica - documento no válido como factura ante la DIAN`. No sustituyen una factura o documento equivalente legalmente exigido.
+Los documentos del ambiente actual son académicos y deben mostrar `Documento académico - no válido como factura ante la DIAN`. No sustituyen una factura o documento equivalente legalmente exigido.
 
 ## 7. Pagos simulados
 

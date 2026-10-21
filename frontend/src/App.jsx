@@ -20,7 +20,7 @@ const TermsAndConditionsPage = lazy(() => import('./TermsAndConditionsPage.jsx')
 const loadAccountPages = () => import('./pages/AccountPages.jsx')
 const AuthPage = lazy(() => loadAccountPages().then(module => ({ default: module.AuthPage })))
 const AuthModal = lazy(() => loadAccountPages().then(module => ({ default: module.AuthModal })))
-const AccountPage = lazy(() => loadAccountPages().then(module => ({ default: module.AccountPage })))
+const AccountPage = lazy(() => import('./pages/AccountWorkspacePage.jsx').then(module => ({ default: module.AccountWorkspacePage })))
 const BusinessDashboard = lazy(() => loadAccountPages().then(module => ({ default: module.BusinessDashboard })))
 const ProviderEntryPage = lazy(() => loadAccountPages().then(module => ({ default: module.ProviderEntryPage })))
 const QuotePage = lazy(() => import('./pages/RentalPages.jsx').then(module => ({ default: module.QuotePage })))
@@ -187,9 +187,9 @@ function App(){
     setSession(authenticated)
     setAuthOpen(false)
   }
-  const logout=async()=>{
+  const logout=async(target='/')=>{
     await api.logout().catch(()=>null)
-    saveSession(null);setSession(null);navigate('/')
+    saveSession(null);setSession(null);navigate(target)
   }
   const continueQuote=async logistics=>{
     if(!session){navigate('/login?returnTo=%2Fcotizacion');return}

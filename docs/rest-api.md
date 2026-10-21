@@ -45,7 +45,9 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 | GET | `/api/v1/auth/sessions` | Bearer |
 | DELETE | `/api/v1/auth/sessions/{id}` | Bearer |
 
-El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La API pública no ofrece recuperación ni restablecimiento de contraseña.
+El access token dura 15 minutos y se conserva en memoria del cliente. El refresh dura 30 días y rota en cada renovación. La API pública no ofrece recuperación ni restablecimiento de contraseña sin sesión; un usuario autenticado puede cambiar su propia contraseña con `PATCH /api/v1/users/me/password`, suministrando la actual, y el cambio revoca todas sus sesiones.
+
+`GET /api/v1/users/me` consulta el perfil autenticado y `PATCH /api/v1/users/me/profile` actualiza nombre y correo sin aceptar un identificador de actor en el cuerpo.
 
 El proveedor queda activo al completar el formulario público y puede entrar directamente a su panel. El administrador conserva `PATCH /api/v1/users/{id}/status` para gestionar estados. `DELETE /api/v1/customers/{id}` y `DELETE /api/v1/suppliers/{id}` conservan el perfil e historial, cambian el usuario compartido a `DISABLED` y revocan sus sesiones.
 
@@ -58,7 +60,7 @@ El proveedor queda activo al completar el formulario público y puede entrar dir
 - `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key`, un medio permitido y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` sin aceptar un importe del navegador.
 - `POST /api/v1/payments/fictional/checkouts/{id}/decision` conserva `APPROVED` o `DECLINED` para el cliente propietario y procesa la decisión de forma idempotente.
 - Una aprobación confirma pago y reserva dentro del límite transaccional y emite un comprobante. Un rechazo libera la retención; una aprobación tardía inicia el reembolso idempotente.
-- `GET /api/v1/invoices/{id}/document` devuelve el comprobante descargable sin presentarlo como factura válida ante la DIAN.
+- `GET /api/v1/invoices/{id}/document?disposition=inline|attachment` devuelve el PDF para vista previa o descarga sin presentarlo como factura válida ante la DIAN.
 
 El proveedor académico no requiere claves financieras externas. Los datos fijos se definen en la interfaz, no se pueden modificar y el backend persiste únicamente metadatos mínimos del medio elegido.
 

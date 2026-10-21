@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public final class DownloadInvoiceUseCase {
   public static final String LEGAL_NOTICE =
-      "Simulación académica - documento no válido como factura ante la DIAN";
+      "Documento académico - no válido como factura ante la DIAN";
 
   private final InvoiceRepository invoices;
   private final InvoiceItemRepository lines;

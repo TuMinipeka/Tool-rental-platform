@@ -1,10 +1,14 @@
 package com.toolrental.infrastructure.user.adapters.in.rest.controllers;
 
+import com.toolrental.application.user.command.ChangePasswordCommand;
 import com.toolrental.application.user.command.RegisterUserCommand;
+import com.toolrental.application.user.command.UpdateUserProfileCommand;
 import com.toolrental.application.user.dto.UserResponse;
 import com.toolrental.application.user.usecase.ManageUserUseCase;
 import com.toolrental.domain.user.model.valueobject.UserId;
 import com.toolrental.infrastructure.common.web.Actor;
+import com.toolrental.infrastructure.user.adapters.in.rest.dtos.ChangePasswordRequest;
+import com.toolrental.infrastructure.user.adapters.in.rest.dtos.UpdateUserProfileRequest;
 import com.toolrental.infrastructure.user.adapters.in.rest.dtos.UserRequest;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -37,6 +41,27 @@ public class UserController {
   @GetMapping("/{id}")
   public UserResponse find(Principal principal, @PathVariable UUID id) {
     return useCase.find(Actor.id(principal), new UserId(id));
+  }
+
+  @GetMapping("/me")
+  public UserResponse current(Principal principal) {
+    var actor = Actor.id(principal);
+    return useCase.find(actor, new UserId(actor));
+  }
+
+  @PatchMapping("/me/profile")
+  public UserResponse updateProfile(
+      Principal principal, @Valid @RequestBody UpdateUserProfileRequest request) {
+    return useCase.updateProfile(
+        Actor.id(principal), new UpdateUserProfileCommand(request.email(), request.displayName()));
+  }
+
+  @PatchMapping("/me/password")
+  public UserResponse changePassword(
+      Principal principal, @Valid @RequestBody ChangePasswordRequest request) {
+    return useCase.changePassword(
+        Actor.id(principal),
+        new ChangePasswordCommand(request.currentPassword(), request.newPassword()));
   }
 
   @PostMapping

@@ -252,6 +252,7 @@ Rutas principales:
 
 - `GET /api/v1/auth/csrf`, `POST /auth/refresh`, `/logout` y `/logout-all`.
 - `GET /api/v1/auth/sessions` y `DELETE /auth/sessions/{id}`.
+- `GET /api/v1/users/me`, `PATCH /users/me/profile` y `PATCH /users/me/password`: consulta y actualización autenticada del perfil; cambiar la contraseña revoca las sesiones.
 - `GET /api/v1/public/features`: disponibilidad del checkout y proveedor de pagos vigente.
 - `GET /api/v1/public/catalog?serviceCity={municipio}`: catálogo público filtrado por la ciudad persistida de cada herramienta.
 - `POST /api/v1/auth/supplier-registration`: crea la cuenta activa de proveedor, inicia sesión y devuelve la cookie de renovación.
@@ -261,10 +262,13 @@ Rutas principales:
 - `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
 - `GET|POST /api/v1/commercial-configuration/delivery-rates` y `/cancellation-policies` para administración.
 - `GET /api/v1/refunds/payments/{id}` y consulta normal de pagos para ajustes.
+- `GET /api/v1/invoices/{id}/document?disposition=inline|attachment`: vista previa o descarga del comprobante académico en PDF.
 
 La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en `http://localhost:8080/swagger-ui.html`. Consulta [contratos REST](docs/rest-api.md).
 
 Después de crear y persistir una reserva, el frontend abre automáticamente `/pago?reservationId={id}`. Ese paso muestra el importe del servidor y permite escoger Visa, Mastercard, PSE, Mercado Pago o PayPal. Cada opción presenta datos de prueba fijos y no editables; el backend conserva el medio seleccionado, confirma la reserva y publica el pago y el comprobante en `/cuenta`. Solo se persisten la red de tarjeta, últimos cuatro dígitos y vencimiento, nunca el número completo, CVV o credenciales de una cuenta.
+
+`/cuenta` vuelve a consultar reservas, alquileres, pagos y comprobantes al recuperar el foco o al usar **Actualizar**. Las reservas exponen únicamente acciones permitidas por su estado, incluida la solicitud de extensión; los pagos y comprobantes conservan su historial inmutable. El perfil permite editar nombre y correo, cambiar la contraseña actual y previsualizar o descargar cada comprobante como PDF.
 
 ## Migraciones y validación
 

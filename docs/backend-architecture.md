@@ -46,4 +46,4 @@ Los controladores publican `/api/v1` y un alias `/api`. Un interceptor añade `D
 
 ## Persistencia
 
-Hay 25 entidades JPA para 25 tablas. Flyway conserva V1–V210 y añade V304–V305 para checkout y decisiones ficticias; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.
+Hay 25 entidades JPA para 25 tablas. Flyway conserva V1–V210 y añade V304–V306 para checkout, decisiones académicas y medios fijos; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.

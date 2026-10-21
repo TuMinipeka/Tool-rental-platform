@@ -102,7 +102,11 @@ async function request(path, options = {}, behavior = {}) {
   }
 
   const response = await fetchApi(`${apiPrefix}${path}`, { ...options, headers })
-  const payload = behavior.responseType === 'text' && response.ok ? await response.text() : await parseResponse(response)
+  const payload = behavior.responseType === 'text' && response.ok
+    ? await response.text()
+    : behavior.responseType === 'blob' && response.ok
+      ? await response.blob()
+      : await parseResponse(response)
 
   if (response.status === 401 && authenticated && retry) {
     try {
@@ -143,6 +147,9 @@ export const api = {
   },
   registerSupplier(account) { return request('/auth/supplier-registration', { method: 'POST', body: JSON.stringify(account) }) },
   updateUserStatus(id, status) { return request('/users/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }, { authenticated: true }) },
+  currentUser() { return request('/users/me', {}, { authenticated: true }) },
+  updateCurrentUser(profile) { return request('/users/me/profile', { method: 'PATCH', body: JSON.stringify(profile) }, { authenticated: true }) },
+  changePassword(passwords) { return request('/users/me/password', { method: 'PATCH', body: JSON.stringify(passwords) }, { authenticated: true }) },
   register(account) {
     return request('/auth/register', { method: 'POST', body: JSON.stringify(account) })
   },
@@ -175,13 +182,14 @@ export const api = {
       { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
       { authenticated: true })
   },
+  requestReservationExtension(id, requestedReturnDate, idempotencyKey) { return request('/reservation-extensions/reservations/' + encodeURIComponent(id), { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ requestedReturnDate }) }, { authenticated: true }) },
   features() { return request('/public/features', {}) },
   decideFictionalPayment(id, outcome) { return request('/payments/fictional/checkouts/' + encodeURIComponent(id) + '/decision', { method: 'POST', body: JSON.stringify({ outcome }) }, { authenticated: true }) },
   checkout(id) { return request('/payments/checkouts/' + encodeURIComponent(id), {}, { authenticated: true }) },
   createCheckout(reservationId, idempotencyKey, paymentMethod) {
     return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId, ...paymentMethod }) }, { authenticated: true })
   },
-  invoiceDocument(id) { return request('/invoices/' + encodeURIComponent(id) + '/document', {}, { authenticated: true, responseType: 'text' }) },
+  invoiceDocument(id, disposition = 'inline') { return request('/invoices/' + encodeURIComponent(id) + '/document?' + new URLSearchParams({ disposition }), {}, { authenticated: true, responseType: 'blob' }) },
   operationalReport(kind, from, to) { return request('/reports/' + kind + '?' + new URLSearchParams({ from, to }), {}, { authenticated: true }) },
   deliveryEntry(reservationId, equipmentUnitId) { return request('/unit-deliveries/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
   returnEntry(reservationId, equipmentUnitId) { return request('/unit-returns/entry?' + new URLSearchParams({ reservationId, equipmentUnitId }), {}, { authenticated: true }) },
