@@ -19,7 +19,7 @@ export default defineConfig({
     { name: 'desktop', use: { viewport: { width: 1440, height: 900 } } },
     { name: 'mobile', use: { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true } },
   ],
-  webServer: {
+  webServer: process.env.LIVE_SYSTEM_TESTS === 'true' ? undefined : {
     command: 'npm run preview -- --host 127.0.0.1 --port 4173 --strictPort',
     url: 'http://localhost:4173',
     reuseExistingServer: !process.env.CI,

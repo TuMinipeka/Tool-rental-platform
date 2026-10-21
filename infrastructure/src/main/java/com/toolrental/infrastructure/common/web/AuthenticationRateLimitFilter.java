@@ -46,14 +46,17 @@ public class AuthenticationRateLimitFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain chain)
       throws ServletException, IOException {
     var now = Instant.now(clock);
-    var key = request.getRemoteAddr() + ":" + request.getRequestURI();
+    if (windows.size() > 1024)
+      windows.entrySet().removeIf(entry -> !now.isBefore(entry.getValue().started.plusSeconds(60)));
+    var operation = request.getRequestURI().endsWith("/auth/login") ? "login" : "refresh";
+    var key = request.getRemoteAddr() + ":" + operation;
     var window =
         windows.compute(
             key,
             (ignored, current) ->
-                current == null || now.isAfter(current.started.plusSeconds(60))
+                current == null || !now.isBefore(current.started.plusSeconds(60))
                     ? new Window(now, 1)
-                    : new Window(current.started, current.count + 1));
+                    : new Window(current.started, Math.min(current.count, requestsPerMinute) + 1));
     if (window.count > requestsPerMinute) {
       var problem =
           ProblemDetail.forStatusAndDetail(

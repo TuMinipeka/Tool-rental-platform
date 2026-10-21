@@ -11,6 +11,7 @@ public class BcryptPasswordHasher implements PasswordHasher {
 
   public String hash(String password) {
     if (password == null
+        || password.indexOf('\0') >= 0
         || password.length() < 12
         || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72)
       throw new BusinessRuleException(
@@ -19,7 +20,11 @@ public class BcryptPasswordHasher implements PasswordHasher {
   }
 
   public boolean matches(String password, String passwordHash) {
-    if (password == null || passwordHash == null || !passwordHash.startsWith("$2")) return false;
+    if (password == null
+        || password.indexOf('\0') >= 0
+        || password.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72
+        || passwordHash == null
+        || !passwordHash.startsWith("$2")) return false;
     return encoder.matches(password, passwordHash);
   }
 }

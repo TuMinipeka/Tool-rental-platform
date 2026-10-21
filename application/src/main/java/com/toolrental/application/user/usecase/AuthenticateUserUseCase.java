@@ -27,6 +27,7 @@ public final class AuthenticateUserUseCase {
   private final UserSessionRepository sessions;
   private final SecureTokenService secrets;
   private final Duration refreshTtl;
+  private final String unknownAccountPasswordHash;
 
   public AuthenticateUserUseCase(
       UserRepository users,
@@ -47,20 +48,22 @@ public final class AuthenticateUserUseCase {
     this.sessions = sessions;
     this.secrets = secrets;
     this.refreshTtl = refreshTtl;
+    this.unknownAccountPasswordHash = passwords.hash("UnknownAccountVerificationOnly");
   }
 
   public AuthenticatedSession execute(String email, String password, String clientLabel) {
     return work.execute(
         () -> {
           var normalizedEmail = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
-          var user =
-              users
-                  .findByEmail(normalizedEmail)
-                  .orElseThrow(AuthenticationFailedApplicationException::new);
-          if (!"ACTIVE".equals(user.accountStatus())
-              || !passwords.matches(password, user.passwordHash())) {
+          var found = users.findByEmail(normalizedEmail);
+          var matches =
+              passwords.matches(
+                  password,
+                  found.map(value -> value.passwordHash()).orElse(unknownAccountPasswordHash));
+          if (found.isEmpty() || !matches || !"ACTIVE".equals(found.get().accountStatus())) {
             throw new AuthenticationFailedApplicationException();
           }
+          var user = found.get();
           var assignedRoles = roles.findRoleCodes(user.id());
           var now = Instant.now(clock);
           var secret = secrets.issue();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 // Dashboard sections shown in the header once a provider or administrator is signed in.
 // Permissions are still enforced by the backend; these entries only decide navigation.
@@ -32,11 +32,10 @@ function readSection(dashboard) {
 
 // Active section derived from the URL, so the header and the dashboard stay in sync.
 export function useDashboardSection(dashboard) {
-  const [section, setSection] = useState(() => readSection(dashboard))
-  useEffect(() => {
-    const update = () => setSection(readSection(dashboard))
-    window.addEventListener('popstate', update)
-    return () => window.removeEventListener('popstate', update)
-  }, [dashboard])
-  return section
+  return useSyncExternalStore(subscribeToNavigation, () => readSection(dashboard), () => null)
+}
+
+function subscribeToNavigation(update) {
+  window.addEventListener('popstate', update)
+  return () => window.removeEventListener('popstate', update)
 }

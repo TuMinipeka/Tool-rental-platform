@@ -11,17 +11,13 @@ import { money } from '../lib/format.js'
 import { serviceLocations } from '../lib/locations.js'
 import { entityId } from '../lib/records.js'
 import { navigate } from '../lib/navigation.js'
-import { dashboardSectionHref, dashboardSections, useDashboardSection } from '../lib/dashboardSections.js'
+import { dashboardSections, useDashboardSection } from '../lib/dashboardSections.js'
 
 const currentDate = new Date().toISOString().slice(0, 10)
 const yearStart = `${currentDate.slice(0, 4)}-01-01`
 
 function Metric({ label, value, note, icon }) {
   return <article className="dashboard-metric"><span><Icon name={icon} size={18}/>{label}</span><strong>{value}</strong><p>{note}</p></article>
-}
-
-function SectionTabs({ active, onChange, items }) {
-  return <nav className="dashboard-tabs" aria-label="Secciones del dashboard">{items.map(([id, label, icon]) => <button key={id} className={active === id ? 'active' : ''} aria-current={active === id ? 'page' : undefined} onClick={() => onChange(id)}><Icon name={icon} size={17}/>{label}</button>)}</nav>
 }
 
 function ToolForm({ categories, editing, onCancel, onSaved, showError }) {
@@ -191,7 +187,6 @@ export function BusinessDashboardPage({ role, session }) {
   const [error, setError] = useState('')
   const dashboard = provider ? dashboardSections.provider : dashboardSections.admin
   const active = useDashboardSection(dashboard) || 'summary'
-  const setActive = id => navigate(dashboardSectionHref(dashboard, id))
 
   const reload = useCallback(async () => {
     setError('')
@@ -238,7 +233,6 @@ export function BusinessDashboardPage({ role, session }) {
 
   const operational = data.units.filter(unit => unit.status === 'OPERATIONAL').length
   const activeUsers = data.users.filter(user => user.accountStatus === 'ACTIVE').length
-  const tabs = dashboard.items
   const headings = {
     summary: provider
       ? { title: 'Tu operación, en un solo lugar.', text: 'Publica, edita y retira tus herramientas. Los ingresos y reservas corresponden únicamente a tu operación.' }
@@ -248,5 +242,5 @@ export function BusinessDashboardPage({ role, session }) {
     administrators: { title: 'Administradores', text: 'Crea accesos administrativos y consulta los existentes.' },
   }
   const heading = headings[active] || headings.summary
-  return <main className="operations-page page-shell page-top staff-dashboard"><header className="operations-heading"><p className="kicker dark"><span/> {provider ? 'Dashboard de proveedor' : 'Dashboard administrativo'}</p><h1>{heading.title}</h1><p>{heading.text}</p></header><SectionTabs active={active} onChange={setActive} items={tabs}/>{error && <div className="form-error" role="alert">{error} <button className="text-action" onClick={reload}>Reintentar carga</button></div>}{state === 'loading' && <div className="integration-banner"><Icon name="grid"/><div><strong>Cargando dashboard</strong><p>Consultando información autorizada.</p></div></div>}{state === 'ready' && <>{active === 'summary' && <><section className="dashboard-metrics"><Metric icon="wallet" label="Ingreso neto" value={income ? money.format(Number(income.netIncome ?? 0)) : '—'} note="Ingresos confirmados menos reembolsos"/><Metric icon="card" label="Ingreso bruto" value={income ? money.format(Number(income.grossIncome ?? 0)) : '—'} note="No equivale a utilidad contable"/><Metric icon="check" label="Pagos confirmados" value={income ? Number(income.confirmedPayments ?? 0) : '—'} note={`Periodo ${yearStart} a ${currentDate}`}/><Metric icon={provider ? 'box' : 'user'} label={provider ? 'Unidades operativas' : 'Cuentas activas'} value={provider ? operational : activeUsers} note={provider ? `${data.tools.length} herramientas propias` : `${data.users.length} cuentas registradas`}/></section><OperationalReportsPanel/><ActivityPanel kind="reservations" supplier={provider}/></>}{provider && active === 'tools' && <ProviderTools data={data} setData={setData} showError={setError}/>} {!provider && active === 'providers' && <ProviderManagement data={data} reload={reload} showError={setError}/>} {!provider && active === 'administrators' && <AdministratorManagement data={data} session={session} reload={reload} showError={setError}/>}</>}</main>
+  return <main className="operations-page page-shell page-top staff-dashboard"><header className="operations-heading"><p className="kicker dark"><span/> {provider ? 'Dashboard de proveedor' : 'Dashboard administrativo'}</p><h1>{heading.title}</h1><p>{heading.text}</p></header>{error && <div className="form-error" role="alert">{error} <button className="text-action" onClick={reload}>Reintentar carga</button></div>}{state === 'loading' && <div className="integration-banner"><Icon name="grid"/><div><strong>Cargando dashboard</strong><p>Consultando información autorizada.</p></div></div>}{state === 'ready' && <>{active === 'summary' && <><section className="dashboard-metrics"><Metric icon="wallet" label="Ingreso neto" value={income ? money.format(Number(income.netIncome ?? 0)) : '—'} note="Ingresos confirmados menos reembolsos"/><Metric icon="card" label="Ingreso bruto" value={income ? money.format(Number(income.grossIncome ?? 0)) : '—'} note="No equivale a utilidad contable"/><Metric icon="check" label="Pagos confirmados" value={income ? Number(income.confirmedPayments ?? 0) : '—'} note={`Periodo ${yearStart} a ${currentDate}`}/><Metric icon={provider ? 'box' : 'user'} label={provider ? 'Unidades operativas' : 'Cuentas activas'} value={provider ? operational : activeUsers} note={provider ? `${data.tools.length} herramientas propias` : `${data.users.length} cuentas registradas`}/></section><OperationalReportsPanel/><ActivityPanel kind="reservations" supplier={provider}/></>}{provider && active === 'tools' && <ProviderTools data={data} setData={setData} showError={setError}/>} {!provider && active === 'providers' && <ProviderManagement data={data} reload={reload} showError={setError}/>} {!provider && active === 'administrators' && <AdministratorManagement data={data} session={session} reload={reload} showError={setError}/>}</>}</main>
 }
