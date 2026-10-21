@@ -20,7 +20,7 @@
         --ts-yellow: #ffd600;
         --ts-cyan: #00d9ff;
         --ts-bone: #f4f6f8;
-        --ts-appear: 300ms;
+        --ts-appear: 0ms;
         --ts-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
         position: fixed;
         inset: 0;
@@ -30,6 +30,8 @@
         background: var(--ts-bg);
         transition: opacity 220ms var(--ts-ease-out);
       }
+      /* Returning visitors in the same session only see it when loading is actually slow. */
+      .boot-splash--returning { --ts-appear: 300ms; }
       .boot-splash.is-leaving { opacity: 0; pointer-events: none; }
       .ts-stage {
         width: min(340px, calc(100vw - 48px));
@@ -149,6 +151,13 @@
         </div>
       </div>
     </div>
+    <script>
+      try {
+        if (sessionStorage.getItem('toolrental-splash-seen') === '1') {
+          document.getElementById('boot-splash').classList.add('boot-splash--returning')
+        }
+      } catch (error) {}
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

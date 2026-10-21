@@ -2,7 +2,11 @@ import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { catalog, mockApi } from './fixtures.js'
 
-test.beforeEach(async ({ page }) => { await mockApi(page) })
+test.beforeEach(async ({ page }) => {
+  // Behave as a returning visitor so the first-visit boot splash does not cover interactions.
+  await page.addInitScript(() => sessionStorage.setItem('toolrental-splash-seen', '1'))
+  await mockApi(page)
+})
 
 async function login(page) {
   const returnTo = new URL(page.url()).pathname
