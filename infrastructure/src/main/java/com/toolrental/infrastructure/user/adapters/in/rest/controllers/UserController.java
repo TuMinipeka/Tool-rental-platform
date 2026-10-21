@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -78,5 +79,16 @@ public class UserController {
       @PathVariable UUID id,
       @Valid @RequestBody com.toolrental.infrastructure.common.web.StatusRequest request) {
     return useCase.transition(Actor.id(principal), new UserId(id), request.status());
+  }
+
+  @PutMapping("/{id}")
+  public UserResponse update(
+      Principal principal,
+      @PathVariable UUID id,
+      @Valid @RequestBody UpdateUserProfileRequest request) {
+    return useCase.updateManagedProfile(
+        Actor.id(principal),
+        new UserId(id),
+        new UpdateUserProfileCommand(request.email(), request.displayName()));
   }
 }

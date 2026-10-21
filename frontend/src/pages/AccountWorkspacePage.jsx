@@ -49,6 +49,7 @@ function ProfileSecurityPanel({session,onLogout}){
 }
 
 export function AccountWorkspacePage({session,onLogout}){
+  const staffRole=session?.roles?.includes('ADMIN')?'ADMIN':session?.roles?.includes('SUPPLIER')?'SUPPLIER':null
   const [reservations,setReservations]=useState([])
   const [state,setState]=useState(()=>session?'loading':'idle')
   const [error,setError]=useState('')
@@ -61,18 +62,22 @@ export function AccountWorkspacePage({session,onLogout}){
   }
 
   useEffect(()=>{
-    if(!session)return undefined
+    if(!session||staffRole)return undefined
     let active=true
     api.listReservations().then(items=>{if(active){setReservations(Array.isArray(items)?items:[]);setState('ready')}}).catch(reason=>{if(active){setError(reason.message);setState('error')}})
     const refresh=()=>{if(active&&document.visibilityState==='visible')refreshReservations()}
     window.addEventListener('focus',refresh)
     document.addEventListener('visibilitychange',refresh)
     return()=>{active=false;window.removeEventListener('focus',refresh);document.removeEventListener('visibilitychange',refresh)}
-  },[session?.userId])
+  },[session?.userId,staffRole])
 
   if(!session)return <EmptyState title="Ingresa para ver tu cuenta" text="Consulta aquí tus reservas y el estado real de tu operación." action={()=>window.dispatchEvent(new Event('open-auth'))} actionText="Ingresar"/>
 
   const name=session.displayName||session.email
+  if(staffRole){
+    const dashboardPath=staffRole==='ADMIN'?'/panel/admin':'/panel/proveedor'
+    return <main className="staff-account-page page-shell page-top"><header className="staff-account-heading"><div><p className="kicker dark"><span/> Mi cuenta</p><h1>Perfil y seguridad.</h1><p>Este espacio contiene únicamente la administración de tu cuenta. La operación permanece en el dashboard.</p></div><button className="button button-dark" onClick={()=>navigate(dashboardPath)}>Volver al dashboard <Icon name="arrow" size={17}/></button></header><div className="staff-account-layout"><aside className="profile-card"><span className="profile-avatar">{name.slice(0,1).toUpperCase()}</span><h2>{name}</h2><p>{session.email}</p><span className="role-badge">{staffRole==='ADMIN'?'Administrador':'Proveedor'}</span><div><button onClick={()=>onLogout()}><Icon name="logout"/>Cerrar sesión <Icon name="chevron"/></button></div></aside><section className="account-panel"><ProfileSecurityPanel session={session} onLogout={onLogout}/></section></div></main>
+  }
   const pending=reservations.filter(item=>String(item.status).includes('PENDING')).length
   const modules=[['reservations','calendar','Mis reservas','Gestiona pagos, cancelaciones y estados.'],['rentals','box','Alquileres','Consulta el avance de cada alquiler.'],['payments','card','Pagos','Revisa medios, importes y resultados.'],['invoices','file','Comprobantes','Vista previa y descarga en PDF.'],['security','shield','Perfil y seguridad','Edita tus datos y contraseña.']]
 

@@ -16,7 +16,8 @@ La API oficial usa /api/v1 y mantiene temporalmente el alias /api. El navegador 
 | Comprobante | GET /invoices/{id}/document?disposition=inline\|attachment; vista previa o descarga autenticada en PDF, académica y sin validez fiscal |
 | Cancelación | POST /reservations/{id}/cancellation; clave idempotente e importes del servidor |
 | Entrega y alquiler | /unit-deliveries, /rentals y /unit-returns; proveedor propietario y orden operativo vigente |
-| Usuarios | /users; administrador activa o desactiva y revoca sesiones |
+| Usuarios | `/users`; el administrador crea cuentas, edita nombre y correo mediante `PUT /users/{id}`, asigna roles y desactiva accesos revocando sesiones |
+| Proveedores | `/suppliers`; el administrador consulta, actualiza y desactiva perfiles. El proveedor administra exclusivamente sus propias herramientas mediante `/tools` |
 | Reportes | /reports/{income,most-rented-tools,frequent-customers,availability,profitability}; fechas y alcance por rol |
 
 Todas las rutas son relativas a /api/v1. [Pagos académicos](fictional-payments.md) documenta campos, configuración y restricciones del ambiente de prueba. Un retorno del navegador nunca confirma un pago.

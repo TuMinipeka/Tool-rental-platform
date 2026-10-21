@@ -147,6 +147,8 @@ export const api = {
   },
   registerSupplier(account) { return request('/auth/supplier-registration', { method: 'POST', body: JSON.stringify(account) }) },
   updateUserStatus(id, status) { return request('/users/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }, { authenticated: true }) },
+  updateUser(id, profile) { return request('/users/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(profile) }, { authenticated: true }) },
+  createUser(user) { return request('/users', { method: 'POST', body: JSON.stringify(user) }, { authenticated: true }) },
   currentUser() { return request('/users/me', {}, { authenticated: true }) },
   updateCurrentUser(profile) { return request('/users/me/profile', { method: 'PATCH', body: JSON.stringify(profile) }, { authenticated: true }) },
   changePassword(passwords) { return request('/users/me/password', { method: 'PATCH', body: JSON.stringify(passwords) }, { authenticated: true }) },
@@ -215,6 +217,8 @@ export const api = {
       { authenticated: true },
     )
   },
+  updateTool(id, tool) { return request('/tools/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(tool) }, { authenticated: true }) },
+  deleteTool(id) { return request('/tools/' + encodeURIComponent(id), { method: 'DELETE' }, { authenticated: true }) },
   listEquipmentUnits() {
     return request('/equipment-units', {}, { authenticated: true })
   },
@@ -231,6 +235,13 @@ export const api = {
   listUsers() {
     return request('/users', {}, { authenticated: true })
   },
+  listSuppliers() { return request('/suppliers', {}, { authenticated: true }) },
+  createSupplier(supplier) { return request('/suppliers', { method: 'POST', body: JSON.stringify(supplier) }, { authenticated: true }) },
+  updateSupplier(id, supplier) { return request('/suppliers/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(supplier) }, { authenticated: true }) },
+  deleteSupplier(id) { return request('/suppliers/' + encodeURIComponent(id), { method: 'DELETE' }, { authenticated: true }) },
+  listRoles() { return request('/roles', {}, { authenticated: true }) },
+  listUserRoles() { return request('/user-roles', {}, { authenticated: true }) },
+  assignUserRole(userId, roleId) { return request('/user-roles', { method: 'POST', body: JSON.stringify({ userId, roleId }) }, { authenticated: true }) },
   simulatePayment(payment) {
     return request(
       '/payments/simulations',

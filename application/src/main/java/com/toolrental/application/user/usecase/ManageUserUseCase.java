@@ -114,6 +114,21 @@ public final class ManageUserUseCase {
         });
   }
 
+  public UserResponse updateManagedProfile(
+      UUID actor, UserId id, UpdateUserProfileCommand command) {
+    return work.execute(
+        () -> {
+          access.requireAdministrator(actor);
+          var value = load(id);
+          var email = command.email().trim().toLowerCase(Locale.ROOT);
+          var duplicate = repository.findByEmail(email);
+          if (duplicate.isPresent() && !duplicate.get().id().equals(id))
+            throw new BusinessRuleException("Email is already registered");
+          return UserResponse.from(
+              repository.save(value.updateProfile(email, command.displayName().trim(), clock)));
+        });
+  }
+
   public UserResponse changePassword(UUID actor, ChangePasswordCommand command) {
     return work.execute(
         () -> {
