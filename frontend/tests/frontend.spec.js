@@ -110,11 +110,12 @@ test('reservation dates stay inclusive and checkout keeps logistics', async ({ p
   await expect(page.getByRole('button', { name: /Entrega del proveedor/ })).toBeVisible()
 })
 
-test('catalog failures retain the explicitly identified demo experience', async ({ page }) => {
+test('catalog failures expose a connection error instead of sample publications', async ({ page }) => {
   await mockApi(page, { unavailable: true })
   await page.goto('/catalogo')
-  await expect(page.locator('.catalog-demo-label')).toContainText(/demostrativ|muestra/i)
-  await expect(page.locator('.tool-card').first()).toBeVisible()
+  await expect(page.getByRole('alert')).toContainText('No pudimos actualizar')
+  await expect(page.locator('.catalog-demo-label')).toHaveCount(0)
+  await expect(page.locator('.tool-card')).toHaveCount(0)
 })
 
 test('registration still sends customer profile fields', async ({ page }) => {
@@ -169,6 +170,7 @@ for (const [role, path] of [['SUPPLIER', '/panel/proveedor'], ['ADMIN', '/panel/
 }
 
 test('public pages and authentication pass automated accessibility checks', async ({ page }) => {
+  test.setTimeout(90000) // Five complete axe scans share this test's time budget.
   for (const path of ['/', '/catalogo', '/nosotros', '/terms-and-conditions']) {
     await page.goto(path)
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible()

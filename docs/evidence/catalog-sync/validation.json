@@ -1,0 +1,58 @@
+{
+  "testedAt": "2026-10-21T04:01:19.732Z",
+  "baseCommit": "9bef4e4717ef2b3d5b15dcae04a4d0772e33f5d2",
+  "workingTreeChangesIncluded": true,
+  "sourceFingerprint": "95c2b86865ad85e5b5526862e52c5533dfec110c2095e6ee18dc1f94f38b504a",
+  "commands": {
+    "maven": ".\\mvnw.cmd clean verify",
+    "browser": "npm run test:e2e -- --workers=2",
+    "lint": "npm run lint",
+    "build": "npm run build",
+    "database": "node scripts/verify-local-catalog.mjs",
+    "compose": "docker compose config --quiet"
+  },
+  "java": {
+    "tests": 112,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "browser": {
+    "passed": 94,
+    "skipped": 2,
+    "failed": 0
+  },
+  "lintPassed": true,
+  "buildPassed": true,
+  "composeValidated": true,
+  "seedFromEmptyDatabaseTestPassed": true,
+  "realSupplierCustomerBrowserPassed": true,
+  "restartPreservedToolPriceAndImage": true,
+  "dbeaver": {
+    "connectionName": "Tool Rental - Docker 5433",
+    "host": "localhost",
+    "port": 5433,
+    "database": "tool_rental_demo_conde_mvp",
+    "connectionVerifiedWithPostgresActivity": true
+  },
+  "stableDatabaseMutationsPerformed": false,
+  "gitPublicationPerformed": false,
+  "screenshots": [
+    {
+      "filename": "customer-new-publication.png",
+      "sha256": "0edfdc010c7c7a29faf89007a50d495321acc2e62fba131ca98d205784f6a29f"
+    },
+    {
+      "filename": "stable-publication-1.png",
+      "sha256": "241fadae23b99043ab51dd48a75759acc37fc6974250e5d8bf84f7c67bbd9dbc"
+    },
+    {
+      "filename": "stable-publication-2.png",
+      "sha256": "71c9f99d21ebd4673fae4a93ccd58c59ca769fe0e35e939ce6038cec613ad52d"
+    },
+    {
+      "filename": "supplier-upload.png",
+      "sha256": "0ab1414bb24ccb7e9b6e4977b0ae9c58033c71d31f4844a668a9feba2c0a4496"
+    }
+  ]
+}

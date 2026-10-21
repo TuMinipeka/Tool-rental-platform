@@ -2,8 +2,9 @@ import { createPointerMotion } from './lib/pointerMotion.js'
 import { AsyncBoundary } from './components/AsyncBoundary.jsx'
 import { heroImageSizes, heroImageSource, imageAttributes } from './lib/responsiveImages.js'
 import { usePointerFrame } from './hooks/usePointerFrame.js'
+import { usePublicCatalog } from './hooks/usePublicCatalog.js'
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
-import { api, normalizeCatalogTool, readSession, saveSession } from './api.js'
+import { api, readSession, saveSession } from './api.js'
 import { demoCatalog } from './demoCatalog.js'
 import { prioritizeFeaturedTools } from './toolVisuals.js'
 
@@ -33,7 +34,7 @@ const ErrorPage = lazy(() => import('./components/ErrorPage.jsx').then(module =>
 function RouteLoading() { return <main className="route-loading page-shell page-top" role="status" aria-live="polite">Cargando contenido…</main> }
 
 const tools = demoCatalog
-const requireLiveApi = import.meta.env.VITE_REQUIRE_LIVE_API === 'true'
+const requireLiveApi = import.meta.env.VITE_REQUIRE_LIVE_API === 'true' || import.meta.env.VITE_DEMO_MODE !== 'true'
 
 const toDateInput=value=>{
   const date=new Date(value)
@@ -94,16 +95,17 @@ function HomePage({catalogTools,dataMode,location,onLocationChange}){return <mai
 const toolCardMotion=createPointerMotion((node,x,y)=>{node.style.transform=`perspective(900px) rotateX(${y*-3}deg) rotateY(${x*4}deg) translateY(-6px)`},node=>{node.style.transform=""})
 function ToolCard({tool}){const openTool=()=>navigate(`/herramienta/${tool.id}`);return <article className="tool-card catalog-tool-card" {...toolCardMotion} onClick={event=>{if(!event.target.closest('button,a'))openTool()}}><div className="tool-card-media"><ToolVisual tool={tool} compact/><span className="tool-category-label">{tool.category}</span><button className="tool-favorite" type="button" aria-label="Favoritos disponibles próximamente" onClick={event=>event.stopPropagation()}><Icon name="heart" size={18}/></button></div><div className="tool-card-body"><h3><a className="tool-title-link" href={`/herramienta/${tool.id}`} onClick={event=>{if(event.button===0&&!event.metaKey&&!event.ctrlKey&&!event.shiftKey&&!event.altKey){event.preventDefault();openTool()}}}>{tool.name}</a></h3><div className="tool-facts"><span><Icon name="box" size={14}/>{tool.stock>0?`${tool.stock} ${tool.stock===1?'unidad':'unidades'}`:'Sin existencias'}</span><span><Icon name="pin" size={14}/>{tool.location?.split(',')[0]||'Ubicación por coordinar'}</span></div><div className="tool-price"><span><strong>{money.format(tool.price)}</strong> / día</span><button type="button" onClick={openTool}>Ver detalle <Icon name="arrow" size={15}/></button></div></div></article>}
 
-function CatalogPage({catalogTools,dataMode,location,onLocationChange}){
+function CatalogPage({catalogTools,dataMode,onRefresh,location,onLocationChange}){
   const params=new URLSearchParams(window.location.search)
   const [query,setQuery]=useState(params.get('q')||'')
   const [category,setCategory]=useState(params.get('categoria')||'Todas')
   const [sort,setSort]=useState('Recomendados')
   const [page,setPage]=useState(1)
-  const [maxPrice,setMaxPrice]=useState(230000)
+  const [maxPrice,setMaxPrice]=useState(null)
+  const priceCeiling=Math.max(5000,Math.ceil(Math.max(0,...catalogTools.map(tool=>tool.price),maxPrice||0)/5000)*5000)
   const availableCategories=['Todas',...new Set(catalogTools.map(tool=>tool.category))]
   useEffect(()=>{const next=new URLSearchParams();if(query.trim())next.set('q',query.trim());if(category!=='Todas')next.set('categoria',category);next.set('municipio',location);window.history.replaceState({},'',`/catalogo?${next}`)},[query,category,location])
-  const visible=useMemo(()=>catalogTools.filter(tool=>(category==='Todas'||tool.category===category)&&tool.price<=maxPrice&&`${tool.name} ${tool.category}`.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>sort==='Menor precio'?a.price-b.price:sort==='Mayor precio'?b.price-a.price:0),[catalogTools,query,category,sort,maxPrice])
+  const visible=useMemo(()=>catalogTools.filter(tool=>(category==='Todas'||tool.category===category)&&(maxPrice===null||tool.price<=maxPrice)&&`${tool.name} ${tool.category}`.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>sort==='Menor precio'?a.price-b.price:sort==='Mayor precio'?b.price-a.price:0),[catalogTools,query,category,sort,maxPrice])
   const pageSize=10
   const totalPages=Math.max(1,Math.ceil(visible.length/pageSize))
   const currentPage=Math.min(page,totalPages)
@@ -112,8 +114,8 @@ function CatalogPage({catalogTools,dataMode,location,onLocationChange}){
     <section className="catalog-hero"><div className="catalog-blueprint"/><div className="catalog-hero-shell page-shell"><div><p className="kicker"><span/> Equipos profesionales a tu alcance</p><h1>Catálogo de herramientas</h1><p>Encuentra equipos para tus proyectos en {location} y su área metropolitana. Alquila, trabaja y haz más.</p></div><img src="/assets/hero-rotary-hammer-1200.png" alt=""/><span className="catalog-side-copy">HERRAMIENTAS<br/>QUE HACEN<br/>PROYECTOS<br/>REALES</span></div></section>
     <div className="catalog-search-dock page-shell"><label><Icon name="search"/><span><small>¿Qué necesitas?</small><input aria-label="Buscar herramienta o categoría" value={query} onChange={event=>{setQuery(event.target.value);setPage(1)}} placeholder="Ej. rotomartillo, mezcladora, cortadora..."/></span></label><label><Icon name="pin"/><span><small>Ubicación</small><select value={location} onChange={event=>{onLocationChange(event.target.value);setPage(1)}}>{serviceLocations.map(city=><option key={city} value={city}>{city}, Santander</option>)}</select></span></label><label><Icon name="grid"/><span><small>Categoría</small><select value={category} onChange={event=>{setCategory(event.target.value);setPage(1)}}>{availableCategories.map(item=><option key={item} value={item}>{item==='Todas'?'Todas las categorías':item}</option>)}</select></span></label><label><Icon name="calendar"/><span><small>Disponibilidad</small><input type="date" min={defaultStartDate} aria-label="Fecha de disponibilidad"/></span></label><button type="button" onClick={()=>setQuery(query.trim())}>Buscar <Icon name="arrow"/></button></div>
     <div className="catalog-body page-shell"><nav className="catalog-breadcrumb" aria-label="Ruta de navegación"><button onClick={()=>navigate('/')}>Inicio</button><span>›</span><strong>Catálogo</strong></nav>{dataMode==='demo'&&<div className="catalog-demo-label" role="status">Catálogo demostrativo · datos provisionales</div>}
-      <aside className="catalog-filters"><h2>Filtros</h2><div className="filter-section"><strong>Categorías</strong>{availableCategories.map(item=>{const count=item==='Todas'?catalogTools.length:catalogTools.filter(tool=>tool.category===item).length;return <label key={item}><input type="checkbox" checked={category===item} onChange={()=>{setCategory(item);setPage(1)}}/><span>{item==='Todas'?'Todas las categorías':item}</span><small>{count}</small></label>})}</div><div className="filter-section"><strong>Precio por día</strong><input type="range" min="0" max="230000" step="5000" value={maxPrice} onChange={event=>{setMaxPrice(Number(event.target.value));setPage(1)}} aria-label="Precio diario máximo"/><div className="filter-range"><span>$ 0</span><span>{money.format(maxPrice)}</span></div></div><div className="filter-section filter-info"><strong>Información verificada</strong><p>Los filtros corresponden únicamente a campos expuestos por el catálogo.</p></div></aside>
-      <section className="catalog-results"><h2 className="sr-only">Resultados del catálogo</h2><div className="catalog-toolbar"><strong>{visible.length} {visible.length===1?'herramienta encontrada':'herramientas encontradas'}</strong><label>Ordenar por <select value={sort} onChange={event=>{setSort(event.target.value);setPage(1)}}><option>Recomendados</option><option>Menor precio</option><option>Mayor precio</option></select></label></div>{pageTools.length?<div className="catalog-grid">{pageTools.map(tool=><ToolCard key={tool.id} tool={tool}/>)}</div>:<EmptyState as="section" title="No encontramos coincidencias" text="Prueba otra palabra o elimina los filtros." action={()=>{setQuery('');setCategory('Todas');setMaxPrice(230000);setPage(1)}}/>}{totalPages>1&&<nav className="catalog-pagination" aria-label="Paginación"><button disabled={currentPage===1} onClick={()=>setPage(value=>Math.max(1,value-1))}>←</button>{Array.from({length:totalPages},(_,index)=>index+1).map(number=><button key={number} className={number===currentPage?'active':''} aria-current={number===currentPage?'page':undefined} onClick={()=>setPage(number)}>{number}</button>)}<button disabled={currentPage===totalPages} onClick={()=>setPage(value=>Math.min(totalPages,value+1))}>→</button></nav>}</section>
+      <aside className="catalog-filters"><h2>Filtros</h2><div className="filter-section"><strong>Categorías</strong>{availableCategories.map(item=>{const count=item==='Todas'?catalogTools.length:catalogTools.filter(tool=>tool.category===item).length;return <label key={item}><input type="checkbox" checked={category===item} onChange={()=>{setCategory(item);setPage(1)}}/><span>{item==='Todas'?'Todas las categorías':item}</span><small>{count}</small></label>})}</div><div className="filter-section"><strong>Precio por día</strong><input type="range" min="0" max={priceCeiling} step="5000" value={maxPrice??priceCeiling} onChange={event=>{setMaxPrice(Number(event.target.value));setPage(1)}} aria-label="Precio diario máximo"/><div className="filter-range"><span>$ 0</span><span>{maxPrice===null?'Sin límite':money.format(maxPrice)}</span></div></div><div className="filter-section filter-info"><strong>Información verificada</strong><p>Los filtros corresponden únicamente a campos expuestos por el catálogo.</p></div></aside>
+      <section className="catalog-results">{dataMode==='loading'&&<p role="status">Cargando publicaciones del servidor…</p>}<h2 className="sr-only">Resultados del catálogo</h2><div className="catalog-toolbar"><strong>{visible.length} {visible.length===1?'herramienta encontrada':'herramientas encontradas'}</strong><button className="text-link" type="button" onClick={onRefresh}>Actualizar catálogo</button><label>Ordenar por <select value={sort} onChange={event=>{setSort(event.target.value);setPage(1)}}><option>Recomendados</option><option>Menor precio</option><option>Mayor precio</option></select></label></div>{pageTools.length?<div className="catalog-grid">{pageTools.map(tool=><ToolCard key={tool.id} tool={tool}/>)}</div>:<EmptyState as="section" title="No encontramos coincidencias" text={`Prueba otra palabra o elimina los filtros. Solo se muestran publicaciones de ${location}; puedes cambiar el municipio.`} action={()=>{setQuery('');setCategory('Todas');setMaxPrice(null);setPage(1)}}/>}{totalPages>1&&<nav className="catalog-pagination" aria-label="Paginación"><button disabled={currentPage===1} onClick={()=>setPage(value=>Math.max(1,value-1))}>←</button>{Array.from({length:totalPages},(_,index)=>index+1).map(number=><button key={number} className={number===currentPage?'active':''} aria-current={number===currentPage?'page':undefined} onClick={()=>setPage(number)}>{number}</button>)}<button disabled={currentPage===totalPages} onClick={()=>setPage(value=>Math.min(totalPages,value+1))}>→</button></nav>}</section>
     </div>
   </main>
 }
@@ -130,8 +132,7 @@ function App(){
   const [session,setSession]=useState(readSession())
   const [authOpen,setAuthOpen]=useState(false)
   const [reservation,setReservation]=useState(null)
-  const [catalogTools,setCatalogTools]=useState(requireLiveApi ? [] : tools)
-  const [dataMode,setDataMode]=useState(requireLiveApi ? 'loading' : 'demo')
+  const {catalogTools,dataMode,catalogError,refreshCatalog}=usePublicCatalog()
   const [location,setLocation]=useState(defaultLocation)
   const displayedCatalogTools=useMemo(()=>catalogTools.filter(tool=>tool.location===location),[catalogTools,location])
 
@@ -161,9 +162,6 @@ function App(){
     window.addEventListener('open-auth',open)
     window.addEventListener('tool-rental-session',updateSession)
     api.restoreSession().catch(()=>null)
-    api.listCatalog().then(items=>{
-      if(items.length || requireLiveApi){setCatalogTools(items.map(normalizeCatalogTool));setDataMode(import.meta.env.VITE_DEMO_MODE==='true'?'demo':'api')}
-    }).catch(()=>{if(requireLiveApi){setCatalogTools([]);setDataMode('error')}else setDataMode('demo')})
     return()=>{window.removeEventListener('popstate',update);window.removeEventListener('open-auth',open);window.removeEventListener('tool-rental-session',updateSession)}
   },[])
 
@@ -208,7 +206,7 @@ function App(){
   }
   let page
   if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
-  else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
+  else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} onRefresh={refreshCatalog} location={location} onLocationChange={changeLocation}/>
   else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools} dataMode={dataMode}/>
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
   else if(path==='/pago')page=<PaymentPage reservation={reservation} session={session}/>
@@ -230,6 +228,6 @@ function App(){
   const minimal=path==='/reserva-confirmada'
   const authRoute=['/login','/registro','/registro/proveedor'].includes(path)
   const footerHidden=authRoute||path==='/pago'||path==='/como-funciona'||path.startsWith('/panel/')||path==='/cuenta'
-  return <div className={`app ${path==='/'?'home-route':''}`}><a className="skip-link" href="#main-content">Saltar al contenido</a>{!minimal&&<Header path={path} session={session} onOpenAuth={()=>navigate('/login')} location={location} onLocationChange={changeLocation}/>}<div className="page-content page-enter" id="main-content" tabIndex={-1} key={path}><AsyncBoundary key={path}>{dataMode==='error'&&<p className="data-notice" role="alert">No pudimos cargar el catálogo del servidor. Reintenta en unos minutos; no se mostrarán datos de respaldo.</p>}<Suspense fallback={<RouteLoading/>}>{page}</Suspense></AsyncBoundary></div>{!minimal&&!footerHidden&&<Footer/>}{authOpen&&<AsyncBoundary as="section"><Suspense fallback={<div className="modal-backdrop"><p className="auth-modal" role="status">Cargando acceso…</p></div>}><AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/></Suspense></AsyncBoundary>}</div>
+  return <div className={`app ${path==='/'?'home-route':''}`}><a className="skip-link" href="#main-content">Saltar al contenido</a>{!minimal&&<Header path={path} session={session} onOpenAuth={()=>navigate('/login')} location={location} onLocationChange={changeLocation}/>}<div className="page-content page-enter" id="main-content" tabIndex={-1} key={path}><AsyncBoundary key={path}>{catalogError&&<p className="data-notice" role="alert">{catalogError} <button type="button" onClick={refreshCatalog}>Reintentar conexión</button></p>}<Suspense fallback={<RouteLoading/>}>{page}</Suspense></AsyncBoundary></div>{!minimal&&!footerHidden&&<Footer/>}{authOpen&&<AsyncBoundary as="section"><Suspense fallback={<div className="modal-backdrop"><p className="auth-modal" role="status">Cargando acceso…</p></div>}><AuthModal onClose={()=>setAuthOpen(false)} onLogin={login}/></Suspense></AsyncBoundary>}</div>
 }
 export default App

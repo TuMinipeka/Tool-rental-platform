@@ -14,6 +14,15 @@
 
 ## Gestión del proveedor y persistencia
 
+La web local se abre en **http://localhost:5173** y utiliza PostgreSQL Docker en **localhost:5433**. El perfil `local,demo` carga el seed automáticamente en instalaciones vacías. Se corrigieron el límite de precio implícito del catálogo y la actualización de publicaciones; en el equipo de Daniel, DBeaver ya tiene la conexión **Tool Rental - Docker 5433**. [Inicio local, consultas y diagnóstico](docs/provider-persistence.md#base-estable-y-dbeaver).
+
+![Publicación nueva con precio e imagen persistidos, recibida por un cliente sin recargar la aplicación](docs/evidence/catalog-sync/customer-new-publication.png)
+
+```powershell
+docker compose up --build -d
+node scripts/verify-local-catalog.mjs
+```
+
 El proveedor puede crear y editar herramientas, publicar/retirar, adjuntar fotos mediante archivos o URLs y administrar unidades físicas. Se verificaron **67 comprobaciones con navegador y PostgreSQL reales**, además de restauración conjunta de datos e imágenes y recreación de contenedores. [Procedimiento, límites y evidencias](docs/provider-persistence.md).
 
 ![Gestión de fotos guardadas por el proveedor](docs/evidence/provider-persistence/supplier-images.png)

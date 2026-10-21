@@ -26,6 +26,59 @@ Publicar una herramienta no inventa existencias. La disponibilidad depende de su
 
 ## Base estable y DBeaver
 
+### Corrección de visibilidad y sincronización del catálogo
+
+La revisión del 20 de octubre de 2026 encontró **52 herramientas guardadas, 32 publicadas, 26 asociaciones de imágenes y 51 unidades** en la base estable. Las dos publicaciones nuevas del usuario ya estaban persistidas. DBeaver consultaba otra instancia de PostgreSQL y la interfaz añadía un filtro de precio implícito.
+
+| Antes | Después | Motivo |
+| --- | --- | --- |
+| Límite inicial de $230.000 por día | Sin límite inicial; control de precio con rango calculado del catálogo | Mostrar también las publicaciones de $234.567 y $245.678 que ya estaban guardadas. |
+| Consulta única al abrir la aplicación | Revalidación al navegar al catálogo, recuperar foco, regresar a una pestaña visible y cada 30 segundos mientras esté visible | Recibir publicaciones de otros proveedores sin recargar toda la aplicación. |
+| Cambios del proveedor sin invalidación | Señal local después de operaciones exitosas y aviso entre pestañas mediante un marcador sin datos personales | Actualizar nombres, fotos, publicación y existencias. |
+| Fallo de API que puede mostrar una muestra | Error explícito con reintento; se conserva la última lectura válida y se advierte que puede estar desactualizada | Evitar confundir contenido de demostración con datos persistidos. La muestra exige `VITE_DEMO_MODE=true`. |
+| DBeaver conectado solamente a `localhost:5432` | Conexión adicional **Tool Rental - Docker 5433** a la misma base de la web | Consultar los datos correctos sin cambiar conexiones de otros proyectos. |
+| URL privada del backend nativo diferente de Docker | `DB_URL` privado alineado con el puerto 5433 y la base estable | Mantener los mismos datos al ejecutar desde Spring Boot Dashboard con `.env`. |
+
+La actualización mantiene búsqueda, categoría, municipio y restricciones de precio elegidas por el usuario. **Actualizar catálogo** permite consultar inmediatamente; también existe **Reintentar conexión** si falla la API. La revalidación periódica no es una conexión WebSocket ni garantiza actualización instantánea entre equipos.
+
+El municipio sigue siendo un filtro real: una publicación de Floridablanca no aparece al seleccionar Bucaramanga. El mensaje de resultados vacíos lo explica. Una publicación sin unidades aparece como **Sin existencias** y no puede reservarse; registrar una herramienta y registrar sus unidades físicas son pasos diferentes.
+
+### Inicio local con datos semilla
+
+El perfil `local,demo` aplica las migraciones de estructura y `db/demo` automáticamente mediante Flyway sobre una base vacía. Incluye cuentas por rol, catálogo y escenarios históricos; las pruebas de integración verifican al menos 20 registros por tabla de negocio y 65 migraciones hasta V308. No es necesario ejecutar INSERT manuales ni volver a cargar el seed en cada inicio.
+
+```powershell
+# Desde la raíz real Tool-rental-platform, con .env privado ya configurado:
+docker compose up --build -d
+node scripts/verify-local-catalog.mjs
+```
+
+En otra instalación, copia primero `.env.example` a `.env`, configura sus credenciales locales y conserva `SPRING_PROFILES_ACTIVE=local,demo`, `POSTGRES_PORT=5433`, `VITE_DEMO_MODE=false` y `VITE_REQUIRE_LIVE_API=true`. La base de ejemplo se llama `tool_rental`; en el equipo de Daniel se conserva `tool_rental_demo_conde_mvp` con sus datos existentes. No cambies `POSTGRES_DB` de un volumen ya inicializado esperando que PostgreSQL cree otra base automáticamente.
+
+Spring Boot Dashboard debe cargar `.env` mediante el `envFile` del lanzamiento de VS Code y usar `DB_URL=jdbc:postgresql://localhost:5433/tool_rental_demo_conde_mvp` en este equipo. Para ejecutar Java desde el IDE, detén antes solo el backend de Docker con `docker compose stop backend` y libera el puerto 8080; conserva PostgreSQL y frontend. Si utilizas otra consola, exporta las variables explícitamente: Spring Boot no lee `.env` por sí solo. La comprobación `verify-local-catalog.mjs` también detecta diferencias entre la URL nativa y la configuración de Docker.
+
+`docker compose down` conserva los volúmenes. **No uses `docker compose down -v` para actualizar**, porque elimina tanto los datos como las fotografías subidas. El perfil demo es exclusivamente local/académico; las cuentas conocidas del seed no son accesos de producción.
+
+### Comprobación desde DBeaver
+
+La conexión adicional está guardada y PostgreSQL confirmó sesiones de DBeaver en la misma base que utiliza Spring Boot. Se abrió [verify-local-persistence.sql](../scripts/database/verify-local-persistence.sql) para consultar base, conteos, publicaciones, imágenes, unidades y migraciones, sin leer contraseñas ni tokens.
+
+Selecciona **Tool Rental - Docker 5433**, abre sus tablas del esquema `public` y actualiza la vista de datos con **F5** después de una operación web. DBeaver no actualiza automáticamente una cuadrícula SQL ya consultada. `inet_server_port()` devuelve 5432 dentro del contenedor; el puerto de acceso desde Windows es 5433.
+
+La conexión se añadió con la [CLI oficial de DBeaver](https://dbeaver.com/docs/dbeaver/Command-Line/), con credenciales procedentes de un archivo temporal privado ignorado, sin incluir la contraseña en argumentos ni modificar la conexión del puerto 5432. El archivo temporal se retiró después de guardar la conexión en DBeaver.
+
+### Evidencias de esta corrección
+
+El [cruce de PostgreSQL y API](evidence/catalog-sync/database.json) verifica que todas las publicaciones, precios y cantidades de imágenes coinciden. La [prueba Playwright con proveedor y cliente reales](evidence/catalog-sync/browser.json) crea una publicación de $345.678 con fotografía y comprueba su llegada a un catálogo previamente abierto. Las escrituras de prueba se hicieron exclusivamente en la base aislada, conservando la base estable.
+
+El [registro SQL de la publicación](evidence/catalog-sync/created-tool.json) y la [verificación posterior al reinicio](evidence/catalog-sync/restart.json) confirman que precio e imagen se conservan. La [revisión de la web estable](evidence/catalog-sync/stable-browser.json) verifica mediante lecturas las dos publicaciones del usuario por encima del antiguo límite.
+
+La [validación de esta corrección](evidence/catalog-sync/validation.json) registra **112 pruebas Java aprobadas**, **94 pruebas de navegador aprobadas y dos omisiones por dispositivo**, lint, build y ambas configuraciones Compose. Las regresiones cubren precios altos, foco, navegación, invalidación entre pestañas, actualización periódica y fallo/reintento sin perder la lectura anterior. Se sustituyó la expectativa antigua de mostrar datos ficticios al fallar la API y se asignó un presupuesto de 90 segundos a la prueba que realiza cinco auditorías axe completas, conservando todas sus verificaciones.
+
+![Cliente que recibe una publicación nueva de $345.678 con fotografía](evidence/catalog-sync/customer-new-publication.png)
+
+Los resultados corresponden a la fecha registrada en cada evidencia; los conteos pueden cambiar al continuar utilizando la aplicación.
+
 La aplicación habitual utiliza `tool_rental_demo_conde_mvp` en PostgreSQL Docker. La configuración privada queda en `.env`, ignorado por Git, con `POSTGRES_PORT=5433`, la base acordada y perfiles `local,demo`. El PostgreSQL local del puerto 5432 permanece separado.
 
 En DBeaver utiliza host `localhost`, puerto `5433`, base `tool_rental_demo_conde_mvp` y el usuario/contraseña privados de `.env`. No conectes al puerto interno del contenedor desde Windows.

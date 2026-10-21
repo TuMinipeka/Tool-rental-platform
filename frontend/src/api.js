@@ -1,3 +1,5 @@
+import { notifyCatalogChange } from './lib/catalogChanges.js'
+
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '')
 const apiPrefix = '/api/v1'
 const demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
@@ -118,6 +120,7 @@ async function request(path, options = {}, behavior = {}) {
   }
 
   if (!response.ok) throw toApiError(response, payload)
+  if (options.method && options.method !== 'GET' && /^(\/tools|\/tool-images|\/equipment-units|\/categories)(\/|\?|$)/.test(path)) notifyCatalogChange()
   return payload
 }
 
