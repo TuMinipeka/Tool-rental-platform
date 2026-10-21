@@ -4,13 +4,13 @@ import { catalog, mockApi } from './fixtures.js'
 
 test.beforeEach(async ({ page }) => { await mockApi(page) })
 
-async function login(page) {
+async function login(page, destination) {
   const returnTo = new URL(page.url()).pathname
   await page.goto('/login?returnTo=' + encodeURIComponent(returnTo))
   await page.getByRole('textbox', { name: 'Correo electrónico' }).fill('qa@example.test')
   await page.getByLabel(/^Contraseña/).fill('qa-password-123456')
   await page.locator('form').getByRole('button', { name: 'Ingresar', exact: true }).click()
-  await expect(page).toHaveURL(new RegExp(returnTo + '$'))
+  await expect(page).toHaveURL(new RegExp((destination || returnTo) + '$'))
   await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toBeVisible()
 }
 
@@ -158,7 +158,7 @@ for (const [role, path] of [['SUPPLIER', '/panel/proveedor'], ['ADMIN', '/panel/
   test(`authenticated ${role} dashboard keeps rendering after code splitting`, async ({ page }) => {
     await mockApi(page, { roles: [role] })
     await page.goto('/')
-    await login(page)
+    await login(page, path)
     const errors = []
     page.on('pageerror', error => errors.push(error.message))
     await page.evaluate(path => { history.pushState({}, '', path); dispatchEvent(new PopStateEvent('popstate')) }, path)
@@ -328,7 +328,7 @@ test('optional external checkout sends payment metadata and redirects to the hos
   await expect(page).toHaveURL(/https:\/\/www.mercadopago.com.co\/checkout\//)
   expect(requests).toHaveLength(1)
   expect(requests[0].body).toMatchObject({ reservationId: id, paymentMethod: 'CREDIT_CARD', cardNetwork: 'VISA', cardLastFour: '1111' })
-  expect(Object.keys(requests[0].body)).not.toEqual(expect.arrayContaining(['cardNumber', 'cvv', 'password']))
+  for (const secret of ['cardNumber', 'cvv', 'password']) expect(requests[0].body).not.toHaveProperty(secret)
   expect(requests[0].key).toBeTruthy()
 })
 
@@ -353,14 +353,18 @@ test('supplier tool and equipment forms reset only after successful persistence'
   await form.locator('[name=description]').fill('QA persisted inventory')
   await form.locator('[name=dailyRate]').fill('25000')
   await form.locator('[name=serviceCity]').selectOption('Bucaramanga')
-  await form.getByRole('button', { name: 'Guardar herramienta' }).click()
+  await form.getByRole('button', { name: 'Crear herramienta' }).click()
   await expect(page.getByRole('heading', { name: 'QA Drill' })).toBeVisible()
   await expect(form.locator('[name=name]')).toHaveValue('')
   await expect(page.locator('main [role=alert]')).toHaveCount(0)
   await page.getByRole('button', { name: 'Unidad física', exact: true }).click()
   await form.locator('[name=toolId]').selectOption('qa-tool')
   await form.locator('[name=inventoryCode]').fill('QA-CODE')
+  const unitSubmission = page.waitForResponse(response => response.request().method() === 'POST' && response.url().endsWith('/equipment-units'))
   await form.getByRole('button', { name: 'Registrar unidad', exact: true }).click()
+  expect((await unitSubmission).status()).toBe(200)
+  await expect(form.getByRole('button', { name: 'Crear herramienta' })).toBeVisible()
+  await page.getByRole('button', { name: 'Unidad física', exact: true }).click()
   await expect(form.locator('[name=inventoryCode]')).toHaveValue('')
   await expect(page.locator('main [role=alert]')).toHaveCount(0)
 })

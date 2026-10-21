@@ -1,24 +1,19 @@
 {
-  "updatedAt": "2026-10-20T21:24:57.539005+00:00",
-  "state": "validated-locally-public-deployment-pending",
-  "validatedSourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
-  "condeReference": "981a16e",
-  "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
+  "updatedAt": "2026-10-21T02:08:35.464042+00:00",
+  "state": "conde-merged-functional-acceptance-pending",
+  "validatedSourceCommit": "10a542e",
+  "condeReference": "f762a5c973254661f842ea8ff177b2b11ae4ff5c",
   "localValidation": {
     "mavenPostgres": true,
+    "javaTests": 104,
+    "javaFailures": 0,
     "frontendLintBuild": true,
     "browserTests": true,
-    "realRoleViews": true,
-    "passwordRecoveryDisabled": true,
-    "showcaseSecurityWithoutSmtp": true,
-    "backupRestoreAndPersistence": true,
-    "dataMinimums": true,
-    "composeConfiguration": true,
-    "fictionalPaymentAndRentalLifecycle": true,
-    "embeddedTomcat": true,
-    "browserRoleWorkflows": true,
-    "serverLogoutRevocation": true,
-    "supplierFormsAfterPersistence": true
+    "realRoleJourneysCurrentRevision": false,
+    "existingDemoDatabaseUpgrade": false,
+    "browserPassed": 80,
+    "browserSkipped": 2,
+    "composeConfiguration": true
   },
   "publicReleaseGates": {
     "oracleCapacity": false,
@@ -28,17 +23,42 @@
     "credentialsProvisioned": false,
     "offsiteBackupAndRestore": false,
     "armRuntimeValidated": false,
-    "fictionalPaymentValidated": true
+    "fictionalPaymentValidated": false
   },
   "limitations": [
     "No Oracle account/capacity or DuckDNS configuration supplied",
     "Public target evaluator credentials not provisioned",
     "No external backup destination supplied; fresh local restore passed",
-    "ARM64 base manifests verified previously; Oracle ARM runtime not exercised"
+    "ARM64 base manifests verified previously; Oracle ARM runtime not exercised",
+    "Current Conde changes require real role/payment acceptance; prior evidence is historical",
+    "Existing demo V305 upgrade needs rehearsal due to newly introduced lower-version migrations"
   ],
   "approvedScopeChanges": [
     "Fictional academic payment replaces official provider requirement",
     "Embedded Apache Tomcat selected",
-    "PayPal, email and recovery deferred"
-  ]
+    "PayPal is an academic payment option; email and recovery deferred"
+  ],
+  "previousValidation": {
+    "updatedAt": "2026-10-20T21:24:57.539005+00:00",
+    "state": "validated-locally-public-deployment-pending",
+    "validatedSourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
+    "condeReference": "981a16e",
+    "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
+    "localValidation": {
+      "mavenPostgres": true,
+      "frontendLintBuild": true,
+      "browserTests": true,
+      "realRoleViews": true,
+      "passwordRecoveryDisabled": true,
+      "showcaseSecurityWithoutSmtp": true,
+      "backupRestoreAndPersistence": true,
+      "dataMinimums": true,
+      "composeConfiguration": true,
+      "fictionalPaymentAndRentalLifecycle": true,
+      "embeddedTomcat": true,
+      "browserRoleWorkflows": true,
+      "serverLogoutRevocation": true,
+      "supplierFormsAfterPersistence": true
+    }
+  }
 }
