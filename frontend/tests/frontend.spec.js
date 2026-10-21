@@ -411,3 +411,24 @@ test('supplier inventory remains usable when income reports fail', async ({ page
   await expect(page.getByRole('button', { name: 'Crear herramienta', exact: true })).toBeVisible()
   await expect(page.locator('select[name=categoryId]')).toBeEnabled()
 })
+
+
+test('profile waits for server data before accepting edits', async ({ page }) => {
+  let release
+  const loaded = new Promise(resolve => { release = resolve })
+  await page.route('**/api/v1/users/me', async route => { await loaded; await route.fulfill({ json: { userId: 'qa-customer', displayName: 'Server profile', email: 'server@example.test' } }) })
+  await page.goto('/cuenta')
+  await login(page)
+  await page.getByRole('button', { name: /^Perfil y seguridad/ }).click()
+  const name = page.locator('.profile-security').getByLabel('Nombre completo')
+  await expect(name).toBeDisabled()
+  release()
+  await expect(name).toBeEnabled()
+  await expect(name).toHaveValue('Server profile')
+  await name.fill('Edited profile')
+  let saved
+  await page.route('**/api/v1/users/me/profile', async route => { saved = route.request().postDataJSON(); await route.fulfill({ json: { ...saved, userId: 'qa-customer' } }) })
+  await page.getByRole('button', { name: 'Guardar cambios', exact: true }).click()
+  await expect(page.getByText('Tus datos se actualizaron correctamente.', { exact: true })).toBeVisible()
+  expect(saved).toEqual({ displayName: 'Edited profile', email: 'server@example.test' })
+})
