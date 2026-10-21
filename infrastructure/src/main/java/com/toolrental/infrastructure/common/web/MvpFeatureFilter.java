@@ -21,8 +21,7 @@ public final class MvpFeatureFilter extends OncePerRequestFilter {
   private final ObjectMapper json;
 
   public MvpFeatureFilter(
-      @Value("${payments.internal-enabled:false}") boolean internal,
-      ObjectMapper json) {
+      @Value("${payments.internal-enabled:false}") boolean internal, ObjectMapper json) {
     this.internal = internal;
     this.json = json;
   }

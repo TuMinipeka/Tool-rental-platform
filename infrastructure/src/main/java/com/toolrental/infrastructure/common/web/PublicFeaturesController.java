@@ -27,12 +27,6 @@ public final class PublicFeaturesController {
 
   @GetMapping
   public Map<String, Object> features() {
-    return Map.of(
-        "hostedCheckout",
-        hosted,
-        "paymentProvider",
-        provider,
-        "currency",
-        "COP");
+    return Map.of("hostedCheckout", hosted, "paymentProvider", provider, "currency", "COP");
   }
 }

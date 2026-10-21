@@ -32,12 +32,7 @@ public final class InvoicePdfRenderer {
       pageReferences.append(3 + index * 2).append(" 0 R ");
     }
     objects.add(
-        bytes(
-            "<< /Type /Pages /Kids ["
-                + pageReferences
-                + "] /Count "
-                + pages.size()
-                + " >>"));
+        bytes("<< /Type /Pages /Kids [" + pageReferences + "] /Count " + pages.size() + " >>"));
 
     for (var index = 0; index < pages.size(); index++) {
       var content = pageContent(document, pages.get(index), index + 1, pages.size());
@@ -74,10 +69,7 @@ public final class InvoicePdfRenderer {
   }
 
   private String pageContent(
-      InvoiceDocumentResponse document,
-      List<InvoiceItemResponse> lines,
-      int page,
-      int pageCount) {
+      InvoiceDocumentResponse document, List<InvoiceItemResponse> lines, int page, int pageCount) {
     var canvas = new StringBuilder();
     rectangle(canvas, 0, 742, 595, 100, "0.027 0.075 0.110");
     rectangle(canvas, 40, 764, 5, 48, "0 0.851 1");
@@ -110,14 +102,7 @@ public final class InvoicePdfRenderer {
         document.invoice().issuedCustomerDocument());
 
     text(canvas, "F2", 9, 40, 626, "DETALLE", "0.118 0.165 0.227");
-    text(
-        canvas,
-        "F1",
-        8,
-        475,
-        626,
-        "PÁGINA " + page + " / " + pageCount,
-        "0.365 0.424 0.486");
+    text(canvas, "F1", 8, 475, 626, "PÁGINA " + page + " / " + pageCount, "0.365 0.424 0.486");
     rectangle(canvas, 40, 596, 515, 24, "0.929 0.953 0.965");
     text(canvas, "F2", 8, 50, 604, "CONCEPTO", "0.118 0.165 0.227");
     text(canvas, "F2", 8, 365, 604, "CANT.", "0.118 0.165 0.227");
@@ -170,13 +155,7 @@ public final class InvoicePdfRenderer {
   }
 
   private void text(
-      StringBuilder canvas,
-      String font,
-      int size,
-      int x,
-      int y,
-      String value,
-      String color) {
+      StringBuilder canvas, String font, int size, int x, int y, String value, String color) {
     canvas
         .append("BT /")
         .append(font)
@@ -193,8 +172,7 @@ public final class InvoicePdfRenderer {
         .append(") Tj ET\n");
   }
 
-  private void rectangle(
-      StringBuilder canvas, int x, int y, int width, int height, String color) {
+  private void rectangle(StringBuilder canvas, int x, int y, int width, int height, String color) {
     canvas
         .append(color)
         .append(" rg ")
@@ -208,8 +186,7 @@ public final class InvoicePdfRenderer {
         .append(" re f\n");
   }
 
-  private void line(
-      StringBuilder canvas, int fromX, int fromY, int toX, int toY, String color) {
+  private void line(StringBuilder canvas, int fromX, int fromY, int toX, int toY, String color) {
     canvas
         .append(color)
         .append(" RG 0.7 w ")
@@ -247,9 +224,7 @@ public final class InvoicePdfRenderer {
     var pdf = new ByteArrayOutputStream();
     write(pdf, "%PDF-1.4\n");
     pdf.writeBytes(
-        new byte[] {
-          (byte) '%', (byte) 0xE2, (byte) 0xE3, (byte) 0xCF, (byte) 0xD3, (byte) '\n'
-        });
+        new byte[] {(byte) '%', (byte) 0xE2, (byte) 0xE3, (byte) 0xCF, (byte) 0xD3, (byte) '\n'});
     var offsets = new long[objects.size() + 1];
     for (var index = 0; index < objects.size(); index++) {
       offsets[index + 1] = pdf.size();

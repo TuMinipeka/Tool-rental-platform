@@ -137,7 +137,8 @@ public final class ManageUserUseCase {
             throw new AuthenticationFailedApplicationException();
           if (hasher.matches(command.newPassword(), value.passwordHash()))
             throw new BusinessRuleException("New password must be different");
-          var changed = repository.save(value.changePassword(hasher.hash(command.newPassword()), clock));
+          var changed =
+              repository.save(value.changePassword(hasher.hash(command.newPassword()), clock));
           sessions.revokeAllForUser(changed.id(), Instant.now(clock));
           return UserResponse.from(changed);
         });

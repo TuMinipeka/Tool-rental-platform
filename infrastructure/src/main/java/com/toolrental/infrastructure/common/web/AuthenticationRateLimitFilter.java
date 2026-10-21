@@ -38,8 +38,7 @@ public class AuthenticationRateLimitFilter extends OncePerRequestFilter {
   protected boolean shouldNotFilter(HttpServletRequest request) {
     var path = request.getRequestURI();
     return !"POST".equals(request.getMethod())
-        || !(path.endsWith("/auth/login")
-            || path.endsWith("/auth/refresh"));
+        || !(path.endsWith("/auth/login") || path.endsWith("/auth/refresh"));
   }
 
   @Override

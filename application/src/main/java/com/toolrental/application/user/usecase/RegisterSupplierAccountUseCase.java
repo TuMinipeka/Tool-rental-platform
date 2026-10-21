@@ -66,8 +66,7 @@ public final class RegisterSupplierAccountUseCase {
     this.refreshTtl = refreshTtl;
   }
 
-  public AuthenticatedSession execute(
-      RegisterSupplierAccountCommand command, String clientLabel) {
+  public AuthenticatedSession execute(RegisterSupplierAccountCommand command, String clientLabel) {
     return work.execute(
         () -> {
           var email = command.email().trim().toLowerCase(Locale.ROOT);

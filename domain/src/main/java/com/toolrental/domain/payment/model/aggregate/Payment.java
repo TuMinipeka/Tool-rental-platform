@@ -90,8 +90,7 @@ public final class Payment extends AggregateRoot {
           || cardExpiryMonth == null
           || cardExpiryMonth < 1
           || cardExpiryMonth > 12
-          || cardExpiryYear == null)
-        throw new BusinessRuleException("Invalid card details");
+          || cardExpiryYear == null) throw new BusinessRuleException("Invalid card details");
     } else if (cardNetwork != null
         || cardLastFour != null
         || cardExpiryMonth != null
