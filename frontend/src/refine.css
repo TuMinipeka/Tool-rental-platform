@@ -207,3 +207,23 @@
 .booking-summary span,
 .booking-summary strong { font-size: 13px; }
 .fulfillment-preview p { font-size: 13px; }
+
+/* ---------- Dashboard sections live in the header on wide screens; in-page tabs only where the header menu collapses ---------- */
+@media (min-width: 821px) {
+  .staff-dashboard .dashboard-tabs { display: none; }
+}
+.dashboard-empty { margin: 0; padding: 28px 24px; color: #5f6c78; font-size: 14px; }
+.operations-form .form-note { color: #5f6c78; font-size: 13px; line-height: 1.5; }
+.operations-form .two-fields { align-items: start; }
+.operations-form .form-field small { font-size: 12px; font-weight: 500; line-height: 1.45; color: #5f6c78; }
+@media (max-width: 820px) {
+  .staff-dashboard .dashboard-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .staff-dashboard .dashboard-tabs button { flex: none; }
+  .dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .dashboard-metric { padding: 16px; }
+  .dashboard-metric strong { font-size: 26px; }
+}
+@media (max-width: 820px) {
+  .staff-dashboard .dashboard-tabs button { padding: 0 14px; }
+  .staff-dashboard .dashboard-tabs button .icon { display: none; }
+}
