@@ -10,7 +10,7 @@ La API oficial usa /api/v1 y mantiene temporalmente el alias /api. El navegador 
 | Perfil propio | GET /users/me y PATCH /users/me/profile; nombre y correo del actor autenticado. PATCH /users/me/password exige la contraseña actual y revoca sesiones |
 | Historial | /reservations, /rentals, /payments e /invoices; filtrados por actor |
 | Catálogo del proveedor | /tools, /equipment-units y /categories; permisos y propiedad en servidor |
-| Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas. Solo una respuesta persistida habilita la redirección automática a `/pago?reservationId={id}` y su consulta posterior en `/cuenta` |
+| Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas. La entrega permite Bucaramanga, Floridablanca, Girón o Piedecuesta y fija Santander como departamento. Solo una respuesta persistida habilita la redirección automática a `/pago?reservationId={id}` y su consulta posterior en `/cuenta` |
 | Pago académico | POST /payments/checkouts con reserva, medio fijo e Idempotency-Key; GET /payments/checkouts/{id} para retorno y conciliación |
 | Decisión de prueba | POST /payments/fictional/checkouts/{id}/decision; aprobación o rechazo persistente del cliente propietario |
 | Comprobante | GET /invoices/{id}/document?disposition=inline\|attachment; vista previa o descarga autenticada en PDF, académica y sin validez fiscal |

@@ -1435,6 +1435,7 @@ select:focus-visible,
 .safe-fields,.two-fields { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .safe-fields label,.form-field { display: grid; gap: 8px; color: #5c6873; font-size: 12px; font-weight: 700; }
 .safe-fields input,.form-field input,.form-field select,.logistics-card input { min-height: 50px; padding: 0 13px; border: 1px solid #cad1d7; border-radius: 0; background: var(--white); }
+.logistics-card input[readonly] { color: #505c66; background: #eef1f3; cursor: not-allowed; }
 .privacy-callout,.paypal-demo { margin-top: 20px; padding: 16px; display: flex; gap: 12px; background: #e7faff; }
 .payment-summary > strong { display: block; margin: 8px 0; font-family: "Archivo Variable", "Archivo", sans-serif; font-size: 46px; }
 .payment-summary dl > div { display: flex; justify-content: space-between; gap: 14px; border-top: 1px solid #dce1e5; padding-block: 14px; }
