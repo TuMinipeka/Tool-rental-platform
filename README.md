@@ -128,7 +128,7 @@ El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módu
 | Dinero | Visa, Mastercard, PSE, Mercado Pago y PayPal con datos fijos, resultado persistente y comprobante académico | Cobros reales, proveedores financieros externos e impuestos definitivos |
 | Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway hasta V306 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway hasta V307 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -272,7 +272,7 @@ Después de crear y persistir una reserva, el frontend abre automáticamente `/p
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos académicos persistidos; V306 habilita PSE y Mercado Pago como métodos del checkout fijo.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos académicos persistidos; V306 añade la ciudad de servicio; V306.1 habilita PSE y Mercado Pago como métodos del checkout fijo y V307 distribuye el catálogo demo por ciudad.
 
 Consulta [pagos académicos](docs/fictional-payments.md): medios fijos, retorno, permisos, persistencia y conciliación. Las integraciones financieras externas y el correo están fuera del alcance.
 

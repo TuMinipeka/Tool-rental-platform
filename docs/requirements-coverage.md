@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | Java 21, Maven multimódulo | Implementado | POM raíz y wrapper |
 | Arquitectura hexagonal y DDD | Implementado | ArchUnit y módulos Domain/Application/Infrastructure |
-| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, hasta V306 y `ddl-auto: validate` |
+| PostgreSQL, JPA y Flyway | Implementado | 25 entidades, hasta V307 y `ddl-auto: validate` |
 | Catálogo y equipos | Implementado | Contextos base y disponibilidad |
 | Reserva concurrente | Implementado | `AtomicReservationManagement` y pruebas PostgreSQL |
 | Sesiones | Implementado | Refresh opaco, rotación y revocación vigentes; no hay recuperación pública de contraseña |

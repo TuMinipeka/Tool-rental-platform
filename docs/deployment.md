@@ -93,7 +93,7 @@ Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, revisión manual del pago fijo e
 
 ## Migraciones tras integrar Conde
 
-V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V306.
+V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V307.
 
 ## Apache Tomcat integrado
 
