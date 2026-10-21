@@ -47,9 +47,10 @@ Un valor desconocido abre el resumen. La definición está en `frontend/src/lib/
 
 ## Comportamiento por dispositivo
 
-- Desde 821 px las secciones aparecen solo en el header. Las pestañas internas se ocultan para no duplicar la navegación.
-- Hasta 820 px el header se colapsa en el menú. Las pestañas internas siguen visibles y desplazables, y las mismas secciones también están en el menú.
+- Desde 821 px las secciones aparecen directamente en el header.
+- Hasta 820 px las mismas secciones se abren desde el menú del header. Se eliminaron las pestañas internas para evitar duplicar la navegación.
 - El título y la descripción del dashboard cambian según la sección activa.
+- La selección activa se sincroniza al iniciar sesión y con atrás/adelante. Véase [integración y seguridad verificadas](header-integration.md).
 
 ## Decisiones de negocio abiertas
 

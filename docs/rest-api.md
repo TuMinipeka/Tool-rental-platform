@@ -37,6 +37,8 @@ Los códigos específicos incluyen `AVAILABILITY_CONFLICT`, `IDEMPOTENCY_CONFLIC
 
 ## Autenticación y sesiones
 
+El login limita el correo a 320 caracteres, valida su formato y rechaza controles invisibles o caracteres incompatibles. La contraseña se conserva exactamente y admite símbolos válidos; se rechazan nulos y más de 72 bytes UTF-8 por el BCrypt existente. Entradas inválidas reciben 400; cuenta inexistente, no activa o contraseña incorrecta comparten una respuesta 401 genérica. Los alias de login comparten el contador de intentos. [Cambios y pruebas de seguridad](header-integration.md).
+
 | Método | Ruta | Acceso |
 | --- | --- | --- |
 | POST | `/api/v1/auth/register` | Público; devuelve access JSON y refresh cookie |

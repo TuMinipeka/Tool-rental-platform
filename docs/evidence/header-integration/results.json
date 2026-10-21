@@ -1,0 +1,72 @@
+{
+  "testedAt": "2026-10-21T06:05:55.410Z",
+  "baseCommit": "706360999893061fdfd572b2e076b232d796fb6b",
+  "workingTreeChangesIncluded": true,
+  "sourceFingerprint": "1a3d299f359322af5c6ad4026d9639793df6e98a3fa5955c251cd7bf76e4ab0b",
+  "mergedBranch": "origin/developer/daniel-experiments",
+  "mergedRevision": "2566790",
+  "target": "http://localhost:15173",
+  "backend": "http://localhost:18080",
+  "realPostgreSQL": true,
+  "apiMocks": false,
+  "browser": {
+    "passed": 5,
+    "failed": 0,
+    "durationMs": 28180.738,
+    "cases": [
+      {
+        "name": "real CUSTOMER login preserves header navigation and server permissions",
+        "passed": true
+      },
+      {
+        "name": "real SUPPLIER login preserves header navigation and server permissions",
+        "passed": true
+      },
+      {
+        "name": "real ADMIN login preserves header navigation and server permissions",
+        "passed": true
+      },
+      {
+        "name": "the login rejects oversized UTF-8 passwords before sending a request",
+        "passed": true
+      },
+      {
+        "name": "the real API rejects invalid inputs and keeps credential failures generic",
+        "passed": true
+      }
+    ]
+  },
+  "java": {
+    "tests": 8,
+    "suites": [
+      {
+        "name": "com.toolrental.application.AuthenticateUserSecurityTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.toolrental.infrastructure.LoginInputSecurityTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "name": "com.toolrental.infrastructure.ArchitectureTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "lintPassed": true,
+  "frontendBuildPassed": true,
+  "spotlessPassed": true,
+  "stableFrontendUpdated": true,
+  "stableFrontend": "http://localhost:5173",
+  "passed": true,
+  "scope": "Critical login, three-role header, administrative route protection, supplier mobile navigation; not a complete penetration or business regression test"
+}

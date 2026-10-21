@@ -14,6 +14,8 @@
 
 ## Gestión del proveedor y persistencia
 
+**Dashboard integrado al header:** al iniciar sesión, proveedor y administrador navegan sus secciones desde el encabezado, también en móvil; el cliente conserva catálogo y cuenta. El login valida formato, controles invisibles y límites de BCrypt sin eliminar símbolos válidos de las contraseñas. [Integración, seguridad y evidencias por rol](docs/header-integration.md).
+
 La carga inicial muestra una cinta métrica con el texto **Tomando medidas** durante al menos cuatro segundos y después revela la interfaz. Respeta la preferencia de movimiento reducido y no se repite al navegar internamente. [Reglas visuales y transición](docs/DESIGN.md#pantalla-de-carga-inicial).
 
 **Actualización del recorrido proveedor → cliente:** el formulario registra también las unidades físicas indicadas; el panel confirma el ID guardado y ofrece **Ver en catálogo** y **Agregar existencias**. El catálogo muestra todas las coincidencias por defecto y oculta inicialmente las herramientas sin unidades operativas. [Uso y validación crítica](docs/provider-persistence.md#publicación-lista-para-alquilar).
