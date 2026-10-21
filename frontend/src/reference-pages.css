@@ -467,7 +467,7 @@
 .payment-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
 .payment-section-heading h2{margin:8px 0 0;font:850 25px/1 "Archivo Variable",sans-serif}
 .payment-environment{flex:0 0 auto;padding:6px 9px;border:1px solid #efd46a;border-radius:999px;color:#755700;background:#fff8d8;font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
-.payment-reference-methods{grid-template-columns:repeat(2,minmax(0,1fr));margin:0;padding:0;border:0}
+.payment-reference-methods{grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding:0;border:0}
 .payment-reference-methods>button{transition:border-color 160ms cubic-bezier(.23,1,.32,1),background-color 160ms ease,transform 140ms cubic-bezier(.23,1,.32,1),box-shadow 160ms ease}
 .payment-reference-methods>button:active{transform:scale(.98)}
 .payment-reference-methods>button:focus-visible{outline:3px solid #00d9ff4d;outline-offset:2px}
@@ -476,6 +476,13 @@
 .payment-method-icon.paypal{color:#0877c9;background:#e7f2ff}
 .payment-reference-methods>button.paypal.active{border-color:#0877c9;background:#f2f7ff;box-shadow:0 8px 20px #0877c91a}
 .payment-reference-methods>button.paypal.active>i{background:#0877c9;box-shadow:0 0 0 1px #0877c9}
+.fixed-payment-details{margin-top:14px;padding:15px;border:1px solid #d8e3e9;border-radius:9px;background:#f8fbfc}
+.fixed-payment-heading{display:flex;align-items:center;gap:11px}
+.fixed-payment-heading strong{font-size:12px}
+.fixed-payment-heading p{margin:3px 0 0;color:#64758a;font-size:9px;line-height:1.4}
+.fixed-payment-fields{margin-top:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fixed-payment-fields label{display:grid;gap:5px;color:#506176;font-size:8px;font-weight:850;text-transform:uppercase;letter-spacing:.04em}
+.fixed-payment-fields input{height:42px;padding:0 11px;border:1px solid #d2dde4;border-radius:6px;color:#172232;background:#edf2f5;font-size:10px;font-weight:700;cursor:not-allowed;outline:0}
 .payment-reference-form>.form-error{margin:14px 0 0}
 .payment-confirm{margin-top:16px;transition:transform 140ms cubic-bezier(.23,1,.32,1),opacity 160ms ease,background-color 160ms ease}
 .payment-back{transition:transform 140ms cubic-bezier(.23,1,.32,1),border-color 160ms ease,background-color 160ms ease}
@@ -487,5 +494,6 @@
 .payment-summary-header h2{margin:4px 0 0}
 .payment-summary-note{margin:12px 0 0;color:#68778a;font-size:9px;line-height:1.5}
 @media (hover:hover) and (pointer:fine){.payment-reference-methods>button:hover{border-color:#92a9b8;background:#f8fbfc}.payment-reference-methods>button.active:hover{border-color:var(--cyan);background:#edfbfe}.payment-reference-methods>button.paypal.active:hover{border-color:#0877c9;background:#f2f7ff}.payment-back:hover{border-color:#93a7b5;background:#f7fafb}}
-@media(max-width:620px){.payment-section-heading{align-items:flex-start;flex-direction:column}.payment-reference-methods{grid-template-columns:1fr}.payment-progress strong small{display:none}}
+@media(max-width:900px){.payment-reference-methods{grid-template-columns:repeat(2,minmax(0,1fr))}.payment-reference-methods>button:last-child{grid-column:1/-1}}
+@media(max-width:620px){.payment-section-heading{align-items:flex-start;flex-direction:column}.payment-reference-methods,.fixed-payment-fields{grid-template-columns:1fr}.payment-reference-methods>button:last-child{grid-column:auto}.payment-progress strong small{display:none}}
 @media(prefers-reduced-motion:reduce){.payment-reference-methods>button,.payment-confirm,.payment-back{transition:none}}

@@ -178,8 +178,8 @@ export const api = {
   features() { return request('/public/features', {}) },
   decideFictionalPayment(id, outcome) { return request('/payments/fictional/checkouts/' + encodeURIComponent(id) + '/decision', { method: 'POST', body: JSON.stringify({ outcome }) }, { authenticated: true }) },
   checkout(id) { return request('/payments/checkouts/' + encodeURIComponent(id), {}, { authenticated: true }) },
-  createCheckout(reservationId, idempotencyKey) {
-    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId }) }, { authenticated: true })
+  createCheckout(reservationId, idempotencyKey, paymentMethod) {
+    return request('/payments/checkouts', { method: 'POST', headers: { 'Idempotency-Key': idempotencyKey }, body: JSON.stringify({ reservationId, ...paymentMethod }) }, { authenticated: true })
   },
   invoiceDocument(id) { return request('/invoices/' + encodeURIComponent(id) + '/document', {}, { authenticated: true, responseType: 'text' }) },
   operationalReport(kind, from, to) { return request('/reports/' + kind + '?' + new URLSearchParams({ from, to }), {}, { authenticated: true }) },

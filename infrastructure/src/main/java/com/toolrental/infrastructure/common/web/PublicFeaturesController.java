@@ -15,7 +15,7 @@ public final class PublicFeaturesController {
       @Value("${payments.mercadopago.collector-id:}") String collector,
       @Value("${payments.mercadopago.webhook-secret:}") String secret,
       @Value("${payments.mercadopago.public-url:}") String url,
-      @Value("${payments.provider:mercadopago}") String provider) {
+      @Value("${payments.provider:fictional}") String provider) {
     this.provider = provider.equals("fictional") ? "FICTIONAL_GATEWAY" : "MERCADO_PAGO";
     this.hosted =
         provider.equals("fictional")

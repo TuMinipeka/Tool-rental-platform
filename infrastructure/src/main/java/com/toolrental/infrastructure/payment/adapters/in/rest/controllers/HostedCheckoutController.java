@@ -1,5 +1,6 @@
 package com.toolrental.infrastructure.payment.adapters.in.rest.controllers;
 
+import com.toolrental.application.payment.command.CreateHostedCheckoutCommand;
 import com.toolrental.application.payment.dto.HostedCheckoutResponse;
 import com.toolrental.application.payment.usecase.CreateHostedCheckoutUseCase;
 import com.toolrental.application.payment.usecase.GetHostedCheckoutUseCase;
@@ -32,6 +33,15 @@ public final class HostedCheckoutController {
       Principal principal,
       @RequestHeader("Idempotency-Key") String key,
       @Valid @RequestBody HostedCheckoutRequest request) {
-    return checkout.execute(Actor.id(principal), new ReservationId(request.reservationId()), key);
+    return checkout.execute(
+        Actor.id(principal),
+        new CreateHostedCheckoutCommand(
+            new ReservationId(request.reservationId()),
+            request.paymentMethod(),
+            key,
+            request.cardNetwork(),
+            request.cardLastFour(),
+            request.cardExpiryMonth(),
+            request.cardExpiryYear()));
   }
 }

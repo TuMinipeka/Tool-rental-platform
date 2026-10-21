@@ -11,6 +11,15 @@ const contracts = {
   invoices: { title: 'Comprobantes académicos', load: () => api.listInvoices(), id: 'invoiceId', status: 'invoiceStatus' },
   reservations: { title: 'Gestión de reservas', load: () => api.listReservations(), id: 'id', status: 'status' },
 }
+const paymentMethodLabels = {
+  CREDIT_CARD: 'Tarjeta de crédito',
+  DEBIT_CARD: 'Tarjeta débito',
+  PAYPAL: 'PayPal',
+  PSE: 'PSE',
+  MERCADO_PAGO: 'Mercado Pago',
+  HOSTED_CHECKOUT: 'Checkout alojado',
+  ADMINISTRATIVE: 'Registro administrativo',
+}
 export function ActivityPanel({ kind, supplier = false }) {
   const contract = contracts[kind]
   const [items, setItems] = useState([])
@@ -29,7 +38,7 @@ export function ActivityPanel({ kind, supplier = false }) {
   }, [contract, revision])
   return <section className="operations-table" aria-label={contract.title}>
     <div className="panel-heading"><div><h2>{contract.title}</h2><p>Registros devueltos por la API para tu usuario.</p></div><button className="button button-ghost" onClick={() => { setState('loading'); setRevision(value => value + 1) }}>Actualizar</button></div>
-    {kind === 'payments' && <p className="panel-state">Los pagos se procesan con Mercado Pago en ambiente de prueba. El servidor verifica su estado antes de confirmar la reserva.</p>}
+    {kind === 'payments' && <p className="panel-state">Los pagos usan medios fijos del ambiente de prueba. El servidor registra el resultado antes de confirmar la reserva.</p>}
     {kind === 'invoices' && <p className="panel-state">Documento no válido como factura ante la DIAN. Descarga el comprobante emitido por el backend.</p>}
     {state === 'loading' && <p role="status">Cargando registros…</p>}
     {state === 'error' && <p className="form-error" role="alert">{error}</p>}
@@ -37,6 +46,7 @@ export function ActivityPanel({ kind, supplier = false }) {
     {state === 'ready' && items.map(item => <article key={String(entityId(item[contract.id]))}>
       <div><span className="status-pill">{item[contract.status]}</span><h3>{item.number ?? String(entityId(item[contract.id])).slice(0, 8).toUpperCase()}</h3>
       {item.period && <p>{item.period.startDate} → {item.effectiveReturnDate ?? item.period.returnDate}</p>}
+      {kind === 'payments' && <p>{paymentMethodLabels[item.paymentMethod] ?? item.paymentMethod}{item.cardNetwork ? ` · ${item.cardNetwork} •••• ${item.cardLastFour} · ${String(item.cardExpiryMonth).padStart(2,'0')}/${String(item.cardExpiryYear).slice(-2)}` : ''}</p>}
       {kind === 'reservations' && <><ReservationActions reservation={item} supplier={supplier} onChanged={() => setRevision(value => value + 1)}/>{supplier&&item.status==='CONFIRMED'&&<ReservationWorkflow reservation={item}/>}</>}</div>
       {kind === 'invoices' && <button className="button button-ghost" onClick={()=>download(item.invoiceId)}>Descargar comprobante académico</button>}
       {item.amount != null && <strong>{money.format(Number(item.amount))}</strong>}

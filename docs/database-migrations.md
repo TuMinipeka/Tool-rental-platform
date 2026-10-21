@@ -50,7 +50,7 @@ V301 amplía el catálogo y los accesos exclusivamente locales. V302 completa es
 
 ## Integración de historiales
 
-La instalación demo combinada tiene 58 migraciones versionadas hasta V305; showcase añade V303 durante una instalación vacía. V209–V210 se integraron sobre una base nueva de validación porque bases demo previas ya habían aplicado versiones superiores. No se activó out-of-order, repair ni baseline para ocultar la divergencia. Coordinar las próximas versiones por encima de V305 y ensayar una evolución explícita para bases que deban conservarse.
+La instalación demo combinada incorpora migraciones versionadas hasta V306; showcase añade V303 durante una instalación vacía. V209–V210 se integraron sobre una base nueva de validación porque bases demo previas ya habían aplicado versiones superiores. No se activó out-of-order, repair ni baseline para ocultar la divergencia. Coordinar las próximas versiones por encima de V306 y ensayar una evolución explícita para bases que deban conservarse.
 
 ## V304 — checkout oficial
 
@@ -59,3 +59,7 @@ Añade ocho columnas de orquestación a payments, claves únicas de reserva ofic
 ## V305 — pasarela ficticia
 
 Añade fictional_outcome y fictional_refunded a payments, refuerza las decisiones académicas y amplía la unicidad del intento a procesadores actuales e históricos. Conserva 25 tablas, 25 entidades JPA y V1–V304 inmutables. Demo aplica 58 migraciones versionadas; showcase añade V303 al instalar desde cero.
+
+## V306 — medios fijos de pago
+
+Amplía la restricción de `payments.payment_method` para admitir `PSE` y `MERCADO_PAGO` en el proveedor académico. Conserva los metadatos mínimos de Visa y Mastercard y exige que los demás medios no almacenen datos de tarjeta.

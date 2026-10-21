@@ -29,7 +29,7 @@ Cada uno de los 25 contextos conserva sus paquetes y datos históricos. `passwor
 - `AtomicReservationManagement` bloquea reserva y unidades en orden estable para crear la retención, confirmar el webhook y resolver extensiones.
 - Un refresh se busca con bloqueo pesimista; la fila anterior y su sucesora se guardan en una transacción.
 - El hash SHA-256 identifica secretos aleatorios de alta entropía. La base nunca guarda refresh ni token de recuperación en claro.
-- El checkout registra `FULL_PAYMENT/PENDING`; Mercado Pago crea la preferencia con credenciales de prueba y la conciliación valida vendedor, importe, moneda, referencia, modo y firma antes de confirmar pago, reserva y comprobante.
+- El checkout registra `FULL_PAYMENT/PENDING`; el proveedor académico conserva la decisión y la conciliación valida actor, importe, moneda, referencia y vencimiento antes de confirmar pago, reserva y comprobante. El adaptador externo de Mercado Pago permanece inactivo.
 - La liquidación comercial usa pagos `CONFIRMED`, genera reembolsos con clave idempotente y crea un pago `ADJUSTMENT/PENDING` cuando queda saldo.
 - `OperationalReportingPort` mantiene SQL y proyecciones de lectura en Infrastructure; Application aplica alcance de proveedor o administrador antes de consultarlo.
 - JPA conserva referencias escalares entre contextos. Las claves compuestas viven solo en Infrastructure mediante `@EmbeddedId`.

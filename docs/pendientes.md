@@ -13,8 +13,8 @@
 ## Pendientes antes de producción
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
-2. Configurar las credenciales privadas de prueba y validar Mercado Pago, webhook y comprobante contra PostgreSQL.
-3. Integrar PayPal en el backend con credenciales de prueba, creación de órdenes, retorno y webhook verificado; hasta entonces la opción pública permanece inactiva.
+2. Revisar manualmente Visa, Mastercard, PSE, Mercado Pago y PayPal con sus datos fijos y comprobar el resultado en PostgreSQL y `/cuenta`.
+3. Mantener cualquier integración financiera externa fuera del MVP hasta definir credenciales, retorno, webhook y cumplimiento aplicable.
 4. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
 5. Mantener recuperación, restablecimiento y correo fuera de la API y de la interfaz pública.
 6. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
@@ -23,9 +23,9 @@
 
 ## Frontend
 
-React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes persistidos; el flujo usa `PENDING_PAYMENT`, selección de medio en `/pago`, redirección de tarjeta a Mercado Pago, comprobante descargable, entrega y devolución. PayPal se muestra como opción inactiva hasta completar su contrato de backend. Consulta los [contratos](integration-contracts.md).
+React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes persistidos; el flujo usa `PENDING_PAYMENT`, selección de uno de cinco medios fijos en `/pago`, confirmación del servidor, comprobante descargable, entrega y devolución. Consulta los [contratos](integration-contracts.md).
 
-Siguen pendientes aceptación legal persistente, protección por daños y aceptación manual del checkout oficial de prueba. El frontend nunca decide permisos, importes ni credenciales.
+Siguen pendientes aceptación legal persistente, protección por daños y revisión manual de los cinco medios de prueba. El frontend nunca decide permisos ni importes.
 
 ## Entrega Daniel/Mayorga
 

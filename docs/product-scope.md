@@ -1,6 +1,6 @@
 # Alcance del producto
 
-> Alcance vigente del MVP: Mercado Pago Checkout Pro en COP con credenciales oficiales de prueba. PayPal, correo y recuperación de contraseña no forman parte del contrato público. Consulta [MVP](mvp.md) para aceptación actual.
+> Alcance vigente del MVP: pagos académicos en COP con Visa, Mastercard, PSE, Mercado Pago y PayPal configurados con datos fijos no editables. El correo y la recuperación de contraseña no forman parte del contrato público. Consulta [MVP](mvp.md) para aceptación actual.
 
 ## Propósito
 
@@ -8,7 +8,7 @@ Tool Rental Platform es una simulación universitaria realista de un mercado col
 
 La fase 0 define el contrato del producto. Una capacidad descrita aquí no está implementada hasta que el estado del repositorio lo indique expresamente.
 
-Estado académico actual: el backend implementa registro directo de clientes y proveedores, retención atómica, vencimiento, adaptador de Mercado Pago de prueba, conciliación idempotente, confirmación automática, comprobante descargable y reportes por rol. La aceptación con credenciales privadas aún debe ejecutarse. Los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
+Estado académico actual: el backend implementa registro directo de clientes y proveedores, retención atómica, vencimiento, proveedor académico persistente, conciliación idempotente, confirmación automática, comprobante descargable y reportes por rol. Los proveedores financieros externos, los impuestos definitivos y la facturación electrónica quedan fuera del MVP.
 
 ## Actores confirmados
 
@@ -58,11 +58,11 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 
 - Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica. La interfaz abre el paso `/pago` únicamente después de recibir el identificador persistido y la misma reserva queda consultable en `/cuenta`.
 - La orden tiene un vencimiento explícito. El pago rechazado, cancelado o vencido libera la retención de inventario de manera idempotente.
-- Una confirmación auténtica recibida y verificada mediante webhook del proveedor sandbox convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
+- La decisión académica registrada por el backend convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
 - El checkout sandbox cobra el total aprobado y mostrado. Daños, extensiones u otros ajustes posteriores se discriminan como operaciones separadas.
 - Extensiones, daños, pérdidas u otros ajustes autorizados son cargos separados y discriminados; nunca se ocultan en el saldo restante.
-- El paso de pago permite escoger tarjeta o PayPal y siempre muestra el total persistido de la reserva. Tarjeta continúa al checkout alojado de Mercado Pago; PayPal se identifica como no disponible mientras estén pendientes sus credenciales de prueba, creación de órdenes y webhook.
-- La plataforma solo guarda referencias tokenizadas y metadatos mínimos autorizados. Nunca recibe ni guarda PAN completo, CVV o contraseña de PayPal.
+- El paso de pago permite escoger Visa, Mastercard, PSE, Mercado Pago o PayPal y siempre muestra el total persistido de la reserva. Los datos visibles son fijos, pertenecen al ambiente de prueba y no se pueden editar.
+- La plataforma solo guarda el medio, la red, los últimos cuatro dígitos y el vencimiento cuando aplica. Nunca persiste el PAN completo, CVV o contraseña de una cuenta.
 - Los estados distinguen como mínimo transacciones pendientes, aprobadas, rechazadas, canceladas y reembolsadas.
 - Cada pago y reembolso debe ser idempotente y auditable.
 
@@ -143,4 +143,4 @@ Estos documentos orientan una simulación académica y no sustituyen asesoría l
 
 ## Decisión de alcance del MVP — 20 de octubre de 2026
 
-Se selecciona Mercado Pago Checkout Pro en COP exclusivamente con cuentas oficiales de prueba. La integración transaccional de PayPal, el correo, la recuperación y el restablecimiento de contraseña quedan fuera del contrato vigente; la interfaz de pago puede comunicar esa indisponibilidad sin solicitar datos sensibles. Las credenciales solo se suministran al backend, no tienen endpoints de administración y deben validarse con un webhook HTTPS auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
+Se selecciona el proveedor académico persistente en COP con Visa, Mastercard, PSE, Mercado Pago y PayPal. La interfaz muestra datos fijos no editables y el backend conserva el medio, el resultado y los metadatos mínimos permitidos. El correo, la recuperación y el restablecimiento de contraseña quedan fuera del contrato vigente. Consulta [MVP](mvp.md) y [contrato de pagos](fictional-payments.md).

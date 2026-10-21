@@ -31,8 +31,8 @@ export function PaymentReturnPage({ session }) {
     return () => { active = false; clearTimeout(timer) }
   }, [session, id])
   if (!session) return <EmptyState title="Ingresa para consultar tu pago" text="El retorno del checkout no acredita por sí solo una aprobación." action={() => navigate('/login')} actionText="Ingresar" />
-  return <main className="page-shell page-top"><p className="kicker dark">Mercado Pago · ambiente de prueba</p><h1>Estado de tu pago</h1>
+  return <main className="page-shell page-top"><p className="kicker dark">Pago · ambiente de prueba</p><h1>Estado de tu pago</h1>
     {error ? <p className="form-error" role="alert">{error}</p> : <p role="status">{state ? labels[state.paymentStatus] || 'Esperando verificación del proveedor' : 'Consultando estado seguro…'}</p>}
-    <p>El servidor verifica el importe y el estado informado por Mercado Pago. Usa únicamente compradores y medios de pago de prueba; el comprobante no tiene validez fiscal.</p>
+    <p>El servidor verifica el importe, el medio seleccionado y el estado registrado. El comprobante generado no tiene validez fiscal.</p>
     <button className="button button-dark" onClick={() => navigate('/cuenta')}>Consultar mis reservas</button></main>
 }

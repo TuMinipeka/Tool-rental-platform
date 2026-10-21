@@ -69,7 +69,14 @@ public final class Payment extends AggregateRoot {
     if (("CONFIRMED".equals(paymentStatus) || "REFUNDED".equals(paymentStatus))
         && confirmedAt == null)
       throw new BusinessRuleException("Confirmed payment requires confirmation time");
-    if (!Set.of("ADMINISTRATIVE", "CREDIT_CARD", "DEBIT_CARD", "PAYPAL", "HOSTED_CHECKOUT")
+    if (!Set.of(
+            "ADMINISTRATIVE",
+            "CREDIT_CARD",
+            "DEBIT_CARD",
+            "PAYPAL",
+            "PSE",
+            "MERCADO_PAGO",
+            "HOSTED_CHECKOUT")
         .contains(paymentMethod)) throw new BusinessRuleException("Invalid payment method");
     if (!Set.of("ADMINISTRATIVE", "FIRST_HALF", "FINAL_HALF", "FULL_PAYMENT", "ADJUSTMENT")
         .contains(paymentStage)) throw new BusinessRuleException("Invalid payment stage");
@@ -84,7 +91,7 @@ public final class Payment extends AggregateRoot {
           || cardExpiryMonth < 1
           || cardExpiryMonth > 12
           || cardExpiryYear == null)
-        throw new BusinessRuleException("Invalid simulated card details");
+        throw new BusinessRuleException("Invalid card details");
     } else if (cardNetwork != null
         || cardLastFour != null
         || cardExpiryMonth != null
@@ -315,6 +322,32 @@ public final class Payment extends AggregateRoot {
       String idempotencyKey,
       Clock clock,
       String processor) {
+    return hostedCheckout(
+        id,
+        reservationId,
+        amount,
+        idempotencyKey,
+        clock,
+        processor,
+        "HOSTED_CHECKOUT",
+        null,
+        null,
+        null,
+        null);
+  }
+
+  public static Payment hostedCheckout(
+      PaymentId id,
+      ReservationId reservationId,
+      BigDecimal amount,
+      String idempotencyKey,
+      Clock clock,
+      String processor,
+      String paymentMethod,
+      String cardNetwork,
+      String cardLastFour,
+      Short cardExpiryMonth,
+      Short cardExpiryYear) {
     if (!Set.of("MERCADO_PAGO", "FICTIONAL_GATEWAY").contains(processor))
       throw new BusinessRuleException("Unsupported hosted processor");
     var result =
@@ -327,13 +360,13 @@ public final class Payment extends AggregateRoot {
             "PENDING",
             Instant.now(clock),
             null,
-            "HOSTED_CHECKOUT",
+            paymentMethod,
             "FULL_PAYMENT",
             idempotencyKey,
-            null,
-            null,
-            null,
-            null,
+            cardNetwork,
+            cardLastFour,
+            cardExpiryMonth,
+            cardExpiryYear,
             null,
             null);
     result.recordEvent(new PaymentChanged(id, Instant.now(clock)));

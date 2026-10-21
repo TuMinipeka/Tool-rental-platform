@@ -53,14 +53,14 @@ El proveedor queda activo al completar el formulario público y puede entrar dir
 
 `POST /api/v1/quotes/reservations` acepta periodo, unidades y modalidad. Devuelve días inclusivos, subtotal, entrega, total, pagos estimados y versión de política. `POST /api/v1/reservations` agrega hora programada y, para `SUPPLIER_DELIVERY`, dirección colombiana. La creación bloquea y vuelve a comprobar las unidades en la misma transacción, responde `PENDING_PAYMENT` con `expiresAt` y evita retenciones superpuestas. Un proceso programado cambia retenciones vencidas a `EXPIRED`.
 
-## Mercado Pago Checkout Pro y comprobante
+## Pago académico y comprobante
 
-- `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key` y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` y crea una preferencia sin recibir PAN ni CVV.
-- `POST /api/v1/payments/mercadopago/webhooks` valida `x-request-id` y `x-signature`, obtiene el pago desde Mercado Pago y compara vendedor, referencia, COP, importe y `live_mode=false`.
-- Un resultado `approved` confirma pago y reserva dentro del límite transaccional y emite un comprobante. Resultados rechazados o cancelados liberan la retención; un pago tardío inicia el reembolso idempotente.
+- `POST /api/v1/payments/checkouts` exige rol `CUSTOMER`, cabecera `Idempotency-Key`, un medio permitido y una reserva propia `PENDING_PAYMENT` no vencida. Registra el total como `FULL_PAYMENT/PENDING` sin aceptar un importe del navegador.
+- `POST /api/v1/payments/fictional/checkouts/{id}/decision` conserva `APPROVED` o `DECLINED` para el cliente propietario y procesa la decisión de forma idempotente.
+- Una aprobación confirma pago y reserva dentro del límite transaccional y emite un comprobante. Un rechazo libera la retención; una aprobación tardía inicia el reembolso idempotente.
 - `GET /api/v1/invoices/{id}/document` devuelve el comprobante descargable sin presentarlo como factura válida ante la DIAN.
 
-El Access Token, el identificador del vendedor y el secreto de webhook son privados del backend. El adaptador acepta únicamente cuentas oficiales de prueba y no expone una operación para modificar estas credenciales.
+El proveedor académico no requiere claves financieras externas. Los datos fijos se definen en la interfaz, no se pueden modificar y el backend persiste únicamente metadatos mínimos del medio elegido.
 
 ## Reportes operativos
 
@@ -112,8 +112,8 @@ Todas las operaciones directas requieren `Idempotency-Key`:
 - `GET /api/v1/refunds/payments/{id}` consulta reembolsos.
 - Los endpoints existentes de pagos muestran ajustes `PENDING` de terminación, extensión o mora.
 
-## Contrato vigente del MVP: Mercado Pago de prueba
+## Contrato vigente del MVP: medios fijos de prueba
 
-La entrada de `POST /api/v1/payments/checkouts` es `{"reservationId":"UUID"}` con `Idempotency-Key` y `Principal` autenticado. No recibe método, PAN, CVV ni credenciales financieras. `GET /api/v1/payments/checkouts/{id}` informa el estado de conciliación.
+La entrada de `POST /api/v1/payments/checkouts` incluye `reservationId`, `paymentMethod` y, solo para Visa o Mastercard, red, últimos cuatro dígitos y vencimiento. Requiere `Idempotency-Key` y `Principal` autenticado; no recibe el importe, PAN completo, CVV ni contraseñas. `GET /api/v1/payments/checkouts/{id}` informa el estado de conciliación.
 
-Recuperación y restablecimiento no tienen rutas públicas y OpenAPI no los anuncia. `GET /api/v1/public/features` comparte con el navegador la disponibilidad del checkout. Véase [Mercado Pago](mercadopago-mvp.md) para configuración, estados y aceptación externa pendiente.
+Recuperación y restablecimiento no tienen rutas públicas y OpenAPI no los anuncia. `GET /api/v1/public/features` comparte con el navegador la disponibilidad del checkout. Véase [pagos académicos](fictional-payments.md) para configuración, estados y límites.

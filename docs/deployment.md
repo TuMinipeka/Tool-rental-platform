@@ -2,7 +2,7 @@
 
 ## Estado y separación de entornos
 
-La entrega prepara una **demo pública académica**. Actualmente se ejecuta en Docker local y no está publicada en Oracle. El proveedor vigente es Mercado Pago con credenciales oficiales de prueba; la aceptación manual requiere un origen HTTPS público y las claves privadas. El cierre depende del [MVP](mvp.md).
+La entrega prepara una **demo pública académica**. Actualmente se ejecuta en Docker local y no está publicada en Oracle. El proveedor vigente es interno, persistente y usa cinco medios con datos fijos; no requiere claves financieras externas. El cierre depende del [MVP](mvp.md).
 
 | Entorno | Composición | Datos / acceso |
 | --- | --- | --- |
@@ -56,11 +56,8 @@ Copia .env.showcase.example a .env.showcase, limita sus permisos a 600 y complet
 | PUBLIC_HOST / ACME_EMAIL | Subdominio registrado y contacto para certificados |
 | POSTGRES_DB / POSTGRES_USER / POSTGRES_PASSWORD | Base y acceso exclusivos; contraseña aleatoria |
 | JWT_SECRET | Secreto aleatorio externo de al menos 32 bytes |
-| PAYMENT_PROVIDER | `mercadopago` |
-| MERCADOPAGO_ACCESS_TOKEN | Access Token del vendedor oficial de prueba; solo backend |
-| MERCADOPAGO_COLLECTOR_ID | Identificador inmutable del mismo vendedor de prueba |
-| MERCADOPAGO_WEBHOOK_SECRET | Secreto de firma configurado en la aplicación de Mercado Pago |
-| PAYMENTS_PUBLIC_URL | Origen HTTPS público para retorno y webhook |
+| PAYMENT_PROVIDER | `fictional` |
+| PAYMENTS_PUBLIC_URL | Origen HTTPS público para el retorno a la aplicación |
 | BACKEND_IMAGE / FRONTEND_IMAGE | Imágenes verificadas por commit o digest |
 
 
@@ -78,7 +75,7 @@ Caddy conserva certificados en volúmenes, sirve la SPA y enruta /api, Swagger, 
 
 Todos los campos de publicReleaseGates deben estar verificados en evidence/mvp/status.json, con evidencias actuales. scripts/release.sh falla si falta alguno. Solo entonces habilita Caddy, descarga las imágenes aprobadas y ejecuta Compose con espera de arranque. El Compose público mantiene Caddy bloqueado por defecto aunque alguien omita el script.
 
-Comprobar externamente HTTPS válido, `/`, `/status/database`, Swagger, rutas React, tres roles, renovación/CSRF, Checkout Pro con vendedor y comprador de prueba, webhook firmado, comprobante descargable y reportes. Capturar evidencias sin tokens ni secretos.
+Comprobar externamente HTTPS válido, `/`, `/status/database`, Swagger, rutas React, tres roles, renovación/CSRF, los cinco medios fijos, el comprobante descargable y los reportes. Capturar evidencias sin tokens ni secretos.
 
 ## Respaldo y recuperación
 
@@ -92,11 +89,11 @@ Antes de actualizar guarda las referencias de imágenes y el respaldo probado. P
 
 ## Límites restantes
 
-Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, validación de Mercado Pago de prueba en el destino público, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles tienen evidencia histórica local. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
+Cuenta/cupo Oracle, DNS/HTTPS real, ensayo ARM, revisión manual del pago fijo en el destino público, respaldo externo y accesos del entorno destino mantienen bloqueada la publicación. Los recorridos internos, facturas, reportes y roles tienen evidencia histórica local. La separación del usuario migrador y usuario de ejecución, alertas avanzadas y validación fiscal/legal se mantienen como requisitos adicionales de una operación comercial.
 
 ## Migraciones tras integrar Conde
 
-V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V305.
+V209–V210 llegaron después de bases demo que ya habían aplicado V302. Para el ensayo conjunto se creó una base nueva exclusiva: no se habilitó out-of-order ni se alteraron checksums. Si tu base desechable ya superó esas versiones, crea otra base aislada; en una base con datos necesarios prepara y revisa una migración hacia delante. Las nuevas versiones compartidas deben coordinarse por encima del máximo del historial combinado, actualmente V306.
 
 ## Apache Tomcat integrado
 
@@ -119,7 +116,7 @@ node frontend/scripts/verify-fictional-mvp.mjs
 
 El verificador registra la versión real de Tomcat, el comando de arranque y la conexión JDBC en [evidencia de Tomcat](evidence/mvp/tomcat-runtime.json). La instalación de Maven utiliza JDK 21; el Java del PATH puede ser distinto. Docker ya incluye su propio JRE y no depende del Java del host.
 
-Para publicar, completa `.env.showcase` con dominio, certificados, PostgreSQL, JWT, imágenes y las tres credenciales privadas de Mercado Pago de prueba. No se requiere SMTP. Configura en Mercado Pago el webhook `https://<PUBLIC_HOST>/api/v1/payments/mercadopago/webhooks`. Las credenciales no se versionan ni se administran desde la web.
+Para publicar, completa `.env.showcase` con dominio, certificados, PostgreSQL, JWT e imágenes. El proveedor académico no requiere SMTP ni credenciales financieras externas. Los valores fijos no se administran desde la web.
 
 No se ha aprovisionado una VM ni un dominio en esta entrega. El servidor local no acredita una publicación pública. Las operaciones de actualización/reversión y respaldo descritas arriba siguen vigentes.
 

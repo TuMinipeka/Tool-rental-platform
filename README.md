@@ -19,7 +19,7 @@
 
 ## Funcionamiento verificado con Playwright CLI
 
-Recorridos históricos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. La configuración vigente cambia el pago a Mercado Pago con credenciales oficiales de prueba; este cambio queda pendiente de validación manual.
+Recorridos históricos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. La configuración vigente usa el proveedor académico persistente y medios de pago fijos; esta ampliación queda pendiente de validación manual.
 
 | Perfil | Acciones verificadas |
 | --- | --- |
@@ -125,10 +125,10 @@ El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módu
 | --- | --- | --- |
 | Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación y CSRF; sin recuperación pública de contraseña | MFA y proveedores de identidad externos |
 | Reservas | Retención atómica con vencimiento, confirmación automática, cancelación, entrega, devolución, extensión y mora | Optimización logística avanzada |
-| Dinero | Mercado Pago Checkout Pro en COP, limitado a credenciales de prueba, webhook firmado y reembolso idempotente | Cobros reales, PayPal e impuestos definitivos |
+| Dinero | Visa, Mastercard, PSE, Mercado Pago y PayPal con datos fijos, resultado persistente y comprobante académico | Cobros reales, proveedores financieros externos e impuestos definitivos |
 | Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway hasta V305 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway hasta V306 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -172,10 +172,7 @@ $env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
 $env:DB_USERNAME = 'tool_rental'
 $env:DB_PASSWORD = '<secret>'
 $env:JWT_SECRET = '<mínimo-32-bytes>'
-$env:PAYMENT_PROVIDER = 'mercadopago'
-$env:MERCADOPAGO_ACCESS_TOKEN = '<test-access-token>'
-$env:MERCADOPAGO_COLLECTOR_ID = '<test-user-id>'
-$env:MERCADOPAGO_WEBHOOK_SECRET = '<webhook-secret>'
+$env:PAYMENT_PROVIDER = 'fictional'
 $env:PAYMENTS_PUBLIC_URL = 'https://app.example'
 $env:CORS_ALLOWED_ORIGINS = 'https://app.example'
 .\mvnw.cmd -pl infrastructure -am spring-boot:run
@@ -258,7 +255,7 @@ Rutas principales:
 - `GET /api/v1/public/features`: disponibilidad del checkout y proveedor de pagos vigente.
 - `GET /api/v1/public/catalog?serviceCity={municipio}`: catálogo público filtrado por la ciudad persistida de cada herramienta.
 - `POST /api/v1/auth/supplier-registration`: crea la cuenta activa de proveedor, inicia sesión y devuelve la cookie de renovación.
-- `POST /api/v1/payments/checkouts`, redirección a Mercado Pago; webhook firmado en `/payments/mercadopago/webhooks`.
+- `POST /api/v1/payments/checkouts`, creación idempotente con el medio fijo elegido; decisión académica persistida en `/payments/fictional/checkouts/{id}/decision`.
 - `GET /api/v1/reports/{income|most-rented-tools|frequent-customers|availability|profitability}`.
 - `POST /api/v1/reservation-terminations/reservations/{id}/cancellation`, `/no-show`, `/withdrawal`, `/external-review` y `/supplier-failure`.
 - `POST /api/v1/reservation-extensions/reservations/{id}` y resolución por aprobación o rechazo.
@@ -267,13 +264,13 @@ Rutas principales:
 
 La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en `http://localhost:8080/swagger-ui.html`. Consulta [contratos REST](docs/rest-api.md).
 
-Después de crear y persistir una reserva, el frontend abre automáticamente `/pago?reservationId={id}`. Ese paso muestra el importe del servidor y permite escoger entre tarjeta y PayPal. Tarjeta continúa al Checkout Pro alojado de Mercado Pago; PayPal permanece identificado como no disponible hasta incorporar credenciales de prueba, creación de órdenes y webhook en el backend. La interfaz no solicita PAN, CVV ni contraseñas de proveedores de pago, y nunca muestra una reserva como creada si falló la disponibilidad o la persistencia.
+Después de crear y persistir una reserva, el frontend abre automáticamente `/pago?reservationId={id}`. Ese paso muestra el importe del servidor y permite escoger Visa, Mastercard, PSE, Mercado Pago o PayPal. Cada opción presenta datos de prueba fijos y no editables; el backend conserva el medio seleccionado, confirma la reserva y publica el pago y el comprobante en `/cuenta`. Solo se persisten la red de tarjeta, últimos cuatro dígitos y vencimiento, nunca el número completo, CVV o credenciales de una cuenta.
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos ficticios persistidos.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos académicos persistidos; V306 habilita PSE y Mercado Pago como métodos del checkout fijo.
 
-Consulta [Mercado Pago](docs/mercadopago-mvp.md): credenciales privadas de prueba, retorno, webhook, permisos y conciliación. PayPal y correo están fuera del alcance.
+Consulta [pagos académicos](docs/fictional-payments.md): medios fijos, retorno, permisos, persistencia y conciliación. Las integraciones financieras externas y el correo están fuera del alcance.
 
 Hibernate usa `ddl-auto: validate`; Flyway tiene `clean` deshabilitado. Nunca edites una migración aplicada. Revisa [migraciones](docs/database-migrations.md), [compilación](docs/build-and-test.md) y el [reporte de validación](docs/validation-report.md).
 
