@@ -14,15 +14,16 @@
 
 1. Mantener la suite PostgreSQL/Testcontainers verificada en cada entrega; consultar el reporte de validación actual.
 2. Configurar las credenciales privadas de prueba y validar Mercado Pago, webhook y comprobante contra PostgreSQL.
-3. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
-4. Mantener recuperación, restablecimiento y correo fuera de la API y de la interfaz pública.
-5. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
-6. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
-7. Cerrar las capacidades futuras de producto: protección, evidencias y aceptación legal persistente; los recorridos operativos y reportes actuales ya están conectados.
+3. Integrar PayPal en el backend con credenciales de prueba, creación de órdenes, retorno y webhook verificado; hasta entonces la opción pública permanece inactiva.
+4. Definir impuestos, facturación electrónica y retenciones con asesoría fiscal.
+5. Mantener recuperación, restablecimiento y correo fuera de la API y de la interfaz pública.
+6. Incorporar almacenamiento de evidencias, consentimiento, protección de datos y auditoría inmutable.
+7. Añadir observabilidad, backups probados, recuperación, CI/CD y análisis de dependencias.
+8. Cerrar las capacidades futuras de producto: protección, evidencias y aceptación legal persistente; los recorridos operativos y reportes actuales ya están conectados.
 
 ## Frontend
 
-React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes persistidos; el flujo usa `PENDING_PAYMENT`, redirección a Mercado Pago, comprobante descargable, entrega y devolución. Consulta los [contratos](integration-contracts.md).
+React consume `/api/v1` con access token en memoria, refresh HttpOnly y CSRF. Los paneles consultan datos y reportes persistidos; el flujo usa `PENDING_PAYMENT`, selección de medio en `/pago`, redirección de tarjeta a Mercado Pago, comprobante descargable, entrega y devolución. PayPal se muestra como opción inactiva hasta completar su contrato de backend. Consulta los [contratos](integration-contracts.md).
 
 Siguen pendientes aceptación legal persistente, protección por daños y aceptación manual del checkout oficial de prueba. El frontend nunca decide permisos, importes ni credenciales.
 

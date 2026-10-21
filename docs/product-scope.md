@@ -61,7 +61,7 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 - Una confirmación auténtica recibida y verificada mediante webhook del proveedor sandbox convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
 - El checkout sandbox cobra el total aprobado y mostrado. Daños, extensiones u otros ajustes posteriores se discriminan como operaciones separadas.
 - Extensiones, daños, pérdidas u otros ajustes autorizados son cargos separados y discriminados; nunca se ocultan en el saldo restante.
-- Los medios objetivo son tarjeta y PayPal mediante SDK o campos alojados/tokenizados del proveedor seleccionado. La selección y credenciales sandbox continúan pendientes de configuración.
+- El paso de pago permite escoger tarjeta o PayPal y siempre muestra el total persistido de la reserva. Tarjeta continúa al checkout alojado de Mercado Pago; PayPal se identifica como no disponible mientras estén pendientes sus credenciales de prueba, creación de órdenes y webhook.
 - La plataforma solo guarda referencias tokenizadas y metadatos mínimos autorizados. Nunca recibe ni guarda PAN completo, CVV o contraseña de PayPal.
 - Los estados distinguen como mínimo transacciones pendientes, aprobadas, rechazadas, canceladas y reembolsadas.
 - Cada pago y reembolso debe ser idempotente y auditable.
@@ -143,4 +143,4 @@ Estos documentos orientan una simulación académica y no sustituyen asesoría l
 
 ## Decisión de alcance del MVP — 20 de octubre de 2026
 
-Se selecciona Mercado Pago Checkout Pro en COP exclusivamente con cuentas oficiales de prueba. PayPal, correo, recuperación y restablecimiento de contraseña quedan fuera del producto público. Las credenciales solo se suministran al backend, no tienen endpoints de administración y deben validarse con un webhook HTTPS auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).
+Se selecciona Mercado Pago Checkout Pro en COP exclusivamente con cuentas oficiales de prueba. La integración transaccional de PayPal, el correo, la recuperación y el restablecimiento de contraseña quedan fuera del contrato vigente; la interfaz de pago puede comunicar esa indisponibilidad sin solicitar datos sensibles. Las credenciales solo se suministran al backend, no tienen endpoints de administración y deben validarse con un webhook HTTPS auténtico antes de publicar. Consulta [MVP](mvp.md) y [contrato de pagos](mercadopago-mvp.md).

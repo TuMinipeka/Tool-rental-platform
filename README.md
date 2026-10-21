@@ -267,6 +267,8 @@ Rutas principales:
 
 La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en `http://localhost:8080/swagger-ui.html`. Consulta [contratos REST](docs/rest-api.md).
 
+El paso `/pago` consulta la reserva del usuario, muestra el importe persistido y permite escoger entre tarjeta y PayPal. Tarjeta continúa al Checkout Pro alojado de Mercado Pago; PayPal permanece identificado como no disponible hasta incorporar credenciales de prueba, creación de órdenes y webhook en el backend. La interfaz no solicita PAN, CVV ni contraseñas de proveedores de pago.
+
 ## Migraciones y validación
 
 El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos ficticios persistidos.

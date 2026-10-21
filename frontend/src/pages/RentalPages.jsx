@@ -1,10 +1,13 @@
 import { demoCatalog as tools } from '../demoCatalog.js'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { api } from '../api.js'
 import { Icon } from '../components/Icon.jsx'
 import { ToolVisual } from '../components/ToolVisual.jsx'
 import { EmptyState } from '../components/EmptyState.jsx'
+import { useFeatures } from '../lib/features.js'
 import { navigate } from '../lib/navigation.js'
 import { money } from '../lib/format.js'
+import { entityId } from '../lib/records.js'
 
 export function QuotePage({reservation,session,onContinue}){
   const [fulfillmentMethod,setFulfillmentMethod]=useState('CUSTOMER_PICKUP')
@@ -31,7 +34,96 @@ export function QuotePage({reservation,session,onContinue}){
 
 export function SuccessPage({reservation}){if(!reservation)return <EmptyState title="Consulta el estado de tu orden" text="Abre tu cuenta para consultar las reservas persistidas." action={()=>navigate('/cuenta')} actionText="Abrir mi cuenta"/>;const reservationCode=reservation?.reservationId?`TR-${String(reservation.reservationId).slice(0,8).toUpperCase()}`:'TR-DEMO';return <main className="success-page page-shell page-top"><div className="success-mark"><Icon name="check" size={42}/></div><p className="kicker dark"><span/> Solicitud creada</p><h1>Tu herramienta está<br/>un paso más cerca.</h1><p>La orden retiene temporalmente la unidad. Abre tus reservas para continuar en Mercado Pago. La reserva se confirma después de verificar el resultado.</p><div className="success-ticket"><div><small>Código</small><strong>{reservationCode}</strong></div><div><small>Equipo</small><strong>{reservation?.tool.name||tools[0].name}</strong></div><div><small>Estado</small><strong>{reservation.reservationStatus||'PENDING_PAYMENT'}</strong></div></div><p className="success-legal">Consulta los <button onClick={()=>navigate('/terms-and-conditions')}>Términos y Condiciones</button> aplicables al ambiente de prueba.</p><div className="success-actions"><button className="button button-dark" onClick={()=>navigate('/cuenta')}>Ver mis reservas <Icon name="arrow"/></button><button className="button button-ghost" onClick={()=>navigate('/catalogo')}>Seguir explorando</button></div></main>}
 
-export function PaymentPage({reservation}) {
-  if (!reservation?.reservationId) return <EmptyState title="Crea primero tu reserva" text="El importe y la disponibilidad se confirman en el servidor." action={()=>navigate('/catalogo')} actionText="Explorar catálogo"/>
-  return <main className="payment-reference-page"><section className="payment-reference-hero"><div className="payment-reference-grid"/><div className="page-shell"><div><p>Mercado Pago</p><h1>Pago en ambiente de prueba</h1><span>Continúa desde tus reservas y usa únicamente credenciales de comprador de prueba.</span></div><img src="/assets/hero-rotary-hammer-1200.png" alt=""/></div></section><div className="payment-reference-layout page-shell"><section className="payment-reference-form"><h2>Checkout Pro en COP</h2><p>Abre tu historial para continuar el pago. El servidor verificará el resultado directamente con Mercado Pago.</p><button className="button button-dark" onClick={()=>navigate('/cuenta')}>Abrir mis reservas <Icon name="arrow"/></button></section><aside className="payment-reference-summary"><ToolVisual tool={reservation.tool} compact/><h2>{reservation.tool?.name}</h2><p>{reservation.startDate} → {reservation.returnDate}</p><p>El comprobante emitido no tiene validez fiscal.</p></aside></div></main>
+const isAllowedMercadoPagoUrl = value => {
+  const target = new URL(value, window.location.origin)
+  const hostAllowed = ['mercadopago.com', 'mercadopago.com.co'].some(host => target.hostname === host || target.hostname.endsWith(`.${host}`))
+  return target.protocol === 'https:' && hostAllowed ? target : null
+}
+
+export function PaymentPage({reservation,session}) {
+  const { hostedCheckout } = useFeatures()
+  const requestedId = new URLSearchParams(window.location.search).get('reservationId') || reservation?.reservationId
+  const [storedReservation,setStoredReservation] = useState(null)
+  const [loadState,setLoadState] = useState(()=>session&&requestedId?'loading':'idle')
+  const [method,setMethod] = useState('card')
+  const [busy,setBusy] = useState(false)
+  const [error,setError] = useState('')
+  const checkoutKey = useRef(null)
+
+  useEffect(()=>{
+    if(!session||!requestedId)return undefined
+    let active=true
+    setLoadState('loading')
+    setError('')
+    api.listReservations().then(items=>{
+      if(!active)return
+      const match=(Array.isArray(items)?items:[]).find(item=>String(entityId(item.id))===String(requestedId))
+      setStoredReservation(match||null)
+      setLoadState(match?'ready':'missing')
+    }).catch(reason=>{
+      if(active){setError(reason.message);setLoadState('error')}
+    })
+    return()=>{active=false}
+  },[session,requestedId])
+
+  if(!session)return <EmptyState title="Ingresa para continuar el pago" text="La reserva y el importe se consultan desde tu cuenta." action={()=>navigate(`/login?returnTo=${encodeURIComponent(window.location.pathname+window.location.search)}`)} actionText="Ingresar"/>
+  if(!requestedId)return <EmptyState title="Selecciona una reserva" text="Abre una reserva pendiente para elegir el medio de pago." action={()=>navigate('/cuenta')} actionText="Abrir mis reservas"/>
+  if(loadState==='loading'||loadState==='idle')return <main className="payment-reference-page"><div className="payment-page-state page-shell" role="status"><Icon name="card" size={34}/><h1>Preparando el pago</h1><p>Consultando el importe registrado para tu reserva.</p></div></main>
+  if(loadState==='error')return <EmptyState title="No pudimos preparar el pago" text={error||'Intenta de nuevo desde tus reservas.'} action={()=>navigate('/cuenta')} actionText="Volver a mis reservas"/>
+  if(loadState==='missing')return <EmptyState title="No encontramos esa reserva" text="Comprueba que la reserva pertenezca a tu cuenta." action={()=>navigate('/cuenta')} actionText="Volver a mis reservas"/>
+
+  const current=storedReservation||reservation
+  const reservationStatus=current?.status||current?.reservationStatus
+  if(reservationStatus!=='PENDING_PAYMENT')return <EmptyState title="Esta reserva no está pendiente de pago" text="Consulta su estado actualizado desde tu cuenta." action={()=>navigate('/cuenta')} actionText="Abrir mis reservas"/>
+
+  const startDate=current.period?.startDate||current.startDate
+  const returnDate=current.effectiveReturnDate||current.period?.returnDate||current.returnDate
+  const rentalSubtotal=Number(current.rentalSubtotal?.amount??current.quote?.rentalSubtotal?.amount??0)
+  const deliveryFee=Number(current.deliveryFee?.amount??current.quote?.deliveryFee?.amount??0)
+  const total=Number(current.total?.amount??current.serverTotal?.amount??current.quote?.total?.amount??0)
+  const reservationCode=String(entityId(current.id??current.reservationId)).slice(0,8).toUpperCase()
+  const fulfillment=current.fulfillmentMethod==='SUPPLIER_DELIVERY'?'Entrega del proveedor':'Recogida con el proveedor'
+
+  const startCheckout=async event=>{
+    event.preventDefault()
+    if(method!=='card'||!hostedCheckout||busy)return
+    setBusy(true)
+    setError('')
+    checkoutKey.current??=crypto.randomUUID()
+    try{
+      const result=await api.createCheckout(requestedId,checkoutKey.current)
+      const target=result.checkoutUrl&&result.paymentStatus==='READY'?isAllowedMercadoPagoUrl(result.checkoutUrl):null
+      if(!target)throw new Error('La pasarela no devolvió una dirección de pago válida.')
+      window.location.assign(target.href)
+    }catch(reason){setError(reason.message)}
+    finally{setBusy(false)}
+  }
+
+  return <main className="payment-reference-page">
+    <section className="payment-reference-hero"><div className="payment-reference-grid"/><div className="page-shell"><div><p>Pago seguro</p><h1>Elige cómo pagar</h1><span>Revisa tu reserva antes de salir hacia la pasarela.</span></div><img src="/assets/hero-rotary-hammer-1200.png" alt=""/></div></section>
+    <div className="payment-progress page-shell" aria-label="Progreso del pago"><span className="done"><b><Icon name="check" size={15}/></b><strong>Reserva<small>Confirmada</small></strong></span><i/><span className="active"><b>2</b><strong>Medio de pago<small>Elige una opción</small></strong></span><i/><span><b>3</b><strong>Resultado<small>Validado por el servidor</small></strong></span></div>
+    <div className="payment-reference-layout page-shell">
+      <form className="payment-reference-form" onSubmit={startCheckout} aria-busy={busy}>
+        <div className="payment-section-heading"><div><p className="kicker dark"><span/> Pago de la reserva</p><h2>Selecciona un medio</h2></div><span className="payment-environment">Ambiente de prueba</span></div>
+        <fieldset className="payment-reference-methods"><legend className="sr-only">Medios de pago</legend>
+          <button type="button" className={method==='card'?'active':''} aria-pressed={method==='card'} onClick={()=>{setMethod('card');setError('')}}><span className="payment-method-icon"><Icon name="card" size={22}/></span><span><strong>Tarjeta</strong><small>Crédito o débito mediante Mercado Pago</small></span><i/></button>
+          <button type="button" className={method==='paypal'?'active paypal':''} aria-pressed={method==='paypal'} onClick={()=>{setMethod('paypal');setError('')}}><span className="payment-method-icon paypal"><Icon name="paypal" size={23}/></span><span><strong>PayPal</strong><small>Opción preparada; conexión pendiente</small></span><i/></button>
+        </fieldset>
+        {method==='card'?<div className="payment-data-boundary"><Icon name="shield" size={25}/><div><strong>Tus datos de tarjeta no pasan por Tool Rental</strong><p>Mercado Pago abrirá su checkout alojado. Usa únicamente una cuenta compradora de prueba.</p></div></div>:<div className="payment-paypal-state" role="status"><Icon name="paypal" size={26}/><div><strong>PayPal todavía no está habilitado</strong><p>La opción queda visible y lista para conectarse cuando el backend tenga credenciales de prueba y un webhook verificado.</p></div></div>}
+        <div className="payment-integrity-row"><span><Icon name="shield" size={16}/>Datos protegidos</span><span><Icon name="check" size={16}/>Importe del servidor</span><span><Icon name="card" size={16}/>Pago alojado</span></div>
+        {error?<div className="form-error" role="alert">{error}</div>:null}
+        <button className="payment-confirm" type="submit" disabled={busy||method!=='card'||!hostedCheckout}>{busy?'Abriendo pasarela…':method==='card'?'Continuar con tarjeta':'PayPal no disponible'} <Icon name="arrow" size={18}/></button>
+        {!hostedCheckout?<p className="payment-unavailable" role="status">La pasarela de tarjetas no está disponible en este entorno.</p>:null}
+        <button className="payment-back" type="button" onClick={()=>navigate('/cuenta')}>Volver a mis reservas</button>
+        <p className="payment-terms"><Icon name="shield" size={13}/>Antes de pagar puedes consultar los <button type="button" onClick={()=>navigate('/terms-and-conditions')}>Términos y Condiciones</button>.</p>
+      </form>
+      <aside className="payment-reference-summary">
+        <div className="payment-summary-header"><span><Icon name="calendar" size={20}/></span><div><small>Reserva</small><h2>TR-{reservationCode}</h2></div></div>
+        <dl><div><dt><Icon name="calendar" size={14}/>Fechas</dt><dd>{startDate} → {returnDate}</dd></div><div><dt><Icon name="pin" size={14}/>Entrega</dt><dd>{fulfillment}</dd></div><div><dt><Icon name="card" size={14}/>Moneda</dt><dd>COP</dd></div></dl>
+        <div className="payment-price-breakdown"><h3>Resumen del cobro</h3><p><span>Alquiler</span><strong>{money.format(rentalSubtotal)}</strong></p><p><span>Entrega</span><strong>{money.format(deliveryFee)}</strong></p></div>
+        <div className="payment-reference-total"><span>Total</span><strong>{money.format(total)}</strong></div>
+        <p className="payment-summary-note">El resultado se confirma desde el servidor. No cierres la pasarela hasta volver a la plataforma.</p>
+      </aside>
+    </div>
+  </main>
 }

@@ -204,21 +204,12 @@ function App(){
     }
     navigate('/reserva-confirmada')
   }
-  const pay=async payment=>{
-    if(reservation?.reservationId&&!session?.demo){
-      try{
-        await api.simulatePayment({reservationId:reservation.reservationId,paymentStage:'FIRST_HALF',idempotencyKey:crypto.randomUUID(),simulationOutcome:'APPROVE',...payment})
-      }catch(error){setReservation(current=>({...current,apiError:error.message}));return}
-    }
-    navigate('/reserva-confirmada')
-  }
-
   let page
   if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
   else if(path==='/catalogo')page=<CatalogPage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>
   else if(path.startsWith('/herramienta/'))page=<ToolDetailPage id={path.split('/').pop()} onReserve={reserve} catalogTools={catalogTools} dataMode={dataMode}/>
   else if(path==='/cotizacion')page=<QuotePage reservation={reservation} session={session} onContinue={continueQuote}/>
-  else if(path==='/pago')page=<PaymentPage reservation={reservation} onPaid={pay}/>
+  else if(path==='/pago')page=<PaymentPage reservation={reservation} session={session}/>
   else if(path==='/reserva-confirmada')page=<SuccessPage reservation={reservation}/>
   else if(path==='/payment-return')page=<PaymentReturnPage session={session}/>
   else if(path==='/login')page=<AuthPage mode="login" onAuthenticated={login}/>
