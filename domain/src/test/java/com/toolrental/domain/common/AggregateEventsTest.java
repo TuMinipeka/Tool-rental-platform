@@ -2,22 +2,22 @@ package com.toolrental.domain.common;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.toolrental.domain.catalog.event.CategoriaRegistrada;
-import com.toolrental.domain.catalog.event.HerramientaRegistrada;
-import com.toolrental.domain.catalog.event.UnidadEquipoRegistrada;
-import com.toolrental.domain.catalog.model.aggregate.Categoria;
-import com.toolrental.domain.catalog.model.aggregate.Herramienta;
-import com.toolrental.domain.catalog.model.aggregate.UnidadEquipo;
-import com.toolrental.domain.common.model.valueobject.ClienteId;
-import com.toolrental.domain.common.model.valueobject.Dinero;
-import com.toolrental.domain.common.model.valueobject.ProveedorId;
-import com.toolrental.domain.reservation.event.ReservaCancelada;
-import com.toolrental.domain.reservation.event.ReservaConfirmada;
-import com.toolrental.domain.reservation.event.ReservaRechazada;
-import com.toolrental.domain.reservation.event.ReservaSolicitada;
-import com.toolrental.domain.reservation.model.aggregate.Reserva;
-import com.toolrental.domain.reservation.model.entity.DetalleReserva;
-import com.toolrental.domain.reservation.model.valueobject.PeriodoReserva;
+import com.toolrental.domain.category.event.CategoryRegistered;
+import com.toolrental.domain.category.model.aggregate.Category;
+import com.toolrental.domain.common.model.valueobject.Money;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.event.EquipmentUnitRegistered;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.reservation.event.ReservationCancelled;
+import com.toolrental.domain.reservation.event.ReservationConfirmed;
+import com.toolrental.domain.reservation.event.ReservationRejected;
+import com.toolrental.domain.reservation.event.ReservationRequested;
+import com.toolrental.domain.reservation.model.aggregate.Reservation;
+import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservationitem.model.entity.ReservationLine;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.event.ToolRegistered;
+import com.toolrental.domain.tool.model.aggregate.Tool;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
@@ -32,159 +32,165 @@ class AggregateEventsTest {
   private final Clock clock = Clock.fixed(Instant.parse("2026-10-14T12:00:00Z"), ZoneOffset.UTC);
 
   @Test
-  void registraEventosTipadosConElRelojInyectado() {
-    var categoria = Categoria.registrar("Perforación", clock);
-    var herramienta =
-        Herramienta.registrar(
-            ProveedorId.generar(),
-            categoria.id(),
-            "Taladro",
+  void recordsTypedEventsWithInjectedClock() {
+    var category = Category.register("Drilling", clock);
+    var tool =
+        Tool.register(
+            SupplierId.generate(),
+            category.id(),
+            "Drill",
             "Industrial",
-            new Dinero(BigDecimal.TEN, Currency.getInstance("COP")),
+            "Bucaramanga",
+            new Money(BigDecimal.TEN, Currency.getInstance("COP")),
             Set.of(),
             clock);
-    var unidad = UnidadEquipo.registrar(herramienta.id(), "EQ-1", clock);
-    assertInstanceOf(CategoriaRegistrada.class, categoria.domainEvents().getFirst());
-    assertInstanceOf(HerramientaRegistrada.class, herramienta.domainEvents().getFirst());
-    assertInstanceOf(UnidadEquipoRegistrada.class, unidad.domainEvents().getFirst());
-    assertEquals(clock.instant(), herramienta.domainEvents().getFirst().occurredOn());
-    assertEquals(clock.instant(), unidad.domainEvents().getFirst().occurredOn());
+    var equipmentUnit = EquipmentUnit.register(tool.id(), "EQ-1", clock);
+    assertInstanceOf(CategoryRegistered.class, category.domainEvents().getFirst());
+    assertInstanceOf(ToolRegistered.class, tool.domainEvents().getFirst());
+    assertInstanceOf(EquipmentUnitRegistered.class, equipmentUnit.domainEvents().getFirst());
+    assertEquals(clock.instant(), tool.domainEvents().getFirst().occurredOn());
+    assertEquals(clock.instant(), equipmentUnit.domainEvents().getFirst().occurredOn());
   }
 
   @Test
-  void eventosSonUnaInstantaneaInmutableQueSePuedeLimpiar() {
-    var categoria = Categoria.registrar("Catálogo", clock);
-    var eventos = categoria.domainEvents();
-    assertThrows(UnsupportedOperationException.class, eventos::clear);
-    categoria.clearDomainEvents();
-    assertTrue(categoria.domainEvents().isEmpty());
-    assertEquals(1, eventos.size());
+  void eventsAreAnImmutableSnapshotThatCanBeCleared() {
+    var category = Category.register("Catalog", clock);
+    var events = category.domainEvents();
+    assertThrows(UnsupportedOperationException.class, events::clear);
+    category.clearDomainEvents();
+    assertTrue(category.domainEvents().isEmpty());
+    assertEquals(1, events.size());
   }
 
   @Test
-  void restaurarCategoriaNoVuelveAGenerarEventoDeRegistro() {
-    var categoria = Categoria.registrar("Catálogo", clock);
-    var restaurada = Categoria.restaurar(categoria.id(), categoria.nombre());
-    assertEquals(categoria.id(), restaurada.id());
-    assertTrue(restaurada.domainEvents().isEmpty());
+  void restoringCategoryDoesNotEmitRegistrationEvent() {
+    var category = Category.register("Catalog", clock);
+    var restored = Category.restore(category.id(), category.name());
+    assertEquals(category.id(), restored.id());
+    assertTrue(restored.domainEvents().isEmpty());
   }
 
   @Test
-  void copiaDeReservaNoRepiteEventosYConfirmacionRegistraSoloSuTransicion() {
-    var pendiente = solicitar();
-    assertInstanceOf(ReservaSolicitada.class, pendiente.domainEvents().getFirst());
-    assertTrue(pendiente.copia().domainEvents().isEmpty());
-    var confirmada = pendiente.confirmarConTarifas(pendiente.detalles(), clock);
-    assertEquals(1, confirmada.domainEvents().size());
-    assertInstanceOf(ReservaConfirmada.class, confirmada.domainEvents().getFirst());
-    assertEquals(confirmada.confirmacion().orElseThrow(), confirmada.domainEvents().getFirst());
-    confirmada.clearDomainEvents();
-    assertTrue(confirmada.confirmacion().isPresent());
+  void reservationCopyDoesNotRepeatEventsAndConfirmationRecordsItsTransition() {
+    var pending = request();
+    assertInstanceOf(ReservationRequested.class, pending.domainEvents().getFirst());
+    assertTrue(pending.copy().domainEvents().isEmpty());
+    var confirmed = pending.confirmWithRates(pending.items(), clock);
+    assertEquals(1, confirmed.domainEvents().size());
+    assertInstanceOf(ReservationConfirmed.class, confirmed.domainEvents().getFirst());
+    assertEquals(confirmed.confirmation().orElseThrow(), confirmed.domainEvents().getFirst());
+    confirmed.clearDomainEvents();
+    assertTrue(confirmed.confirmation().isPresent());
   }
 
   @Test
-  void rechazarYCancelarRegistranLaTransicionYUnFalloNoAgregaEventos() {
-    var rechazada = solicitar();
-    rechazada.clearDomainEvents();
-    rechazada.rechazar(clock);
-    assertInstanceOf(ReservaRechazada.class, rechazada.domainEvents().getFirst());
+  void rejectAndCancelRecordTransitionsAndFailureAddsNoEvents() {
+    var rejected = request();
+    rejected.clearDomainEvents();
+    rejected.reject(clock);
+    assertInstanceOf(ReservationRejected.class, rejected.domainEvents().getFirst());
     assertThrows(
-        com.toolrental.domain.common.exception.ReglaNegocioException.class,
-        () -> rechazada.cancelar(clock));
-    assertEquals(1, rechazada.domainEvents().size());
-    var cancelada = solicitar();
-    cancelada.clearDomainEvents();
-    cancelada.cancelar(clock);
-    assertInstanceOf(ReservaCancelada.class, cancelada.domainEvents().getFirst());
+        com.toolrental.domain.common.exception.BusinessRuleException.class,
+        () -> rejected.cancel(clock));
+    assertEquals(1, rejected.domainEvents().size());
+    var cancelled = request();
+    cancelled.clearDomainEvents();
+    cancelled.cancel(clock);
+    assertInstanceOf(ReservationCancelled.class, cancelled.domainEvents().getFirst());
   }
 
   @Test
-  void eventoNoAdmiteIdentidadNiFechaNulas() {
-    assertThrows(NullPointerException.class, () -> new CategoriaRegistrada(null, clock.instant()));
-    var categoria = Categoria.registrar("Catálogo", clock);
-    assertThrows(NullPointerException.class, () -> new CategoriaRegistrada(categoria.id(), null));
+  void eventRejectsNullIdentityAndTimestamp() {
+    assertThrows(NullPointerException.class, () -> new CategoryRegistered(null, clock.instant()));
+    var category = Category.register("Catalog", clock);
+    assertThrows(NullPointerException.class, () -> new CategoryRegistered(category.id(), null));
   }
 
   @Test
-  void restaurarHerramientaYUnidadConservaIdentidadEstadoYSinEventosNuevos() {
-    var categoria = Categoria.registrar("Catálogo", clock);
-    var herramienta =
-        Herramienta.registrar(
-            ProveedorId.generar(),
-            categoria.id(),
-            "Taladro",
+  void restoringToolAndUnitPreservesIdentityAndStatusWithoutNewEvents() {
+    var category = Category.register("Catalog", clock);
+    var tool =
+        Tool.register(
+            SupplierId.generate(),
+            category.id(),
+            "Drill",
             "Industrial",
-            new Dinero(BigDecimal.TEN, Currency.getInstance("COP")),
+            "Bucaramanga",
+            new Money(BigDecimal.TEN, Currency.getInstance("COP")),
             Set.of(),
             clock);
-    herramienta.retirarPublicacion();
-    var restaurada =
-        Herramienta.restaurar(
-            herramienta.id(),
-            herramienta.proveedorId(),
-            herramienta.categoriaId(),
-            herramienta.nombre(),
-            herramienta.descripcion(),
-            herramienta.tarifaDiaria(),
-            herramienta.imagenes(),
-            herramienta.publicada());
-    assertEquals(herramienta.id(), restaurada.id());
-    assertFalse(restaurada.publicada());
-    assertTrue(restaurada.domainEvents().isEmpty());
-    var unidad = UnidadEquipo.registrar(herramienta.id(), "EQ-1", clock);
-    unidad.enviarAMantenimiento();
-    var restauradaUnidad =
-        UnidadEquipo.restaurar(
-            unidad.id(), unidad.herramientaId(), unidad.codigoInventario(), unidad.estado());
-    assertEquals(unidad.id(), restauradaUnidad.id());
-    assertFalse(restauradaUnidad.operativa());
-    assertTrue(restauradaUnidad.domainEvents().isEmpty());
+    tool.unpublish();
+    var restored =
+        Tool.restore(
+            tool.id(),
+            tool.supplierId(),
+            tool.categoryId(),
+            tool.name(),
+            tool.description(),
+            tool.serviceCity(),
+            tool.dailyRate(),
+            tool.imageUrls(),
+            tool.published());
+    assertEquals(tool.id(), restored.id());
+    assertFalse(restored.published());
+    assertTrue(restored.domainEvents().isEmpty());
+    var equipmentUnit = EquipmentUnit.register(tool.id(), "EQ-1", clock);
+    equipmentUnit.sendToMaintenance();
+    var restoredEquipmentUnit =
+        EquipmentUnit.restore(
+            equipmentUnit.id(),
+            equipmentUnit.toolId(),
+            equipmentUnit.inventoryCode(),
+            equipmentUnit.status());
+    assertEquals(equipmentUnit.id(), restoredEquipmentUnit.id());
+    assertFalse(restoredEquipmentUnit.isOperational());
+    assertTrue(restoredEquipmentUnit.domainEvents().isEmpty());
   }
 
   @Test
-  void restaurarReservaConservaConfirmacionSinReemitirEventosYValidaEstado() {
-    var pendiente = solicitar();
-    var confirmada = pendiente.confirmarConTarifas(pendiente.detalles(), clock);
-    var restaurada =
-        Reserva.restaurar(
-            confirmada.id(),
-            confirmada.clienteId(),
-            confirmada.periodo(),
-            confirmada.detalles(),
-            confirmada.creadaEn(),
-            confirmada.estado(),
-            confirmada.confirmacion().orElseThrow().occurredOn());
-    assertEquals(confirmada.id(), restaurada.id());
-    assertEquals(confirmada.estado(), restaurada.estado());
-    assertEquals(confirmada.total(), restaurada.total());
-    assertEquals(confirmada.confirmacion(), restaurada.confirmacion());
-    assertTrue(restaurada.domainEvents().isEmpty());
+  void restoringReservationPreservesConfirmationWithoutReemittingEvents() {
+    var pending = request();
+    var confirmed = pending.confirmWithRates(pending.items(), clock);
+    var restored =
+        Reservation.restore(
+            confirmed.id(),
+            confirmed.customerId(),
+            confirmed.period(),
+            confirmed.items(),
+            confirmed.createdAt(),
+            confirmed.status(),
+            confirmed.confirmation().orElseThrow().occurredOn());
+    assertEquals(confirmed.id(), restored.id());
+    assertEquals(confirmed.status(), restored.status());
+    assertEquals(confirmed.total(), restored.total());
+    assertEquals(confirmed.confirmation(), restored.confirmation());
+    assertTrue(restored.domainEvents().isEmpty());
     assertThrows(
-        com.toolrental.domain.common.exception.ReglaNegocioException.class,
+        com.toolrental.domain.common.exception.BusinessRuleException.class,
         () ->
-            Reserva.restaurar(
-                confirmada.id(),
-                confirmada.clienteId(),
-                confirmada.periodo(),
-                confirmada.detalles(),
-                confirmada.creadaEn(),
-                confirmada.estado(),
+            Reservation.restore(
+                confirmed.id(),
+                confirmed.customerId(),
+                confirmed.period(),
+                confirmed.items(),
+                confirmed.createdAt(),
+                confirmed.status(),
                 null));
   }
 
-  private Reserva solicitar() {
-    var categoria = Categoria.registrar("Catálogo", clock);
-    var proveedor = ProveedorId.generar();
-    var tarifa = new Dinero(BigDecimal.TEN, Currency.getInstance("COP"));
-    var herramienta =
-        Herramienta.registrar(
-            proveedor, categoria.id(), "Taladro", "Industrial", tarifa, Set.of(), clock);
-    var unidad = UnidadEquipo.registrar(herramienta.id(), "EQ-1", clock);
-    var fecha = LocalDate.of(2026, 10, 14);
-    return Reserva.solicitar(
-        ClienteId.generar(),
-        new PeriodoReserva(fecha, fecha),
-        List.of(new DetalleReserva(unidad.id(), proveedor, tarifa)),
+  private Reservation request() {
+    var category = Category.register("Catalog", clock);
+    var supplier = SupplierId.generate();
+    var rate = new Money(BigDecimal.TEN, Currency.getInstance("COP"));
+    var tool =
+        Tool.register(
+            supplier, category.id(), "Drill", "Industrial", "Bucaramanga", rate, Set.of(), clock);
+    var equipmentUnit = EquipmentUnit.register(tool.id(), "EQ-1", clock);
+    var date = LocalDate.of(2026, 10, 14);
+    return Reservation.request(
+        CustomerId.generate(),
+        new ReservationPeriod(date, date),
+        List.of(new ReservationLine(equipmentUnit.id(), supplier, rate)),
         clock);
   }
 }

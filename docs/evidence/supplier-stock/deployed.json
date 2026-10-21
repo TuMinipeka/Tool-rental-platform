@@ -1,0 +1,22 @@
+{
+  "testedAt": "2026-10-21T04:25:18.697Z",
+  "base": "http://localhost:5173",
+  "businessDataWrites": false,
+  "checks": [
+    {
+      "name": "The deployed default catalog shows every stocked publication",
+      "passed": true,
+      "count": 9
+    },
+    {
+      "name": "The existing zero-stock publication is saved and accessible through the explicit filter",
+      "passed": true,
+      "toolId": "04735338-1b44-491d-a2bb-399992b5fba1"
+    },
+    {
+      "name": "The updated catalog remains usable on mobile without horizontal overflow",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

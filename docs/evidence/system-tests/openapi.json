@@ -1,0 +1,12 @@
+{
+  "testedAt": "2026-10-21T05:42:55.926Z",
+  "url": "http://localhost:8080/v3/api-docs",
+  "paths": 92,
+  "operations": 123,
+  "jsonRequests": 47,
+  "jsonResponses": 553,
+  "swaggerStatus": 200,
+  "exampleValidation": "JSON shapes and scalar types checked against the served schemas; illustrative values are not live fixture identifiers",
+  "passed": true,
+  "failures": []
+}

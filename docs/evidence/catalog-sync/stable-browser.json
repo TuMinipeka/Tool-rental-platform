@@ -1,0 +1,23 @@
+{
+  "testedAt": "2026-10-21T03:52:45.677Z",
+  "readOnly": true,
+  "checks": [
+    {
+      "toolId": "477000eb-7f20-4f53-b092-9490970f2ccd",
+      "visibleAboveFormerCeiling": true,
+      "municipality": "Floridablanca",
+      "price": 234567
+    },
+    {
+      "toolId": "3899b74a-8c7f-4828-bbbc-86cce4bab104",
+      "visibleAboveFormerCeiling": true,
+      "municipality": "Bucaramanga",
+      "price": 245678
+    }
+  ],
+  "screenshots": [
+    "stable-publication-1.png",
+    "stable-publication-2.png"
+  ],
+  "completed": true
+}

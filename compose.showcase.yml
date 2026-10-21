@@ -1,0 +1,97 @@
+name: tool-rental-showcase
+x-logging: &logging
+  driver: json-file
+  options: { max-size: "10m", max-file: "3" }
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:17.11-alpine}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Set dedicated showcase database}
+      POSTGRES_USER: ${POSTGRES_USER:?Set showcase database user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set showcase database password}
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    networks: [database]
+    mem_limit: 2g
+    cpus: 0.75
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+  backend:
+    image: ${BACKEND_IMAGE:?Set tested image identified by commit or digest}
+    volumes: ["tool_images:/application/storage/tool-images"]
+    environment:
+      SPRING_PROFILES_ACTIVE: production,showcase
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      SHOWCASE_DATABASE_NAME: ${POSTGRES_DB}
+      DB_MAX_POOL_SIZE: 5
+      DB_MIN_IDLE: 1
+      JWT_SECRET: ${JWT_SECRET:?Set random JWT secret}
+      CORS_ALLOWED_ORIGINS: https://${PUBLIC_HOST:?Set DuckDNS host}
+      PAYMENT_PROVIDER: ${PAYMENT_PROVIDER:-fictional}
+      MERCADOPAGO_ACCESS_TOKEN: ${MERCADOPAGO_ACCESS_TOKEN:-}
+      MERCADOPAGO_COLLECTOR_ID: ${MERCADOPAGO_COLLECTOR_ID:-}
+      MERCADOPAGO_WEBHOOK_SECRET: ${MERCADOPAGO_WEBHOOK_SECRET:-}
+      PAYMENTS_PUBLIC_URL: https://${PUBLIC_HOST}
+      JAVA_TOOL_OPTIONS: -XX:MaxRAMPercentage=65 -XX:+ExitOnOutOfMemoryError
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+    networks: [database,edge]
+    mem_limit: 2g
+    cpus: 1
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      postgres: { condition: service_healthy }
+    healthcheck:
+      test: [CMD-SHELL, 'curl --fail --silent http://localhost:8080/status/database >/dev/null']
+      interval: 15s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
+  frontend:
+    image: ${FRONTEND_IMAGE:?Set tested image identified by commit or digest}
+    networks: [edge]
+    mem_limit: 256m
+    cpus: 0.25
+    restart: unless-stopped
+    logging: *logging
+    healthcheck:
+      test: [CMD-SHELL, 'wget -q --spider http://localhost/health']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  caddy:
+    image: ${CADDY_IMAGE:-caddy:2.11.2-alpine}
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST}
+      ACME_EMAIL: ${ACME_EMAIL:?Set certificate contact}
+      MVP_RELEASE_APPROVED: ${MVP_RELEASE_APPROVED:-false}
+    entrypoint: [/bin/sh, -ec]
+    command:
+      - 'test "$$MVP_RELEASE_APPROVED" = "true" || { echo "Public MVP release is blocked"; exit 1; }; exec caddy run --config /etc/caddy/Caddyfile --adapter caddyfile'
+    ports: ["80:80", "443:443"]
+    volumes:
+      - ./ops/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks: [edge]
+    mem_limit: 256m
+    cpus: 0.25
+    restart: unless-stopped
+    logging: *logging
+    depends_on:
+      backend: { condition: service_healthy }
+      frontend: { condition: service_healthy }
+networks:
+  database: { internal: true }
+  edge: {}
+volumes:
+  tool_images: {}
+  postgres_data: {}
+  caddy_data: {}
+  caddy_config: {}

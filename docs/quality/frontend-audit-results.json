@@ -1,0 +1,2172 @@
+{
+  "measuredAtUtc": "2026-10-20T13:33:22.861Z",
+  "baselineCommit": "4d4afd2b27d6c542ff584240993a98df24abd298",
+  "scope": "Local production build on Nginx; localhost:4173; backend localhost:8080 returned an empty catalog; no authenticated session. Browser tests/runtime use deterministic API fixtures.",
+  "fieldData": "Unavailable: localhost has no CrUX or production RUM. Lab results are not field Core Web Vitals.",
+  "lighthouse": {
+    "baseline": [
+      {
+        "scenario": "home-mobile",
+        "route": "/",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "screen": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 3461.3872,
+            "min": 3459.5838000000003,
+            "max": 3463.7006,
+            "runs": [
+              3463.7006,
+              3459.5838000000003,
+              3461.3872
+            ]
+          },
+          "lcp": {
+            "median": 10514.3757,
+            "min": 10295.5509,
+            "max": 10517.0808,
+            "runs": [
+              10295.5509,
+              10514.3757,
+              10517.0808
+            ]
+          },
+          "tbt": {
+            "median": 0,
+            "min": 0,
+            "max": 9,
+            "runs": [
+              9,
+              0,
+              0
+            ]
+          },
+          "cls": {
+            "median": 0.00002797677970868067,
+            "min": 0.00002797677970868067,
+            "max": 0.00002797677970868067,
+            "runs": [
+              0.00002797677970868067,
+              0.00002797677970868067,
+              0.00002797677970868067
+            ]
+          },
+          "bytes": {
+            "median": 1951571,
+            "min": 1951571,
+            "max": 1951652,
+            "runs": [
+              1951652,
+              1951571,
+              1951571
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.67,
+            "min": 0.67,
+            "max": 0.68,
+            "runs": [
+              0.67,
+              0.68,
+              0.67
+            ]
+          },
+          "accessibility": {
+            "median": 0.94,
+            "min": 0.94,
+            "max": 0.94,
+            "runs": [
+              0.94,
+              0.94,
+              0.94
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 0.92,
+            "min": 0.92,
+            "max": 0.92,
+            "runs": [
+              0.92,
+              0.92,
+              0.92
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "first-contentful-paint",
+          "largest-contentful-paint",
+          "speed-index",
+          "errors-in-console",
+          "interactive",
+          "color-contrast",
+          "label-content-name-mismatch",
+          "landmark-one-main",
+          "unused-css-rules",
+          "unused-javascript",
+          "robots-txt",
+          "cache-insight",
+          "image-delivery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight",
+          "lcp-discovery-insight"
+        ]
+      },
+      {
+        "scenario": "home-desktop",
+        "route": "/",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "screen": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 692.0153,
+            "min": 691.8644,
+            "max": 697.5038000000001,
+            "runs": [
+              697.5038000000001,
+              691.8644,
+              692.0153
+            ]
+          },
+          "lcp": {
+            "median": 2338.02295,
+            "min": 2337.7966,
+            "max": 2346.2557,
+            "runs": [
+              2346.2557,
+              2337.7966,
+              2338.02295
+            ]
+          },
+          "tbt": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "runs": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cls": {
+            "median": 0.0005531218006901029,
+            "min": 0.0005317001251285649,
+            "max": 0.0005531218006901029,
+            "runs": [
+              0.0005531218006901029,
+              0.0005317001251285649,
+              0.0005531218006901029
+            ]
+          },
+          "bytes": {
+            "median": 3148287,
+            "min": 3148287,
+            "max": 3148378,
+            "runs": [
+              3148378,
+              3148287,
+              3148287
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.88,
+            "min": 0.87,
+            "max": 0.88,
+            "runs": [
+              0.87,
+              0.88,
+              0.88
+            ]
+          },
+          "accessibility": {
+            "median": 0.95,
+            "min": 0.95,
+            "max": 0.95,
+            "runs": [
+              0.95,
+              0.95,
+              0.95
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 0.92,
+            "min": 0.92,
+            "max": 0.92,
+            "runs": [
+              0.92,
+              0.92,
+              0.92
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "first-contentful-paint",
+          "largest-contentful-paint",
+          "errors-in-console",
+          "interactive",
+          "color-contrast",
+          "label-content-name-mismatch",
+          "landmark-one-main",
+          "total-byte-weight",
+          "unused-css-rules",
+          "unused-javascript",
+          "robots-txt",
+          "cache-insight",
+          "image-delivery-insight",
+          "lcp-discovery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight"
+        ]
+      },
+      {
+        "scenario": "catalog-mobile",
+        "route": "/catalogo",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "screen": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 3462.7574999999997,
+            "min": 3461.2195,
+            "max": 3471.5845,
+            "runs": [
+              3462.7574999999997,
+              3471.5845,
+              3461.2195
+            ]
+          },
+          "lcp": {
+            "median": 6122.376749999999,
+            "min": 6107.13625,
+            "max": 6131.024375000001,
+            "runs": [
+              6107.13625,
+              6122.376749999999,
+              6131.024375000001
+            ]
+          },
+          "tbt": {
+            "median": 13.5,
+            "min": 12,
+            "max": 57,
+            "runs": [
+              13.5,
+              12,
+              57
+            ]
+          },
+          "cls": {
+            "median": 0.00002797677970868067,
+            "min": 0.00002797677970868067,
+            "max": 0.00002797677970868067,
+            "runs": [
+              0.00002797677970868067,
+              0.00002797677970868067,
+              0.00002797677970868067
+            ]
+          },
+          "bytes": {
+            "median": 2283096,
+            "min": 2283091,
+            "max": 2283096,
+            "runs": [
+              2283091,
+              2283096,
+              2283096
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.7,
+            "min": 0.7,
+            "max": 0.7,
+            "runs": [
+              0.7,
+              0.7,
+              0.7
+            ]
+          },
+          "accessibility": {
+            "median": 0.95,
+            "min": 0.95,
+            "max": 0.95,
+            "runs": [
+              0.95,
+              0.95,
+              0.95
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 0.92,
+            "min": 0.92,
+            "max": 0.92,
+            "runs": [
+              0.92,
+              0.92,
+              0.92
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "first-contentful-paint",
+          "largest-contentful-paint",
+          "speed-index",
+          "max-potential-fid",
+          "errors-in-console",
+          "interactive",
+          "color-contrast",
+          "heading-order",
+          "label-content-name-mismatch",
+          "unused-css-rules",
+          "unused-javascript",
+          "robots-txt",
+          "cache-insight",
+          "image-delivery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight"
+        ]
+      }
+    ],
+    "optimized": [
+      {
+        "scenario": "home-mobile",
+        "route": "/",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "screen": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 1530.6091,
+            "min": 1517.7832,
+            "max": 1576.3575,
+            "runs": [
+              1576.3575,
+              1530.6091,
+              1517.7832
+            ]
+          },
+          "lcp": {
+            "median": 4891.03625,
+            "min": 4224.9136499999995,
+            "max": 5051.674800000001,
+            "runs": [
+              4891.03625,
+              4224.9136499999995,
+              5051.674800000001
+            ]
+          },
+          "tbt": {
+            "median": 0,
+            "min": 0,
+            "max": 90,
+            "runs": [
+              90,
+              0,
+              0
+            ]
+          },
+          "cls": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "runs": [
+              0,
+              0,
+              0
+            ]
+          },
+          "bytes": {
+            "median": 869160,
+            "min": 869159,
+            "max": 869245,
+            "runs": [
+              869245,
+              869160,
+              869159
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.81,
+            "min": 0.81,
+            "max": 0.86,
+            "runs": [
+              0.81,
+              0.86,
+              0.81
+            ]
+          },
+          "accessibility": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "first-contentful-paint",
+          "largest-contentful-paint",
+          "total-blocking-time",
+          "max-potential-fid",
+          "errors-in-console",
+          "interactive",
+          "unused-css-rules",
+          "unused-javascript",
+          "image-delivery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight"
+        ]
+      },
+      {
+        "scenario": "home-desktop",
+        "route": "/",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "desktop",
+        "throttling": {
+          "rttMs": 40,
+          "throughputKbps": 10240,
+          "requestLatencyMs": 0,
+          "downloadThroughputKbps": 0,
+          "uploadThroughputKbps": 0,
+          "cpuSlowdownMultiplier": 1
+        },
+        "screen": {
+          "mobile": false,
+          "width": 1350,
+          "height": 940,
+          "deviceScaleFactor": 1,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 384.8161,
+            "min": 379.2977,
+            "max": 403.0649,
+            "runs": [
+              379.2977,
+              403.0649,
+              384.8161
+            ]
+          },
+          "lcp": {
+            "median": 948.9465500000001,
+            "min": 784.59735,
+            "max": 957.22415,
+            "runs": [
+              948.9465500000001,
+              784.59735,
+              957.22415
+            ]
+          },
+          "tbt": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "runs": [
+              0,
+              0,
+              0
+            ]
+          },
+          "cls": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "runs": [
+              0,
+              0,
+              0
+            ]
+          },
+          "bytes": {
+            "median": 927718,
+            "min": 927713,
+            "max": 927719,
+            "runs": [
+              927718,
+              927719,
+              927713
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.99,
+            "min": 0.99,
+            "max": 1,
+            "runs": [
+              0.99,
+              1,
+              0.99
+            ]
+          },
+          "accessibility": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "largest-contentful-paint",
+          "errors-in-console",
+          "unused-css-rules",
+          "unused-javascript",
+          "image-delivery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight"
+        ]
+      },
+      {
+        "scenario": "catalog-mobile",
+        "route": "/catalogo",
+        "toolVersion": "13.5.0",
+        "browser": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/156.0.0.0 Safari/537.36",
+        "formFactor": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1638.4,
+          "requestLatencyMs": 562.5,
+          "downloadThroughputKbps": 1474.5600000000002,
+          "uploadThroughputKbps": 675,
+          "cpuSlowdownMultiplier": 4
+        },
+        "screen": {
+          "mobile": true,
+          "width": 412,
+          "height": 823,
+          "deviceScaleFactor": 1.75,
+          "disabled": false
+        },
+        "throttlingMethod": "simulate",
+        "cache": "Cold; Lighthouse storage reset enabled",
+        "metrics": {
+          "fcp": {
+            "median": 1523.1812,
+            "min": 1518.4218,
+            "max": 1531.2678,
+            "runs": [
+              1518.4218,
+              1531.2678,
+              1523.1812
+            ]
+          },
+          "lcp": {
+            "median": 1981.2678,
+            "min": 1973.1812,
+            "max": 1984.4218,
+            "runs": [
+              1984.4218,
+              1981.2678,
+              1973.1812
+            ]
+          },
+          "tbt": {
+            "median": 1.5,
+            "min": 1,
+            "max": 13.5,
+            "runs": [
+              1.5,
+              1,
+              13.5
+            ]
+          },
+          "cls": {
+            "median": 0,
+            "min": 0,
+            "max": 0,
+            "runs": [
+              0,
+              0,
+              0
+            ]
+          },
+          "bytes": {
+            "median": 1014983,
+            "min": 1014982,
+            "max": 1014984,
+            "runs": [
+              1014982,
+              1014983,
+              1014984
+            ]
+          }
+        },
+        "scores": {
+          "performance": {
+            "median": 0.99,
+            "min": 0.99,
+            "max": 0.99,
+            "runs": [
+              0.99,
+              0.99,
+              0.99
+            ]
+          },
+          "accessibility": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          },
+          "best-practices": {
+            "median": 0.96,
+            "min": 0.96,
+            "max": 0.96,
+            "runs": [
+              0.96,
+              0.96,
+              0.96
+            ]
+          },
+          "seo": {
+            "median": 1,
+            "min": 1,
+            "max": 1,
+            "runs": [
+              1,
+              1,
+              1
+            ]
+          }
+        },
+        "remainingAuditIds": [
+          "first-contentful-paint",
+          "largest-contentful-paint",
+          "errors-in-console",
+          "interactive",
+          "label-content-name-mismatch",
+          "unused-css-rules",
+          "unused-javascript",
+          "image-delivery-insight",
+          "network-dependency-tree-insight",
+          "render-blocking-insight",
+          "max-potential-fid"
+        ]
+      }
+    ]
+  },
+  "bundle": {
+    "baseline": {
+      "assets": [
+        {
+          "file": "index-aQJqRvJL.css",
+          "initial": true,
+          "bytes": 111591,
+          "gzipBytes": 23016
+        },
+        {
+          "file": "index-De7zPeXf.js",
+          "initial": true,
+          "bytes": 314589,
+          "gzipBytes": 92733
+        }
+      ],
+      "originalImageBytes": 8175106,
+      "initialJavaScriptBytes": 314589,
+      "initialJavaScriptGzipBytes": 92733,
+      "totalJavaScriptBytes": 314589
+    },
+    "optimized": {
+      "assets": [
+        {
+          "file": "AccountPages-m6clB5LB.js",
+          "initial": false,
+          "bytes": 22053,
+          "gzipBytes": 6096
+        },
+        {
+          "file": "ErrorPage-PymnSgYx.js",
+          "initial": false,
+          "bytes": 617,
+          "gzipBytes": 394
+        },
+        {
+          "file": "index-CikTOzFl.js",
+          "initial": true,
+          "bytes": 273897,
+          "gzipBytes": 83747
+        },
+        {
+          "file": "index-DUojwlwm.css",
+          "initial": true,
+          "bytes": 112181,
+          "gzipBytes": 23108
+        },
+        {
+          "file": "InformationPages-Dh9msssP.js",
+          "initial": false,
+          "bytes": 6782,
+          "gzipBytes": 2323
+        },
+        {
+          "file": "jsx-runtime-IzPD2q5l.js",
+          "initial": true,
+          "bytes": 468,
+          "gzipBytes": 302
+        },
+        {
+          "file": "RentalPages-FpoZwtIJ.js",
+          "initial": false,
+          "bytes": 11417,
+          "gzipBytes": 3151
+        },
+        {
+          "file": "TermsAndConditionsPage-DO8hSIOS.js",
+          "initial": false,
+          "bytes": 11216,
+          "gzipBytes": 3837
+        }
+      ],
+      "originalImageBytes": 8175106,
+      "initialJavaScriptBytes": 274365,
+      "initialJavaScriptGzipBytes": 84049,
+      "totalJavaScriptBytes": 326450
+    }
+  },
+  "browser": {
+    "baseline": {
+      "pointer": {
+        "events": 120,
+        "boundsReads": 120,
+        "styleMutations": 240
+      },
+      "routes": [
+        {
+          "path": "/",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "aria-allowed-role",
+            "color-contrast",
+            "landmark-one-main",
+            "region"
+          ]
+        },
+        {
+          "path": "/catalogo",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "aria-allowed-role",
+            "color-contrast",
+            "heading-order"
+          ]
+        },
+        {
+          "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/nosotros",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/como-funciona",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/terms-and-conditions",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/cuenta",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/panel/proveedor",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/panel/admin",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/cotizacion",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/pago",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/reserva-confirmada",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/no-existe",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/#login-dialog",
+          "profile": "desktop",
+          "violations": [
+            "aria-allowed-role",
+            "aria-dialog-name",
+            "color-contrast",
+            "region"
+          ]
+        },
+        {
+          "path": "/",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "aria-allowed-role",
+            "color-contrast",
+            "landmark-one-main",
+            "region"
+          ]
+        },
+        {
+          "path": "/catalogo",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "aria-allowed-role",
+            "color-contrast",
+            "heading-order"
+          ]
+        },
+        {
+          "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/nosotros",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/como-funciona",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/terms-and-conditions",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/cuenta",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/panel/proveedor",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/panel/admin",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/cotizacion",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/pago",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/reserva-confirmada",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": [
+            "color-contrast"
+          ]
+        },
+        {
+          "path": "/no-existe",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/#login-dialog",
+          "profile": "mobile",
+          "violations": [
+            "aria-allowed-role",
+            "aria-dialog-name",
+            "color-contrast",
+            "region"
+          ]
+        }
+      ],
+      "runtimeErrors": []
+    },
+    "optimized": {
+      "pointer": {
+        "events": 120,
+        "boundsReads": 1,
+        "styleMutations": 2
+      },
+      "routes": [
+        {
+          "path": "/",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/catalogo",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/nosotros",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/como-funciona",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/terms-and-conditions",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/cuenta",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/panel/proveedor",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/panel/admin",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/cotizacion",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/pago",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/reserva-confirmada",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/no-existe",
+          "profile": "desktop",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/#login-dialog",
+          "profile": "desktop",
+          "violations": []
+        },
+        {
+          "path": "/",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/catalogo",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/nosotros",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/como-funciona",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/terms-and-conditions",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/cuenta",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/panel/proveedor",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/panel/admin",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/cotizacion",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/pago",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/reserva-confirmada",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/no-existe",
+          "profile": "mobile",
+          "overflow": false,
+          "violations": []
+        },
+        {
+          "path": "/#login-dialog",
+          "profile": "mobile",
+          "violations": []
+        }
+      ],
+      "runtimeErrors": []
+    }
+  },
+  "runtime": {
+    "baseline": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "coldHeapBytes": {
+          "median": 2703256,
+          "min": 2701936,
+          "max": 2738348,
+          "runs": [
+            2738348,
+            2703256,
+            2701936
+          ]
+        },
+        "decodedRgbaEstimateBytes": {
+          "median": 29000448,
+          "min": 29000448,
+          "max": 29000448,
+          "runs": [
+            29000448,
+            29000448,
+            29000448
+          ]
+        },
+        "retainedHeapAfterRounds": [
+          {
+            "median": 3773320,
+            "min": 3767708,
+            "max": 3802136,
+            "runs": [
+              3802136,
+              3767708,
+              3773320
+            ]
+          },
+          {
+            "median": 3811340,
+            "min": 3811236,
+            "max": 3844700,
+            "runs": [
+              3844700,
+              3811236,
+              3811340
+            ]
+          },
+          {
+            "median": 3828188,
+            "min": 3828176,
+            "max": 3864056,
+            "runs": [
+              3864056,
+              3828188,
+              3828176
+            ]
+          }
+        ],
+        "retainedDomNodesAfterRounds": [
+          {
+            "median": 701,
+            "min": 700,
+            "max": 701,
+            "runs": [
+              701,
+              701,
+              700
+            ]
+          },
+          {
+            "median": 702,
+            "min": 701,
+            "max": 702,
+            "runs": [
+              702,
+              702,
+              701
+            ]
+          },
+          {
+            "median": 700,
+            "min": 700,
+            "max": 713,
+            "runs": [
+              713,
+              700,
+              700
+            ]
+          }
+        ],
+        "scriptTimeFor120NavigationsMs": {
+          "median": 948.003,
+          "min": 906.8960000000001,
+          "max": 959.855,
+          "runs": [
+            906.8960000000001,
+            959.855,
+            948.003
+          ]
+        },
+        "note": "RGBA estimate is width*height*4 of unique selected image files, not measured GPU/process memory. Heap uses CDP GC; each round is 20 home/catalog round trips."
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "coldHeapBytes": {
+          "median": 2701840,
+          "min": 2701840,
+          "max": 2701844,
+          "runs": [
+            2701844,
+            2701840,
+            2701840
+          ]
+        },
+        "decodedRgbaEstimateBytes": {
+          "median": 10130112,
+          "min": 10130112,
+          "max": 10130112,
+          "runs": [
+            10130112,
+            10130112,
+            10130112
+          ]
+        },
+        "retainedHeapAfterRounds": [
+          {
+            "median": 3771484,
+            "min": 3770508,
+            "max": 3772604,
+            "runs": [
+              3771484,
+              3770508,
+              3772604
+            ]
+          },
+          {
+            "median": 3807380,
+            "min": 3802484,
+            "max": 3809120,
+            "runs": [
+              3802484,
+              3807380,
+              3809120
+            ]
+          },
+          {
+            "median": 3825424,
+            "min": 3820200,
+            "max": 3827396,
+            "runs": [
+              3827396,
+              3820200,
+              3825424
+            ]
+          }
+        ],
+        "retainedDomNodesAfterRounds": [
+          {
+            "median": 697,
+            "min": 697,
+            "max": 699,
+            "runs": [
+              699,
+              697,
+              697
+            ]
+          },
+          {
+            "median": 698,
+            "min": 697,
+            "max": 699,
+            "runs": [
+              697,
+              699,
+              698
+            ]
+          },
+          {
+            "median": 697,
+            "min": 697,
+            "max": 699,
+            "runs": [
+              697,
+              699,
+              697
+            ]
+          }
+        ],
+        "scriptTimeFor120NavigationsMs": {
+          "median": 719.238,
+          "min": 620.308,
+          "max": 764.751,
+          "runs": [
+            764.751,
+            719.238,
+            620.308
+          ]
+        },
+        "note": "RGBA estimate is width*height*4 of unique selected image files, not measured GPU/process memory. Heap uses CDP GC; each round is 20 home/catalog round trips."
+      }
+    ],
+    "optimized": [
+      {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "coldHeapBytes": {
+          "median": 2748892,
+          "min": 2747668,
+          "max": 2748924,
+          "runs": [
+            2747668,
+            2748892,
+            2748924
+          ]
+        },
+        "decodedRgbaEstimateBytes": {
+          "median": 4470400,
+          "min": 4470400,
+          "max": 4470400,
+          "runs": [
+            4470400,
+            4470400,
+            4470400
+          ]
+        },
+        "retainedHeapAfterRounds": [
+          {
+            "median": 3866372,
+            "min": 3864080,
+            "max": 3866712,
+            "runs": [
+              3864080,
+              3866712,
+              3866372
+            ]
+          },
+          {
+            "median": 3901848,
+            "min": 3901120,
+            "max": 3902116,
+            "runs": [
+              3901120,
+              3902116,
+              3901848
+            ]
+          },
+          {
+            "median": 3913456,
+            "min": 3909140,
+            "max": 3916688,
+            "runs": [
+              3913456,
+              3909140,
+              3916688
+            ]
+          }
+        ],
+        "retainedDomNodesAfterRounds": [
+          {
+            "median": 716,
+            "min": 715,
+            "max": 717,
+            "runs": [
+              716,
+              717,
+              715
+            ]
+          },
+          {
+            "median": 715,
+            "min": 715,
+            "max": 716,
+            "runs": [
+              715,
+              716,
+              715
+            ]
+          },
+          {
+            "median": 715,
+            "min": 715,
+            "max": 717,
+            "runs": [
+              715,
+              717,
+              715
+            ]
+          }
+        ],
+        "scriptTimeFor120NavigationsMs": {
+          "median": 621.7719999999999,
+          "min": 565.723,
+          "max": 815.104,
+          "runs": [
+            621.7719999999999,
+            565.723,
+            815.104
+          ]
+        },
+        "note": "RGBA estimate is width*height*4 of unique selected image files, not measured GPU/process memory. Heap uses CDP GC; each round is 20 home/catalog round trips."
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "coldHeapBytes": {
+          "median": 2748788,
+          "min": 2748788,
+          "max": 2748788,
+          "runs": [
+            2748788,
+            2748788,
+            2748788
+          ]
+        },
+        "decodedRgbaEstimateBytes": {
+          "median": 614400,
+          "min": 614400,
+          "max": 614400,
+          "runs": [
+            614400,
+            614400,
+            614400
+          ]
+        },
+        "retainedHeapAfterRounds": [
+          {
+            "median": 3864268,
+            "min": 3860596,
+            "max": 3864768,
+            "runs": [
+              3864768,
+              3860596,
+              3864268
+            ]
+          },
+          {
+            "median": 3900156,
+            "min": 3900148,
+            "max": 3900336,
+            "runs": [
+              3900336,
+              3900148,
+              3900156
+            ]
+          },
+          {
+            "median": 3914476,
+            "min": 3912628,
+            "max": 3914756,
+            "runs": [
+              3914756,
+              3914476,
+              3912628
+            ]
+          }
+        ],
+        "retainedDomNodesAfterRounds": [
+          {
+            "median": 713,
+            "min": 712,
+            "max": 714,
+            "runs": [
+              714,
+              712,
+              713
+            ]
+          },
+          {
+            "median": 713,
+            "min": 712,
+            "max": 713,
+            "runs": [
+              712,
+              713,
+              713
+            ]
+          },
+          {
+            "median": 712,
+            "min": 712,
+            "max": 713,
+            "runs": [
+              713,
+              712,
+              712
+            ]
+          }
+        ],
+        "scriptTimeFor120NavigationsMs": {
+          "median": 808.514,
+          "min": 769.1170000000001,
+          "max": 915.7180000000001,
+          "runs": [
+            915.7180000000001,
+            808.514,
+            769.1170000000001
+          ]
+        },
+        "note": "RGBA estimate is width*height*4 of unique selected image files, not measured GPU/process memory. Heap uses CDP GC; each round is 20 home/catalog round trips."
+      }
+    ]
+  },
+  "visual": {
+    "before": "baseline",
+    "after": "optimized",
+    "geometry": [
+      {
+        "path": "/",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/catalogo",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/nosotros",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/como-funciona",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/terms-and-conditions",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/cuenta",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/panel/proveedor",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/panel/admin",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/cotizacion",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/pago",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/reserva-confirmada",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/no-existe",
+        "profile": "desktop",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/catalogo",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/herramienta/20000000-0000-0000-0000-000000000002",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/nosotros",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/como-funciona",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/terms-and-conditions",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/cuenta",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/panel/proveedor",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/panel/admin",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/cotizacion",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/pago",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/reserva-confirmada",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      },
+      {
+        "path": "/no-existe",
+        "profile": "mobile",
+        "maxGeometryDelta": 0
+      }
+    ],
+    "screenshots": [
+      {
+        "file": "catalogo-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0026496976027547484,
+        "changedPixelFraction": 0.013803331735378715
+      },
+      {
+        "file": "catalogo-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0035378645412921976,
+        "changedPixelFraction": 0.018985369674318818
+      },
+      {
+        "file": "como-funciona-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00017947294332443462,
+        "changedPixelFraction": 0.0005932120500782473
+      },
+      {
+        "file": "como-funciona-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0005982288047281878,
+        "changedPixelFraction": 0.0019772768024516277
+      },
+      {
+        "file": "cotizacion-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.000016230197728272993,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "cotizacion-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00005126266710967969,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "cuenta-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.000028306301944646172,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "cuenta-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00011143437404937266,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "herramienta-20000000-0000-0000-0000-000000000002-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0008462000460997935,
+        "changedPixelFraction": 0.00266956863902415
+      },
+      {
+        "file": "herramienta-20000000-0000-0000-0000-000000000002-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.001967230513332788,
+        "changedPixelFraction": 0.010037538363718622
+      },
+      {
+        "file": "home-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0004607920057713256,
+        "changedPixelFraction": 0.0006725343883547009
+      },
+      {
+        "file": "home-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0003823692123179595,
+        "changedPixelFraction": 0.000775937498612018
+      },
+      {
+        "file": "no-existe-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "no-existe-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "nosotros-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "nosotros-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00021995762851757835,
+        "changedPixelFraction": 0.000017714881512749653
+      },
+      {
+        "file": "pago-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00011523244652458483,
+        "changedPixelFraction": 0.0001343614908283678
+      },
+      {
+        "file": "pago-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0002506507045990333,
+        "changedPixelFraction": 0.0002926767194757269
+      },
+      {
+        "file": "panel-admin-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.000028451545227144357,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "panel-admin-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00011211346449707197,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "panel-proveedor-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.000028451545227144357,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "panel-proveedor-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00011211346449707197,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "reserva-confirmada-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.0000496545768566494,
+        "changedPixelFraction": 0.000007196315486470927
+      },
+      {
+        "file": "reserva-confirmada-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00014818877563975603,
+        "changedPixelFraction": 0.000015108348441681775
+      },
+      {
+        "file": "terms-and-conditions-desktop.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.000020766367496442454,
+        "changedPixelFraction": 0
+      },
+      {
+        "file": "terms-and-conditions-mobile.png",
+        "dimensionsMatch": true,
+        "normalizedMeanAbsoluteError": 0.00005269501663012587,
+        "changedPixelFraction": 0
+      }
+    ],
+    "note": "Color contrast corrections and responsive-image resampling can change pixels. Inspect images; metrics do not replace visual review."
+  },
+  "imageIntegrity": [
+    {
+      "source": "/assets/about-bucaramanga-editorial.png",
+      "pngBytes": 2020589,
+      "webpBytes": 1467178,
+      "width": 1672,
+      "height": 941,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/hero-rotary-hammer-1200.png",
+      "pngBytes": 1179639,
+      "webpBytes": 677568,
+      "width": 1200,
+      "height": 800,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/air-compressor.png",
+      "pngBytes": 331282,
+      "webpBytes": 282636,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/brush-cutter.png",
+      "pngBytes": 115807,
+      "webpBytes": 95370,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/chainsaw.png",
+      "pngBytes": 261083,
+      "webpBytes": 221726,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/concrete-mixer.png",
+      "pngBytes": 279466,
+      "webpBytes": 224650,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/concrete-vibrator.png",
+      "pngBytes": 227794,
+      "webpBytes": 193726,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/floor-polisher.png",
+      "pngBytes": 164440,
+      "webpBytes": 140232,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/inverter-welder.png",
+      "pngBytes": 348416,
+      "webpBytes": 297596,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/manual-tile-cutter.png",
+      "pngBytes": 288685,
+      "webpBytes": 247522,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/mobile-light-tower.png",
+      "pngBytes": 212599,
+      "webpBytes": 180940,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/mobile-scaffold.png",
+      "pngBytes": 201363,
+      "webpBytes": 176796,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/multi-purpose-ladder.png",
+      "pngBytes": 151001,
+      "webpBytes": 129950,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/plate-compactor.png",
+      "pngBytes": 289466,
+      "webpBytes": 249914,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/pneumatic-nail-gun.png",
+      "pngBytes": 388256,
+      "webpBytes": 334864,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/portable-generator.png",
+      "pngBytes": 495363,
+      "webpBytes": 430418,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/power-trowel.png",
+      "pngBytes": 276782,
+      "webpBytes": 237852,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/pressure-washer.png",
+      "pngBytes": 411944,
+      "webpBytes": 357124,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/tamping-rammer.png",
+      "pngBytes": 237556,
+      "webpBytes": 208628,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    },
+    {
+      "source": "/assets/tools/equipment/wet-dry-vacuum.png",
+      "pngBytes": 293575,
+      "webpBytes": 247216,
+      "width": 1448,
+      "height": 1086,
+      "changedVisiblePixels": 0
+    }
+  ]
+}

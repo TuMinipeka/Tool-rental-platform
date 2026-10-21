@@ -1,0 +1,36 @@
+{
+  "testedAt": "2026-10-21T03:49:06.493Z",
+  "realServices": true,
+  "checks": [
+    {
+      "name": "A draft is persisted before publication",
+      "passed": true
+    },
+    {
+      "name": "The public API returns the real price and stored image",
+      "passed": true
+    },
+    {
+      "name": "An already open customer catalog receives the new publication without reloading",
+      "passed": true
+    },
+    {
+      "name": "The price ceiling is opt-in",
+      "passed": true
+    },
+    {
+      "name": "The customer receives actual uploaded image bytes",
+      "passed": true
+    },
+    {
+      "name": "Publishing without physical units does not invent stock",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "supplier-upload.png",
+    "customer-new-publication.png"
+  ],
+  "toolId": "ede88e44-6a96-46bc-be5c-f9024db7b676",
+  "completed": true
+}

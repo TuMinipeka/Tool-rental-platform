@@ -1,0 +1,71 @@
+# Repository working rules
+
+These instructions apply to the entire repository. Read `docs/development-guide.md` and `docs/backend-architecture.md` before changing code.
+
+## Required architecture
+
+- Keep the Maven modules `domain`, `application`, and `infrastructure`.
+- Preserve the dependency direction `infrastructure -> application -> domain`.
+- `domain` may depend only on Java. Do not add Spring, JPA, HTTP, JSON, or database details.
+- `application` may depend on `domain` and Java, never on `infrastructure` or frameworks.
+- Ports belong to the domain; adapters that implement them belong to infrastructure.
+- Organize code first by the existing 25 table-aligned contexts, then by technical responsibility.
+- Keep the project convention of one context per base table. Cross-context invariants retain their atomic transaction boundaries.
+
+## Language and naming
+
+- Write filenames, source identifiers, comments, messages, test names, and configuration keys in English.
+- Write human-facing documentation in Spanish. Keep AI-facing operational instructions, such as this file and skill instructions, in English.
+- Keep the root package `com.toolrental`.
+- Use `PascalCase` for Java types, `camelCase` for members, and lowercase package names.
+- Use the established suffixes `UseCase`, `Command`, `Response`, `Repository`, `Controller`, and `Configuration`.
+- Use plural `snake_case` PostgreSQL table names and singular `snake_case` columns.
+- Use natural English plurals: `category -> categories`, `country -> countries`, `person -> people`. Do not append `s` mechanically when English requires another form.
+
+## Required locations
+
+```text
+domain/<context>/model/{aggregate,entity,valueobject}
+domain/<context>/{event,port/repository}
+application/<context>/{command,dto,usecase,exception}
+infrastructure/<context>/adapters/in/rest/{controllers,dtos}
+infrastructure/<context>/adapters/out/persistence/{entity,mapper,repository}
+infrastructure/<context>/config
+```
+
+Do not add speculative empty classes or abstractions. Empty adapter directories already agreed by the project may use `.gitkeep`.
+
+## Domain and application design
+
+- Put invariants in aggregates and value objects. Do not expose generic setters or mutable collections.
+- Use typed IDs, `Money`/`BigDecimal`, `LocalDate` for reservation dates, and `Instant` with an injected `Clock` for timestamps.
+- Use cases coordinate domain behavior and ports; they do not know HTTP or JPA.
+- Application inputs and outputs are immutable. Never expose JPA entities or mutable aggregates through the API.
+- Keep availability checks and reservation confirmation inside one atomic boundary.
+- `restore` factories rebuild persisted state without emitting new domain events.
+- An HTTP actor identifier must come from the authenticated principal, not from a freely supplied request-body field.
+
+## Infrastructure and database
+
+- Keep JPA entities, mappers, and repository adapters separate.
+- Change the schema only through versioned Flyway migrations; do not use destructive schema generation.
+- Reinforce keys, uniqueness, references, and relevant invariants in PostgreSQL.
+- Keep controllers thin: validate the HTTP contract, create a command, invoke one use case, and map its result or error.
+- Use constructor injection and configuration grouped by business context.
+
+## Quality and documentation
+
+- For frontend interface design, interaction, and motion work, consult `.agents/skills/emil-design-eng/SKILL.md` and apply the guidance relevant to the task.
+- For frontend optimization, prioritize `.agents/skills/performance/SKILL.md` and `.agents/skills/web-quality-audit/SKILL.md`; apply `.agents/skills/vercel-react-best-practices/SKILL.md` to React changes and `.agents/skills/webapp-testing/SKILL.md` to browser verification. Preserve visual design, animations, content, and functionality. Require equivalent before/after measurements before claiming performance improvements.
+- Add tests in the layer that owns each new behavior. Persistence and concurrency require real integration tests.
+- Deliver the corresponding frontend workflow with each user-facing feature; do not report a backend-only change as a completed product feature.
+- Prioritize the runnable presentation build. Validate critical affected paths with focused checks, including real persistence when relevant. Avoid routine full regression runs; use Maven `clean verify` when a broad backend change requires it or the user requests it.
+- Rebuild the running local frontend after changing it and verify the served version, so refreshing the user's URL shows the delivered feature.
+- Apply Java formatting with `mvnw.cmd spotless:apply` or `./mvnw spotless:apply` when required.
+- Update documentation whenever a rule, contract, structure, technology, or implementation status changes.
+- Do not describe templates or planned work as implemented.
+- Treat `docs/product-scope.md` as the approved product contract and `docs/pendientes.md` as the delivery roadmap. Record unresolved commercial rules instead of inventing values in code.
+- Keep Terms and Conditions, privacy notices, protection terms, and user acceptances versioned. Never preselect optional consent or describe the internal Damage Protection Plan as insurance.
+- Keep tax rates, tax-base rules, protection prices, deductibles, and monetary limits explicit and historically reproducible; do not bury changeable commercial or legal values in application code.
+- Write every commit message in English using `<type>: :<gitmoji>: <CamelCaseSummary>`.
+- Keep the summary concatenated without spaces, for example `feat: :card_file_box: AddImplementationMigrations`.

@@ -1,0 +1,80 @@
+{
+  "testedAt": "2026-10-20T20:33:57.752Z",
+  "sourceFingerprint": "a903473550a3699c1d389e4229f1d3142e37c1972d7d15380374760e2571d53a",
+  "scope": "Private production+showcase profile without SMTP; no public HTTPS; fictional academic payment",
+  "checks": [
+    {
+      "name": "Secure profile starts against an isolated showcase database",
+      "passed": true
+    },
+    {
+      "name": "Recovery is disabled in the runtime frontend contract",
+      "passed": true
+    },
+    {
+      "name": "Fictional gateway needs no external credentials",
+      "passed": true
+    },
+    {
+      "name": "password-recovery remains disabled with a stable contract",
+      "passed": true
+    },
+    {
+      "name": "password-reset remains disabled with a stable contract",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI excludes recovery and internal sandbox routes",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI exposes fictional checkout",
+      "passed": true
+    },
+    {
+      "name": "Production refuses legacy unsigned approvals",
+      "passed": true
+    },
+    {
+      "name": "Known demonstration administrator credentials are disabled",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned CUSTOMER can authenticate",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER offline credential rotation revokes prior access",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned SUPPLIER can authenticate",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER offline credential rotation revokes prior access",
+      "passed": true
+    },
+    {
+      "name": "Privately provisioned ADMIN can authenticate",
+      "passed": true
+    },
+    {
+      "name": "ADMIN refresh cookie is Secure, HttpOnly and SameSite=Lax",
+      "passed": true
+    },
+    {
+      "name": "ADMIN offline credential rotation revokes prior access",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

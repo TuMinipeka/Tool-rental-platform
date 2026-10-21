@@ -1,0 +1,5 @@
+# Install in the operator's crontab after configuring private backup.env and SSH.
+# Configure the server timezone to UTC before installing this 03:00 schedule.
+SHELL=/bin/sh
+PATH=/usr/local/bin:/usr/bin:/bin
+0 3 * * * /opt/toolrental/scripts/scheduled-backup.sh

@@ -1,0 +1,52 @@
+{
+  "recordedAt": "2026-10-21T02:11:49.162757+00:00",
+  "integrationCommit": "10a542ec2204b3290a4c788866a3f0ae68190c90",
+  "condeCommit": "f762a5c973254661f842ea8ff177b2b11ae4ff5c",
+  "branch": "developer/daniel",
+  "published": false,
+  "commands": {
+    "mvnw.cmd clean verify": {
+      "tests": 104,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "npm run lint": {
+      "exitCode": 0
+    },
+    "npm run build": {
+      "exitCode": 0
+    },
+    "npm run test:e2e": {
+      "passed": 80,
+      "failed": 0,
+      "skipped": 2
+    },
+    "docker compose config --quiet": {
+      "exitCode": 0
+    }
+  },
+  "logs": [
+    {
+      "path": "frontend/test-results/conde-merge-maven.log",
+      "sha256": "c97d4a8b31e7d9b4c86ecf502d7981cef47feb28c3b8c2f936f88406eef92d36"
+    },
+    {
+      "path": "frontend/test-results/conde-merge-lint.log",
+      "sha256": "043846a64a6ae4438809b4126755bc31e5d4079b5a183ec09958cf6d7b97644f"
+    },
+    {
+      "path": "frontend/test-results/conde-merge-build.log",
+      "sha256": "2d03a02c5dc13d5f1601cbb2e598f1a84c8253522f7f8b4ee3defd67c7a1de62"
+    },
+    {
+      "path": "frontend/test-results/conde-merge-browser-final.log",
+      "sha256": "14e937bd3ebe4ba3ab824b431a49aaab3898f11137aaba6051c8b1a36a5c2eae"
+    }
+  ],
+  "limitations": [
+    "Browser tests use HTTP test doubles; new live role journeys remain pending",
+    "Existing demo database upgrade not exercised",
+    "No public deployment or remote publication performed"
+  ]
+}

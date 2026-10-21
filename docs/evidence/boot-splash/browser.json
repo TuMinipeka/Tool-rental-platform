@@ -1,0 +1,17 @@
+{
+  "testedAt": "2026-10-21T04:59:51.249Z",
+  "url": "http://localhost:5173",
+  "loadingSeen": true,
+  "revealedAtMs": 4755,
+  "internalNavigationDoesNotRepeatSplash": true,
+  "stockControlsPreserved": true,
+  "realCatalogPublishedCount": 33,
+  "runtimeErrors": [],
+  "completed": true,
+  "mergedBranch": "developer/daniel-experiments",
+  "mergedCommit": "b024c61ea7135c324406192a04c5745cb2014c0e",
+  "focusedTestsPassed": 4,
+  "lintPassed": true,
+  "buildPassed": true,
+  "githubPushPerformed": false
+}

@@ -1,0 +1,46 @@
+{
+  "testedAt": "2026-10-21T04:22:25.442Z",
+  "realServices": true,
+  "checks": [
+    {
+      "name": "The supplier sees server persistence and two physical units",
+      "passed": true
+    },
+    {
+      "name": "The supplier can open the exact persisted publication",
+      "passed": true
+    },
+    {
+      "name": "The customer receives the publication without a page reload or search",
+      "passed": true
+    },
+    {
+      "name": "The public card shows real uploaded image and two units",
+      "passed": true
+    },
+    {
+      "name": "All matching stocked publications are shown instead of only the first ten",
+      "passed": true
+    },
+    {
+      "name": "A publication disappears from the default catalog when stock reaches zero",
+      "passed": true
+    },
+    {
+      "name": "An exhausted publication cannot be reserved even in the expanded catalog",
+      "passed": true
+    },
+    {
+      "name": "The customer creates a real held reservation for the new supplier tool",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "supplier-saved.png",
+    "customer-publication.png",
+    "customer-reservation.png"
+  ],
+  "toolId": "086cb4db-d7bd-4fd5-b90f-fe3cb2b0c125",
+  "reservationId": "319af61c-0c05-4c5d-909c-939c62a9dafb",
+  "completed": true
+}

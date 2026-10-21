@@ -1,0 +1,34 @@
+# Reglas visuales vigentes
+
+El diseño de Conde es la referencia de interfaz. Esta guía consolida reglas aún válidas de los documentos de rediseño retirados; no es un encargo de rediseño nuevo.
+
+- Conservar el logo y el símbolo aprobados, su geometría y proporciones.
+- Mantener amarillo eléctrico, cyan, fondos industriales oscuros y superficies claras, con ajustes de contraste accesibles.
+- Mantener tipografías Archivo y Public Sans, composición adaptable, imágenes y animaciones existentes.
+- No sustituir componentes por capturas ni presentar favoritos, métricas, pagos o notificaciones inexistentes como funcionales.
+- Preservar teclado, foco visible, semántica de enlaces, jerarquía de títulos y movimiento reducido.
+- Usar las rutas unificadas de acceso y registro del diseño integrado.
+- Toda optimización necesita evidencia comparable; una integración no acredita por sí sola mejoras de rendimiento.
+
+## Pantalla de carga inicial
+
+`frontend/index.html` incluye en línea una pantalla de carga con SVG y CSS, sin imágenes ni video, para que se pinte antes que el bundle de React. Sobre fondo `#101318`, una cinta métrica amarilla sale de su carcasa mientras la lectura en centímetros aumenta junto al texto «Tomando medidas».
+
+- En cada carga completa del sitio aparece de inmediato y permanece al menos 4 s. Mientras tanto, React carga y renderiza la interfaz en segundo plano.
+- La cinta llega cerca del 90 % de su recorrido a los 4 s y después avanza cada vez más lento hasta los 12 s: una carga lenta sigue desenrollando la cinta sin detenerse. La lectura es decorativa y no representa un porcentaje de progreso.
+- Al cumplirse el mínimo y con la aplicación renderizada, `src/lib/bootSplash.js` recoge la cinta de golpe en 260 ms. Luego la pantalla se disuelve en 420 ms mientras la interfaz principal sube 12 px y aparece con un fundido de 520 ms (clase temporal `app-entering`).
+- Movimiento reducido: la cinta se muestra estática, se respeta el mínimo de 4 s y la interfaz solo aparece con un fundido.
+- `tests/boot-splash.spec.js` verifica el mínimo, el renderizado en segundo plano, la transición y el movimiento reducido. La suite general elimina la pantalla al cargar para que no tape las interacciones.
+
+## Refinamiento minimalista
+
+`frontend/src/refine.css` se carga al final y concentra los ajustes de refinamiento sobre el diseño de Conde, sin cambiar paleta, tipografías ni componentes:
+
+- Texto mínimo de 12 px en tarjetas, filtros, metadatos y pasos; las etiquetas superiores que aportan contexto se muestran en minúsculas y sin línea decorativa.
+- Los títulos usan relleno sólido en lugar de palabras contorneadas.
+- Se retiraron elementos decorativos o repetidos: textos verticales, coordenadas y retícula del hero, franja de beneficios del hero, numeración de categorías, estado repetido en equipos destacados, órbita de la sección de proveedores, botón de favoritos sin funcionalidad, recuadro «Información verificada», bloque «Lo que sí sabemos» del detalle y el cierre duplicado de «Mi cuenta».
+- Las sombras desplazadas sólidas se conservan solo en estados seleccionados; las superficies grandes usan elevación suave.
+- Los paneles operativos muestran títulos compactos y métricas con un único tratamiento neutro.
+- Con sesión de proveedor o administrador, las secciones del dashboard se integran al header; consulta [navegación por rol](role-navigation.md).
+
+Las fotografías deben tener permiso de uso y evitar datos personales identificables. Los activos oficiales del catálogo se organizan en `frontend/public/assets/tools/equipment/` con versiones optimizadas. Los [resultados previos de calidad](frontend-quality.md) identifican la versión medida y no describen automáticamente este MVP.

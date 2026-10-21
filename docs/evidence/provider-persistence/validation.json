@@ -1,0 +1,92 @@
+{
+  "validatedAt": "2026-10-21T03:12:59.615018+00:00",
+  "localDate": "2026-10-20",
+  "timezone": "America/Bogota",
+  "sourceCommit": "b3ac9f53b0cb70a6edc257841fa92396ee4beb83",
+  "sourceFingerprint": "e26eba334a6d203debef760aa10cf28a5bbcf5362ac8e52097ea18ac7e982c9d",
+  "retainedUncommittedChange": "frontend/src/premium.css: existing comment-only change preserved",
+  "java": {
+    "command": "mvnw.cmd clean verify",
+    "modules": {
+      "domain": {
+        "tests": 27,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "application": {
+        "tests": 16,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      "infrastructure": {
+        "tests": 69,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    },
+    "reportSha256": {
+      "domain/target/surefire-reports/TEST-com.toolrental.domain.common.AggregateEventsTest.xml": "387a4f1fbc3a8012b1d585921e9524489709a75dc1c9bd64b60365e72779fba5",
+      "domain/target/surefire-reports/TEST-com.toolrental.domain.CriticalPolicyTest.xml": "3ad5537cdfd28a81f213662ddc1a98b6b9a9a56f624f4708a6847aedfbc471e6",
+      "domain/target/surefire-reports/TEST-com.toolrental.domain.OperationalRecordsTest.xml": "2a290c79f51878f8f018f59ed19930ad2e423accbe7fbc6050974f3414518b4e",
+      "domain/target/surefire-reports/TEST-com.toolrental.domain.reservation.ReservationTest.xml": "1e7f3d325da59f23ee7309e9e5aecde18e69d6303bf8ef55453aff0e253c50f6",
+      "application/target/surefire-reports/TEST-com.toolrental.application.ApplicationExceptionsTest.xml": "c3a9d5f7801fb4eaafb5d275530f8459bd6cfc1ec47a585af6d7b50b736018e3",
+      "application/target/surefire-reports/TEST-com.toolrental.application.CatalogAndReservationsTest.xml": "916f5d466fc36148766404b1c5ceacbc2a79e2a31fc615efa49e3b926c27dca4",
+      "application/target/surefire-reports/TEST-com.toolrental.application.EquipmentUnitListingUseCaseTest.xml": "0fbee616bd87a6ec4617d86f9d1bce97a4db30590833290fe3121e734f499ae1",
+      "application/target/surefire-reports/TEST-com.toolrental.application.RefreshSessionUseCaseTest.xml": "1034638ed1f977c2bf54c6d918e16f9fff0e59933e935e02d1496225850ac39d",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.ArchitectureTest.xml": "d5f06d7b65bff41faab545924ac038a502f28e9f8862f2f957b48e9c765d880e",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.BeanConfigurationTest.xml": "9c0b219fe34cd514e23bc63b9187a59e6ac3b72a1e2e0c375cd1a6c025bd62b0",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.BoundedContextBeanWiringTest.xml": "6bdbd0f8eaa274d6ab95c28a30d78bd63c2e316c493a144597bdaae21117bf60",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.BoundedContextHttpMappingTest.xml": "c1991450fcdf8186a3c6922d8f81cdf7806afa235399dd6e8c788f16290f7a3c",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.common.web.MvpFeatureFilterTest.xml": "3598b9fa7977c87c9d6a83e9a11f0b11dc7faa77d984b89a8e464cde5c3e50bd",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.DatabaseConnectivityProbeTest.xml": "364177b31e9dbace446a0b107a14016c5a0ab07faace4f4f1bc7f1622424d89d",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.DatabaseStatusControllerTest.xml": "cd82191c745961469577ca0470e55e2bb65e04f88b6f1cf5e136383502abd7d6",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.FictionalPaymentIntegrationTest.xml": "9b75d5a021bdc94a6dfcc7dedaabf0c5d8c80e9de7deadd3bdccf4570fd12c39",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.FlywayUpgradeIntegrationTest.xml": "998b8c283f8474f01adfa44eca3ad59f954c077d83cea49ed9d74a46b01992a1",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.MappingContractTest.xml": "79d7fcbef9454f7b9b56894088c53544fbada7196b15af61e6daa03e9957e465",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.payment.adapters.in.rest.MercadoPagoWebhookVerifierTest.xml": "5c58074c4bcabfab3705762ae64de1ae4340a9009d6e390fa35464d3469bf28a",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.payment.adapters.out.gateway.MercadoPagoPaymentGatewayTest.xml": "34b787f2e0bd1cb9b059fdedc7b56046b8992a89455c68302e4be9138816092c",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.PostgresIntegrationTest.xml": "e8070ee87fd55ba57f454cd2eb39cdc57b73052872a950f170746aec9d19b368",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.PostgreSqlPersistenceIntegrationTest.xml": "237b6f4288d2b0f00589f797940ab62d13d6a3a73c2e76c15b20536ab98f7b48",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.ShowcaseConfigurationTest.xml": "ab30d00b50e8601d10d1a494bbb224a8f2f1937db464ed6a5795abd317fd7adf",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.toolimage.FileSystemToolImageStorageTest.xml": "7120d1425f098b4d96f7ff62caac841efeea17bef7c8a720a2a5a5708a7aab9f",
+      "infrastructure/target/surefire-reports/TEST-com.toolrental.infrastructure.toolimage.ToolImageRollbackTest.xml": "1b644679fa39d7499c5f02e2df178021e4eab7719ea40e30544afb0393aa2ad6"
+    }
+  },
+  "frontend": {
+    "lint": true,
+    "build": true,
+    "browserPassed": 84,
+    "browserFailed": 0,
+    "browserSkipped": 2
+  },
+  "liveBrowser": {
+    "tool": "Playwright CLI",
+    "checksPassed": 67,
+    "apiMocks": false,
+    "sqlFinalSnapshotVerified": true
+  },
+  "backup": {
+    "databaseRestored": true,
+    "imagesRestored": true,
+    "containerRecreation": true,
+    "offsiteCopy": false
+  },
+  "configuration": {
+    "localCompose": true,
+    "isolatedCompose": true,
+    "showcaseSyntaxWithTemporaryValidationValues": true,
+    "backupShellSyntax": true,
+    "documentationLinksChecked": 11
+  },
+  "runtime": {
+    "frontend": "http://localhost:5173",
+    "databaseStatus": "http://localhost:8080/status/database",
+    "database": "tool_rental_demo_conde_mvp",
+    "postgresPort": 5433
+  },
+  "publishedToGitHub": false,
+  "publicDeploymentPerformed": false
+}

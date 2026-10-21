@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Comprueba en tiempo real la conexión de Tool Rental con su base de datos.">
+  <title>Estado de conexión · Tool Rental</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/connection-status.css">
+  <script src="/connection-status.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="/" aria-label="Tool Rental, inicio"><span class="brand-mark" aria-hidden="true">TR</span><span>Tool Rental<span class="brand-caption">PLATAFORMA DE ALQUILER</span></span></a><span class="environment">Entorno local <span aria-hidden="true">/</span> :8080</span></header>
+  <main>
+    <p class="eyebrow">ESTADO DEL SISTEMA</p>
+    <section class="connection-panel" data-state="checking" aria-labelledby="status-title" aria-busy="true">
+      <div class="signal" aria-hidden="true"><svg class="success-symbol" viewBox="0 0 32 32"><path d="m7 16 6 6L25 10"/></svg><span class="other-symbol">···</span></div>
+      <div class="status-copy" role="status" aria-live="polite" aria-atomic="true"><span class="status-label" id="status-label">COMPROBANDO CONEXIÓN</span><h1 id="status-title">Conectando con tu base de datos…</h1><p id="status-description">Estamos comprobando que el backend puede consultar PostgreSQL.</p></div>
+      <div class="connection-path" aria-label="Trayecto de la conexión"><span><i aria-hidden="true"></i>Backend</span><span class="path-line" aria-hidden="true"></span><span><i aria-hidden="true"></i>PostgreSQL</span></div>
+      <div class="panel-footer"><div><span class="detail-label">ÚLTIMA COMPROBACIÓN</span><time id="checked-at">Pendiente</time></div><button id="recheck" type="button" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M6 8a7 7 0 0 1 12-2l2 3M4 15l2 3a7 7 0 0 0 12-2"/></svg><span>Comprobar de nuevo</span></button></div>
+    </section>
+    <p class="verification-note">Estado consultado en tiempo real. Se actualiza cada 30 segundos.</p>
+    <noscript><p class="script-notice">Activa JavaScript para comprobar la conexión. También puedes consultar <a href="/status/database">el estado del servidor</a>.</p></noscript>
+  </main>
+  <footer class="site-footer"><span>Tool Rental Platform</span><span>Una base lista para seguir construyendo.</span></footer>
+</body>
+</html>

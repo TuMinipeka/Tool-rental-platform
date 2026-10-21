@@ -1,0 +1,28 @@
+# Diagrama conceptual entidad-relación
+
+La ilustración histórica representa las 25 entidades descritas en el [modelo conceptual](../conceptual-model.md): el modelo base y siete ampliaciones críticas de seguridad y operación.
+
+## Archivos
+
+- [Escena editable de Excalidraw](conceptual-er-model.excalidraw).
+- [Vista vectorial](conceptual-er-model.svg).
+- [Vista PNG](conceptual-er-model.png).
+- [Auditoría](conceptual-er-model.audit.json) con conteos y huella de la fuente.
+
+![Diagrama conceptual ER](conceptual-er-model.svg)
+
+## Notación
+
+Los rectángulos representan entidades. `[ID]` identifica la identidad conceptual, `[unique]` una clave alternativa y `?` un dato opcional. Las multiplicidades usan `1`, `0..1`, `0..N` y `1..N`.
+
+La primera sección conserva el modelo base. El panel de ampliación conecta usuario con sesiones y recuperación, reserva con política, tarifa, terminación y extensión, y pagos con reembolsos. Es un modelo conceptual; tipos SQL, índices y restricciones físicas se documentan en las migraciones.
+
+Para editar, abre el archivo `.excalidraw` y vuelve a exportar SVG y PNG. Actualiza también la huella SHA-256 del modelo y los conteos de la auditoría.
+
+## Modelo lógico y físico
+
+El [modelo relacional](../logical-physical-model.md) añade PK, FK y cardinalidades extraídas del esquema real. Se conserva el conceptual editable de Excalidraw como artefacto distinto.
+
+## Cambio de relación de factura (V210)
+
+El texto conceptual y el modelo relacional vigente enlazan Invoice con Reservation, permitiendo emitir el comprobante antes de iniciar Rental. La ilustración Excalidraw/SVG/PNG conservada es una instantánea anterior y aún muestra la relación histórica con Rental; no debe usarse para generar el esquema. Su auditoría mantiene la huella original y marca que no verifica la fuente actual. Usa el [relacional actualizado](relational-model.svg) y el [DDL](physical-schema.sql) para claves y cardinalidades vigentes.

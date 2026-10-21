@@ -1,5 +1,66 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   application:
     name: tool-rental-platform
-  main:
-    web-application-type: none
+  profiles:
+    default: local
+  flyway:
+    enabled: true
+    validate-on-migrate: true
+    baseline-on-migrate: false
+    clean-disabled: true
+    locations: classpath:db/migration
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:2}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:30000}
+
+auth:
+  jwt:
+    secret: ${JWT_SECRET:local-development-secret-change-before-production-2026}
+    access-ttl: ${JWT_ACCESS_TTL:PT15M}
+    refresh-ttl: ${AUTH_REFRESH_TTL:P30D}
+    refresh-reuse-grace: ${AUTH_REFRESH_REUSE_GRACE:PT10S}
+  cookie:
+    secure: ${AUTH_COOKIE_SECURE:false}
+    same-site: ${AUTH_COOKIE_SAME_SITE:Lax}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
+payments:
+  provider: ${PAYMENT_PROVIDER:fictional}
+  internal-enabled: ${PAYMENTS_INTERNAL_ENABLED:false}
+  mercadopago:
+    access-token: ${MERCADOPAGO_ACCESS_TOKEN:}
+    collector-id: ${MERCADOPAGO_COLLECTOR_ID:}
+    webhook-secret: ${MERCADOPAGO_WEBHOOK_SECRET:}
+    public-url: ${PAYMENTS_PUBLIC_URL:}
+  sandbox:
+    webhook-secret: ${SANDBOX_WEBHOOK_SECRET:local-sandbox-webhook-secret-change-me-2026}
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    operations-sorter: method
+  cache:
+    max-entries: 20
+
+tool-images:
+  storage-directory: ${TOOL_IMAGES_DIRECTORY:./storage/tool-images}

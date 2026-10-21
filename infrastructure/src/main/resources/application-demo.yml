@@ -1,0 +1,9 @@
+spring:
+  config:
+    activate:
+      on-profile: demo
+  flyway:
+    out-of-order: true
+    locations:
+      - classpath:db/migration
+      - classpath:db/demo

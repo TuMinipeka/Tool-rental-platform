@@ -1,0 +1,42 @@
+{
+  "name": "tool-rental-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "images:optimize": "node scripts/optimize-images.mjs",
+    "test:e2e": "playwright test",
+    "audit:serve": "node scripts/start-audit-server.mjs",
+    "audit:lighthouse": "node scripts/audit.mjs",
+    "audit:browser": "node scripts/browser-audit.mjs",
+    "audit:runtime": "node scripts/runtime-audit.mjs",
+    "audit:bundle": "node scripts/bundle-report.mjs",
+    "audit:delivery": "node scripts/check-delivery.mjs",
+    "audit:visual": "node scripts/compare-visual.mjs",
+    "audit:report": "node scripts/report-audit.mjs"
+  },
+  "dependencies": {
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@fontsource-variable/public-sans": "^5.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "@vitejs/plugin-react": "^6.1.2",
+    "chrome-launcher": "^1.2.2",
+    "eslint": "^10.12.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
+    "globals": "^17.13.0",
+    "lighthouse": "^13.5.0",
+    "sharp": "^0.35.5",
+    "vite": "^8.3.4"
+  }
+}

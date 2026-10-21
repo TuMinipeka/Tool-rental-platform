@@ -1,0 +1,92 @@
+{
+  "testedAt": "2026-10-20T20:09:16.799Z",
+  "sourceFingerprint": "8451f65c1caf7aad0532181dfbc364b132008d335e78105eb4b0dc94dbc3c760",
+  "scope": "Real isolated frontend/backend/PostgreSQL; no API mocks; external checkout acceptance unavailable without credentials",
+  "checks": [
+    {
+      "name": "Isolated application becomes ready",
+      "passed": true
+    },
+    {
+      "name": "JDBC connection remains active after migration",
+      "passed": true
+    },
+    {
+      "name": "Runtime capability disables recovery",
+      "passed": true
+    },
+    {
+      "name": "Unconfigured provider is not presented as available",
+      "passed": true
+    },
+    {
+      "name": "/auth/password-recovery is disabled",
+      "passed": true
+    },
+    {
+      "name": "/auth/password-reset is disabled",
+      "passed": true
+    },
+    {
+      "name": "/payments/simulations is disabled",
+      "passed": true
+    },
+    {
+      "name": "/payments/sandbox/webhooks is disabled",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI advertises only versioned routes",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI excludes disabled recovery and internal approvals",
+      "passed": true
+    },
+    {
+      "name": "OpenAPI publishes hosted checkout",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER loads real scoped endpoint data",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER authenticates against real API and renders its view",
+      "passed": true
+    },
+    {
+      "name": "CUSTOMER keeps credentials and access tokens out of web storage",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER loads real scoped endpoint data",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER authenticates against real API and renders its view",
+      "passed": true
+    },
+    {
+      "name": "SUPPLIER keeps credentials and access tokens out of web storage",
+      "passed": true
+    },
+    {
+      "name": "ADMIN loads real scoped endpoint data",
+      "passed": true
+    },
+    {
+      "name": "ADMIN authenticates against real API and renders its view",
+      "passed": true
+    },
+    {
+      "name": "ADMIN keeps credentials and access tokens out of web storage",
+      "passed": true
+    },
+    {
+      "name": "Reset URL cannot expose a form while recovery is disabled",
+      "passed": true
+    }
+  ],
+  "completed": true
+}

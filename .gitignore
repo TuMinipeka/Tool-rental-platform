@@ -1,6 +1,7 @@
 # Archivos locales de editores y sistema
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
 .DS_Store
 Thumbs.db
 
@@ -12,4 +13,21 @@ Thumbs.db
 # Artefactos de futuras implementaciones
 target/
 node_modules/
+frontend/dist/
+frontend/test-results/
+frontend/playwright-report/
 *.log
+
+# Browser verification artifacts
+.playwright-cli/
+.impeccable/review/
+tmp/
+
+# Public showcase template and private operational artifacts
+!.env.showcase.example
+backups/
+
+!.env.mercadopago.example
+
+# Uploaded images are private runtime artifacts, not repository assets
+storage/

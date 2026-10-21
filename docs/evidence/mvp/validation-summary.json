@@ -1,0 +1,265 @@
+{
+  "recordedAt": "2026-10-20T21:24:57.539005+00:00",
+  "validatedSourceCommit": "8e68b8baa1edb619297482f0e8e6083e79cab508",
+  "condeReference": "981a16ecd863531fdb16a6547358ace130be19d6",
+  "sourceFingerprint": "9740ec24a5e576450e4a22603b548f095ba55080fe05dae1e632f3614565e08e",
+  "maven": {
+    "command": ".\\mvnw.cmd clean verify",
+    "java": "21.0.12.1",
+    "finishedAt": "2026-10-20T16:06:24-05:00",
+    "result": "BUILD SUCCESS",
+    "suites": [
+      {
+        "suite": "com.toolrental.domain.common.AggregateEventsTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.CriticalPolicyTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.OperationalRecordsTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.domain.reservation.ReservationTest",
+        "tests": 12,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.ApplicationExceptionsTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.CatalogAndReservationsTest",
+        "tests": 11,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.EquipmentUnitListingUseCaseTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.application.RefreshSessionUseCaseTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.ArchitectureTest",
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BeanConfigurationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BoundedContextBeanWiringTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.BoundedContextHttpMappingTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.common.web.MvpFeatureFilterTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.DatabaseConnectivityProbeTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.DatabaseStatusControllerTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.FictionalPaymentIntegrationTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.FlywayUpgradeIntegrationTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.MappingContractTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PasswordRecoveryNotifierTest",
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.payment.adapters.in.rest.MercadoPagoWebhookVerifierTest",
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.payment.adapters.out.gateway.MercadoPagoPaymentGatewayTest",
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PostgresIntegrationTest",
+        "tests": 23,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.PostgreSqlPersistenceIntegrationTest",
+        "tests": 8,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      },
+      {
+        "suite": "com.toolrental.infrastructure.ShowcaseConfigurationTest",
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0
+      }
+    ],
+    "totals": {
+      "tests": 105,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "logSha256": "65764fce6d4027156e10ff5102bb8129e7c6e3f1d708a0c543c2139e8b0f4fc9"
+  },
+  "frontend": {
+    "commands": [
+      "npm run lint",
+      "npm run build",
+      "npm run test:e2e"
+    ],
+    "passed": 88,
+    "failed": 0,
+    "skipped": 2,
+    "scope": "Isolated API fixtures, desktop/mobile, accessibility, motion, supplier forms and CSRF renewal on logout after login/refresh",
+    "logSha256": "8682baa8f9c4a9d2e20bb3974bcee65e0234122cb914568e3ff10b15c681187e"
+  },
+  "integration": {
+    "command": "node frontend/scripts/verify-role-workflows.mjs",
+    "passed": 91,
+    "screenshots": 23,
+    "scope": "Real isolated React, Spring Boot and PostgreSQL; no API mocks",
+    "evidence": "role-workflows.json",
+    "authRateLimitUnchanged": true
+  },
+  "security": {
+    "command": "node scripts/verify-showcase.mjs",
+    "passed": 18,
+    "scope": "Private production+showcase without SMTP or payment credentials; session cookies, roles, disabled legacy routes and recovery",
+    "evidence": "secure-profile.json"
+  },
+  "operationalCommands": [
+    "node scripts/verify-backup.mjs",
+    "node scripts/audit-database.mjs",
+    "node scripts/verify-configuration.mjs"
+  ],
+  "localImages": {
+    "tool-rental-mvp-backend:working": "sha256:ef2eb6622bfd74cf0cde96380547bdc08b4de22938a83a87af3e7323d632eb9f",
+    "tool-rental-mvp-frontend:working": "sha256:b97e991f8c672e086776242ff67a5cf9cd997124c6e6c80f3776f149a9e1682e"
+  },
+  "publicDeploymentPerformed": false,
+  "privateConfiguration": {
+    "path": ".env.validation",
+    "gitIgnored": true,
+    "scope": "Local isolated fictitious data only; public target uses private .env.showcase"
+  },
+  "scopeDecisions": {
+    "provider": "Persistent fictional academic gateway",
+    "currency": "COP",
+    "liveCharges": false,
+    "paypal": "deferred",
+    "emailAndRecovery": "deferred and disabled"
+  },
+  "historicalEvidence": [
+    {
+      "evidence": "live-integration.json",
+      "scope": "Previous internal HMAC and Mailpit journey; not current public acceptance"
+    },
+    {
+      "evidence": "arm-manifests.json",
+      "scope": "Base image architecture manifests; no Oracle ARM runtime acceptance"
+    },
+    {
+      "evidence": "hosted-integration.json",
+      "scope": "Previous external-provider preparation; superseded by fictional payment scope"
+    }
+  ],
+  "tomcat": {
+    "command": "node scripts/verify-tomcat.mjs",
+    "serverVersion": "Apache Tomcat/10.1.55",
+    "mode": "embedded executable JAR",
+    "internalPort": 8080,
+    "databaseConnected": true,
+    "evidence": "tomcat-runtime.json"
+  },
+  "externalPaymentCredentialsRequired": false,
+  "previousIntegrationEvidence": {
+    "evidence": "fictional-integration.json",
+    "passed": 19,
+    "scope": "Earlier subset of the real fictional payment and rental lifecycle"
+  }
+}

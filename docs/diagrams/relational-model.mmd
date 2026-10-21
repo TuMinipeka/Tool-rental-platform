@@ -1,0 +1,282 @@
+erDiagram
+    cancellation_policies {
+        uuid cancellation_policy_id PK
+        integer policy_version
+        integer cutoff_hours
+        numeric late_cancellation_rate
+        numeric no_show_rate
+        integer no_show_grace_minutes
+        boolean active
+        timestamp_with_time_zone effective_at
+    }
+    categories {
+        uuid category_id PK
+        character_varying name
+        character_varying description
+    }
+    customers {
+        uuid user_id PK,FK
+        character_varying person_type
+        character_varying document_type
+        character_varying document_number
+        character_varying billing_name
+    }
+    damage_reports {
+        uuid damage_report_id PK
+        uuid reservation_id FK
+        uuid equipment_unit_id FK
+        timestamp_with_time_zone reported_at
+        character_varying description
+        character_varying report_status
+        numeric assessed_cost
+    }
+    delivery_rates {
+        uuid delivery_rate_id PK
+        integer rate_version
+        numeric amount
+        character currency
+        boolean active
+        timestamp_with_time_zone effective_at
+    }
+    equipment_units {
+        uuid equipment_unit_id PK
+        uuid tool_id FK
+        character_varying inventory_code
+        character_varying serial_number
+        character_varying current_condition
+        character_varying operational_status
+    }
+    invoice_items {
+        uuid invoice_id PK,FK
+        integer line_number PK
+        character_varying issued_description
+        numeric quantity
+        numeric issued_unit_price
+    }
+    invoices {
+        uuid invoice_id PK
+        uuid reservation_id FK
+        character_varying number
+        timestamp_with_time_zone issued_at
+        character_varying invoice_status
+        character_varying issued_supplier_name
+        character_varying issued_supplier_document
+        character_varying issued_customer_name
+        character_varying issued_customer_document
+    }
+    password_reset_tokens {
+        uuid password_reset_token_id PK
+        uuid user_id FK
+        character token_hash
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone expires_at
+        timestamp_with_time_zone used_at
+        timestamp_with_time_zone revoked_at
+    }
+    payments {
+        uuid payment_id PK
+        uuid reservation_id FK
+        character_varying processor
+        character_varying external_reference
+        numeric amount
+        character_varying payment_status
+        timestamp_with_time_zone recorded_at
+        timestamp_with_time_zone confirmed_at
+        character_varying payment_method
+        character_varying payment_stage
+        character_varying idempotency_key
+        character_varying card_network
+        character_varying card_last_four
+        smallint card_expiry_month
+        smallint card_expiry_year
+        character_varying adjustment_type
+        uuid adjustment_reference
+        timestamp_with_time_zone checkout_expires_at
+        character_varying checkout_preference_id
+        character_varying checkout_url
+        character_varying provider_payment_id
+        character_varying checkout_phase
+        integer checkout_attempts
+        timestamp_with_time_zone checkout_lease_until
+        timestamp_with_time_zone checkout_retry_at
+        character_varying fictional_outcome
+        boolean fictional_refunded
+    }
+    refunds {
+        uuid refund_id PK
+        uuid payment_id FK
+        uuid reservation_termination_id FK
+        numeric amount
+        character currency
+        character_varying refund_status
+        character_varying idempotency_key
+        timestamp_with_time_zone recorded_at
+        timestamp_with_time_zone confirmed_at
+    }
+    rentals {
+        uuid reservation_id PK,FK
+        timestamp_with_time_zone started_at
+        character_varying rental_status
+    }
+    reservation_extensions {
+        uuid reservation_extension_id PK
+        uuid reservation_id FK
+        uuid requested_by FK
+        date requested_return_date
+        character_varying extension_status
+        timestamp_with_time_zone requested_at
+        uuid resolved_by FK
+        timestamp_with_time_zone resolved_at
+        numeric additional_amount
+        character currency
+        character_varying idempotency_key
+    }
+    reservation_items {
+        uuid reservation_id PK,FK
+        uuid equipment_unit_id PK,FK
+        numeric agreed_daily_rate
+    }
+    reservation_terminations {
+        uuid reservation_termination_id PK
+        uuid reservation_id FK
+        character_varying termination_type
+        character_varying termination_status
+        uuid requested_by FK
+        timestamp_with_time_zone requested_at
+        uuid resolved_by FK
+        timestamp_with_time_zone resolved_at
+        character_varying reason
+        numeric fee_amount
+        numeric refund_amount
+        numeric outstanding_amount
+        character currency
+        character_varying idempotency_key
+    }
+    reservations {
+        uuid reservation_id PK
+        uuid customer_id FK
+        timestamp_with_time_zone created_at
+        date start_date
+        date return_date
+        timestamp_with_time_zone expires_at
+        character_varying reservation_status
+        character currency
+        timestamp_with_time_zone confirmed_at
+        timestamp_with_time_zone scheduled_fulfillment_at
+        character_varying fulfillment_method
+        uuid delivery_rate_id FK
+        uuid cancellation_policy_id FK
+        numeric delivery_fee
+        date effective_return_date
+        character_varying delivery_address_line
+        character_varying delivery_city
+        character_varying delivery_region
+        character delivery_country_code
+    }
+    roles {
+        smallint role_id PK
+        character_varying code
+        character_varying description
+    }
+    suppliers {
+        uuid user_id PK,FK
+        character_varying document_type
+        character_varying document_number
+        character_varying business_name
+    }
+    tool_images {
+        uuid tool_id PK,FK
+        character_varying image_url PK
+    }
+    tools {
+        uuid tool_id PK
+        uuid supplier_id FK
+        uuid category_id FK
+        character_varying name
+        character_varying description
+        numeric current_daily_rate
+        character rate_currency
+        character_varying publication_status
+    }
+    unit_deliveries {
+        uuid reservation_id PK,FK
+        uuid equipment_unit_id PK,FK
+        timestamp_with_time_zone scheduled_at
+        timestamp_with_time_zone delivered_at
+        character_varying outbound_condition
+        character_varying address_line
+        character_varying city
+        character_varying region
+        character_varying country
+        character_varying fulfillment_method
+        character_varying delivery_status
+        character_varying failure_type
+        character_varying failure_reason
+        timestamp_with_time_zone failed_at
+    }
+    unit_returns {
+        uuid reservation_id PK,FK
+        uuid equipment_unit_id PK,FK
+        timestamp_with_time_zone received_at
+        character_varying inbound_condition
+        character_varying notes
+        integer late_days
+        numeric late_fee
+        character late_fee_currency
+    }
+    user_roles {
+        uuid user_id PK,FK
+        smallint role_id PK,FK
+    }
+    user_sessions {
+        uuid session_id PK
+        uuid family_id
+        uuid user_id FK
+        character refresh_token_hash
+        character_varying session_status
+        timestamp_with_time_zone created_at
+        timestamp_with_time_zone expires_at
+        timestamp_with_time_zone rotated_at
+        timestamp_with_time_zone revoked_at
+        uuid replaced_by_session_id FK
+        character_varying client_label
+    }
+    users {
+        uuid user_id PK
+        character_varying email
+        character_varying display_name
+        character_varying password_hash
+        character_varying account_status
+        timestamp_with_time_zone registered_at
+    }
+    users ||--o| customers : "customers_user_id_fkey"
+    unit_returns ||--o{ damage_reports : "damage_reports_return"
+    tools ||--o{ equipment_units : "equipment_units_tool_id_fkey"
+    invoices ||--o{ invoice_items : "invoice_items_invoice_id_fkey"
+    reservations ||--o| invoices : "invoices_reservation_id_fkey"
+    users ||--o{ password_reset_tokens : "password_reset_tokens_user_id_fkey"
+    reservations ||--o{ payments : "payments_reservation_id_fkey"
+    payments ||--o{ refunds : "refunds_payment_id_fkey"
+    reservation_terminations |o--o{ refunds : "refunds_reservation_termination_id_fkey"
+    reservations ||--o| rentals : "rentals_reservation_id_fkey"
+    users ||--o{ reservation_extensions : "reservation_extensions_requested_by_fkey"
+    reservations ||--o{ reservation_extensions : "reservation_extensions_reservation_id_fkey"
+    users |o--o{ reservation_extensions : "reservation_extensions_resolved_by_fkey"
+    equipment_units ||--o{ reservation_items : "reservation_items_equipment_unit_id_fkey"
+    reservations ||--o{ reservation_items : "reservation_items_reservation_id_fkey"
+    users ||--o{ reservation_terminations : "reservation_terminations_requested_by_fkey"
+    reservations ||--o{ reservation_terminations : "reservation_terminations_reservation_id_fkey"
+    users |o--o{ reservation_terminations : "reservation_terminations_resolved_by_fkey"
+    cancellation_policies ||--o{ reservations : "reservations_cancellation_policy_id_fkey"
+    customers ||--o{ reservations : "reservations_customer_id_fkey"
+    delivery_rates |o--o{ reservations : "reservations_delivery_rate_id_fkey"
+    users ||--o| suppliers : "suppliers_user_id_fkey"
+    tools ||--o{ tool_images : "tool_images_tool_id_fkey"
+    categories ||--o{ tools : "tools_category_id_fkey"
+    suppliers ||--o{ tools : "tools_supplier_id_fkey"
+    reservation_items ||--o| unit_deliveries : "unit_deliveries_item"
+    unit_deliveries ||--o| unit_returns : "unit_returns_delivery"
+    roles ||--o{ user_roles : "user_roles_role_id_fkey"
+    users ||--o{ user_roles : "user_roles_user_id_fkey"
+    user_sessions |o--o{ user_sessions : "user_sessions_replaced_by_session_id_fkey"
+    users ||--o{ user_sessions : "user_sessions_user_id_fkey"

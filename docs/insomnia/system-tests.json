@@ -1,0 +1,1066 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-10-21T05:39:49.668Z",
+  "__export_source": "tool-rental-system-tests",
+  "resources": [
+    {
+      "_id": "wrk_tool_rental_system",
+      "_type": "workspace",
+      "name": "Tool Rental - System Acceptance",
+      "scope": "collection",
+      "description": "Critical system tests against the isolated backend on localhost:18080. Creates uniquely named fixtures; never run against the working or public database."
+    },
+    {
+      "_id": "env_system_base",
+      "_type": "environment",
+      "parentId": "wrk_tool_rental_system",
+      "name": "Base environment",
+      "data": {
+        "base_url": "http://localhost:18080",
+        "supplier_email": "proveedor@toolrental.local",
+        "customer_email": "cliente@toolrental.local",
+        "demo_password": "ToolRental2026!",
+        "supplier_token": "",
+        "customer_token": "",
+        "category_id": "",
+        "tool_id": "",
+        "unit_id": "",
+        "reservation_id": "",
+        "payment_id": "",
+        "invoice_id": ""
+      }
+    },
+    {
+      "_id": "req_system_01",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "01 Public features and initialize fixture identities",
+      "metaSortKey": 1,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/public/features",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\nconst run=Date.now().toString(); insomnia.environment.set('run_id',run); insomnia.environment.set('tool_name','INSO Drill '+run); const today=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Bogota'}).format(new Date()); insomnia.environment.set('rental_date',today); const next=new Date(Date.now()+86400000); insomnia.environment.set('decline_date',new Intl.DateTimeFormat('en-CA',{timeZone:'America/Bogota'}).format(next));",
+      "afterResponseScript": "insomnia.test('01 Public features and initialize fixture identities: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Fictional provider is enabled\", () => { insomnia.expect(json.paymentProvider).to.eql('FICTIONAL_GATEWAY'); });"
+    },
+    {
+      "_id": "req_system_02",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "02 Protected route without JWT",
+      "metaSortKey": 2,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/tools",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('02 Protected route without JWT: HTTP 401', () => insomnia.expect(insomnia.response.code).to.eql(401));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Stable authentication problem\", () => { insomnia.expect(json.code).to.eql('AUTHENTICATION_REQUIRED'); insomnia.expect(json.traceId).to.be.a('string'); });"
+    },
+    {
+      "_id": "req_system_03",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "03 Protected route with invalid JWT",
+      "metaSortKey": 3,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/tools",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer invalid.jwt.signature"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('03 Protected route with invalid JWT: HTTP 401', () => insomnia.expect(insomnia.response.code).to.eql(401));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_04",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "04 Public catalog and category reference",
+      "metaSortKey": 4,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/public/catalog",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('04 Public catalog and category reference: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Catalog uses published server data\", () => { insomnia.expect(json.length).to.be.above(0); });insomnia.environment.set('category_id', json[0].categoryId);"
+    },
+    {
+      "_id": "req_system_05",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "05 Login supplier",
+      "metaSortKey": 5,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.supplier_email }}\",\n  \"password\": \"{{ _.demo_password }}\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('05 Login supplier: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"supplier JWT and role\", () => { insomnia.expect(json.accessToken).to.be.a('string'); insomnia.expect(json.roles).to.include('SUPPLIER'); });insomnia.environment.set('supplier_token', json.accessToken);const refreshCookie=insomnia.response.headers.find(h=>h.key.toLowerCase()==='set-cookie' && h.value.startsWith('trp_refresh=')); if(refreshCookie) insomnia.environment.set('supplier_refresh',refreshCookie.value.split(';')[0]);"
+    },
+    {
+      "_id": "req_system_06",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "06 POST supplier tool",
+      "metaSortKey": 6,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/tools",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"categoryId\": \"{{ _.category_id }}\",\n  \"name\": \"{{ _.tool_name }}\",\n  \"description\": \"Created by the Insomnia system acceptance collection\",\n  \"serviceCity\": \"Bucaramanga\",\n  \"dailyRate\": 25000,\n  \"currency\": \"COP\",\n  \"imageUrls\": [],\n  \"published\": true\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('06 POST supplier tool: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('tool_id', json.id.value);insomnia.test(\"Tool has its persisted identity\", () => { insomnia.expect(json.id.value).to.be.a(\"string\"); });"
+    },
+    {
+      "_id": "req_system_07",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "07 PUT supplier tool",
+      "metaSortKey": 7,
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"{{ _.tool_name }} Updated\",\n  \"description\": \"Updated through PUT in Insomnia\",\n  \"serviceCity\": \"Bucaramanga\",\n  \"dailyRate\": 25000,\n  \"currency\": \"COP\",\n  \"published\": true\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('07 PUT supplier tool: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"PUT returns updated fields\", () => { insomnia.expect(json.name).to.include('Updated'); });"
+    },
+    {
+      "_id": "req_system_08",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "08 GET persisted supplier tool",
+      "metaSortKey": 8,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('08 GET persisted supplier tool: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Fresh read preserves PUT\", () => { insomnia.expect(json.name).to.include('Updated'); insomnia.expect(json.dailyRate.amount).to.eql(25000); insomnia.expect(json.dailyRate.currency).to.eql('COP'); });"
+    },
+    {
+      "_id": "req_system_09",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "09 DELETE withdraws publication",
+      "metaSortKey": 9,
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('09 DELETE withdraws publication: HTTP 204', () => insomnia.expect(insomnia.response.code).to.eql(204));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_10",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "10 Withdrawn tool is absent from public catalog",
+      "metaSortKey": 10,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/public/catalog/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('10 Withdrawn tool is absent from public catalog: HTTP 404', () => insomnia.expect(insomnia.response.code).to.eql(404));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_11",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "11 Withdrawal preserves private tool history",
+      "metaSortKey": 11,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('11 Withdrawal preserves private tool history: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"DELETE is a logical withdrawal\", () => { insomnia.expect(json.published).to.eql(false); });"
+    },
+    {
+      "_id": "req_system_12",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "12 Republish the tool",
+      "metaSortKey": 12,
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}/publication",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"published\": true\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('12 Republish the tool: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_13",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "13 Register a physical equipment unit",
+      "metaSortKey": 13,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/equipment-units",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"toolId\": \"{{ _.tool_id }}\",\n  \"inventoryCode\": \"INSO-{{ _.run_id }}\",\n  \"serialNumber\": \"INSO-SERIAL-{{ _.run_id }}\",\n  \"currentCondition\": \"GOOD\",\n  \"status\": \"OPERATIONAL\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('13 Register a physical equipment unit: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('unit_id', json.id.value);"
+    },
+    {
+      "_id": "req_system_14",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "14 Login customer",
+      "metaSortKey": 14,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/auth/login",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.customer_email }}\",\n  \"password\": \"{{ _.demo_password }}\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('14 Login customer: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"customer JWT and role\", () => { insomnia.expect(json.accessToken).to.be.a('string'); insomnia.expect(json.roles).to.include('CUSTOMER'); });insomnia.environment.set('customer_token', json.accessToken);const refreshCookie=insomnia.response.headers.find(h=>h.key.toLowerCase()==='set-cookie' && h.value.startsWith('trp_refresh=')); if(refreshCookie) insomnia.environment.set('customer_refresh',refreshCookie.value.split(';')[0]);"
+    },
+    {
+      "_id": "req_system_15",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "15 Customer cannot access administrator users",
+      "metaSortKey": 15,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/users",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('15 Customer cannot access administrator users: HTTP 403', () => insomnia.expect(insomnia.response.code).to.eql(403));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_16",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "16 Customer cannot modify supplier publication",
+      "metaSortKey": 16,
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/v1/tools/{{ _.tool_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Forbidden modification\",\n  \"description\": \"Must be rejected\",\n  \"serviceCity\": \"Bucaramanga\",\n  \"dailyRate\": 1,\n  \"currency\": \"COP\",\n  \"published\": true\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('16 Customer cannot modify supplier publication: HTTP 403', () => insomnia.expect(insomnia.response.code).to.eql(403));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_17",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "17 Create held reservation",
+      "metaSortKey": 17,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/reservations",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"equipmentUnitIds\": [\n    \"{{ _.unit_id }}\"\n  ],\n  \"startDate\": \"{{ _.rental_date }}\",\n  \"returnDate\": \"{{ _.rental_date }}\",\n  \"fulfillmentMethod\": \"CUSTOMER_PICKUP\",\n  \"scheduledFulfillmentAt\": \"{{ _.scheduled_at }}\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\ninsomnia.environment.set('scheduled_at',new Date(Date.now()+1000).toISOString());",
+      "afterResponseScript": "insomnia.test('17 Create held reservation: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('reservation_id', json.id.value);insomnia.test(\"Server price and inclusive one-day period\", () => { insomnia.expect(json.status).to.eql('PENDING_PAYMENT'); insomnia.expect(json.total.amount).to.eql(25000); });"
+    },
+    {
+      "_id": "req_system_18",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "18 A second overlapping reservation is rejected",
+      "metaSortKey": 18,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/reservations",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"equipmentUnitIds\": [\n    \"{{ _.unit_id }}\"\n  ],\n  \"startDate\": \"{{ _.rental_date }}\",\n  \"returnDate\": \"{{ _.rental_date }}\",\n  \"fulfillmentMethod\": \"CUSTOMER_PICKUP\",\n  \"scheduledFulfillmentAt\": \"{{ _.scheduled_at }}\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('18 A second overlapping reservation is rejected: HTTP 409', () => insomnia.expect(insomnia.response.code).to.eql(409));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_19",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "19 Create fictional checkout",
+      "metaSortKey": 19,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/checkouts",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "inso-approved-{{ _.run_id }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardNetwork\": \"VISA\",\n  \"cardLastFour\": \"1111\",\n  \"cardExpiryMonth\": 12,\n  \"cardExpiryYear\": 2030\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('19 Create fictional checkout: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('payment_id', json.paymentId);insomnia.test(\"Checkout amount comes from reservation\", () => { insomnia.expect(json.amount).to.eql(25000); });"
+    },
+    {
+      "_id": "req_system_20",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "20 Checkout retry reuses the same payment",
+      "metaSortKey": 20,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/checkouts",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "inso-approved-{{ _.run_id }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardNetwork\": \"VISA\",\n  \"cardLastFour\": \"1111\",\n  \"cardExpiryMonth\": 12,\n  \"cardExpiryYear\": 2030\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('20 Checkout retry reuses the same payment: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Checkout is idempotent\", () => { insomnia.expect(json.paymentId).to.eql(insomnia.environment.get('payment_id')); });"
+    },
+    {
+      "_id": "req_system_21",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "21 Approve fictional payment",
+      "metaSortKey": 21,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/fictional/checkouts/{{ _.payment_id }}/decision",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"outcome\": \"APPROVED\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('21 Approve fictional payment: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_22",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "22 Duplicate approval is idempotent",
+      "metaSortKey": 22,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/fictional/checkouts/{{ _.payment_id }}/decision",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"outcome\": \"APPROVED\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('22 Duplicate approval is idempotent: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_23",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "23 Payment confirms the reservation",
+      "metaSortKey": 23,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.reservation_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('23 Payment confirms the reservation: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Reservation is confirmed\", () => { insomnia.expect(json.status).to.eql('CONFIRMED'); });"
+    },
+    {
+      "_id": "req_system_24",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "24 Exactly one academic receipt is issued",
+      "metaSortKey": 24,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/invoices",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('24 Exactly one academic receipt is issued: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\nconst invoices=json.filter(row=>row.reservationId===insomnia.environment.get('reservation_id'));insomnia.test(\"One receipt despite duplicate approval\", () => { insomnia.expect(invoices.length).to.eql(1); });insomnia.environment.set('invoice_id', invoices[0].invoiceId);"
+    },
+    {
+      "_id": "req_system_25",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "25 Download academic receipt PDF",
+      "metaSortKey": 25,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/invoices/{{ _.invoice_id }}/document?disposition=attachment",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('25 Download academic receipt PDF: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Receipt is a PDF\", () => { insomnia.expect(insomnia.response.headers.find(h=>h.key.toLowerCase()==='content-type').value).to.include('application/pdf'); });"
+    },
+    {
+      "_id": "req_system_26",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "26 Schedule supplier delivery or pickup",
+      "metaSortKey": 26,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/unit-deliveries",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\",\n  \"equipmentUnitId\": \"{{ _.unit_id }}\",\n  \"scheduledAt\": \"{{ _.scheduled_at }}\",\n  \"outboundCondition\": \"GOOD\",\n  \"addressLine\": \"Academic pickup point\",\n  \"city\": \"Bucaramanga\",\n  \"region\": \"Santander\",\n  \"country\": \"CO\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('26 Schedule supplier delivery or pickup: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_27",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "27 Complete physical delivery",
+      "metaSortKey": 27,
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/unit-deliveries/entry/completion?reservationId={{ _.reservation_id }}&equipmentUnitId={{ _.unit_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"condition\": \"GOOD\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\nconst wait=new Date(insomnia.environment.get('scheduled_at')).getTime()-Date.now()+100; if(wait>0) await new Promise(resolve=>setTimeout(resolve,wait));",
+      "afterResponseScript": "insomnia.test('27 Complete physical delivery: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_28",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "28 Start rental",
+      "metaSortKey": 28,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/rentals",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('28 Start rental: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Rental is active\", () => { insomnia.expect(json.rentalStatus).to.eql('ACTIVE'); });"
+    },
+    {
+      "_id": "req_system_29",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "29 Register equipment return",
+      "metaSortKey": 29,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/unit-returns",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.reservation_id }}\",\n  \"equipmentUnitId\": \"{{ _.unit_id }}\",\n  \"inboundCondition\": \"GOOD\",\n  \"notes\": \"Returned during the Insomnia acceptance flow\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('29 Register equipment return: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_30",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "30 Complete rental",
+      "metaSortKey": 30,
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/v1/rentals/{{ _.reservation_id }}/status",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"status\": \"COMPLETED\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('30 Complete rental: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_31",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "31 GET completed rental",
+      "metaSortKey": 31,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/rentals/{{ _.reservation_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.supplier_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('31 GET completed rental: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Full operational lifecycle persisted\", () => { insomnia.expect(json.rentalStatus).to.eql('COMPLETED'); });"
+    },
+    {
+      "_id": "req_system_32",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "32 Create reservation for declined payment",
+      "metaSortKey": 32,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/reservations",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"equipmentUnitIds\": [\n    \"{{ _.unit_id }}\"\n  ],\n  \"startDate\": \"{{ _.decline_date }}\",\n  \"returnDate\": \"{{ _.decline_date }}\",\n  \"fulfillmentMethod\": \"CUSTOMER_PICKUP\",\n  \"scheduledFulfillmentAt\": \"{{ _.decline_date }}T15:00:00Z\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('32 Create reservation for declined payment: HTTP 201', () => insomnia.expect(insomnia.response.code).to.eql(201));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('decline_reservation_id', json.id.value);"
+    },
+    {
+      "_id": "req_system_33",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "33 Create checkout for decline scenario",
+      "metaSortKey": 33,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/checkouts",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        },
+        {
+          "name": "Idempotency-Key",
+          "value": "inso-declined-{{ _.run_id }}"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"reservationId\": \"{{ _.decline_reservation_id }}\",\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardNetwork\": \"VISA\",\n  \"cardLastFour\": \"1111\",\n  \"cardExpiryMonth\": 12,\n  \"cardExpiryYear\": 2030\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('33 Create checkout for decline scenario: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('decline_payment_id', json.paymentId);"
+    },
+    {
+      "_id": "req_system_34",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "34 Decline fictional payment",
+      "metaSortKey": 34,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/payments/fictional/checkouts/{{ _.decline_payment_id }}/decision",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"outcome\": \"DECLINED\"\n}"
+      },
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('34 Decline fictional payment: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_35",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "35 Declined payment releases the reservation",
+      "metaSortKey": 35,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/reservations/{{ _.decline_reservation_id }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('35 Declined payment releases the reservation: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Reservation payment failed\", () => { insomnia.expect(json.status).to.eql('PAYMENT_FAILED'); });"
+    },
+    {
+      "_id": "req_system_36",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "36 Declined payment releases availability",
+      "metaSortKey": 36,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/public/catalog/{{ _.tool_id }}/availability?startDate={{ _.decline_date }}&returnDate={{ _.decline_date }}",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('36 Declined payment releases availability: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"Unit becomes available after decline\", () => { insomnia.expect(json.availableEquipmentUnitIds).to.include(insomnia.environment.get('unit_id')); });"
+    },
+    {
+      "_id": "req_system_37",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "37 Initialize CSRF cookie and header token",
+      "metaSortKey": 37,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/auth/csrf",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('37 Initialize CSRF cookie and header token: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.environment.set('csrf_token', json.token);insomnia.environment.set('csrf_cookie', insomnia.response.headers.find(h=>h.key.toLowerCase()==='set-cookie' && h.value.startsWith('XSRF-TOKEN=')).value.split(';')[0]);"
+    },
+    {
+      "_id": "req_system_38",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "38 Refresh without CSRF is rejected",
+      "metaSortKey": 38,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/auth/refresh",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Cookie",
+          "value": "{{ _.customer_refresh }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('38 Refresh without CSRF is rejected: HTTP 403', () => insomnia.expect(insomnia.response.code).to.eql(403));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_39",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "39 Rotate refresh and receive a new access token",
+      "metaSortKey": 39,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/auth/refresh",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "X-XSRF-TOKEN",
+          "value": "{{ _.csrf_token }}"
+        },
+        {
+          "name": "Cookie",
+          "value": "{{ _.customer_refresh }}; {{ _.csrf_cookie }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('39 Rotate refresh and receive a new access token: HTTP 200', () => insomnia.expect(insomnia.response.code).to.eql(200));\nlet json; try { json = insomnia.response.json(); } catch {}\ninsomnia.test(\"customer JWT and role\", () => { insomnia.expect(json.accessToken).to.be.a('string'); insomnia.expect(json.roles).to.include('CUSTOMER'); });insomnia.environment.set('customer_token', json.accessToken);const refreshCookie=insomnia.response.headers.find(h=>h.key.toLowerCase()==='set-cookie' && h.value.startsWith('trp_refresh=')); if(refreshCookie) insomnia.environment.set('customer_refresh',refreshCookie.value.split(';')[0]);"
+    },
+    {
+      "_id": "req_system_40",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "40 Logout revokes the customer session",
+      "metaSortKey": 40,
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/v1/auth/logout",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "X-XSRF-TOKEN",
+          "value": "{{ _.csrf_token }}"
+        },
+        {
+          "name": "Cookie",
+          "value": "{{ _.customer_refresh }}; {{ _.csrf_cookie }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('40 Logout revokes the customer session: HTTP 204', () => insomnia.expect(insomnia.response.code).to.eql(204));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    },
+    {
+      "_id": "req_system_41",
+      "_type": "request",
+      "parentId": "wrk_tool_rental_system",
+      "name": "41 Revoked access token no longer authenticates",
+      "metaSortKey": 41,
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/v1/users/me",
+      "authentication": {},
+      "parameters": [],
+      "settingSendCookies": false,
+      "settingStoreCookies": false,
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{ _.customer_token }}"
+        }
+      ],
+      "body": {},
+      "preRequestScript": "const target = new URL(insomnia.environment.get('base_url'));\nif (!['localhost', '127.0.0.1'].includes(target.hostname) || target.port !== '18080') throw new Error('Use the isolated local backend on port 18080; these requests write test fixtures.');\n",
+      "afterResponseScript": "insomnia.test('41 Revoked access token no longer authenticates: HTTP 401', () => insomnia.expect(insomnia.response.code).to.eql(401));\nlet json; try { json = insomnia.response.json(); } catch {}\n"
+    }
+  ]
+}

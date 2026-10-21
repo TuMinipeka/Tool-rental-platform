@@ -1,0 +1,19 @@
+{
+  "entities": 25,
+  "baseRelationships": 19,
+  "criticalExtensionRelationships": 7,
+  "elements": 332,
+  "canvas": [
+    1915,
+    6400
+  ],
+  "source": "docs/conceptual-model.md",
+  "sourceSha256": "ac3d777784dbd603f0bfd089230491d41dcf03d26dd87dd812732ec1c5534bfa",
+  "crossCheckedAgainstMermaid": true,
+  "editableSource": "docs/diagrams/conceptual-er-model.excalidraw",
+  "createdOn": "2026-10-15",
+  "updatedOn": "2026-10-19",
+  "notes": "Historical conceptual illustration retained. V210 moved the invoice relationship to Reservation. Current conceptual text and exported relational diagram are authoritative; this snapshot and its original source hash do not claim validation against the updated source.",
+  "historicalSnapshot": true,
+  "currentSourceVerified": false
+}

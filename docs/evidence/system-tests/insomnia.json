@@ -1,0 +1,549 @@
+{
+  "testedAt": "2026-10-21T05:43:05.762Z",
+  "baseCommit": "a9671a69f8147d83f33f76cbf1abea378b56e58c",
+  "workingTreeChangesIncluded": true,
+  "sourceFingerprint": "b0077d5c03251703cf8e8cbfcfdcc39217dacd9c2e6156ebed83f3d32ef7c56f",
+  "engine": "Official Kong Inso CLI 13.3.1",
+  "graphicalClientExecuted": false,
+  "target": "http://localhost:18080",
+  "database": "Isolated PostgreSQL through compose.validation.yml",
+  "paymentProvider": "FICTIONAL_GATEWAY",
+  "realChargesPerformed": false,
+  "requests": 41,
+  "assertions": 61,
+  "failures": 0,
+  "passed": true,
+  "results": [
+    {
+      "request": "01 Public features and initialize fixture identities",
+      "status": 200,
+      "durationMs": 134.12199999999999,
+      "assertions": [
+        {
+          "name": "01 Public features and initialize fixture identities: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Fictional provider is enabled",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "02 Protected route without JWT",
+      "status": 401,
+      "durationMs": 15.311,
+      "assertions": [
+        {
+          "name": "02 Protected route without JWT: HTTP 401",
+          "result": "passed"
+        },
+        {
+          "name": "Stable authentication problem",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "03 Protected route with invalid JWT",
+      "status": 401,
+      "durationMs": 43.105,
+      "assertions": [
+        {
+          "name": "03 Protected route with invalid JWT: HTTP 401",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "04 Public catalog and category reference",
+      "status": 200,
+      "durationMs": 490.636,
+      "assertions": [
+        {
+          "name": "04 Public catalog and category reference: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Catalog uses published server data",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "05 Login supplier",
+      "status": 200,
+      "durationMs": 400.86899999999997,
+      "assertions": [
+        {
+          "name": "05 Login supplier: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "supplier JWT and role",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "06 POST supplier tool",
+      "status": 201,
+      "durationMs": 163.67499999999998,
+      "assertions": [
+        {
+          "name": "06 POST supplier tool: HTTP 201",
+          "result": "passed"
+        },
+        {
+          "name": "Tool has its persisted identity",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "07 PUT supplier tool",
+      "status": 200,
+      "durationMs": 137.16400000000002,
+      "assertions": [
+        {
+          "name": "07 PUT supplier tool: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "PUT returns updated fields",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "08 GET persisted supplier tool",
+      "status": 200,
+      "durationMs": 71.618,
+      "assertions": [
+        {
+          "name": "08 GET persisted supplier tool: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Fresh read preserves PUT",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "09 DELETE withdraws publication",
+      "status": 204,
+      "durationMs": 49.88,
+      "assertions": [
+        {
+          "name": "09 DELETE withdraws publication: HTTP 204",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "10 Withdrawn tool is absent from public catalog",
+      "status": 404,
+      "durationMs": 41.188,
+      "assertions": [
+        {
+          "name": "10 Withdrawn tool is absent from public catalog: HTTP 404",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "11 Withdrawal preserves private tool history",
+      "status": 200,
+      "durationMs": 31.019000000000002,
+      "assertions": [
+        {
+          "name": "11 Withdrawal preserves private tool history: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "DELETE is a logical withdrawal",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "12 Republish the tool",
+      "status": 200,
+      "durationMs": 45.297999999999995,
+      "assertions": [
+        {
+          "name": "12 Republish the tool: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "13 Register a physical equipment unit",
+      "status": 201,
+      "durationMs": 106.902,
+      "assertions": [
+        {
+          "name": "13 Register a physical equipment unit: HTTP 201",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "14 Login customer",
+      "status": 200,
+      "durationMs": 100.743,
+      "assertions": [
+        {
+          "name": "14 Login customer: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "customer JWT and role",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "15 Customer cannot access administrator users",
+      "status": 403,
+      "durationMs": 15.888,
+      "assertions": [
+        {
+          "name": "15 Customer cannot access administrator users: HTTP 403",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "16 Customer cannot modify supplier publication",
+      "status": 403,
+      "durationMs": 30.352,
+      "assertions": [
+        {
+          "name": "16 Customer cannot modify supplier publication: HTTP 403",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "17 Create held reservation",
+      "status": 201,
+      "durationMs": 268.467,
+      "assertions": [
+        {
+          "name": "17 Create held reservation: HTTP 201",
+          "result": "passed"
+        },
+        {
+          "name": "Server price and inclusive one-day period",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "18 A second overlapping reservation is rejected",
+      "status": 409,
+      "durationMs": 92.611,
+      "assertions": [
+        {
+          "name": "18 A second overlapping reservation is rejected: HTTP 409",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "19 Create fictional checkout",
+      "status": 200,
+      "durationMs": 142.738,
+      "assertions": [
+        {
+          "name": "19 Create fictional checkout: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Checkout amount comes from reservation",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "20 Checkout retry reuses the same payment",
+      "status": 200,
+      "durationMs": 123.074,
+      "assertions": [
+        {
+          "name": "20 Checkout retry reuses the same payment: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Checkout is idempotent",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "21 Approve fictional payment",
+      "status": 200,
+      "durationMs": 163.428,
+      "assertions": [
+        {
+          "name": "21 Approve fictional payment: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "22 Duplicate approval is idempotent",
+      "status": 200,
+      "durationMs": 57.825,
+      "assertions": [
+        {
+          "name": "22 Duplicate approval is idempotent: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "23 Payment confirms the reservation",
+      "status": 200,
+      "durationMs": 44.053000000000004,
+      "assertions": [
+        {
+          "name": "23 Payment confirms the reservation: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Reservation is confirmed",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "24 Exactly one academic receipt is issued",
+      "status": 200,
+      "durationMs": 32.925000000000004,
+      "assertions": [
+        {
+          "name": "24 Exactly one academic receipt is issued: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "One receipt despite duplicate approval",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "25 Download academic receipt PDF",
+      "status": 200,
+      "durationMs": 71.535,
+      "assertions": [
+        {
+          "name": "25 Download academic receipt PDF: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Receipt is a PDF",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "26 Schedule supplier delivery or pickup",
+      "status": 201,
+      "durationMs": 72.892,
+      "assertions": [
+        {
+          "name": "26 Schedule supplier delivery or pickup: HTTP 201",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "27 Complete physical delivery",
+      "status": 200,
+      "durationMs": 52.301,
+      "assertions": [
+        {
+          "name": "27 Complete physical delivery: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "28 Start rental",
+      "status": 201,
+      "durationMs": 60.262,
+      "assertions": [
+        {
+          "name": "28 Start rental: HTTP 201",
+          "result": "passed"
+        },
+        {
+          "name": "Rental is active",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "29 Register equipment return",
+      "status": 201,
+      "durationMs": 46.161,
+      "assertions": [
+        {
+          "name": "29 Register equipment return: HTTP 201",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "30 Complete rental",
+      "status": 200,
+      "durationMs": 33.956,
+      "assertions": [
+        {
+          "name": "30 Complete rental: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "31 GET completed rental",
+      "status": 200,
+      "durationMs": 40.953,
+      "assertions": [
+        {
+          "name": "31 GET completed rental: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Full operational lifecycle persisted",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "32 Create reservation for declined payment",
+      "status": 201,
+      "durationMs": 68.251,
+      "assertions": [
+        {
+          "name": "32 Create reservation for declined payment: HTTP 201",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "33 Create checkout for decline scenario",
+      "status": 200,
+      "durationMs": 64.563,
+      "assertions": [
+        {
+          "name": "33 Create checkout for decline scenario: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "34 Decline fictional payment",
+      "status": 200,
+      "durationMs": 63.82,
+      "assertions": [
+        {
+          "name": "34 Decline fictional payment: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "35 Declined payment releases the reservation",
+      "status": 200,
+      "durationMs": 21.453,
+      "assertions": [
+        {
+          "name": "35 Declined payment releases the reservation: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Reservation payment failed",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "36 Declined payment releases availability",
+      "status": 200,
+      "durationMs": 29.415,
+      "assertions": [
+        {
+          "name": "36 Declined payment releases availability: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "Unit becomes available after decline",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "37 Initialize CSRF cookie and header token",
+      "status": 200,
+      "durationMs": 16.929,
+      "assertions": [
+        {
+          "name": "37 Initialize CSRF cookie and header token: HTTP 200",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "38 Refresh without CSRF is rejected",
+      "status": 403,
+      "durationMs": 6.472,
+      "assertions": [
+        {
+          "name": "38 Refresh without CSRF is rejected: HTTP 403",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "39 Rotate refresh and receive a new access token",
+      "status": 200,
+      "durationMs": 35.91,
+      "assertions": [
+        {
+          "name": "39 Rotate refresh and receive a new access token: HTTP 200",
+          "result": "passed"
+        },
+        {
+          "name": "customer JWT and role",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "40 Logout revokes the customer session",
+      "status": 204,
+      "durationMs": 32.473,
+      "assertions": [
+        {
+          "name": "40 Logout revokes the customer session: HTTP 204",
+          "result": "passed"
+        }
+      ]
+    },
+    {
+      "request": "41 Revoked access token no longer authenticates",
+      "status": 401,
+      "durationMs": 8.392,
+      "assertions": [
+        {
+          "name": "41 Revoked access token no longer authenticates: HTTP 401",
+          "result": "passed"
+        }
+      ]
+    }
+  ]
+}

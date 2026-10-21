@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Plataforma para alquilar herramientas y equipos de construcción."
+    />
+    <meta name="theme-color" content="#2354c6" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href="/node_modules/@fontsource-variable/public-sans/files/public-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/node_modules/@fontsource-variable/archivo/files/archivo-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <title>Tool Rental | Haz más, compra menos</title>
+    <style>
+      /* Boot splash: inlined so it paints before the JavaScript bundle arrives. */
+      @property --ts-cm { syntax: "<integer>"; inherits: true; initial-value: 0; }
+      .boot-splash {
+        --ts-bg: #101318;
+        --ts-yellow: #ffd600;
+        --ts-cyan: #00d9ff;
+        --ts-bone: #f4f6f8;
+        --ts-appear: 0ms;
+        --ts-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        display: grid;
+        place-items: center;
+        background: var(--ts-bg);
+        transition: opacity 420ms var(--ts-ease-out);
+      }
+      .boot-splash.is-leaving { opacity: 0; pointer-events: none; }
+      .ts-stage {
+        width: min(340px, calc(100vw - 48px));
+        animation: ts-appear 240ms var(--ts-ease-out) var(--ts-appear) both;
+        transition: transform 420ms var(--ts-ease-out), opacity 260ms var(--ts-ease-out);
+      }
+      .boot-splash.is-leaving .ts-stage { opacity: 0; transform: translateY(-10px); }
+      /* The app was rendered behind the splash; it rises in gently as the splash dissolves. */
+      .app-entering #root { animation: ts-app-in 520ms var(--ts-ease-out, cubic-bezier(0.23, 1, 0.32, 1)) both; }
+      @keyframes ts-app-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+      .ts-meter { position: relative; display: flex; align-items: center; height: 56px; }
+      .ts-case {
+        position: relative;
+        z-index: 1;
+        flex: none;
+        width: 52px;
+        height: 52px;
+        transform-origin: 70% 60%;
+        animation: ts-case-kick 12s var(--ts-ease-out) var(--ts-appear) both;
+      }
+      .ts-track { position: relative; flex: 1; height: 12px; margin-left: -6px; }
+      .ts-tape {
+        position: relative;
+        width: 0;
+        height: 100%;
+        border-radius: 0 2px 2px 0;
+        background-color: var(--ts-yellow);
+        /* Ticks are anchored to the tip, so the markings travel with the tape as it extends. */
+        background-image:
+          repeating-linear-gradient(to left, var(--ts-bg) 0 1.5px, transparent 1.5px 40px),
+          repeating-linear-gradient(to left, var(--ts-bg) 0 1px, transparent 1px 8px),
+          linear-gradient(transparent 82%, #c9a800 82%);
+        background-size: 100% 62%, 100% 32%, 100% 100%;
+        background-position: right top, right top, 0 0;
+        background-repeat: no-repeat;
+        animation: ts-extend 12s linear var(--ts-appear) forwards;
+      }
+      .ts-hook {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 5px;
+        height: 20px;
+        border-radius: 1.5px;
+        background: #cfd6dd;
+        box-shadow: inset -1.5px 0 #8e99a5;
+      }
+      .ts-readout {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 14px;
+        padding-left: 4px;
+        transition: opacity 150ms var(--ts-ease-out);
+      }
+      .boot-splash.is-retracting .ts-readout { opacity: 0; }
+      .ts-caption {
+        margin: 0;
+        color: #8b96a3;
+        font: 600 11px/1.4 "Public Sans Variable", "Public Sans", system-ui, sans-serif;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+      .ts-reading {
+        margin: 0;
+        color: var(--ts-bone);
+        font: 800 15px/1 "Archivo Variable", "Archivo", system-ui, sans-serif;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: -0.01em;
+        animation: ts-measure 12s linear var(--ts-appear) forwards;
+        counter-reset: ts-cm var(--ts-cm);
+      }
+      .ts-reading::before { content: counter(ts-cm); }
+      .ts-reading span { color: var(--ts-cyan); font-weight: 700; }
+
+      /* Paced for the 4 s minimum (33% of 12 s), then a long tail: a slow load keeps unrolling instead of stalling. */
+      @keyframes ts-extend {
+        0% { width: 0; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+        4% { width: 30%; animation-timing-function: cubic-bezier(0.3, 0.6, 0.4, 1); }
+        13% { width: 60%; animation-timing-function: cubic-bezier(0.4, 0.4, 0.6, 1); }
+        33% { width: 90%; animation-timing-function: cubic-bezier(0.2, 0.5, 0.3, 1); }
+        100% { width: 97%; }
+      }
+      @keyframes ts-measure {
+        0% { --ts-cm: 0; animation-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+        4% { --ts-cm: 45; animation-timing-function: cubic-bezier(0.3, 0.6, 0.4, 1); }
+        13% { --ts-cm: 90; animation-timing-function: cubic-bezier(0.4, 0.4, 0.6, 1); }
+        33% { --ts-cm: 135; animation-timing-function: cubic-bezier(0.2, 0.5, 0.3, 1); }
+        100% { --ts-cm: 146; }
+      }
+      @keyframes ts-case-kick {
+        0% { transform: rotate(0deg); }
+        2% { transform: rotate(-7deg); }
+        6%, 100% { transform: rotate(0deg); }
+      }
+      @keyframes ts-appear { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ts-stage, .ts-case, .ts-tape, .ts-reading { animation: none; }
+        .ts-tape { width: 40%; }
+        .ts-reading { --ts-cm: 60; }
+        .boot-splash.is-leaving .ts-stage { transform: none; }
+        .app-entering #root { animation-name: ts-app-fade; }
+        @keyframes ts-app-fade { from { opacity: 0; } to { opacity: 1; } }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="boot-splash" class="boot-splash" role="status" aria-live="polite">
+      <div class="ts-stage">
+        <div class="ts-meter" aria-hidden="true">
+          <svg class="ts-case" viewBox="0 0 52 52" focusable="false">
+            <rect x="1" y="1" width="50" height="50" rx="12" fill="#ffd600" />
+            <rect x="1" y="38" width="50" height="13" rx="6" fill="#e6c000" />
+            <rect x="1" y="38" width="50" height="6" fill="#e6c000" />
+            <circle cx="24" cy="25" r="13" fill="#101318" />
+            <circle cx="24" cy="25" r="4.5" fill="#00d9ff" />
+            <rect x="44" y="20" width="8" height="12" rx="2" fill="#101318" />
+          </svg>
+          <div class="ts-track"><div class="ts-tape"><span class="ts-hook"></span></div></div>
+        </div>
+        <div class="ts-readout">
+          <p class="ts-caption">Tomando medidas</p>
+          <p class="ts-reading" aria-hidden="true"><span> cm</span></p>
+        </div>
+      </div>
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

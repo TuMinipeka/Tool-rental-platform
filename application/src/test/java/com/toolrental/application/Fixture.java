@@ -1,28 +1,29 @@
 package com.toolrental.application;
 
-import com.toolrental.application.catalog.exception.HerramientaNotFoundApplicationException;
-import com.toolrental.application.catalog.exception.UnidadEquipoNotFoundApplicationException;
-import com.toolrental.application.reservation.exception.ReservaNotFoundApplicationException;
-import com.toolrental.domain.catalog.model.aggregate.Categoria;
-import com.toolrental.domain.catalog.model.aggregate.Herramienta;
-import com.toolrental.domain.catalog.model.aggregate.UnidadEquipo;
-import com.toolrental.domain.catalog.model.valueobject.CategoriaId;
-import com.toolrental.domain.catalog.model.valueobject.HerramientaId;
-import com.toolrental.domain.catalog.model.valueobject.UnidadEquipoId;
-import com.toolrental.domain.catalog.port.repository.CategoriaRepository;
-import com.toolrental.domain.catalog.port.repository.HerramientaRepository;
-import com.toolrental.domain.catalog.port.repository.RegistroUnidadAtomico;
-import com.toolrental.domain.catalog.port.repository.UnidadEquipoRepository;
-import com.toolrental.domain.common.exception.ReglaNegocioException;
-import com.toolrental.domain.common.model.valueobject.ClienteId;
-import com.toolrental.domain.common.model.valueobject.ProveedorId;
-import com.toolrental.domain.common.port.ParticipantesPort;
-import com.toolrental.domain.reservation.model.aggregate.Reserva;
-import com.toolrental.domain.reservation.model.valueobject.EstadoReserva;
-import com.toolrental.domain.reservation.model.valueobject.PeriodoReserva;
-import com.toolrental.domain.reservation.model.valueobject.ReservaId;
-import com.toolrental.domain.reservation.port.repository.GestionReservaAtomica;
-import com.toolrental.domain.reservation.port.repository.ReservaRepository;
+import com.toolrental.application.equipmentunit.exception.EquipmentUnitNotFoundApplicationException;
+import com.toolrental.application.reservation.exception.ReservationNotFoundApplicationException;
+import com.toolrental.application.tool.exception.ToolNotFoundApplicationException;
+import com.toolrental.domain.category.model.aggregate.Category;
+import com.toolrental.domain.category.model.valueobject.CategoryId;
+import com.toolrental.domain.category.port.repository.CategoryRepository;
+import com.toolrental.domain.common.exception.BusinessRuleException;
+import com.toolrental.domain.common.port.ParticipantsPort;
+import com.toolrental.domain.customer.model.valueobject.CustomerId;
+import com.toolrental.domain.equipmentunit.model.aggregate.EquipmentUnit;
+import com.toolrental.domain.equipmentunit.model.valueobject.EquipmentUnitId;
+import com.toolrental.domain.equipmentunit.port.repository.AtomicEquipmentUnitRegistration;
+import com.toolrental.domain.equipmentunit.port.repository.EquipmentUnitRepository;
+import com.toolrental.domain.reservation.model.aggregate.Reservation;
+import com.toolrental.domain.reservation.model.valueobject.ReservationId;
+import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
+import com.toolrental.domain.reservation.model.valueobject.ReservationStatus;
+import com.toolrental.domain.reservation.port.repository.AtomicReservationManagement;
+import com.toolrental.domain.reservation.port.repository.ReservationRepository;
+import com.toolrental.domain.supplier.model.valueobject.SupplierId;
+import com.toolrental.domain.tool.model.aggregate.Tool;
+import com.toolrental.domain.tool.model.valueobject.ToolId;
+import com.toolrental.domain.tool.port.repository.ToolRepository;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,151 +31,195 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-/** Adaptadores de prueba exclusivamente. No prueban transacciones ni bloqueos PostgreSQL. */
+/** Test-only in-memory adapters; they do not prove PostgreSQL transactions or locking. */
 final class Fixture {
-  final Map<CategoriaId, Categoria> categorias = new HashMap<>();
-  final Map<HerramientaId, Herramienta> herramientas = new HashMap<>();
-  final Map<UnidadEquipoId, UnidadEquipo> unidades = new HashMap<>();
-  final Map<ReservaId, Reserva> reservas = new HashMap<>();
-  final Set<ClienteId> clientes = new HashSet<>();
-  final Set<ProveedorId> proveedores = new HashSet<>();
+  final Map<CategoryId, Category> categories = new HashMap<>();
+  final Map<ToolId, Tool> tools = new HashMap<>();
+  final Map<EquipmentUnitId, EquipmentUnit> equipmentUnits = new HashMap<>();
+  final Map<ReservationId, Reservation> reservations = new HashMap<>();
+  final Set<CustomerId> customers = new HashSet<>();
+  final Set<SupplierId> suppliers = new HashSet<>();
 
-  final ParticipantesPort participantes =
-      new ParticipantesPort() {
-        public boolean clienteActivo(ClienteId id) {
-          return clientes.contains(id);
+  final ParticipantsPort participants =
+      new ParticipantsPort() {
+        public boolean isCustomerActive(CustomerId id) {
+          return customers.contains(id);
         }
 
-        public boolean proveedorActivo(ProveedorId id) {
-          return proveedores.contains(id);
+        public boolean isSupplierActive(SupplierId id) {
+          return suppliers.contains(id);
         }
       };
-  final CategoriaRepository categoriaRepository =
-      new CategoriaRepository() {
-        public Optional<Categoria> buscar(CategoriaId id) {
-          return Optional.ofNullable(categorias.get(id));
+  final CategoryRepository categoryRepository =
+      new CategoryRepository() {
+        public Optional<Category> findById(CategoryId id) {
+          return Optional.ofNullable(categories.get(id));
         }
 
-        public List<Categoria> listar() {
-          return List.copyOf(categorias.values());
+        public List<Category> findAll() {
+          return List.copyOf(categories.values());
         }
 
-        public void guardar(Categoria c) {
-          categorias.put(c.id(), c);
+        public void delete(CategoryId id) {
+          categories.remove(id);
+        }
+
+        public void save(Category c) {
+          categories.put(c.id(), c);
         }
       };
-  final HerramientaRepository herramientaRepository =
-      new HerramientaRepository() {
-        public Optional<Herramienta> buscar(HerramientaId id) {
-          return Optional.ofNullable(herramientas.get(id));
+  final ToolRepository toolRepository =
+      new ToolRepository() {
+        public Optional<Tool> findById(ToolId id) {
+          return Optional.ofNullable(tools.get(id));
         }
 
-        public List<Herramienta> listar() {
-          return List.copyOf(herramientas.values());
+        public List<Tool> findAll() {
+          return List.copyOf(tools.values());
         }
 
-        public void guardar(Herramienta h) {
-          herramientas.put(h.id(), h);
+        public void save(Tool h) {
+          tools.put(h.id(), h);
         }
       };
-  final UnidadEquipoRepository unidadRepository =
-      new UnidadEquipoRepository() {
-        public Optional<UnidadEquipo> buscar(UnidadEquipoId id) {
-          return Optional.ofNullable(unidades.get(id));
+  final EquipmentUnitRepository equipmentUnitRepository =
+      new EquipmentUnitRepository() {
+        public Optional<EquipmentUnit> findById(EquipmentUnitId id) {
+          return Optional.ofNullable(equipmentUnits.get(id));
         }
 
-        public List<UnidadEquipo> listar() {
-          return List.copyOf(unidades.values());
+        public List<EquipmentUnit> findAll() {
+          return List.copyOf(equipmentUnits.values());
         }
 
-        public void guardar(UnidadEquipo u) {
-          unidades.put(u.id(), u);
+        public void save(EquipmentUnit u) {
+          equipmentUnits.put(u.id(), u);
         }
       };
-  final ReservaRepository reservaRepository =
-      new ReservaRepository() {
-        public Optional<Reserva> buscar(ReservaId id) {
-          return Optional.ofNullable(reservas.get(id));
+  final ReservationRepository reservationRepository =
+      new ReservationRepository() {
+        public Optional<Reservation> findById(ReservationId id) {
+          return Optional.ofNullable(reservations.get(id));
         }
 
-        public void agregarSolicitud(Reserva r) {
-          if (r.estado() != EstadoReserva.PENDIENTE || reservas.containsKey(r.id()))
-            throw new ReglaNegocioException("Solicitud inválida");
-          reservas.put(r.id(), r);
+        public List<Reservation> findByCustomer(CustomerId customerId) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.customerId().equals(customerId))
+              .toList();
+        }
+
+        public List<Reservation> findBySupplier(SupplierId supplierId) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.supplierId().equals(supplierId))
+              .toList();
+        }
+
+        public void addRequest(Reservation r) {
+          if (r.status() != ReservationStatus.PENDING || reservations.containsKey(r.id()))
+            throw new BusinessRuleException("Invalid reservation request");
+          reservations.put(r.id(), r);
+        }
+
+        public List<Reservation> findExpiredPaymentHolds(Instant now) {
+          return reservations.values().stream()
+              .filter(reservation -> reservation.status() == ReservationStatus.PENDING_PAYMENT)
+              .filter(reservation -> !reservation.expiresAt().isAfter(now))
+              .toList();
         }
       };
-  final RegistroUnidadAtomico registroUnidad =
-      (id, codigo, clock) -> {
+  final AtomicEquipmentUnitRegistration equipmentUnitRegistration =
+      (id, code, clock) -> {
         synchronized (this) {
-          var h = herramienta(id);
-          var unidad = UnidadEquipo.registrar(id, codigo, clock);
-          boolean duplicado =
-              unidades.values().stream()
+          var h = tool(id);
+          var equipmentUnit = EquipmentUnit.register(id, code, clock);
+          boolean duplicate =
+              equipmentUnits.values().stream()
                   .anyMatch(
                       u ->
-                          u.codigoInventario().equals(unidad.codigoInventario())
-                              && herramienta(u.herramientaId())
-                                  .proveedorId()
-                                  .equals(h.proveedorId()));
-          if (duplicado) throw new ReglaNegocioException("Código duplicado para proveedor");
-          unidades.put(unidad.id(), unidad);
-          return unidad;
+                          u.inventoryCode().equals(equipmentUnit.inventoryCode())
+                              && tool(u.toolId()).supplierId().equals(h.supplierId()));
+          if (duplicate)
+            throw new BusinessRuleException("Inventory code must be unique per supplier");
+          equipmentUnits.put(equipmentUnit.id(), equipmentUnit);
+          return equipmentUnit;
         }
       };
-  final GestionReservaAtomica gestion =
-      (id, operacion) -> {
-        synchronized (this) {
-          var aislada = reserva(id).copia();
-          var contexto =
-              new GestionReservaAtomica.Contexto() {
-                public Reserva reserva() {
-                  return aislada;
+  final AtomicReservationManagement management =
+      new AtomicReservationManagement() {
+        public Reservation create(
+            Reservation requested, java.util.function.Function<Context, Reservation> operation) {
+          synchronized (Fixture.this) {
+            if (reservations.containsKey(requested.id()))
+              throw new BusinessRuleException("Reservation already exists");
+            return apply(requested, operation);
+          }
+        }
+
+        public Reservation execute(
+            ReservationId id, java.util.function.Function<Context, Reservation> operation) {
+          synchronized (Fixture.this) {
+            return apply(reservation(id).copy(), operation);
+          }
+        }
+
+        private Reservation apply(
+            Reservation isolated, java.util.function.Function<Context, Reservation> operation) {
+          var context =
+              new Context() {
+                public Reservation reservation() {
+                  return isolated;
                 }
 
-                public UnidadEquipo unidad(UnidadEquipoId unidadId) {
-                  return unidadRepository
-                      .buscar(unidadId)
-                      .orElseThrow(() -> new UnidadEquipoNotFoundApplicationException(unidadId));
+                public EquipmentUnit equipmentUnit(EquipmentUnitId equipmentUnitId) {
+                  return equipmentUnitRepository
+                      .findById(equipmentUnitId)
+                      .orElseThrow(
+                          () -> new EquipmentUnitNotFoundApplicationException(equipmentUnitId));
                 }
 
-                public Herramienta herramienta(HerramientaId herramientaId) {
-                  return Fixture.this.herramienta(herramientaId);
+                public Tool tool(ToolId toolId) {
+                  return Fixture.this.tool(toolId);
                 }
 
-                public boolean clienteActivo(ClienteId cliente) {
-                  return participantes.clienteActivo(cliente);
+                public boolean isCustomerActive(CustomerId customer) {
+                  return participants.isCustomerActive(customer);
                 }
 
-                public boolean proveedorActivo(ProveedorId proveedor) {
-                  return participantes.proveedorActivo(proveedor);
+                public boolean isSupplierActive(SupplierId supplier) {
+                  return participants.isSupplierActive(supplier);
                 }
 
-                public boolean ocupada(UnidadEquipoId unidadId, PeriodoReserva periodo) {
-                  return reservas.values().stream()
-                      .filter(otra -> !otra.id().equals(id))
-                      .filter(otra -> otra.estado() == EstadoReserva.CONFIRMADA)
-                      .filter(otra -> otra.periodo().solapa(periodo))
+                public boolean isOccupied(
+                    EquipmentUnitId equipmentUnitId, ReservationPeriod period) {
+                  return reservations.values().stream()
+                      .filter(other -> !other.id().equals(isolated.id()))
+                      .filter(
+                          other ->
+                              other.status() == ReservationStatus.CONFIRMED
+                                  || other.status() == ReservationStatus.PENDING_PAYMENT)
+                      .filter(other -> other.period().overlaps(period))
                       .anyMatch(
-                          otra ->
-                              otra.detalles().stream()
-                                  .anyMatch(d -> d.unidadId().equals(unidadId)));
+                          other ->
+                              other.items().stream()
+                                  .anyMatch(d -> d.equipmentUnitId().equals(equipmentUnitId)));
                 }
               };
-          var resultado = operacion.apply(contexto);
-          if (!id.equals(resultado.id())) throw new ReglaNegocioException("Identidad modificada");
-          reservas.put(id, resultado);
-          return resultado;
+          var result = operation.apply(context);
+          if (!isolated.id().equals(result.id()))
+            throw new BusinessRuleException("Reservation identity cannot change");
+          reservations.put(isolated.id(), result);
+          return result;
         }
       };
 
-  private Herramienta herramienta(HerramientaId id) {
-    return Optional.ofNullable(herramientas.get(id))
-        .orElseThrow(() -> new HerramientaNotFoundApplicationException(id));
+  private Tool tool(ToolId id) {
+    return Optional.ofNullable(tools.get(id))
+        .orElseThrow(() -> new ToolNotFoundApplicationException(id));
   }
 
-  private Reserva reserva(ReservaId id) {
-    return reservaRepository
-        .buscar(id)
-        .orElseThrow(() -> new ReservaNotFoundApplicationException(id));
+  private Reservation reservation(ReservationId id) {
+    return reservationRepository
+        .findById(id)
+        .orElseThrow(() -> new ReservationNotFoundApplicationException(id));
   }
 }
