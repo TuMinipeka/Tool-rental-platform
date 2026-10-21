@@ -43,6 +43,8 @@ La alternativa admite `postgres.test.username` y `postgres.test.password`; sus v
 
 ## Formato y diagnóstico
 
+Para la aceptación crítica HTTP con Insomnia, JWT, pagos ficticios y alquiler completo, usar [pruebas del sistema](system-tests.md). La colección se ejecuta con `node scripts/verify-system-tests.mjs` contra la composición aislada en `18080`; no requiere ejecutar toda la regresión Maven. El alcance y los resultados quedan separados del histórico de `clean verify`.
+
 ```powershell
 .\mvnw.cmd spotless:apply
 .\mvnw.cmd spotless:check

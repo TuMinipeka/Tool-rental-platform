@@ -43,6 +43,14 @@ El proveedor puede crear y editar herramientas, publicar/retirar, adjuntar fotos
 [Despliegue reproducible](docs/deployment.md) · [Contratos por rol](docs/integration-contracts.md) · [Modelo relacional y físico](docs/logical-physical-model.md) · [Evidencias](docs/validation-report.md)
 
 
+## Pruebas del sistema: Swagger, Insomnia y Tomcat
+
+**Entrega verificada localmente:** Swagger documenta 123 operaciones en 92 rutas, con ejemplos JSON e instrucciones JWT. Una colección de Insomnia ejecutada mediante **Inso CLI** aprobó **41 peticiones y 61 comprobaciones** contra PostgreSQL aislado: CRUD, permisos, sesiones, pago ficticio aprobado/rechazado y alquiler hasta devolución. Apache Tomcat **10.1.55** está integrado en Spring Boot y se ejecuta con Java 21.
+
+[Procedimiento y alcance](docs/system-tests.md) · [Colección importable en Insomnia](docs/insomnia/system-tests.json) · [Resultados](docs/evidence/system-tests/insomnia.json) · [Swagger local](http://localhost:8080/swagger-ui/index.html)
+
+![Swagger: instrucciones de autenticación JWT y operaciones documentadas](docs/evidence/system-tests/swagger-overview.png)
+
 ## Funcionamiento verificado con Playwright CLI
 
 Recorridos históricos ejecutados contra **React, Spring Boot/Tomcat y PostgreSQL reales**, en la composición aislada de validación. La configuración vigente usa el proveedor académico persistente y medios de pago fijos; la verificación actual se detalla en [persistencia del proveedor](docs/provider-persistence.md).

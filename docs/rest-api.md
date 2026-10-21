@@ -4,6 +4,8 @@
 
 ## Convenciones
 
+Swagger incluye ejemplos JSON e instrucciones de autorización. Consulta [pruebas del sistema](system-tests.md) para importar la colección de Insomnia, reproducir los flujos y consultar sus resultados ejecutados.
+
 La API oficial usa `/api/v1`. El alias `/api` es temporal y responde con `Deprecation: true` y `Link` hacia la ruta sucesora. OpenAPI muestra solo `/api/v1`.
 
 Las rutas privadas requieren `Authorization: Bearer <access-token>`. La identidad procede del `Principal`; ningún `actorId` de entrada la sustituye. Las mutaciones idempotentes reciben `Idempotency-Key`.

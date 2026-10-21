@@ -1,0 +1,11 @@
+{
+  "testedAt": "2026-10-21T05:42:18.524Z",
+  "command": "mvnw.cmd -pl infrastructure -am -Dtest=OpenApiDocumentationCustomizerTest -Dsurefire.failIfNoSpecifiedTests=false clean test",
+  "tests": 2,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "javaVersion": 21,
+  "formatCheck": "mvnw.cmd -q -pl infrastructure spotless:check",
+  "passed": true
+}

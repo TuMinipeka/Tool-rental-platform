@@ -1,0 +1,22 @@
+{
+  "testedAt": "2026-10-21T05:43:07.960Z",
+  "database": "mvp_supplier_20261020",
+  "passed": true,
+  "fixture": "INSO Drill 1792561378554 Updated",
+  "tools": 1,
+  "equipmentUnits": 1,
+  "reservations": [
+    "CONFIRMED",
+    "PAYMENT_FAILED"
+  ],
+  "payments": [
+    "CONFIRMED",
+    "FAILED"
+  ],
+  "invoices": 1,
+  "rentals": [
+    "COMPLETED"
+  ],
+  "deliveries": 1,
+  "returns": 1
+}
