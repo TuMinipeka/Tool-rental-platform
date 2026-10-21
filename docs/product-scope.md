@@ -56,7 +56,7 @@ Node.js no es un segundo backend. Java y Spring Boot siguen siendo responsables 
 
 ## Reglas de reserva y pago
 
-- Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica.
+- Customer selecciona equipo, fechas y logística; el backend vuelve a validar disponibilidad y crea una orden pendiente de pago con retención temporal atómica. La interfaz abre el paso `/pago` únicamente después de recibir el identificador persistido y la misma reserva queda consultable en `/cuenta`.
 - La orden tiene un vencimiento explícito. El pago rechazado, cancelado o vencido libera la retención de inventario de manera idempotente.
 - Una confirmación auténtica recibida y verificada mediante webhook del proveedor sandbox convierte automáticamente la orden en reserva confirmada, sin aprobación manual posterior del Supplier.
 - El checkout sandbox cobra el total aprobado y mostrado. Daños, extensiones u otros ajustes posteriores se discriminan como operaciones separadas.

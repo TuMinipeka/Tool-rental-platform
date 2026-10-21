@@ -9,7 +9,7 @@ La API oficial usa /api/v1 y mantiene temporalmente el alias /api. El navegador 
 | Registro y sesión | /auth/register, /auth/supplier-registration, login, refresh y logout; el proveedor queda activo y autenticado al registrarse |
 | Historial | /reservations, /rentals, /payments e /invoices; filtrados por actor |
 | Catálogo del proveedor | /tools, /equipment-units y /categories; permisos y propiedad en servidor |
-| Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas |
+| Reserva | POST /reservations; retención PENDING_PAYMENT y fechas inclusivas. Solo una respuesta persistida habilita la redirección automática a `/pago?reservationId={id}` y su consulta posterior en `/cuenta` |
 | Mercado Pago | POST /payments/checkouts con reserva e Idempotency-Key; GET /payments/checkouts/{id} para retorno y conciliación |
 | Webhook | POST /payments/mercadopago/webhooks; firma oficial, identificador del pago y consulta posterior al proveedor |
 | Comprobante | GET /invoices/{id}/document; descarga autenticada, académica y sin validez fiscal |

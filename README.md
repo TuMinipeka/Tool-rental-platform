@@ -267,7 +267,7 @@ Rutas principales:
 
 La especificación está en `http://localhost:8080/v3/api-docs` y Swagger UI en `http://localhost:8080/swagger-ui.html`. Consulta [contratos REST](docs/rest-api.md).
 
-El paso `/pago` consulta la reserva del usuario, muestra el importe persistido y permite escoger entre tarjeta y PayPal. Tarjeta continúa al Checkout Pro alojado de Mercado Pago; PayPal permanece identificado como no disponible hasta incorporar credenciales de prueba, creación de órdenes y webhook en el backend. La interfaz no solicita PAN, CVV ni contraseñas de proveedores de pago.
+Después de crear y persistir una reserva, el frontend abre automáticamente `/pago?reservationId={id}`. Ese paso muestra el importe del servidor y permite escoger entre tarjeta y PayPal. Tarjeta continúa al Checkout Pro alojado de Mercado Pago; PayPal permanece identificado como no disponible hasta incorporar credenciales de prueba, creación de órdenes y webhook en el backend. La interfaz no solicita PAN, CVV ni contraseñas de proveedores de pago, y nunca muestra una reserva como creada si falló la disponibilidad o la persistencia.
 
 ## Migraciones y validación
 

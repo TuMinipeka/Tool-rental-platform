@@ -174,12 +174,11 @@ function App(){
   },[path,catalogTools.length])
 
   const reserve=async selection=>{
-    if(selection.tool.source==='api'){
-      try{
-        const availability=await api.getAvailability(selection.tool.id,selection.startDate,selection.returnDate)
-        selection={...selection,equipmentUnitIds:availability.availableEquipmentUnitIds}
-      }catch(error){selection={...selection,availabilityError:error.message}}
-    }
+    try{
+      const availability=await api.getAvailability(selection.tool.id,selection.startDate,selection.returnDate)
+      const equipmentUnitIds=Array.isArray(availability.availableEquipmentUnitIds)?availability.availableEquipmentUnitIds:[]
+      selection={...selection,equipmentUnitIds,availabilityError:equipmentUnitIds.length?'':'No hay unidades disponibles para las fechas seleccionadas.'}
+    }catch(error){selection={...selection,equipmentUnitIds:[],availabilityError:error.message}}
     setReservation(selection)
     navigate('/cotizacion')
   }
@@ -194,15 +193,16 @@ function App(){
   }
   const continueQuote=async logistics=>{
     if(!session){navigate('/login?returnTo=%2Fcotizacion');return}
-    if(reservation?.tool.source==='api'&&reservation.equipmentUnitIds?.length&&!session?.demo){
-      try{
-        const equipmentUnitIds=[reservation.equipmentUnitIds[0]]
-        const quote=await api.quoteReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,fulfillmentMethod:logistics.fulfillmentMethod,deliveryCountryCode:logistics.deliveryCountryCode})
-        const created=await api.createReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,...logistics,scheduledFulfillmentAt:new Date(logistics.scheduledFulfillmentAt).toISOString()})
-        setReservation(current=>({...current,quote,reservationId:created.id?.value||created.id,reservationStatus:created.status,expiresAt:created.expiresAt,serverTotal:created.total}))
-      }catch(error){setReservation(current=>({...current,apiError:error.message}));return}
-    }
-    navigate('/reserva-confirmada')
+    if(!reservation?.equipmentUnitIds?.length){setReservation(current=>({...current,apiError:current?.availabilityError||'No hay una unidad disponible para crear la reserva.'}));return}
+    try{
+      const equipmentUnitIds=[reservation.equipmentUnitIds[0]]
+      const quote=await api.quoteReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,fulfillmentMethod:logistics.fulfillmentMethod,deliveryCountryCode:logistics.deliveryCountryCode})
+      const created=await api.createReservation({startDate:reservation.startDate,returnDate:reservation.returnDate,equipmentUnitIds,...logistics,scheduledFulfillmentAt:new Date(logistics.scheduledFulfillmentAt).toISOString()})
+      const reservationId=created.id?.value||created.id
+      if(!reservationId)throw new Error('El servidor no devolvió el identificador de la reserva.')
+      setReservation(current=>({...current,quote,persistedReservation:created,reservationId,reservationStatus:created.status,expiresAt:created.expiresAt,serverTotal:created.total,apiError:''}))
+      navigate(`/pago?reservationId=${encodeURIComponent(reservationId)}`)
+    }catch(error){setReservation(current=>({...current,apiError:error.message}))}
   }
   let page
   if(path==='/')page=<HomePage catalogTools={displayedCatalogTools} dataMode={dataMode} location={location} onLocationChange={changeLocation}/>

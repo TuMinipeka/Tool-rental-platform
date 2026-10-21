@@ -167,6 +167,9 @@ export const api = {
       { authenticated: true },
     )
   },
+  getReservation(id) {
+    return request('/reservations/' + encodeURIComponent(id), {}, { authenticated: true })
+  },
   reservationAction(id, action, idempotencyKey) {
     return request('/reservations/' + encodeURIComponent(id) + '/' + action,
       { method: 'POST', headers: idempotencyKey ? { 'Idempotency-Key': idempotencyKey } : {} },
