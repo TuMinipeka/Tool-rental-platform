@@ -2,7 +2,18 @@ import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
 import { catalog, mockApi } from './fixtures.js'
 
-test.beforeEach(async ({ page }) => { await mockApi(page) })
+test.beforeEach(async ({ page }) => {
+  // The 4 s boot splash is covered by boot-splash.spec.js; drop it here so it does not cover interactions.
+  await page.addInitScript(() => {
+    new MutationObserver((_, observer) => {
+      const splash = document.getElementById('boot-splash')
+      if (!splash) return
+      splash.remove()
+      observer.disconnect()
+    }).observe(document, { childList: true, subtree: true })
+  })
+  await mockApi(page)
+})
 
 async function login(page, destination) {
   const returnTo = new URL(page.url()).pathname
