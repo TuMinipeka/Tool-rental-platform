@@ -299,3 +299,339 @@ La ilustración conservada es anterior a V210: la factura actualmente pertenece 
 | Condiciones | [terms-and-conditions.md](docs/terms-and-conditions.md) |
 
 Los nombres de código y commits se mantienen en inglés. La documentación para el equipo se conserva en español.
+
+---
+
+## Guía completa de ejecución y despliegue
+
+Esta sección permite poner en funcionamiento el proyecto desde un computador nuevo. La forma recomendada es Docker Compose, porque inicia PostgreSQL, el backend y el frontend con versiones compatibles y ejecuta automáticamente las migraciones Flyway.
+
+### 1. Requisitos
+
+Para la ejecución recomendada instala:
+
+- Git.
+- Docker Desktop en Windows o macOS, o Docker Engine con el complemento Compose en Linux.
+- Al menos 6 GB de memoria disponible para Docker.
+- Puertos locales `5173`, `8080` y `5432` libres.
+
+Comprueba la instalación:
+
+```text
+git --version
+docker --version
+docker compose version
+```
+
+Para ejecutar los componentes sin Docker también se necesitan:
+
+- JDK 21.
+- PostgreSQL 17.
+- Node.js 24 y npm.
+
+### 2. Descargar el proyecto
+
+```text
+git clone https://github.com/TuMinipeka/Tool-rental-platform.git
+cd Tool-rental-platform
+git checkout developer/conde
+git pull origin developer/conde
+```
+
+Si el trabajo ya fue integrado a la rama principal, sustituye `developer/conde` por la rama que se vaya a desplegar.
+
+### 3. Configurar las variables locales
+
+En Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+En Linux o macOS:
+
+```bash
+cp .env.example .env
+```
+
+Abre `.env` y cambia como mínimo estos valores:
+
+```dotenv
+POSTGRES_PASSWORD=una-clave-local-segura
+DB_PASSWORD=una-clave-local-segura
+JWT_SECRET=un-secreto-aleatorio-de-32-bytes-como-minimo
+```
+
+`POSTGRES_PASSWORD` y `DB_PASSWORD` deben ser iguales. El archivo `.env` es privado y no se debe subir a Git. Para la demostración local conserva:
+
+```dotenv
+SPRING_PROFILES_ACTIVE=local,demo
+PAYMENT_PROVIDER=fictional
+VITE_DEMO_MODE=true
+```
+
+El perfil `demo` solo debe utilizarse sobre una base nueva y desechable. Nunca debe habilitarse sobre una base productiva.
+
+### 4. Ejecutar todo con Docker Compose
+
+Desde la raíz del repositorio:
+
+```text
+docker compose up --build -d
+```
+
+La primera ejecución descarga las imágenes, compila el backend y el frontend, crea PostgreSQL y aplica las migraciones. Puede tardar varios minutos.
+
+Consulta el estado:
+
+```text
+docker compose ps
+docker compose logs -f backend
+```
+
+Cuando `postgres`, `backend` y `frontend` estén saludables, abre:
+
+| Servicio | Dirección |
+| --- | --- |
+| Aplicación web | http://localhost:5173 |
+| Backend | http://localhost:8080 |
+| Estado de PostgreSQL | http://localhost:8080/status/database |
+| Swagger UI | http://localhost:8080/swagger-ui.html |
+| OpenAPI JSON | http://localhost:8080/v3/api-docs |
+
+Las cuentas creadas por las migraciones del perfil `demo` son:
+
+| Rol | Correo | Contraseña |
+| --- | --- | --- |
+| Cliente | `cliente@toolrental.local` | `ToolRental2026!` |
+| Proveedor | `proveedor@toolrental.local` | `ToolRental2026!` |
+| Administrador | `admin@toolrental.local` | `ToolRental2026!` |
+
+Estas credenciales son exclusivas del entorno académico local.
+
+### 5. Comandos habituales de Docker
+
+Ver todos los registros:
+
+```text
+docker compose logs -f
+```
+
+Reconstruir después de descargar cambios:
+
+```text
+git pull origin developer/conde
+docker compose up --build -d
+```
+
+Reiniciar los servicios:
+
+```text
+docker compose restart
+```
+
+Detenerlos sin borrar la base de datos:
+
+```text
+docker compose down
+```
+
+PostgreSQL persiste en el volumen `postgres_data`. El siguiente comando también elimina la base y solo debe utilizarse cuando se quiera comenzar nuevamente con datos demo:
+
+```text
+docker compose down -v
+docker compose up --build -d
+```
+
+No ejecutes `down -v` si necesitas conservar reservas, usuarios, pagos o facturas.
+
+### 6. Ejecutar la base de datos por separado
+
+Si solo necesitas PostgreSQL en Docker:
+
+```text
+docker compose up -d postgres
+docker compose ps postgres
+```
+
+El backend se conecta con los valores de `.env` mediante `jdbc:postgresql://localhost:5432/tool_rental`.
+
+Si prefieres una instalación local de PostgreSQL, crea el usuario y la base con una cuenta administradora:
+
+```text
+psql -U postgres -c "CREATE USER tool_rental WITH PASSWORD 'una-clave-local-segura';"
+psql -U postgres -c "CREATE DATABASE tool_rental OWNER tool_rental;"
+```
+
+No se deben crear tablas manualmente. Flyway las crea y actualiza cuando arranca el backend. Hibernate utiliza `ddl-auto: validate` y no reemplaza las migraciones.
+
+### 7. Ejecutar el backend sin Docker
+
+Primero inicia PostgreSQL. Después configura la terminal.
+
+Windows PowerShell:
+
+```powershell
+$env:SPRING_PROFILES_ACTIVE = 'local,demo'
+$env:DB_URL = 'jdbc:postgresql://localhost:5432/tool_rental'
+$env:DB_USERNAME = 'tool_rental'
+$env:DB_PASSWORD = 'una-clave-local-segura'
+$env:JWT_SECRET = 'un-secreto-aleatorio-de-32-bytes-como-minimo'
+$env:CORS_ALLOWED_ORIGINS = 'http://localhost:5173'
+$env:PAYMENT_PROVIDER = 'fictional'
+./mvnw.cmd -pl infrastructure -am spring-boot:run
+```
+
+Linux o macOS:
+
+```bash
+export SPRING_PROFILES_ACTIVE='local,demo'
+export DB_URL='jdbc:postgresql://localhost:5432/tool_rental'
+export DB_USERNAME='tool_rental'
+export DB_PASSWORD='una-clave-local-segura'
+export JWT_SECRET='un-secreto-aleatorio-de-32-bytes-como-minimo'
+export CORS_ALLOWED_ORIGINS='http://localhost:5173'
+export PAYMENT_PROVIDER='fictional'
+chmod +x mvnw
+./mvnw -pl infrastructure -am spring-boot:run
+```
+
+El backend arranca Spring Boot con Apache Tomcat integrado en `http://localhost:8080`. Al iniciar, Flyway prepara la base automáticamente.
+
+Para generar el JAR sin ejecutar pruebas:
+
+```powershell
+./mvnw.cmd -DskipTests -pl infrastructure -am clean package
+java -jar infrastructure/target/infrastructure-0.1.0-SNAPSHOT.jar
+```
+
+En Linux o macOS usa `./mvnw` en lugar de `./mvnw.cmd`.
+
+### 8. Ejecutar el frontend sin Docker
+
+En otra terminal:
+
+```text
+cd frontend
+npm ci
+npm run dev
+```
+
+Abre `http://localhost:5173`. Vite redirige `/api` y `/status` al backend local cuando `VITE_API_BASE_URL` no está definido.
+
+Si el backend usa otra dirección, crea `frontend/.env.local`:
+
+```dotenv
+VITE_API_BASE_URL=http://localhost:8080
+VITE_DEMO_MODE=true
+```
+
+Las variables de Vite se incorporan durante la compilación. Después de cambiarlas hay que detener y volver a iniciar `npm run dev`, o reconstruir la imagen del frontend.
+
+Para compilar una versión estática:
+
+```text
+npm run build
+npm run preview
+```
+
+### 9. Orden correcto de arranque manual
+
+1. Inicia PostgreSQL y confirma que acepta conexiones.
+2. Inicia el backend y espera a que `/status/database` indique conexión correcta.
+3. Inicia el frontend.
+4. Abre `http://localhost:5173` e inicia sesión.
+
+Si se inicia el frontend antes del backend, la interfaz puede mostrar un error de conexión hasta que el servicio Java esté disponible.
+
+### 10. Despliegue público con Docker, dominio y HTTPS
+
+El despliegue público está preparado para un servidor Linux con Docker, un dominio apuntando a su IP y los puertos `80` y `443` abiertos. PostgreSQL, Tomcat y el frontend no deben exponer directamente sus puertos públicos; Caddy es el único punto de entrada.
+
+1. En un computador de construcción limpio, inicia sesión en el registro de contenedores:
+
+   ```bash
+   docker login ghcr.io
+   docker buildx create --use --name tool-rental-builder
+   ```
+
+2. Define el prefijo del registro y construye las imágenes para AMD64 y ARM64:
+
+   ```bash
+   export IMAGE_PREFIX='ghcr.io/tu-usuario/tool-rental'
+   ./scripts/build-release.sh
+   ```
+
+   El script etiqueta las imágenes con el SHA completo del commit y las publica como `backend:<sha>` y `frontend:<sha>`.
+
+3. En el servidor, clona la misma revisión del repositorio:
+
+   ```bash
+   git clone https://github.com/TuMinipeka/Tool-rental-platform.git
+   cd Tool-rental-platform
+   git checkout <sha-publicado>
+   cp .env.showcase.example .env.showcase
+   ```
+
+4. Configura el registro DNS `A` del dominio para que apunte a la IP pública del servidor. Abre únicamente `80`, `443` y un acceso SSH restringido.
+
+5. Completa `.env.showcase` sin subirlo al repositorio:
+
+   ```dotenv
+   PUBLIC_HOST=tu-dominio.example
+   ACME_EMAIL=administrador@example.com
+   POSTGRES_DB=tool_rental_showcase
+   POSTGRES_USER=tool_rental_showcase
+   POSTGRES_PASSWORD=una-clave-aleatoria-larga
+   JWT_SECRET=un-secreto-aleatorio-de-al-menos-32-bytes
+   BACKEND_IMAGE=ghcr.io/tu-usuario/tool-rental/backend:<sha-publicado>
+   FRONTEND_IMAGE=ghcr.io/tu-usuario/tool-rental/frontend:<sha-publicado>
+   PAYMENT_PROVIDER=fictional
+   ```
+
+6. En Linux limita la lectura del archivo:
+
+   ```bash
+   chmod 600 .env.showcase
+   ```
+
+7. Confirma que las evidencias y compuertas de publicación vigentes estén aprobadas. Después ejecuta:
+
+   ```bash
+   ./scripts/release.sh
+   ```
+
+   Este script valida la configuración, descarga las imágenes y levanta PostgreSQL, backend, frontend y Caddy. Caddy solicita y renueva el certificado HTTPS automáticamente cuando el dominio y los puertos son correctos.
+
+8. Comprueba desde otro equipo:
+
+   ```text
+   https://tu-dominio.example/
+   https://tu-dominio.example/status/database
+   https://tu-dominio.example/swagger-ui.html
+   ```
+
+El entorno `showcase` no publica las credenciales demo conocidas. Los accesos de evaluadores deben provisionarse de forma privada siguiendo [la guía de despliegue](docs/deployment.md). No se deben copiar `.env`, contraseñas, tokens, volúmenes ni respaldos al repositorio.
+
+### 11. Actualizar un despliegue existente
+
+Para desarrollo local:
+
+```text
+git pull
+docker compose up --build -d
+```
+
+Para producción, crea imágenes nuevas identificadas por el nuevo SHA, actualiza `BACKEND_IMAGE` y `FRONTEND_IMAGE` en `.env.showcase`, realiza el respaldo requerido y vuelve a ejecutar `./scripts/release.sh`. No uses la etiqueta `latest` y no reviertas migraciones Flyway aplicadas.
+
+### 12. Solución de problemas frecuentes
+
+- **El navegador no refleja cambios:** ejecuta `docker compose up --build -d` y recarga sin caché. Actualizar la pestaña no reconstruye las imágenes.
+- **El backend no conecta con PostgreSQL:** verifica que `POSTGRES_PASSWORD` y `DB_PASSWORD` coincidan y consulta `docker compose logs postgres backend`.
+- **Un puerto está ocupado:** cambia `FRONTEND_PORT`, `BACKEND_PORT` o `POSTGRES_PORT` en `.env` y reconstruye.
+- **GitHub devuelve `Connection was reset`:** comprueba la conexión, VPN, proxy o firewall y vuelve a ejecutar `git push origin <rama>`.
+- **Flyway informa una versión incoherente:** no edites migraciones ya aplicadas. En una base local desechable crea un volumen nuevo; si contiene datos necesarios, prepara una migración hacia delante.
+- **El frontend abre pero la API falla:** confirma `http://localhost:8080/status/database`, el valor de `VITE_API_BASE_URL` y `CORS_ALLOWED_ORIGINS`.
+- **Docker conserva una versión anterior:** usa `docker compose up --build -d`; si sigue usando caché y no necesitas la imagen anterior, reconstruye explícitamente con `docker compose build --no-cache frontend backend`.
+
+La explicación operativa ampliada, los respaldos y la restauración están en [docs/deployment.md](docs/deployment.md).
