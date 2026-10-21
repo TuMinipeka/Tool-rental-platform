@@ -63,6 +63,26 @@ public class ApiExceptionHandler {
         HttpStatus.SERVICE_UNAVAILABLE, "PAYMENT_PROVIDER_UNAVAILABLE", ex.getMessage(), request);
   }
 
+  @ExceptionHandler(org.springframework.web.multipart.MaxUploadSizeExceededException.class)
+  ResponseEntity<ProblemDetail> uploadSize(Exception error, HttpServletRequest request) {
+    return problem(
+        HttpStatus.PAYLOAD_TOO_LARGE,
+        "IMAGE_TOO_LARGE",
+        "Images must not exceed five MiB",
+        request);
+  }
+
+  @ExceptionHandler(
+      com.toolrental.infrastructure.toolimage.exception.ToolImageStorageInfrastructureException
+          .class)
+  ResponseEntity<ProblemDetail> imageStorage(Exception error, HttpServletRequest request) {
+    return problem(
+        HttpStatus.SERVICE_UNAVAILABLE,
+        "IMAGE_STORAGE_UNAVAILABLE",
+        "Image storage is unavailable",
+        request);
+  }
+
   @ExceptionHandler(ApplicationException.class)
   ResponseEntity<ProblemDetail> missing(RuntimeException ex, HttpServletRequest request) {
     return problem(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", ex.getMessage(), request);
@@ -96,6 +116,7 @@ public class ApiExceptionHandler {
     IllegalArgumentException.class,
     MethodArgumentNotValidException.class,
     HttpMessageNotReadableException.class,
+    org.springframework.web.multipart.support.MissingServletRequestPartException.class,
     org.springframework.web.method.annotation.MethodArgumentTypeMismatchException.class
   })
   ResponseEntity<ProblemDetail> invalid(Exception ex, HttpServletRequest request) {

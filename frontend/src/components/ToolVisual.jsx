@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { resolveApiImageUrl } from '../api.js'
 import { resolveToolVisual, resolveToolVisualClass } from '../toolVisuals.js'
 import { heroImageSizes, heroImageSource, imageAttributes } from '../lib/responsiveImages.js'
 
 export function ToolVisual({ tool, compact = false, priority = false, reuseHero = false }) {
   const [failedUrls, setFailedUrls] = useState([])
-  const imageUrl = [tool.imageUrl, resolveToolVisual(tool)].find(url => url && !failedUrls.includes(url))
+  const imageUrl = [resolveApiImageUrl(tool.imageUrl), resolveToolVisual(tool)].find(url => url && !failedUrls.includes(url))
   const sizes = reuseHero && imageUrl === heroImageSource ? heroImageSizes : compact
     ? '(max-width: 600px) 90vw, (max-width: 1100px) 45vw, 400px'
     : '(max-width: 900px) 90vw, 50vw'

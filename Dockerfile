@@ -23,7 +23,8 @@ WORKDIR /application
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/* \
-    && groupadd --system spring && useradd --system --gid spring spring
+    && groupadd --system spring && useradd --system --gid spring spring \
+    && mkdir -p /application/storage/tool-images && chown -R spring:spring /application/storage
 USER spring:spring
 
 COPY --from=builder --chown=spring:spring /workspace/extracted/dependencies/ ./

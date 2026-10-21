@@ -17,7 +17,8 @@ public class ToolImageBeanConfiguration {
       UnitOfWork work,
       AccessPolicy access,
       WorkflowReferences references,
-      Clock clock) {
-    return new ManageToolImageUseCase(repository, work, access, references, clock);
+      Clock clock,
+      com.toolrental.domain.toolimage.port.ToolImageStorage storage) {
+    return new ManageToolImageUseCase(repository, work, access, references, clock, storage);
   }
 }

@@ -93,6 +93,23 @@ public final class ManageToolUseCase {
         });
   }
 
+  public ToolResponse publish(UUID actor, ToolId id, boolean published) {
+    return work.execute(
+        () -> {
+          var value = references.tool(actor, id);
+          var changed =
+              value.update(
+                  value.name(),
+                  value.description(),
+                  value.serviceCity(),
+                  value.dailyRate(),
+                  published,
+                  clock);
+          repository.save(changed);
+          return ToolResponse.from(changed);
+        });
+  }
+
   public void unpublish(UUID actor, ToolId id) {
     work.execute(
         () -> {

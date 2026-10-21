@@ -31,6 +31,11 @@ public final class RegisterToolUseCase {
         .orElseThrow(() -> new CategoryNotFoundApplicationException(c.categoryId()));
     if (!participants.isSupplierActive(c.supplierId()))
       throw new SupplierNotFoundApplicationException(c.supplierId());
+    for (var image : c.imageUrls()) {
+      if (new com.toolrental.domain.toolimage.model.valueobject.ToolImageReference(image.toString())
+          .managed())
+        throw new IllegalArgumentException("Managed images must be uploaded for their owning tool");
+    }
     var h =
         Tool.register(
             c.supplierId(),

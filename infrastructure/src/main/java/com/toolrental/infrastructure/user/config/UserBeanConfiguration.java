@@ -95,6 +95,20 @@ public class UserBeanConfiguration {
   }
 
   @Bean
+  com.toolrental.application.user.usecase.CreateManagedAccountUseCase createManagedAccountUseCase(
+      UserRepository users,
+      SupplierRepository suppliers,
+      RoleRepository roles,
+      UserRoleRepository assignments,
+      PasswordHasher passwords,
+      UnitOfWork work,
+      AccessPolicy access,
+      Clock clock) {
+    return new com.toolrental.application.user.usecase.CreateManagedAccountUseCase(
+        users, suppliers, roles, assignments, passwords, work, access, clock);
+  }
+
+  @Bean
   ManageUserUseCase manageUserUseCase(
       UserRepository repository,
       UnitOfWork work,

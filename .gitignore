@@ -28,3 +28,6 @@ tmp/
 backups/
 
 !.env.mercadopago.example
+
+# Uploaded images are private runtime artifacts, not repository assets
+storage/

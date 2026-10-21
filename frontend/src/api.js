@@ -92,7 +92,7 @@ async function refreshSession() {
 async function request(path, options = {}, behavior = {}) {
   const { authenticated = false, csrf = false, retry = true } = behavior
   const headers = new Headers(options.headers)
-  if (options.body) headers.set('Content-Type', 'application/json')
+  if (typeof options.body === 'string') headers.set('Content-Type', 'application/json')
   if (authenticated && activeSession?.accessToken) {
     headers.set('Authorization', `Bearer ${activeSession.accessToken}`)
   }
@@ -148,6 +148,8 @@ export const api = {
   registerSupplier(account) { return request('/auth/supplier-registration', { method: 'POST', body: JSON.stringify(account) }) },
   updateUserStatus(id, status) { return request('/users/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status }) }, { authenticated: true }) },
   updateUser(id, profile) { return request('/users/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(profile) }, { authenticated: true }) },
+  createManagedSupplier(account) { return request('/suppliers/accounts', { method: 'POST', body: JSON.stringify(account) }, { authenticated: true }) },
+  createAdministrator(account) { return request('/users/administrators', { method: 'POST', body: JSON.stringify(account) }, { authenticated: true }) },
   createUser(user) { return request('/users', { method: 'POST', body: JSON.stringify(user) }, { authenticated: true }) },
   currentUser() { return request('/users/me', {}, { authenticated: true }) },
   updateCurrentUser(profile) { return request('/users/me/profile', { method: 'PATCH', body: JSON.stringify(profile) }, { authenticated: true }) },
@@ -218,6 +220,13 @@ export const api = {
     )
   },
   updateTool(id, tool) { return request('/tools/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(tool) }, { authenticated: true }) },
+  publishTool(id, published) { return request('/tools/' + encodeURIComponent(id) + '/publication', { method: 'PATCH', body: JSON.stringify({ published }) }, { authenticated: true }) },
+  getTool(id) { return request('/tools/' + encodeURIComponent(id), {}, { authenticated: true }) },
+  listToolImages(id) { return request('/tools/' + encodeURIComponent(id) + '/images', {}, { authenticated: true }) },
+  addToolImage(toolId, imageUrl) { return request('/tool-images', { method: 'POST', body: JSON.stringify({ toolId, imageUrl }) }, { authenticated: true }) },
+  uploadToolImage(id, file) { const body = new FormData(); body.append('file', file); return request('/tools/' + encodeURIComponent(id) + '/images', { method: 'POST', body }, { authenticated: true }) },
+  removeToolImage(toolId, imageUrl) { return request('/tool-images/entry?' + new URLSearchParams({ toolId, imageUrl }), { method: 'DELETE' }, { authenticated: true }) },
+  updateEquipmentUnit(id, unit) { return request('/equipment-units/' + encodeURIComponent(id), { method: 'PUT', body: JSON.stringify(unit) }, { authenticated: true }) },
   deleteTool(id) { return request('/tools/' + encodeURIComponent(id), { method: 'DELETE' }, { authenticated: true }) },
   listEquipmentUnits() {
     return request('/equipment-units', {}, { authenticated: true })
@@ -251,6 +260,10 @@ export const api = {
   },
 }
 
+export function resolveApiImageUrl(value) {
+  return value?.startsWith('/api/v1/public/tool-images/files/') ? apiBaseUrl + value : value
+}
+
 export function normalizeCatalogTool(tool, index = 0) {
   const colors = ['orange', 'yellow', 'blue', 'green', 'red', 'silver']
   return {
@@ -272,7 +285,7 @@ export function normalizeCatalogTool(tool, index = 0) {
         ? 'CatÃ¡logo real'
         : 'Sin existencias',
     description: tool.description,
-    imageUrl: tool.imageUrls?.[0] || null,
+    imageUrl: resolveApiImageUrl(tool.imageUrls?.[0]) || null,
     source: 'api',
   }
 }

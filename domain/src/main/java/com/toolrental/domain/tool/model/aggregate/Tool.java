@@ -48,13 +48,14 @@ public final class Tool extends AggregateRoot {
       throw new BusinessRuleException("Tool text exceeds the supported length");
     this.dailyRate = Objects.requireNonNull(rate);
     this.imageUrls = Set.copyOf(imageUrls);
+    if (this.imageUrls.size() > 8)
+      throw new BusinessRuleException("A tool supports at most eight images");
     for (URI image : this.imageUrls) {
-      if (image.toString().length() > 2048)
-        throw new BusinessRuleException("Image URL is too long");
-      if (!("https".equalsIgnoreCase(image.getScheme())
-              || "http".equalsIgnoreCase(image.getScheme()))
-          || image.getHost() == null)
-        throw new BusinessRuleException("Tool images require an absolute HTTP(S) URL");
+      try {
+        new com.toolrental.domain.toolimage.model.valueobject.ToolImageReference(image.toString());
+      } catch (IllegalArgumentException error) {
+        throw new BusinessRuleException(error.getMessage());
+      }
     }
   }
 

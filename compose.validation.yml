@@ -14,6 +14,7 @@ services:
       retries: 30
   backend:
     image: tool-rental-mvp-backend:working
+    volumes: ["mvp_tool_images:/application/storage/tool-images"]
     build: { context: ., dockerfile: Dockerfile }
     environment:
       SPRING_PROFILES_ACTIVE: local,demo
@@ -41,4 +42,5 @@ services:
     volumes: ["./ops/Caddyfile.local:/etc/caddy/Caddyfile:ro"]
     depends_on: [backend,frontend]
 volumes:
+  mvp_tool_images: {}
   mvp_data: {}

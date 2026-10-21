@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
   application:
     name: tool-rental-platform
   profiles:
@@ -57,3 +61,6 @@ springdoc:
     operations-sorter: method
   cache:
     max-entries: 20
+
+tool-images:
+  storage-directory: ${TOOL_IMAGES_DIRECTORY:./storage/tool-images}

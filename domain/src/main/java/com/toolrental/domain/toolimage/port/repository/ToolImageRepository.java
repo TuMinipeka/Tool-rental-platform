@@ -10,6 +10,10 @@ public interface ToolImageRepository {
 
   List<ToolImage> findAll();
 
+  default List<ToolImage> findByToolId(com.toolrental.domain.tool.model.valueobject.ToolId id) {
+    return findAll().stream().filter(image -> image.id().toolId().equals(id)).toList();
+  }
+
   ToolImage save(ToolImage value);
 
   void delete(ToolImageId id);

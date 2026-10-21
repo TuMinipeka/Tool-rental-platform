@@ -22,6 +22,7 @@ services:
       retries: 12
   backend:
     image: ${BACKEND_IMAGE:?Set tested image identified by commit or digest}
+    volumes: ["tool_images:/application/storage/tool-images"]
     environment:
       SPRING_PROFILES_ACTIVE: production,showcase
       DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
@@ -90,6 +91,7 @@ networks:
   database: { internal: true }
   edge: {}
 volumes:
+  tool_images: {}
   postgres_data: {}
   caddy_data: {}
   caddy_config: {}

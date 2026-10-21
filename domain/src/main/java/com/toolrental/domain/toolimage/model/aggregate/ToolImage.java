@@ -1,6 +1,5 @@
 package com.toolrental.domain.toolimage.model.aggregate;
 
-import com.toolrental.domain.common.exception.BusinessRuleException;
 import com.toolrental.domain.common.model.AggregateRoot;
 import com.toolrental.domain.toolimage.event.ToolImageChanged;
 import com.toolrental.domain.toolimage.model.valueobject.ToolImageId;
@@ -13,10 +12,7 @@ public final class ToolImage extends AggregateRoot {
 
   private ToolImage(ToolImageId id) {
     Objects.requireNonNull(id);
-    var uri = java.net.URI.create(id.imageUrl());
-    if (uri.getHost() == null
-        || !("http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme())))
-      throw new BusinessRuleException("Image requires an absolute HTTP(S) URL");
+    new com.toolrental.domain.toolimage.model.valueobject.ToolImageReference(id.imageUrl());
     this.id = id;
   }
 

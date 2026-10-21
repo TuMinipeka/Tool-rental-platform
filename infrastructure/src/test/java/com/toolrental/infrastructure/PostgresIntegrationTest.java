@@ -65,6 +65,7 @@ class PostgresIntegrationTest {
 
   @DynamicPropertySource
   static void database(DynamicPropertyRegistry registry) {
+    registry.add("tool-images.storage-directory", () -> "target/test-images-" + schema);
     String url = System.getProperty("postgres.test.url");
     String username = System.getProperty("postgres.test.username", "postgres");
     String password = System.getProperty("postgres.test.password", "");
@@ -806,6 +807,201 @@ class PostgresIntegrationTest {
             header()
                 .string("Content-Disposition", org.hamcrest.Matchers.containsString("attachment")))
         .andExpect(content().string(org.hamcrest.Matchers.startsWith("%PDF-")));
+  }
+
+  @Test
+  void supplierPublicationAndImagesPersistAndRejectCrossOwnerWrites() throws Exception {
+    var filename = new java.io.ByteArrayOutputStream();
+    javax.imageio.ImageIO.write(
+        new java.awt.image.BufferedImage(4, 4, java.awt.image.BufferedImage.TYPE_INT_RGB),
+        "png",
+        filename);
+    var file =
+        new org.springframework.mock.web.MockMultipartFile(
+            "file", "ignored.png", "image/png", filename.toByteArray());
+    mvc.perform(multipart("/api/v1/tools/" + tool + "/images").file(file))
+        .andExpect(status().isUnauthorized());
+    mvc.perform(
+            multipart("/api/v1/tools/" + tool + "/images")
+                .file(file)
+                .with(jwt().jwt(token -> token.subject(customer.toString()))))
+        .andExpect(status().isForbidden());
+    var uploaded =
+        mvc.perform(
+                multipart("/api/v1/tools/" + tool + "/images")
+                    .file(file)
+                    .with(jwt().jwt(token -> token.subject(supplier.toString()))))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse();
+    var reference = json.readTree(uploaded.getContentAsString()).path("imageUrl").asText();
+    assertThat(
+            db.queryForObject(
+                "select count(*) from tool_images where tool_id=? and image_url=?",
+                Integer.class,
+                tool,
+                reference))
+        .isEqualTo(1);
+    mvc.perform(get(reference))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType("image/png"))
+        .andExpect(header().string("X-Content-Type-Options", "nosniff"));
+    call(supplier, get("/api/v1/tools/" + tool + "/images"), null, 200);
+    call(
+        customer, patch("/api/v1/tools/" + tool + "/publication"), Map.of("published", false), 403);
+    call(
+        supplier, patch("/api/v1/tools/" + tool + "/publication"), Map.of("published", false), 200);
+    assertThat(
+            db.queryForObject(
+                "select publication_status from tools where tool_id=?", String.class, tool))
+        .isEqualTo("UNPUBLISHED");
+    call(null, get("/api/v1/public/catalog/" + tool), null, 404);
+    call(supplier, patch("/api/v1/tools/" + tool + "/publication"), Map.of("published", true), 200);
+    call(null, get("/api/v1/public/catalog/" + tool), null, 200);
+    call(
+        supplier,
+        delete("/api/v1/tool-images/entry")
+            .param("toolId", tool.toString())
+            .param("imageUrl", reference),
+        null,
+        204);
+    assertThat(
+            db.queryForObject(
+                "select count(*) from tool_images where image_url=?", Integer.class, reference))
+        .isZero();
+    mvc.perform(get(reference)).andExpect(status().isNotFound());
+    var fake =
+        new org.springframework.mock.web.MockMultipartFile(
+            "file", "evil.png", "image/png", "not an image".getBytes());
+    mvc.perform(
+            multipart("/api/v1/tools/" + tool + "/images")
+                .file(fake)
+                .with(jwt().jwt(token -> token.subject(supplier.toString()))))
+        .andExpect(status().isBadRequest());
+    var large =
+        new org.springframework.mock.web.MockMultipartFile(
+            "file", "large.png", "image/png", new byte[5 * 1024 * 1024 + 1]);
+    mvc.perform(
+            multipart("/api/v1/tools/" + tool + "/images")
+                .file(large)
+                .with(jwt().jwt(token -> token.subject(supplier.toString()))))
+        .andExpect(status().isPayloadTooLarge())
+        .andExpect(jsonPath("$.code").value("IMAGE_TOO_LARGE"));
+  }
+
+  @Test
+  void managedSupplierCreationRollsBackAccountAndRoleWhenProfileConflicts() throws Exception {
+    var email = "rollback@example.test";
+    var command =
+        Map.of(
+            "email",
+            email,
+            "displayName",
+            "Rollback Supplier",
+            "password",
+            "Private-Test-2026!",
+            "documentType",
+            "ID",
+            "documentNumber",
+            "S-1",
+            "businessName",
+            "Duplicate supplier");
+    call(customer, post("/api/v1/suppliers/accounts"), command, 403);
+    call(admin, post("/api/v1/suppliers/accounts"), command, 409);
+    assertThat(db.queryForObject("select count(*) from users where email=?", Integer.class, email))
+        .isZero();
+    var valid = new java.util.HashMap<String, Object>(command);
+    valid.put("documentNumber", "S-NEW");
+    var created = call(admin, post("/api/v1/suppliers/accounts"), valid, 201);
+    var createdId = UUID.fromString(created.path("userId").asText());
+    assertThat(
+            db.queryForObject(
+                "select count(*) from suppliers where user_id=?", Integer.class, createdId))
+        .isEqualTo(1);
+    assertThat(
+            db.queryForObject(
+                "select count(*) from user_roles ur join roles r using(role_id) where ur.user_id=? and r.code='SUPPLIER'",
+                Integer.class,
+                createdId))
+        .isEqualTo(1);
+  }
+
+  @Test
+  void concurrentImageAssociationsRespectCapacityUnderTheToolLock() throws Exception {
+    for (int n = 0; n < 6; n++)
+      call(
+          supplier,
+          post("/api/v1/tool-images"),
+          Map.of("toolId", tool, "imageUrl", "https://example.test/start-" + n + ".png"),
+          201);
+    var barrier = new CyclicBarrier(2);
+    try (var executor = Executors.newFixedThreadPool(2)) {
+      var attempts = new ArrayList<Future<Integer>>();
+      for (int n = 0; n < 2; n++) {
+        final int number = n;
+        attempts.add(
+            executor.submit(
+                () -> {
+                  barrier.await(10, TimeUnit.SECONDS);
+                  return mvc.perform(
+                          post("/api/v1/tool-images")
+                              .with(jwt().jwt(token -> token.subject(supplier.toString())))
+                              .contentType("application/json")
+                              .content(
+                                  json.writeValueAsString(
+                                      Map.of(
+                                          "toolId",
+                                          tool,
+                                          "imageUrl",
+                                          "https://example.test/concurrent-" + number + ".png"))))
+                      .andReturn()
+                      .getResponse()
+                      .getStatus();
+                }));
+      }
+      assertThat(
+              List.of(
+                  attempts.get(0).get(20, TimeUnit.SECONDS),
+                  attempts.get(1).get(20, TimeUnit.SECONDS)))
+          .containsExactlyInAnyOrder(201, 409);
+    }
+    assertThat(
+            db.queryForObject(
+                "select count(*) from tool_images where tool_id=?", Integer.class, tool))
+        .isEqualTo(8);
+  }
+
+  @Test
+  void imageCapacityAndManagedReferencesCannotBeBypassed() throws Exception {
+    for (int n = 0; n < 7; n++)
+      call(
+          supplier,
+          post("/api/v1/tool-images"),
+          Map.of("toolId", tool, "imageUrl", "https://example.test/image-" + n + ".png"),
+          201);
+    call(
+        supplier,
+        post("/api/v1/tool-images"),
+        Map.of("toolId", tool, "imageUrl", "https://example.test/extra.png"),
+        409);
+    call(
+        supplier,
+        post("/api/v1/tool-images"),
+        Map.of(
+            "toolId",
+            tool,
+            "imageUrl",
+            "/api/v1/public/tool-images/files/" + UUID.randomUUID() + ".png"),
+        400);
+    call(
+        supplier,
+        post("/api/v1/tool-images"),
+        Map.of("toolId", tool, "imageUrl", "https://user:secret@example.test/image.png"),
+        400);
+    assertThat(
+            db.queryForObject(
+                "select count(*) from tool_images where tool_id=?", Integer.class, tool))
+        .isEqualTo(8);
   }
 
   @Test

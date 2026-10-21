@@ -31,3 +31,15 @@
 @media(hover:none){.button:hover,.tool-card:hover,.category-tiles button:hover{transform:none}}
 @media(max-width:760px){.fulfillment-options{grid-template-columns:1fr}.legal-status{display:block}.legal-status span{display:block;margin-top:5px}.legal-layout{grid-template-columns:1fr;gap:35px}.legal-metadata{position:static}.legal-content h2{font-size:24px}}
 @media print{body{background:#fff}.site-header,.site-footer{display:none}.legal-page{width:100%;padding:0}.legal-hero{padding-top:0}.legal-layout{display:block}.legal-metadata{position:static;margin:24px 0}.legal-content section{break-inside:avoid}.legal-content a{color:#000}}
+
+/* Provider media and physical inventory retain the existing dashboard tokens. */
+.provider-tools-workspace { display: grid; gap: 24px; min-width: 0; }
+.tool-image-manager, .equipment-unit-manager { background: #fff; border: 1px solid #dde1e5; border-radius: 20px; padding: 24px; min-width: 0; }
+.tool-image-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap: 16px; margin-block: 16px; }
+.tool-image-grid figure { margin: 0; min-width: 0; }
+.tool-image-grid img { width: 100%; height: 150px; object-fit: contain; border-radius: 10px; background: #f4f6f8; }
+.image-url-row { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+.image-url-row .form-field { flex: 1 1 220px; }
+.equipment-unit-manager article { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; border-bottom: 1px solid #e8eaed; flex-wrap: wrap; }
+.equipment-unit-manager form { display: grid; gap: 12px; margin-top: 18px; max-width: 520px; }
+@media(max-width:600px) { .tool-image-manager, .equipment-unit-manager { padding: 16px; } .tool-image-manager .panel-heading { flex-wrap: wrap; gap: 12px; } }

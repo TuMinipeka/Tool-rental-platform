@@ -30,6 +30,11 @@ public class ToolImagePersistenceAdapter implements ToolImageRepository {
     return rows.findAll().stream().map(mapper::toDomain).toList();
   }
 
+  @Override
+  public List<ToolImage> findByToolId(com.toolrental.domain.tool.model.valueobject.ToolId id) {
+    return rows.findByIdToolId(id.value()).stream().map(mapper::toDomain).toList();
+  }
+
   public ToolImage save(ToolImage value) {
     return mapper.toDomain(rows.saveAndFlush(mapper.toEntity(value)));
   }

@@ -50,6 +50,7 @@ services:
         condition: service_healthy
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8080}:8080"
+    volumes: ["tool_images:/application/storage/tool-images"]
     restart: unless-stopped
     logging: *logging
     healthcheck:
@@ -67,7 +68,7 @@ services:
         NODE_IMAGE: ${NODE_IMAGE:-node:24.22.0-alpine}
         NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.30.6-alpine-slim}
         VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8080}
-        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-true}
+        VITE_DEMO_MODE: ${VITE_DEMO_MODE:-false}
     ports:
       - "127.0.0.1:${FRONTEND_PORT:-5173}:80"
     healthcheck:
@@ -80,4 +81,5 @@ services:
     logging: *logging
 
 volumes:
+  tool_images:
   postgres_data:

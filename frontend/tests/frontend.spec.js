@@ -354,7 +354,7 @@ test('supplier tool and equipment forms reset only after successful persistence'
   await form.locator('[name=dailyRate]').fill('25000')
   await form.locator('[name=serviceCity]').selectOption('Bucaramanga')
   await form.getByRole('button', { name: 'Crear herramienta' }).click()
-  await expect(page.getByRole('heading', { name: 'QA Drill' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'QA Drill', exact: true })).toBeVisible()
   await expect(form.locator('[name=name]')).toHaveValue('')
   await expect(page.locator('main [role=alert]')).toHaveCount(0)
   await page.getByRole('button', { name: 'Unidad física', exact: true }).click()
@@ -399,3 +399,15 @@ for (const reload of [false, true]) {
     await expect(page.getByRole('button', { name: 'Abrir mi cuenta' })).toHaveCount(0)
   })
 }
+
+
+test('supplier inventory remains usable when income reports fail', async ({ page }) => {
+  await mockApi(page, { roles: ['SUPPLIER'] })
+  await page.route('**/api/v1/reports/**', route => route.fulfill({ status: 503, json: { detail: 'Report unavailable' } }))
+  await page.route('**/api/v1/categories', route => route.fulfill({ json: [{ id: 'qa-category', name: 'QA Category' }] }))
+  await page.goto('/panel/proveedor')
+  await login(page)
+  await page.getByRole('button', { name: 'Herramientas', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Crear herramienta', exact: true })).toBeVisible()
+  await expect(page.locator('select[name=categoryId]')).toBeEnabled()
+})

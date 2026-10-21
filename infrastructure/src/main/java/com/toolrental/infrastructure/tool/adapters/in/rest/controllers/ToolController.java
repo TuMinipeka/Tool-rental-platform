@@ -79,6 +79,15 @@ public class ToolController {
         request.published());
   }
 
+  @org.springframework.web.bind.annotation.PatchMapping("/{id}/publication")
+  public ToolResponse publication(
+      Principal principal,
+      @PathVariable UUID id,
+      @Valid @RequestBody
+          com.toolrental.infrastructure.tool.adapters.in.rest.dtos.ToolPublicationRequest request) {
+    return management.publish(Actor.id(principal), new ToolId(id), request.published());
+  }
+
   @DeleteMapping("/{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void unpublish(Principal principal, @PathVariable UUID id) {

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { api } from '../api.js'
+import { ToolImageManager } from '../components/ToolImageManager.jsx'
+import { EquipmentUnitManager } from '../components/EquipmentUnitManager.jsx'
 import { ActivityPanel } from '../components/ActivityPanel.jsx'
 import { EmptyState } from '../components/EmptyState.jsx'
 import { ErrorPage } from '../components/ErrorPage.jsx'
@@ -61,30 +63,44 @@ function ToolForm({ categories, editing, onCancel, onSaved, showError }) {
 function ProviderTools({ data, setData, showError }) {
   const [editing, setEditing] = useState(null)
   const [unitMode, setUnitMode] = useState(false)
+  const [imageTool, setImageTool] = useState(null)
+  const [pendingPublication, setPendingPublication] = useState(null)
+  const [unitBusy, setUnitBusy] = useState(false)
+  const [notice, setNotice] = useState('')
   const saveTool = saved => {
     setData(current => ({ ...current, tools: current.tools.some(tool => String(entityId(tool.id)) === String(entityId(saved.id))) ? current.tools.map(tool => String(entityId(tool.id)) === String(entityId(saved.id)) ? saved : tool) : [saved, ...current.tools] }))
     setEditing(null)
+    setImageTool(saved)
+    setNotice('Herramienta guardada. Puedes añadir sus imágenes.')
+    showError('')
   }
-  const unpublish = async tool => {
+  const changePublication = async tool => {
+    const id = entityId(tool.id)
+    setPendingPublication(id); showError('')
     try {
-      await api.deleteTool(entityId(tool.id))
-      setData(current => ({ ...current, tools: current.tools.map(item => String(entityId(item.id)) === String(entityId(tool.id)) ? { ...item, published: false } : item) }))
-    } catch (reason) { showError(reason.message) }
+      const saved = await api.publishTool(id, !tool.published)
+      setData(current => ({ ...current, tools: current.tools.map(item => String(entityId(item.id)) === String(id) ? saved : item) }))
+      setNotice(saved.published ? 'Herramienta publicada.' : 'Herramienta retirada del catálogo.')
+    } catch (reason) { showError(reason.message) } finally { setPendingPublication(null) }
   }
   const createUnit = async event => {
     event.preventDefault()
     const element = event.currentTarget
     const form = new FormData(element)
+    setUnitBusy(true); showError('')
     try {
       const created = await api.createEquipmentUnit({ toolId: form.get('toolId'), inventoryCode: form.get('inventoryCode').trim(), serialNumber: form.get('serialNumber').trim() || null, currentCondition: form.get('currentCondition'), status: 'OPERATIONAL' })
       setData(current => ({ ...current, units: [created, ...current.units] }))
       element.reset()
       setUnitMode(false)
-    } catch (reason) { showError(reason.message) }
+      setNotice('Unidad física guardada.')
+    } catch (reason) { showError(reason.message) } finally { setUnitBusy(false) }
   }
-  return <div className="dashboard-management-grid">
-    <section className="operations-form dashboard-editor"><div className="form-tabs"><button className={!unitMode ? 'active' : ''} onClick={() => setUnitMode(false)}>Herramienta</button><button className={unitMode ? 'active' : ''} disabled={!data.tools.length} onClick={() => setUnitMode(true)}>Unidad física</button></div>{unitMode ? <form onSubmit={createUnit}><div className="dashboard-form-title"><div><p>Inventario</p><h2>Registrar unidad</h2></div></div><label className="form-field"><span>Herramienta</span><select name="toolId" required>{data.tools.map(tool => <option key={String(entityId(tool.id))} value={String(entityId(tool.id))}>{tool.name}</option>)}</select></label><label className="form-field"><span>Código de inventario</span><input name="inventoryCode" required maxLength="120"/></label><label className="form-field"><span>Serial</span><input name="serialNumber" maxLength="160"/></label><label className="form-field"><span>Condición</span><select name="currentCondition" defaultValue="GOOD"><option value="NEW">Nueva</option><option value="GOOD">Buena</option><option value="FAIR">Aceptable</option></select></label><button className="button button-lime">Registrar unidad <Icon name="arrow" size={16}/></button></form> : <ToolForm categories={data.categories} editing={editing} onCancel={() => setEditing(null)} onSaved={saveTool} showError={showError}/>}</section>
-    <section className="operations-table dashboard-list"><div className="panel-heading"><div><p className="kicker dark"><span/> Catálogo propio</p><h2>Mis herramientas</h2><p>Administra todas tus publicaciones, incluidas las que no están visibles.</p></div><strong>{data.tools.length}</strong></div>{!data.tools.length ? <div className="account-empty"><Icon name="box" size={30}/><h3>No hay herramientas registradas</h3></div> : data.tools.map(tool => <article key={String(entityId(tool.id))}><div><span className={`status-pill ${tool.published ? 'green' : 'amber'}`}>{tool.published ? 'Publicada' : 'No publicada'}</span><h3>{tool.name}</h3><p>{tool.serviceCity} · {money.format(Number(tool.dailyRate?.amount ?? 0))} por día</p></div><div className="row-actions"><button className="button button-ghost" onClick={() => { setEditing(tool); setUnitMode(false) }}>Editar</button>{tool.published && <button className="danger-action" onClick={() => unpublish(tool)}>Retirar</button>}</div></article>)}</section>
+  return <div className="provider-tools-workspace">{notice && <p role="status" className="account-success">{notice}</p>}<div className="dashboard-management-grid">
+    <section className="operations-form dashboard-editor"><div className="form-tabs"><button className={!unitMode ? 'active' : ''} onClick={() => setUnitMode(false)}>Herramienta</button><button className={unitMode ? 'active' : ''} disabled={!data.tools.length} onClick={() => setUnitMode(true)}>Unidad física</button></div>{unitMode ? <form onSubmit={createUnit}><div className="dashboard-form-title"><div><p>Inventario</p><h2>Registrar unidad</h2></div></div><label className="form-field"><span>Herramienta</span><select name="toolId" required>{data.tools.map(tool => <option key={String(entityId(tool.id))} value={String(entityId(tool.id))}>{tool.name}</option>)}</select></label><label className="form-field"><span>Código de inventario</span><input name="inventoryCode" required maxLength="120"/></label><label className="form-field"><span>Serial</span><input name="serialNumber" maxLength="160"/></label><label className="form-field"><span>Condición</span><select name="currentCondition" defaultValue="GOOD"><option value="NEW">Nueva</option><option value="GOOD">Buena</option><option value="FAIR">Aceptable</option></select></label><button className="button button-lime" disabled={unitBusy}>Registrar unidad <Icon name="arrow" size={16}/></button></form> : <ToolForm categories={data.categories} editing={editing} onCancel={() => setEditing(null)} onSaved={saveTool} showError={showError}/>}</section>
+    <section className="operations-table dashboard-list"><div className="panel-heading"><div><p className="kicker dark"><span/> Catálogo propio</p><h2>Mis herramientas</h2><p>Administra todas tus publicaciones, incluidas las que no están visibles.</p></div><strong>{data.tools.length}</strong></div>{!data.tools.length ? <div className="account-empty"><Icon name="box" size={30}/><h3>No hay herramientas registradas</h3></div> : data.tools.map(tool => <article key={String(entityId(tool.id))}><div><span className={`status-pill ${tool.published ? 'green' : 'amber'}`}>{tool.published ? 'Publicada' : 'No publicada'}</span><h3>{tool.name}</h3><p>{tool.serviceCity} · {money.format(Number(tool.dailyRate?.amount ?? 0))} por día</p></div><div className="row-actions"><button className="button button-ghost" onClick={() => { setEditing(tool); setUnitMode(false) }}>Editar</button><button className="button button-ghost" onClick={() => setImageTool(tool)}>Imágenes</button><button className={tool.published ? 'danger-action' : 'button button-dark'} disabled={pendingPublication !== null} onClick={() => changePublication(tool)}>{pendingPublication === entityId(tool.id) ? 'Guardando…' : tool.published ? 'Retirar' : 'Publicar'}</button></div></article>)}</section>
+  </div>{imageTool && <ToolImageManager key={String(entityId(imageTool.id))} tool={imageTool} onChanged={saved => setData(current => ({ ...current, tools: current.tools.map(item => String(entityId(item.id)) === String(entityId(saved.id)) ? saved : item) }))} onClose={() => setImageTool(null)}/>}
+  <EquipmentUnitManager units={data.units} tools={data.tools} onChanged={saved => setData(current => ({ ...current, units: current.units.map(unit => String(entityId(unit.id)) === String(entityId(saved.id)) ? saved : unit) }))}/>
   </div>
 }
 
@@ -102,9 +118,7 @@ function ProviderManagement({ data, reload, showError }) {
       if (editing) {
         await api.updateSupplier(editing.userId, { userId: editing.userId, documentType: form.get('documentType'), documentNumber: form.get('documentNumber').trim(), businessName: form.get('businessName').trim() })
       } else {
-        const created = await api.createUser({ email: form.get('email').trim(), displayName: form.get('displayName').trim(), password: form.get('password') })
-        await api.assignUserRole(created.userId, supplierRole.roleId)
-        await api.createSupplier({ userId: created.userId, documentType: form.get('documentType'), documentNumber: form.get('documentNumber').trim(), businessName: form.get('businessName').trim() })
+        await api.createManagedSupplier({ email: form.get('email').trim(), displayName: form.get('displayName').trim(), password: form.get('password'), documentType: form.get('documentType'), documentNumber: form.get('documentNumber').trim(), businessName: form.get('businessName').trim() })
       }
       setEditing(null)
       formElement.reset()
@@ -131,8 +145,7 @@ function AdministratorManagement({ data, session, reload, showError }) {
     try {
       if (editing) await api.updateUser(editing.userId, { displayName: form.get('displayName').trim(), email: form.get('email').trim() })
       else {
-        const created = await api.createUser({ displayName: form.get('displayName').trim(), email: form.get('email').trim(), password: form.get('password') })
-        await api.assignUserRole(created.userId, adminRole.roleId)
+        await api.createAdministrator({ displayName: form.get('displayName').trim(), email: form.get('email').trim(), password: form.get('password') })
       }
       setEditing(null)
       formElement.reset()
@@ -157,12 +170,24 @@ export function BusinessDashboardPage({ role, session }) {
 
   const reload = useCallback(async () => {
     setError('')
-    const common = [api.listTools(), api.listEquipmentUnits(), api.listCategories(), api.operationalReport('income', yearStart, currentDate)]
-    const results = provider ? await Promise.all(common) : await Promise.all([...common, api.listUsers(), api.listSuppliers(), api.listRoles(), api.listUserRoles()])
-    const [allTools, units, categories, incomeRows, users = [], suppliers = [], roles = [], userRoles = []] = results
-    const tools = provider ? allTools.filter(tool => String(entityId(tool.supplierId)) === String(userId)) : allTools
-    setData({ tools, units, categories, users, suppliers, roles, userRoles })
-    setIncome(Array.isArray(incomeRows) ? incomeRows.find(row => row.currency === 'COP') || incomeRows[0] || null : null)
+    const sources = [
+      ['tools', api.listTools], ['units', api.listEquipmentUnits], ['categories', api.listCategories],
+      ...(!provider ? [['users', api.listUsers], ['suppliers', api.listSuppliers], ['roles', api.listRoles], ['userRoles', api.listUserRoles]] : []),
+    ]
+    const results = await Promise.allSettled(sources.map(([, load]) => load()))
+    const errors = []
+    const loaded = Object.fromEntries(results.map((result, index) => {
+      const name = sources[index][0]
+      if (result.status === 'rejected') { errors.push(name); return [name, null] }
+      return [name, result.value]
+    }))
+    setData(current => {
+      const next = { ...current }
+      for (const [name, rows] of Object.entries(loaded)) if (Array.isArray(rows)) next[name] = rows
+      if (provider) next.tools = next.tools.filter(tool => String(entityId(tool.supplierId)) === String(userId))
+      return next
+    })
+    if (errors.length) setError('No se pudieron cargar algunos datos: ' + errors.join(', ') + '. Vuelve a intentar; los demás módulos siguen disponibles.')
     setState('ready')
   }, [provider, userId])
 
@@ -174,11 +199,20 @@ export function BusinessDashboardPage({ role, session }) {
     return () => { activeRequest = false }
   }, [authorized, reload])
 
+  useEffect(() => {
+    if (!authorized) return undefined
+    let activeRequest = true
+    api.operationalReport('income', yearStart, currentDate).then(rows => {
+      if (activeRequest) setIncome(rows.find(row => row.currency === 'COP') || rows[0] || { netIncome: 0, grossIncome: 0, confirmedPayments: 0 })
+    }).catch(() => { if (activeRequest) setIncome(null) })
+    return () => { activeRequest = false }
+  }, [authorized, userId])
+
   if (!session) return <EmptyState title="Acceso restringido" text="Ingresa con una cuenta autorizada para abrir este espacio." action={() => window.dispatchEvent(new Event('open-auth'))} actionText="Ingresar"/>
   if (!authorized) return <ErrorPage code="403"/>
 
   const operational = data.units.filter(unit => unit.status === 'OPERATIONAL').length
   const activeUsers = data.users.filter(user => user.accountStatus === 'ACTIVE').length
   const tabs = provider ? [['summary', 'Resumen', 'grid'], ['tools', 'Herramientas', 'box']] : [['summary', 'Resumen', 'grid'], ['providers', 'Proveedores', 'box'], ['administrators', 'Administradores', 'shield']]
-  return <main className="operations-page page-shell page-top staff-dashboard"><header className="operations-heading"><p className="kicker dark"><span/> {provider ? 'Dashboard de proveedor' : 'Dashboard administrativo'}</p><h1>{provider ? 'Tu operación, en un solo lugar.' : 'El pulso de la plataforma.'}</h1><p>{provider ? 'Publica, edita y retira tus herramientas. Los ingresos y reservas corresponden únicamente a tu operación.' : 'Consulta ingresos registrados, actividad y cuentas autorizadas con información persistida por el sistema.'}</p></header><SectionTabs active={active} onChange={setActive} items={tabs}/>{error && <div className="form-error" role="alert">{error}</div>}{state === 'loading' && <div className="integration-banner"><Icon name="grid"/><div><strong>Cargando dashboard</strong><p>Consultando información autorizada.</p></div></div>}{state === 'ready' && <>{active === 'summary' && <><section className="dashboard-metrics"><Metric icon="wallet" label="Ingreso neto" value={money.format(Number(income?.netIncome ?? 0))} note="Ingresos confirmados menos reembolsos"/><Metric icon="card" label="Ingreso bruto" value={money.format(Number(income?.grossIncome ?? 0))} note="No equivale a utilidad contable"/><Metric icon="check" label="Pagos confirmados" value={Number(income?.confirmedPayments ?? 0)} note={`Periodo ${yearStart} a ${currentDate}`}/><Metric icon={provider ? 'box' : 'user'} label={provider ? 'Unidades operativas' : 'Cuentas activas'} value={provider ? operational : activeUsers} note={provider ? `${data.tools.length} herramientas propias` : `${data.users.length} cuentas registradas`}/></section><OperationalReportsPanel/><ActivityPanel kind="reservations" supplier={provider}/></>}{provider && active === 'tools' && <ProviderTools data={data} setData={setData} showError={setError}/>} {!provider && active === 'providers' && <ProviderManagement data={data} reload={reload} showError={setError}/>} {!provider && active === 'administrators' && <AdministratorManagement data={data} session={session} reload={reload} showError={setError}/>}</>}</main>
+  return <main className="operations-page page-shell page-top staff-dashboard"><header className="operations-heading"><p className="kicker dark"><span/> {provider ? 'Dashboard de proveedor' : 'Dashboard administrativo'}</p><h1>{provider ? 'Tu operación, en un solo lugar.' : 'El pulso de la plataforma.'}</h1><p>{provider ? 'Publica, edita y retira tus herramientas. Los ingresos y reservas corresponden únicamente a tu operación.' : 'Consulta ingresos registrados, actividad y cuentas autorizadas con información persistida por el sistema.'}</p></header><SectionTabs active={active} onChange={setActive} items={tabs}/>{error && <div className="form-error" role="alert">{error} <button className="text-action" onClick={reload}>Reintentar carga</button></div>}{state === 'loading' && <div className="integration-banner"><Icon name="grid"/><div><strong>Cargando dashboard</strong><p>Consultando información autorizada.</p></div></div>}{state === 'ready' && <>{active === 'summary' && <><section className="dashboard-metrics"><Metric icon="wallet" label="Ingreso neto" value={income ? money.format(Number(income.netIncome ?? 0)) : '—'} note="Ingresos confirmados menos reembolsos"/><Metric icon="card" label="Ingreso bruto" value={income ? money.format(Number(income.grossIncome ?? 0)) : '—'} note="No equivale a utilidad contable"/><Metric icon="check" label="Pagos confirmados" value={income ? Number(income.confirmedPayments ?? 0) : '—'} note={`Periodo ${yearStart} a ${currentDate}`}/><Metric icon={provider ? 'box' : 'user'} label={provider ? 'Unidades operativas' : 'Cuentas activas'} value={provider ? operational : activeUsers} note={provider ? `${data.tools.length} herramientas propias` : `${data.users.length} cuentas registradas`}/></section><OperationalReportsPanel/><ActivityPanel kind="reservations" supplier={provider}/></>}{provider && active === 'tools' && <ProviderTools data={data} setData={setData} showError={setError}/>} {!provider && active === 'providers' && <ProviderManagement data={data} reload={reload} showError={setError}/>} {!provider && active === 'administrators' && <AdministratorManagement data={data} session={session} reload={reload} showError={setError}/>}</>}</main>
 }
