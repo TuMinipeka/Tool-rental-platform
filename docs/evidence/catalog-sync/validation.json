@@ -1,8 +1,8 @@
 {
   "testedAt": "2026-10-21T04:01:19.732Z",
-  "baseCommit": "9bef4e4717ef2b3d5b15dcae04a4d0772e33f5d2",
+  "baseCommit": "5dafbe1b7460064f510c316a5c06895bb3641fed",
   "workingTreeChangesIncluded": true,
-  "sourceFingerprint": "95c2b86865ad85e5b5526862e52c5533dfec110c2095e6ee18dc1f94f38b504a",
+  "sourceFingerprint": "e83ab71c6fbae10ca12dfcbcd74e6f6b71f58f39c3818e1d2d5ef819f885ea31",
   "commands": {
     "maven": ".\\mvnw.cmd clean verify",
     "browser": "npm run test:e2e -- --workers=2",
@@ -54,5 +54,6 @@
       "filename": "supplier-upload.png",
       "sha256": "0ab1414bb24ccb7e9b6e4977b0ae9c58033c71d31f4844a668a9feba2c0a4496"
     }
-  ]
+  ],
+  "postValidationChanges": "Removed an extra blank line at the end of a regression test; no behavior changed."
 }

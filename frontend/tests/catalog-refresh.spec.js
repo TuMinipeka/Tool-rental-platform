@@ -90,4 +90,3 @@ test('visible catalog revalidation runs periodically', async ({ page }) => {
   await page.clock.fastForward(30001)
   await expect(page.getByRole('link', { name: 'Updated publication', exact: true })).toBeVisible()
 })
-
