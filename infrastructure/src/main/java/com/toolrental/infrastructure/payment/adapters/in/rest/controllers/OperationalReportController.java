@@ -3,6 +3,7 @@ package com.toolrental.infrastructure.payment.adapters.in.rest.controllers;
 import com.toolrental.application.payment.dto.AvailabilityReportResponse;
 import com.toolrental.application.payment.dto.FrequentCustomerReportResponse;
 import com.toolrental.application.payment.dto.IncomeReportResponse;
+import com.toolrental.application.payment.dto.OverdueRentalReportResponse;
 import com.toolrental.application.payment.dto.ProfitabilityReportResponse;
 import com.toolrental.application.payment.dto.ToolRentalReportResponse;
 import com.toolrental.application.payment.usecase.OperationalReportUseCase;
@@ -69,5 +70,13 @@ public class OperationalReportController {
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
     return reports.profitability(Actor.id(principal), supplierId, from, to);
+  }
+
+  @GetMapping("/overdue-rentals")
+  public List<OverdueRentalReportResponse> overdueRentals(
+      Principal principal,
+      @RequestParam(required = false) UUID supplierId,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate asOf) {
+    return reports.overdueRentals(Actor.id(principal), supplierId, asOf);
   }
 }

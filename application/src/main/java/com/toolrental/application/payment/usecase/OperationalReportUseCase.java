@@ -3,6 +3,7 @@ package com.toolrental.application.payment.usecase;
 import com.toolrental.application.payment.dto.AvailabilityReportResponse;
 import com.toolrental.application.payment.dto.FrequentCustomerReportResponse;
 import com.toolrental.application.payment.dto.IncomeReportResponse;
+import com.toolrental.application.payment.dto.OverdueRentalReportResponse;
 import com.toolrental.application.payment.dto.ProfitabilityReportResponse;
 import com.toolrental.application.payment.dto.ToolRentalReportResponse;
 import com.toolrental.domain.common.exception.BusinessRuleException;
@@ -122,6 +123,25 @@ public final class OperationalReportUseCase {
                             view.rentedDays(),
                             view.bookedRevenue(),
                             view.averageRevenuePerReservation()))
+                .toList());
+  }
+
+  public List<OverdueRentalReportResponse> overdueRentals(
+      UUID actor, UUID requestedSupplierId, LocalDate asOf) {
+    if (asOf == null) throw new BusinessRuleException("Report date is required");
+    return work.execute(
+        () ->
+            reports.overdueRentals(scope(actor, requestedSupplierId), asOf).stream()
+                .map(
+                    view ->
+                        new OverdueRentalReportResponse(
+                            view.reservationId(),
+                            view.customerId(),
+                            view.customerName(),
+                            view.expectedReturnDate(),
+                            view.overdueDays(),
+                            view.rentalStatus(),
+                            view.unitCount()))
                 .toList());
   }
 

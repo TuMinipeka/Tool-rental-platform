@@ -81,11 +81,15 @@ Todos requieren `from` y `to` en formato ISO `YYYY-MM-DD`:
 | GET | `/api/v1/reports/frequent-customers` | Frecuencia e ingreso neto por cliente y moneda |
 | GET | `/api/v1/reports/availability` | Unidades disponibles, reservadas, en mantenimiento y retiradas |
 | GET | `/api/v1/reports/profitability` | Indicador de ingreso reservado por herramienta |
+| GET | `/api/v1/reports/overdue-rentals` | Alquileres activos vencidos a la fecha `asOf` |
 
 El proveedor queda limitado a sus herramientas. El administrador consulta toda la plataforma o filtra con `supplierId`; el cliente recibe 403. El indicador de rentabilidad usa ingreso reservado porque el modelo aún no registra costos operativos y, por tanto, no afirma un margen contable.
 
+El reporte de mora recibe `asOf=YYYY-MM-DD` en lugar del intervalo `from/to` y devuelve reserva, cliente, devolución esperada, días vencidos, estado y cantidad de unidades.
+
 ## Catálogo operativo por rol
 
+- `GET /api/v1/public/catalog/page` expone el catálogo público paginado sin cambiar el contrato histórico de `/api/v1/public/catalog`. Acepta `categoryId`, `query`, `serviceCity`, `minDailyRate`, `maxDailyRate`, `page`, `size` (máximo 100) y `sort=name|dailyRate,asc|desc`.
 - `GET /api/v1/tools` devuelve todas las herramientas al administrador. Para un proveedor autenticado devuelve las publicaciones visibles y sus propios borradores; el frontend del panel selecciona las herramientas cuyo `supplierId` coincide con el actor.
 - `POST /api/v1/tools` exige rol `SUPPLIER` y crea la herramienta para el actor autenticado. Las actualizaciones y el retiro validan propiedad o administración en el caso de uso.
 - `GET /api/v1/equipment-units` devuelve todas las unidades al administrador y únicamente las unidades pertenecientes a herramientas propias al proveedor. La selección se aplica en Application mediante los puertos de unidades y herramientas; no depende de un filtro del navegador.
@@ -119,6 +123,11 @@ Todas las operaciones directas requieren `Idempotency-Key`:
 - `GET|POST /api/v1/commercial-configuration/cancellation-policies` versiona la política.
 - `GET /api/v1/refunds/payments/{id}` consulta reembolsos.
 - Los endpoints existentes de pagos muestran ajustes `PENDING` de terminación, extensión o mora.
+
+## Aceptaciones legales
+
+- `POST /api/v1/legal-acceptances` registra para el usuario autenticado una aceptación de `TERMS_AND_CONDITIONS` o `PRIVACY_NOTICE`, con versión y propósito. Repetir la misma combinación es idempotente y devuelve el registro existente.
+- `GET /api/v1/legal-acceptances/me` devuelve el historial inmutable del usuario autenticado, ordenado desde la aceptación más reciente.
 
 ## Contrato vigente del MVP: medios fijos de prueba
 

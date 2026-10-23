@@ -10,7 +10,7 @@ La convención del proyecto asigna un contexto organizativo por tabla. No implic
 
 El modelo base conserva los contextos `user`, `role`, `userrole`, `customer`, `supplier`, `category`, `tool`, `toolimage`, `equipmentunit`, `reservation`, `reservationitem`, `rental`, `unitdelivery`, `unitreturn`, `damagereport`, `payment`, `invoice` e `invoiceitem`.
 
-Los siete contextos críticos añadidos son:
+Los ocho contextos críticos añadidos son:
 
 | Contexto | Responsabilidad |
 | --- | --- |
@@ -21,8 +21,9 @@ Los siete contextos críticos añadidos son:
 | `deliveryrate` | Tarifa COP global y versionada |
 | `reservationextension` | Solicitud y resolución de una nueva fecha efectiva |
 | `refund` | Reembolso idempotente ligado al pago y a la terminación |
+| `legalacceptance` | Aceptación inmutable e idempotente de documentos legales versionados |
 
-Cada uno de los 25 contextos conserva sus paquetes y datos históricos. `passwordreset` permanece en el modelo para respetar las migraciones ya aplicadas, pero no publica controladores, páginas ni correo. Las políticas, tarifas, extensiones y reembolsos se ensamblan desde su propia configuración.
+Cada uno de los 26 contextos conserva sus paquetes y datos históricos. `passwordreset` permanece en el modelo para respetar las migraciones ya aplicadas, pero no publica controladores, páginas ni correo. Las políticas, tarifas, extensiones, reembolsos y aceptaciones legales se ensamblan desde su propia configuración.
 
 ## Consistencia
 
@@ -46,7 +47,7 @@ Los controladores publican `/api/v1` y un alias `/api`. Un interceptor añade `D
 
 ## Persistencia
 
-Hay 25 entidades JPA para 25 tablas. Flyway conserva V1–V210 y añade V304–V308 para checkout, decisiones académicas, medios fijos y ciudad de servicio; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V301; no debe ejecutarse sobre producción.
+Hay 26 entidades JPA para 26 tablas. Flyway conserva V1–V210, añade V304–V306.1 para checkout, decisiones académicas, medios fijos y ciudad de servicio, y V309 para aceptaciones legales versionadas; todas las ampliaciones son aditivas. Hibernate usa `ddl-auto: validate`. El perfil demo añade V101–V118 y V300–V302, V307–V308; no debe ejecutarse sobre producción.
 
 ## Archivos de herramientas y altas administrativas
 

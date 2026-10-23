@@ -136,4 +136,4 @@ erDiagram
 
 ## Correspondencia con DDD y estado
 
-El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva, extensión, terminación, reembolso y factura siguen coordinadas. Las 25 tablas tienen mapeo JPA. La pasarela externa sigue pendiente; informes y recorridos operativos actuales están integrados. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).
+El proyecto organiza una tabla por contexto por decisión expresa, pero las transacciones de reserva, extensión, terminación, reembolso y factura siguen coordinadas. Las 26 tablas tienen mapeo JPA; `legal_acceptances` conserva el consentimiento versionado e inmutable del usuario. La pasarela externa sigue pendiente; informes y recorridos operativos actuales están integrados. Consulta [arquitectura](backend-architecture.md), [README](../README.md#modelo-conceptual) y [cobertura](requirements-coverage.md).

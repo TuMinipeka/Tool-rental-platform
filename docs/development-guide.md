@@ -12,7 +12,7 @@ La estructura sigue la [arquitectura](backend-architecture.md). El [alcance apro
 | Application | Comandos/respuestas inmutables, excepciones y coordinación de casos de uso | Domain y Java |
 | Infrastructure | REST, DTOs HTTP, JPA, mappers, adaptadores y configuración | Application, Domain y frameworks |
 
-Conserva tres módulos y los 25 contextos existentes. Las entidades hijas no ofrecen operaciones que evadan invariantes de reserva, terminación, extensión, reembolso o factura. No crees clases vacías para completar un árbol.
+Conserva tres módulos y los 26 contextos existentes. Las entidades hijas no ofrecen operaciones que evadan invariantes de reserva, terminación, extensión, reembolso, aceptación legal o factura. No crees clases vacías para completar un árbol.
 
 ## Convenciones
 

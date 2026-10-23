@@ -2,7 +2,7 @@
 
 ## Completado en backend y frontend
 
-- 25 contextos con Domain, Application, JPA y REST en arquitectura hexagonal.
+- 26 contextos con Domain, Application, JPA y REST en arquitectura hexagonal.
 - Sesiones rotativas y revocacion por familia/usuario con almacenamiento seguro de tokens.
 - CORS con credenciales, CSRF, rate limit de autenticacion y ProblemDetail estandar.
 - API oficial /api/v1 con alias /api marcado como obsoleto mediante cabeceras HTTP.
@@ -15,7 +15,7 @@
 - Retiro definitivo de controladores y notificadores SMTP de recuperacion de contrasena en la interfaz publica.
 - Gestion de cuenta con actualizacion de perfil, cambio de contrasena y revocacion de sesiones activas.
 - Dashboards y reportes por rol en frontend (BusinessDashboardPage y AccountWorkspacePage) con aislamiento estricto entre cliente, proveedor y administrador.
-- Pagina y aceptacion de terminos y condiciones de servicio (TermsAndConditionsPage).
+- Pagina de terminos y condiciones, más aceptación versionada persistente e idempotente en backend; queda conectar el formulario del frontend al nuevo endpoint.
 
 ## Pendientes antes de una salida a produccion comercial
 

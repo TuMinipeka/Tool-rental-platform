@@ -33,7 +33,11 @@ V1–V200 no se modifican. Las evoluciones compartidas conservan V1–V210 y con
 
 ## Pruebas
 
-`MappingContractTest` compara las 25 tablas y entidades JPA. `FlywayUpgradeIntegrationTest` conserva checksums y datos al actualizar desde V200 hasta V306.1. Las pruebas PostgreSQL verifican restricciones, rollback, retenciones y confirmación concurrente. Testcontainers se usa por defecto; también puede suministrarse una base con permiso para crear esquemas:
+`MappingContractTest` compara las 26 tablas y entidades JPA. `FlywayUpgradeIntegrationTest` conserva checksums y datos al actualizar desde V200 hasta V309. Las pruebas PostgreSQL verifican restricciones, rollback, retenciones y confirmación concurrente. Testcontainers se usa por defecto; también puede suministrarse una base con permiso para crear esquemas:
+
+## V309 — aceptaciones legales
+
+Crea `legal_acceptances` para conservar de forma inmutable usuario, tipo de documento, versión, finalidad y fecha de aceptación. La clave única vuelve idempotente la aceptación repetida de la misma versión y finalidad.
 
 ```powershell
 .\mvnw.cmd clean verify `
@@ -50,7 +54,7 @@ V301 amplía el catálogo y los accesos exclusivamente locales. V302 completa es
 
 ## Integración de historiales
 
-La instalación demo combinada incorpora migraciones versionadas hasta V308; showcase añade V303 durante una instalación vacía. V209–V210 se integraron sobre una base nueva de validación porque bases demo previas ya habían aplicado versiones superiores. No se activó out-of-order, repair ni baseline para ocultar la divergencia. Coordinar las próximas versiones por encima de V308 y ensayar una evolución explícita para bases que deban conservarse.
+La instalación demo combinada incorpora migraciones versionadas hasta V309; showcase añade V303 durante una instalación vacía. El perfil desechable `demo` activa `out-of-order` porque sus fixtures históricos V101–V118 se intercalan con el esquema base; producción no carga esa ubicación. No se usa `repair` ni `baseline` para ocultar divergencias. Coordinar las próximas versiones por encima de V309 y ensayar una evolución explícita para bases que deban conservarse.
 
 ## V304 — checkout oficial
 
@@ -74,6 +78,6 @@ Distribuye las herramientas demo entre las cuatro ciudades admitidas y refleja l
 
 ## V308 y compatibilidad de bases demo
 
-V308 retira los valores por defecto temporales introducidos por V106.1, V109.1 y V115.1. El conjunto actual contiene **39 migraciones base y 65 al incluir demo** (showcase añade su ubicación independiente).
+V308 retira los valores por defecto temporales introducidos por V106.1, V109.1 y V115.1. V309 agrega las aceptaciones legales versionadas. El conjunto actual contiene **40 migraciones base y 66 al incluir demo** (showcase añade su ubicación independiente).
 
-Las tres migraciones preparatorias tienen versiones inferiores al historial demo V305 existente. Una instalación vacía no demuestra que ese historial pueda actualizarse. Antes de actualizar una base que deba conservarse, ensayar su evolución en una copia y revisar la validación de Flyway; no ejecutar `repair`, `out-of-order` ni borrar la base para ocultar la divergencia. Véase [la revisión de integración](integration-review.md).
+Las tres migraciones preparatorias tienen versiones inferiores al historial demo V305 existente. Una instalación vacía no demuestra que ese historial pueda actualizarse. Antes de actualizar una base que deba conservarse, ensayar su evolución en una copia y revisar la validación de Flyway; no ejecutar `repair`, habilitar `out-of-order` fuera del perfil demo ni borrar la base para ocultar la divergencia. Véase [la revisión de integración](integration-review.md).
