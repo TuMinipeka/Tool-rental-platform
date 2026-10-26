@@ -41,6 +41,17 @@ public interface PaymentJpaRepository extends JpaRepository<PaymentJpaEntity, UU
       nativeQuery = true)
   List<PaymentJpaEntity> findByParticipantId(@Param("participantId") UUID participantId);
 
+  @Query(
+      value =
+          """
+      SELECT payment.* FROM payments payment
+      JOIN reservations reservation ON reservation.reservation_id = payment.reservation_id
+      WHERE reservation.customer_id = :customerId
+      ORDER BY payment.recorded_at DESC, payment.payment_id DESC
+      """,
+      nativeQuery = true)
+  List<PaymentJpaEntity> findByCustomerId(@Param("customerId") UUID customerId);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("select row from PaymentJpaEntity row where row.id = :id")
   Optional<PaymentJpaEntity> findLocked(@Param("id") UUID id);

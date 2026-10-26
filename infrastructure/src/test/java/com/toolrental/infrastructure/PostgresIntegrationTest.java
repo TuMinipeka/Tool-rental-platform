@@ -1729,4 +1729,43 @@ class PostgresIntegrationTest {
         null,
         403);
   }
+
+  @Test
+  void customerPaymentHistoryIsPrivateOrderedAndIncludesEveryStatus() throws Exception {
+    call(null, get("/pagos/cliente/" + customer), null, 401);
+    call(customer, get("/pagos/cliente/" + supplier), null, 403);
+    call(admin, get("/pagos/cliente/" + customer), null, 403);
+    call(supplier, get("/pagos/cliente/" + supplier), null, 403);
+    assertThat(call(customer, get("/pagos/cliente/" + customer), null, 200)).isEmpty();
+    var reservation = pending();
+    int index = 0;
+    for (var state : List.of("PENDING", "FAILED", "CONFIRMED", "REFUNDED")) {
+      db.update(
+          """
+          insert into payments(payment_id,reservation_id,processor,external_reference,amount,
+            payment_status,recorded_at,confirmed_at,payment_method,payment_stage,idempotency_key)
+          values (?,?,'MANUAL',?,10,?,?::timestamptz,?::timestamptz,'ADMINISTRATIVE','ADMINISTRATIVE',?)
+          """,
+          UUID.randomUUID(),
+          reservation.value(),
+          "history-" + index,
+          state,
+          "2026-01-0" + (index + 1) + "T10:00:00Z",
+          index >= 2 ? "2026-01-05T10:00:00Z" : null,
+          "history-" + index);
+      index++;
+    }
+    var history = call(customer, get("/pagos/cliente/" + customer), null, 200);
+    assertThat(history).hasSize(4);
+    assertThat(history.get(0).get("status").asText()).isEqualTo("REFUNDED");
+    assertThat(history.get(0).get("paymentDate").asText()).isEqualTo("2026-01-05T10:00:00Z");
+    assertThat(history.get(0).get("amount").decimalValue()).isEqualByComparingTo("10");
+    assertThat(history.get(0).get("paymentMethod").isNull()).isTrue();
+    assertThat(history.get(3).get("status").asText()).isEqualTo("PENDING");
+    assertThat(history.get(3).get("paymentDate").asText()).isEqualTo("2026-01-01T10:00:00Z");
+    assertThat(call(customer, get("/api/v1/pagos/cliente/" + customer), null, 200))
+        .isEqualTo(history);
+    db.update("insert into user_roles select ?,role_id from roles where code='CUSTOMER'", supplier);
+    assertThat(call(supplier, get("/pagos/cliente/" + supplier), null, 200)).isEmpty();
+  }
 }

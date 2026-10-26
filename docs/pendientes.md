@@ -33,3 +33,7 @@ React v1.2 consume /api/v1 con access token en memoria, refresh token en cookie 
 ## Entrega e integracion
 
 La sincronizacion con los cambios de developer/conde se encuentra integrada en developer/daniel con suite de pruebas completa en verde (104 pruebas backend sin errores y build de frontend exitoso). No hay publicaciones a Oracle ni a pasarelas reales en este entorno.
+
+### Historial de pagos del cliente
+
+Backend implementado en `GET /pagos/cliente/{id}` y sus rutas API: consulta privada de todos los estados y datos básicos, sin acceso cruzado entre clientes. Frontend implementado en `/cuenta`, sección «Historial de Pagos», con tabla Fecha | Monto | Estado, actualización manual y estados de carga, error y lista vacía.

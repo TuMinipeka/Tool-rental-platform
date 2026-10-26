@@ -207,6 +207,7 @@ export const api = {
   returnUnit(body) { return request('/unit-returns', { method: 'POST', body: JSON.stringify({...body,notes:body.notes?.trim()||null}) }, { authenticated: true }) },
   completeRental(id) { return request('/rentals/' + encodeURIComponent(id) + '/status', { method: 'PATCH', body: JSON.stringify({ status: 'COMPLETED' }) }, { authenticated: true }) },
   listRentals() { return request('/rentals', {}, { authenticated: true }) },
+  customerPaymentHistory(userId) { return request('/pagos/cliente/' + encodeURIComponent(userId), {}, { authenticated: true }) },
   listPayments() { return request('/payments', {}, { authenticated: true }) },
   listInvoices() { return request('/invoices', {}, { authenticated: true }) },
   listReservations() {

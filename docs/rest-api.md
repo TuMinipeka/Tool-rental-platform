@@ -134,3 +134,11 @@ Todas las operaciones directas requieren `Idempotency-Key`:
 La entrada de `POST /api/v1/payments/checkouts` incluye `reservationId`, `paymentMethod` y, solo para Visa o Mastercard, red, últimos cuatro dígitos y vencimiento. Requiere `Idempotency-Key` y `Principal` autenticado; no recibe el importe, PAN completo, CVV ni contraseñas. `GET /api/v1/payments/checkouts/{id}` informa el estado de conciliación.
 
 Recuperación y restablecimiento no tienen rutas públicas y OpenAPI no los anuncia. `GET /api/v1/public/features` comparte con el navegador la disponibilidad del checkout. Véase [pagos académicos](fictional-payments.md) para configuración, estados y límites.
+
+## Historial privado de pagos del cliente
+
+`GET /pagos/cliente/{id}` devuelve todos los pagos de las reservas del cliente autenticado. También están disponibles `/api/v1/pagos/cliente/{id}` y `/api/pagos/cliente/{id}`. El identificador corresponde al UUID de usuario del cliente. Requiere sesión activa, rol `CUSTOMER` e igualdad estricta entre el usuario autenticado y `{id}`; no existe excepción para administradores. Sin autenticación devuelve 401; otro usuario o un rol incompatible recibe 403; un UUID mal formado recibe 400.
+
+La respuesta es una lista (vacía si no hay pagos), ordenada por fecha de registro descendente y UUID descendente como desempate. Cada elemento contiene `paymentId`, `paymentDate`, `amount`, `paymentMethod` y `status`. La fecha usa la confirmación si existe y, en caso contrario, el registro, en UTC ISO 8601. El método administrativo se representa con `null`; los demás conservan el código del método registrado. No incluye datos de tarjeta.
+
+Los estados conservan el contrato inglés del backend: `CONFIRMED` (Pagado), `PENDING` (Pendiente), `FAILED` (Fallido) y `REFUNDED` (Reembolsado). Se conservan los reembolsados para no ocultar movimientos históricos. Los importes corresponden al valor registrado del pago en COP; un pago pendiente o fallido no acredita un cobro. No se modifica el esquema ni el endpoint general `/api/v1/payments`. El panel del cliente en `/cuenta` consume esta API en la sección «Historial de Pagos», con columnas Fecha, Monto y Estado y etiquetas de estado en español.

@@ -61,6 +61,21 @@ public final class ManagePaymentUseCase {
         });
   }
 
+  public List<com.toolrental.application.payment.dto.CustomerPaymentResponse> history(
+      UUID actor, UUID customerId) {
+    return work.execute(
+        () -> {
+          access.requireActive(actor);
+          access.requireRole(actor, "CUSTOMER");
+          if (!actor.equals(customerId))
+            throw new com.toolrental.application.common.exception
+                .AccessDeniedApplicationException();
+          return repository.findByCustomer(actor).stream()
+              .map(com.toolrental.application.payment.dto.CustomerPaymentResponse::from)
+              .toList();
+        });
+  }
+
   public PaymentResponse register(UUID actor, RegisterPaymentCommand command) {
     return work.execute(
         () -> {

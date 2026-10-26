@@ -31,6 +31,10 @@ public class PaymentPersistenceAdapter implements PaymentRepository {
     return rows.findAll().stream().map(mapper::toDomain).toList();
   }
 
+  public List<Payment> findByCustomer(UUID customerId) {
+    return rows.findByCustomerId(customerId).stream().map(mapper::toDomain).toList();
+  }
+
   public List<Payment> findByParticipant(UUID participantId) {
     return rows.findByParticipantId(participantId).stream().map(mapper::toDomain).toList();
   }

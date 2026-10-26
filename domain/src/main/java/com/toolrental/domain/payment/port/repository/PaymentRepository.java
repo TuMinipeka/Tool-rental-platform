@@ -11,6 +11,8 @@ public interface PaymentRepository {
 
   List<Payment> findAll();
 
+  List<Payment> findByCustomer(UUID customerId);
+
   List<Payment> findByParticipant(UUID participantId);
 
   List<Payment> findByReservation(
