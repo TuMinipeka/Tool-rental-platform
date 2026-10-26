@@ -75,3 +75,11 @@ Un puerto PostgreSQL abierto no demuestra integración: se requiere conexión, m
 ## Integración y publicación MVP
 
 Consulta [MVP](mvp.md), [contratos por rol](integration-contracts.md), [despliegue](deployment.md) y [reglas visuales consolidadas](DESIGN.md). La composición de validación usa proyecto, base y puertos separados. No restaures skills eliminadas por el usuario ni incluyas esas eliminaciones en un commit de otra entrega.
+
+### Acceso a la base local con Docker
+
+En este entorno local PostgreSQL se publica en `127.0.0.1:5433`. Para DBeaver o pgAdmin usa la base `tool_rental`, el usuario `tool_rental` y la contraseña de `POSTGRES_PASSWORD` en el archivo local `.env`. La URL JDBC es `jdbc:postgresql://localhost:5433/tool_rental`. No versiones ni compartas el archivo `.env`.
+
+El backend usa el nombre interno `postgres:5432` dentro de Docker; no debe usar el puerto del anfitrión. Si el puerto 8080 está ocupado, configura `BACKEND_PORT=8081` y `VITE_API_BASE_URL=http://localhost:8081` en `.env`. Reconstruye con `docker compose up -d --build --wait`; consulta `http://localhost:8081/status/database` para comprobar la conexión. El frontend queda en `http://localhost:5173`.
+
+Las ediciones manuales de datos son locales; los cambios estructurales del producto siguen requiriendo migraciones Flyway. No uses esta base de trabajo para ejecutar suites que alteran esquemas.
