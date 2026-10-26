@@ -65,6 +65,10 @@ public record ReservationResponse(
       case CONFIRMED -> List.of("CANCEL", "REQUEST_WITHDRAWAL", "REQUEST_EXTENSION");
       case CANCELLATION_REVIEW -> List.of();
       case REJECTED, CANCELLED, PAYMENT_FAILED, EXPIRED, NO_SHOW -> List.of();
+      case PENDING_RETURN -> throw new UnsupportedOperationException("Unimplemented case: " + reservation.status());
+      case RETURN_OK -> throw new UnsupportedOperationException("Unimplemented case: " + reservation.status());
+      case RETURN_WITH_DAMAGE -> throw new UnsupportedOperationException("Unimplemented case: " + reservation.status());
+      default -> throw new IllegalArgumentException("Unexpected value: " + reservation.status());
     };
   }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.security.Timestamp;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -23,6 +24,9 @@ public class DamageReportJpaEntity {
 
   @Column(name = "reported_at", nullable = false)
   private Instant reportedAt;
+
+  @Column (name= "date_report", nullable = false)
+  private Timestamp date_report;
 
   @Column(name = "description", nullable = false, length = 2000)
   private String description;
@@ -78,5 +82,9 @@ public class DamageReportJpaEntity {
 
   public BigDecimal getAssessedCost() {
     return assessedCost;
+  }
+
+  public Timestamp getDate_report() {
+    return date_report;
   }
 }

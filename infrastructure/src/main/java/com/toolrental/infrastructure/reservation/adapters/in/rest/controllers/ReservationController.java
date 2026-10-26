@@ -84,6 +84,11 @@ public class ReservationController {
     return query.list(Actor.id(principal));
   }
 
+  @GetMapping ("/{id}/registrar-devolucion")
+  public ReservationResponse registReservationResponses(Principal principal, @PathVariable UUID id){
+    return query.execute(Actor.id(principal), null);
+  }
+
   @PostMapping("/{id}/confirmation")
   public ReservationResponse confirm(Principal principal, @PathVariable UUID id) {
     return confirm.execute(new ReservationId(id), new SupplierId(Actor.id(principal)));

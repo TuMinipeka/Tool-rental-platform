@@ -671,3 +671,11 @@ Para producción, crea imágenes nuevas identificadas por el nuevo SHA, actualiz
 - **Docker conserva una versión anterior:** usa `docker compose up --build -d`; si sigue usando caché y no necesitas la imagen anterior, reconstruye explícitamente con `docker compose build --no-cache frontend backend`.
 
 La explicación operativa ampliada, los respaldos y la restauración están en [docs/deployment.md](docs/deployment.md).
+
+
+EXAMEN PRUEBAS
+
+<a href="https://ibb.co/rRQtvXtC"><img src="https://i.ibb.co/VcLN3kN7/Captura-desde-2026-10-26-08-04-37.png" alt="Captura-desde-2026-10-26-08-04-37" border="0"></a>
+<a href="https://ibb.co/rVFDcgm"><img src="https://i.ibb.co/97cQVJN/Captura-desde-2026-10-26-07-54-56.png" alt="Captura-desde-2026-10-26-07-54-56" border="0"></a>
+<a href="https://ibb.co/DHcsymdc"><img src="https://i.ibb.co/LXjbWBKj/Captura-desde-2026-10-26-07-54-10.png" alt="Captura-desde-2026-10-26-07-54-10" border="0"></a>
+<a href="https://ibb.co/1Jb35rhS"><img src="https://i.ibb.co/n8RTv7ZW/Captura-desde-2026-10-26-07-49-02.png" alt="Captura-desde-2026-10-26-07-49-02" border="0"></a>

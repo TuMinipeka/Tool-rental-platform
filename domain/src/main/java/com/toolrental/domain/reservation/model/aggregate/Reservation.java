@@ -174,7 +174,7 @@ public final class Reservation extends AggregateRoot {
             period,
             items,
             now,
-            ReservationStatus.PENDING,
+            ReservationStatus.PENDING_RETURN,
             null,
             null,
             scheduledFulfillmentAt,
@@ -257,6 +257,20 @@ public final class Reservation extends AggregateRoot {
     var expired = copyWith(items, ReservationStatus.EXPIRED, null, expiresAt);
     expired.recordEvent(new ReservationExpired(id, Instant.now(clock)));
     return expired;
+  }
+
+  public ReservationStatus returnItemReservationOkay(Clock clock) {
+    if (status != ReservationStatus.OK)
+      throw new BusinessRuleException("Reservation need to bew ok");
+    else if(ReservationStatus.RETURN_OK != null);
+    return status;
+  }
+
+   public ReservationStatus returnItemReservationDamage(Clock clock) {
+    if (status != ReservationStatus.DAMAGE)
+      throw new BusinessRuleException("Reservation need to bew ok");
+    else if(ReservationStatus.RETURN_WITH_DAMAGE != null);
+    return status;
   }
 
   private Reservation copyWith(
