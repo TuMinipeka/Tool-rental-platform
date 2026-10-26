@@ -254,4 +254,48 @@ public class OperationalReportingPersistenceAdapter implements OperationalReport
         supplierId,
         supplierId);
   }
+
+  @Override
+  public List<OverdueRentalView> overdueRentals(UUID supplierId, LocalDate asOf) {
+    var sql =
+        """
+        SELECT reservation.reservation_id,
+               customer.user_id AS customer_id,
+               customer.billing_name AS customer_name,
+               reservation.effective_return_date,
+               (?::date - reservation.effective_return_date) AS overdue_days,
+               rental.rental_status,
+               COUNT(DISTINCT item.equipment_unit_id) AS unit_count
+        FROM rentals rental
+        JOIN reservations reservation ON reservation.reservation_id = rental.reservation_id
+        JOIN customers customer ON customer.user_id = reservation.customer_id
+        JOIN reservation_items item ON item.reservation_id = reservation.reservation_id
+        JOIN equipment_units unit ON unit.equipment_unit_id = item.equipment_unit_id
+        JOIN tools tool ON tool.tool_id = unit.tool_id
+        WHERE rental.rental_status = 'ACTIVE'
+          AND reservation.effective_return_date < ?
+          AND (?::uuid IS NULL OR tool.supplier_id = ?::uuid)
+        GROUP BY reservation.reservation_id,
+                 customer.user_id,
+                 customer.billing_name,
+                 reservation.effective_return_date,
+                 rental.rental_status
+        ORDER BY overdue_days DESC, reservation.reservation_id
+        """;
+    return jdbc.query(
+        sql,
+        (row, index) ->
+            new OverdueRentalView(
+                row.getObject("reservation_id", UUID.class),
+                row.getObject("customer_id", UUID.class),
+                row.getString("customer_name"),
+                row.getObject("effective_return_date", LocalDate.class),
+                row.getLong("overdue_days"),
+                row.getString("rental_status"),
+                row.getLong("unit_count")),
+        asOf,
+        asOf,
+        supplierId,
+        supplierId);
+  }
 }

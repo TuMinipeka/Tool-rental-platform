@@ -33,7 +33,7 @@ class ArchitectureTest {
               .filter(name -> !name.equals("common"))
               .collect(Collectors.toSet());
     }
-    assertThat(contexts).hasSize(25);
+    assertThat(contexts).hasSize(26);
     for (var context : contexts) {
       assertThat(Files.isDirectory(applicationRoot.resolve(context)))
           .as(context + " application")

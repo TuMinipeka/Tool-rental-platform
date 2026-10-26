@@ -72,6 +72,6 @@ class MappingContractTest {
       }
       assertThat(columns).as(table).isEqualTo(tables.get(table));
     }
-    assertThat(owners).hasSize(25).containsExactlyInAnyOrderElementsOf(tables.keySet());
+    assertThat(owners).hasSize(26).containsExactlyInAnyOrderElementsOf(tables.keySet());
   }
 }

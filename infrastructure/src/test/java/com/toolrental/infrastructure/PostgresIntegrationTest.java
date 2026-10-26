@@ -197,19 +197,19 @@ class PostgresIntegrationTest {
   }
 
   @Test
-  void bootsWithAllTwentyFiveMappingsAndFreshMigrations() {
-    assertThat(emf.getMetamodel().getEntities()).hasSize(25);
+  void bootsWithAllMappingsAndFreshMigrations() {
+    assertThat(emf.getMetamodel().getEntities()).hasSize(26);
     assertThat(
             db.queryForObject(
                 "select count(*) from flyway_schema_history where success and version is not null",
                 Integer.class))
-        .isEqualTo(39);
+        .isEqualTo(40);
     assertThat(
             db.queryForObject(
                 "select count(*) from information_schema.tables where table_schema=? and table_type='BASE TABLE' and table_name<>'flyway_schema_history'",
                 Integer.class,
                 schema))
-        .isEqualTo(25);
+        .isEqualTo(26);
   }
 
   @Test
@@ -1639,5 +1639,94 @@ class PostgresIntegrationTest {
         .andExpect(content().string(org.hamcrest.Matchers.containsString("status-title")));
     mvc.perform(get("/connection-status.js")).andExpect(status().isOk());
     call(null, get("/api/users"), null, 401);
+  }
+
+  @Test
+  void predictedExamFeaturesExposePaginationOverdueReportsAndLegalAcceptance() throws Exception {
+    var page =
+        call(
+            null,
+            get("/api/v1/public/catalog/page")
+                .param("page", "0")
+                .param("size", "1")
+                .param("sort", "dailyRate,desc")
+                .param("minDailyRate", "1")
+                .param("maxDailyRate", "100"),
+            null,
+            200);
+    assertThat(page.get("content")).hasSize(1);
+    assertThat(page.get("page").asInt()).isZero();
+    assertThat(page.get("totalElements").asLong()).isEqualTo(1);
+    call(
+        null,
+        get("/api/v1/public/catalog/page").param("page", "-1").param("size", "10"),
+        null,
+        409);
+
+    var firstAcceptance =
+        call(
+            customer,
+            post("/api/v1/legal-acceptances"),
+            Map.of(
+                "documentType",
+                "TERMS_AND_CONDITIONS",
+                "documentVersion",
+                "2026-10-20",
+                "purpose",
+                "CUSTOMER_REGISTRATION"),
+            200);
+    var repeatedAcceptance =
+        call(
+            customer,
+            post("/api/v1/legal-acceptances"),
+            Map.of(
+                "documentType",
+                "terms_and_conditions",
+                "documentVersion",
+                "2026-10-20",
+                "purpose",
+                "customer_registration"),
+            200);
+    assertThat(repeatedAcceptance.get("id").asText()).isEqualTo(firstAcceptance.get("id").asText());
+    assertThat(call(customer, get("/api/v1/legal-acceptances/me"), null, 200)).hasSize(1);
+    assertThat(
+            db.queryForObject(
+                "select count(*) from legal_acceptances where user_id=?", Integer.class, customer))
+        .isEqualTo(1);
+
+    var reservationId = UUID.randomUUID();
+    var dueDate = LocalDate.now(ZoneId.of("America/Bogota")).minusDays(3);
+    db.update(
+        """
+        insert into reservations (
+          reservation_id, customer_id, created_at, start_date, return_date, expires_at,
+          reservation_status, currency, confirmed_at, scheduled_fulfillment_at,
+          fulfillment_method, cancellation_policy_id, delivery_fee, effective_return_date)
+        values (?, ?, now(), ?, ?, null, 'CONFIRMED', 'COP', now(), now(),
+                'CUSTOMER_PICKUP', '00000000-0000-0000-0000-000000000203', 0, ?)
+        """,
+        reservationId,
+        customer,
+        dueDate.minusDays(1),
+        dueDate,
+        dueDate);
+    db.update("insert into reservation_items values (?,?,10)", reservationId, unit);
+    db.update("insert into rentals values (?,now(),'ACTIVE')", reservationId);
+
+    var overdue =
+        call(
+            supplier,
+            get("/api/v1/reports/overdue-rentals").param("asOf", dueDate.plusDays(3).toString()),
+            null,
+            200);
+    assertThat(overdue).hasSize(1);
+    assertThat(overdue.get(0).get("reservationId").asText()).isEqualTo(reservationId.toString());
+    assertThat(overdue.get(0).get("overdueDays").asLong()).isEqualTo(3);
+    assertThat(overdue.get(0).get("unitCount").asLong()).isEqualTo(1);
+    call(
+        customer,
+        get("/api/v1/reports/overdue-rentals").param("asOf", dueDate.toString()),
+        null,
+        403);
   }
 }

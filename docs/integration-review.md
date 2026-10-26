@@ -35,7 +35,7 @@ Integración local realizada el 20 de octubre de 2026 en `developer/daniel`, sin
 ## Validación ejecutada
 
 - `mvnw.cmd clean verify`: **104 pruebas, cero fallos, errores u omisiones** (27 Domain, 16 Application y 61 Infrastructure). Incluye PostgreSQL/Testcontainers, Flyway, JPA, arquitectura y formato. La diferencia frente a las 105 históricas corresponde a la retirada de `PasswordRecoveryNotifierTest` junto con el adaptador SMTP.
-- Flyway desde V200 conserva datos/checksums y alcanza V306.1; instalación demo vacía alcanza V308. Hay 39 migraciones base y 65 con demo.
+- Flyway desde V200 conserva datos/checksums y alcanza V309; la instalación demo vacía también alcanza V309. Hay 40 migraciones base y 66 con demo.
 - `npm run lint`, `npm run build` y `docker compose config --quiet`: correctos.
 - `npm run test:e2e`: **80 pruebas correctas y 2 omisiones previstas por dispositivo**, cero fallos en la ejecución completa final. Se cubren escritorio/móvil, accesibilidad automatizada, paneles, navegación al nuevo pago, formularios y revocación CSRF.
 - Los tests frontend usan dobles HTTP para aislar contratos; no sustituyen recorridos nuevos con navegador, backend y base reales.

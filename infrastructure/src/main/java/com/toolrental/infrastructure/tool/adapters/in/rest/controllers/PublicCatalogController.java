@@ -1,5 +1,6 @@
 package com.toolrental.infrastructure.tool.adapters.in.rest.controllers;
 
+import com.toolrental.application.tool.dto.CatalogPageResponse;
 import com.toolrental.application.tool.dto.CatalogToolResponse;
 import com.toolrental.application.tool.dto.ToolAvailabilityResponse;
 import com.toolrental.application.tool.usecase.BrowseCatalogUseCase;
@@ -7,6 +8,7 @@ import com.toolrental.application.tool.usecase.CheckToolAvailabilityUseCase;
 import com.toolrental.domain.reservation.model.valueobject.ReservationPeriod;
 import com.toolrental.domain.tool.model.valueobject.ToolId;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +38,20 @@ public final class PublicCatalogController {
       @RequestParam(required = false) String query,
       @RequestParam(required = false) String serviceCity) {
     return catalog.list(categoryId, query, serviceCity);
+  }
+
+  @GetMapping("/page")
+  public CatalogPageResponse page(
+      @RequestParam(required = false) UUID categoryId,
+      @RequestParam(required = false) String query,
+      @RequestParam(required = false) String serviceCity,
+      @RequestParam(required = false) BigDecimal minDailyRate,
+      @RequestParam(required = false) BigDecimal maxDailyRate,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "12") int size,
+      @RequestParam(defaultValue = "name,asc") String sort) {
+    return catalog.page(
+        categoryId, query, serviceCity, minDailyRate, maxDailyRate, page, size, sort);
   }
 
   @GetMapping("/{id}")

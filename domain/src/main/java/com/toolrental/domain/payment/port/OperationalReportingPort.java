@@ -47,6 +47,15 @@ public interface OperationalReportingPort {
       BigDecimal bookedRevenue,
       BigDecimal averageRevenuePerReservation) {}
 
+  record OverdueRentalView(
+      UUID reservationId,
+      UUID customerId,
+      String customerName,
+      LocalDate expectedReturnDate,
+      long overdueDays,
+      String rentalStatus,
+      long unitCount) {}
+
   List<IncomeView> income(UUID supplierId, LocalDate from, LocalDate to);
 
   List<ToolRentalView> mostRentedTools(UUID supplierId, LocalDate from, LocalDate to);
@@ -57,4 +66,6 @@ public interface OperationalReportingPort {
       UUID supplierId, LocalDate from, LocalDate to, Instant currentTime);
 
   List<ProfitabilityView> profitability(UUID supplierId, LocalDate from, LocalDate to);
+
+  List<OverdueRentalView> overdueRentals(UUID supplierId, LocalDate asOf);
 }

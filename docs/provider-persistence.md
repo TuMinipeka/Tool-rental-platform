@@ -77,7 +77,7 @@ El municipio sigue siendo un filtro real: una publicación de Floridablanca no a
 
 ### Inicio local con datos semilla
 
-El perfil `local,demo` aplica las migraciones de estructura y `db/demo` automáticamente mediante Flyway sobre una base vacía. Incluye cuentas por rol, catálogo y escenarios históricos; las pruebas de integración verifican al menos 20 registros por tabla de negocio y 65 migraciones hasta V308. No es necesario ejecutar INSERT manuales ni volver a cargar el seed en cada inicio.
+El perfil `local,demo` aplica las migraciones de estructura y `db/demo` automáticamente mediante Flyway sobre una base vacía. Incluye cuentas por rol, catálogo y escenarios históricos; las pruebas de integración verifican al menos 20 registros en las tablas demo y 66 migraciones hasta V309. No es necesario ejecutar INSERT manuales ni volver a cargar el seed en cada inicio.
 
 ```powershell
 # Desde la raíz real Tool-rental-platform, con .env privado ya configurado:

@@ -126,7 +126,7 @@ La página debe:
 - registrar versión aceptada, usuario, fecha, finalidad y transacción cuando corresponda;
 - separar la aceptación de términos del mercadeo opcional y la protección opcional.
 
-La ruta pública e imprimible ya forma parte de la base React y se enlaza desde el pie, registro, solicitud, pago y confirmación. El registro persistente de la versión aceptada continúa pendiente y no debe simularse solo en el cliente.
+La ruta pública e imprimible ya forma parte de la base React y se enlaza desde el pie, registro, solicitud, pago y confirmación. El backend conserva aceptaciones autenticadas mediante `/api/v1/legal-acceptances`, con versión, finalidad y fecha; integrar cada formulario del frontend con ese contrato continúa como trabajo de interfaz.
 
 ## Referencias legales y límite de lanzamiento
 

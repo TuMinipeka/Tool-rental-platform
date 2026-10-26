@@ -155,16 +155,16 @@ La [matriz de verificación](docs/browser-verification.md) distingue interfaz, R
 
 ## Estado actual
 
-El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módulos Maven conservan las dependencias hacia dentro: `infrastructure → application → domain`. El modelo contiene **25 tablas y 25 contextos organizativos**; las transacciones coordinan las reglas que atraviesan reservas, pagos, sesiones, devoluciones y reembolsos.
+El proyecto usa Java 21, Spring Boot 3.5.16, PostgreSQL y Flyway. Los tres módulos Maven conservan las dependencias hacia dentro: `infrastructure → application → domain`. El modelo contiene **26 tablas y 26 contextos organizativos**; las transacciones coordinan las reglas que atraviesan reservas, pagos, sesiones, devoluciones, reembolsos y aceptación legal.
 
 | Área | Implementado | Fuera de este alcance |
 | --- | --- | --- |
 | Identidad | BCrypt, JWT de acceso, sesiones rotativas, revocación y CSRF; sin recuperación pública de contraseña | MFA y proveedores de identidad externos |
 | Reservas | Retención atómica con vencimiento, confirmación automática, cancelación, entrega, devolución, extensión y mora | Optimización logística avanzada |
 | Dinero | Visa, Mastercard, PSE, Mercado Pago y PayPal con datos fijos, resultado persistente y comprobante académico | Cobros reales, proveedores financieros externos e impuestos definitivos |
-| Reportes | Ingresos, demanda, clientes, disponibilidad y rentabilidad con alcance por rol | Margen contable hasta modelar costos operativos |
+| Reportes | Ingresos, demanda, clientes, disponibilidad, rentabilidad y alquileres vencidos con alcance por rol | Margen contable hasta modelar costos operativos |
 | Entrega | Recogida gratuita o entrega del proveedor en Colombia | Tarifas geográficas y transportadoras externas |
-| Persistencia | JPA, PostgreSQL, Flyway hasta V307 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
+| Persistencia | JPA, PostgreSQL, Flyway hasta V309 y datos demo separados | Operación administrada de respaldos y alta disponibilidad |
 | API | `/api/v1`, OpenAPI, `ProblemDetail` y alias temporal `/api` | Eliminación futura del alias heredado |
 
 El [enunciado original](ejercicioDemo.md) se conserva sin cambios. PostgreSQL reemplaza a MySQL por decisión autorizada.
@@ -234,7 +234,7 @@ flowchart LR
 Los módulos Domain y Application no importan Spring, Hibernate ni HTTP. Infrastructure contiene controladores, seguridad, entidades JPA, mappers, repositorios Spring Data y configuración.
 
 <details>
-<summary><strong>Ver los 25 contextos y tablas</strong></summary>
+<summary><strong>Ver los 26 contextos y tablas</strong></summary>
 
 | Contexto | Tabla | Contexto | Tabla |
 | --- | --- | --- | --- |
@@ -250,7 +250,7 @@ Los módulos Domain y Application no importan Spring, Hibernate ni HTTP. Infrast
 | `usersession` | `user_sessions` | `passwordreset` | `password_reset_tokens` |
 | `cancellationpolicy` | `cancellation_policies` | `reservationtermination` | `reservation_terminations` |
 | `deliveryrate` | `delivery_rates` | `reservationextension` | `reservation_extensions` |
-| `refund` | `refunds` |  |  |
+| `refund` | `refunds` | `legalacceptance` | `legal_acceptances` |
 
 </details>
 
@@ -308,7 +308,7 @@ Después de crear y persistir una reserva, el frontend abre automáticamente `/p
 
 ## Migraciones y validación
 
-El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos académicos persistidos; V306 añade la ciudad de servicio; V306.1 habilita PSE y Mercado Pago como métodos del checkout fijo y V307 distribuye el catálogo demo por ciudad.
+El historial previo hasta V200 se conserva sin reescritura. Las migraciones aditivas V201–V210 agregan sesiones, recuperación, políticas, terminaciones, tarifa de entrega, extensiones, reembolsos, campos operativos y retenciones/pagos completos. `db/demo/V300–V302` carga políticas, cuentas, catálogo y escenarios históricos académicos. V303 se reserva a showcase y desactiva credenciales conocidas. V304 añade la orquestación del checkout en payments; V305 incorpora decisiones y reembolsos académicos persistidos; V306 añade la ciudad de servicio; V306.1 habilita PSE y Mercado Pago como métodos del checkout fijo; V307 distribuye el catálogo demo por ciudad y V309 registra aceptaciones legales versionadas.
 
 Consulta [pagos académicos](docs/fictional-payments.md): medios fijos, retorno, permisos, persistencia y conciliación. Las integraciones financieras externas y el correo están fuera del alcance.
 
@@ -328,6 +328,7 @@ La ilustración conservada es anterior a V210: la factura actualmente pertenece 
 | --- | --- |
 | Arquitectura y paquetes | [backend-architecture.md](docs/backend-architecture.md) · [source-package-map.md](docs/source-package-map.md) · [Guía de desarrollo](docs/development-guide.md) |
 | API y seguridad | [rest-api.md](docs/rest-api.md) · [production-readiness.md](docs/production-readiness.md) |
+| Preparación de evaluación backend | [evaluacion-backend.md](docs/evaluacion-backend.md) |
 | Modelo y datos | [conceptual-model.md](docs/conceptual-model.md) · [fourth-normal-form.md](docs/fourth-normal-form.md) · [data-sources.md](docs/data-sources.md) |
 | Alcance y cobertura | [product-scope.md](docs/product-scope.md) · [requirements-coverage.md](docs/requirements-coverage.md) · [pendientes.md](docs/pendientes.md) |
 | Operación | [deployment.md](docs/deployment.md) · [build-and-test.md](docs/build-and-test.md) · [database-migrations.md](docs/database-migrations.md) |

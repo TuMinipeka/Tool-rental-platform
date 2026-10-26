@@ -57,8 +57,8 @@ class FlywayUpgradeIntegrationTest {
               .defaultSchema(schema)
               .cleanDisabled(true)
               .load();
-      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(14);
-      assertThat(upgraded.info().current().getVersion().getVersion()).isEqualTo("306.1");
+      assertThat(upgraded.migrate().migrationsExecuted).isEqualTo(15);
+      assertThat(upgraded.info().current().getVersion().getVersion()).isEqualTo("309");
       assertThat(checksums(upgraded)).containsAllEntriesOf(originalChecksums);
       assertThat(upgraded.validateWithResult().validationSuccessful).isTrue();
       assertThat(upgraded.migrate().migrationsExecuted).isZero();
@@ -88,7 +88,7 @@ class FlywayUpgradeIntegrationTest {
           query.setString(1, schema);
           try (var rows = query.executeQuery()) {
             rows.next();
-            assertThat(rows.getInt(1)).isEqualTo(25);
+            assertThat(rows.getInt(1)).isEqualTo(26);
           }
         }
       }
