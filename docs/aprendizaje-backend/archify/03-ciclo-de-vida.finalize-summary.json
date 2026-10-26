@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "lifecycle",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\reservation-lifecycle.json",
+    "sha256": "442e2009700bd11172afb2b66abacd9cfe6143fb94da94290cdc6e2c5e0b94a9",
+    "bytes": 5798
+  },
+  "artifact": {
+    "path": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\03-ciclo-de-vida.html",
+    "sha256": "19da4192dccc8636387a3472350f0fd3ef7ab757665a9a9e8dd81e889a457e68",
+    "bytes": 835992
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\03-ciclo-de-vida.finalize.json",
+    "summaryReceipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\03-ciclo-de-vida.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\03-ciclo-de-vida.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-23T16:32:33.920Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 5566,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  },
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "resolvedCrossovers": 1
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [
+        {
+          "left": {
+            "id": "pending-confirmed",
+            "from": "pending",
+            "to": "confirmed",
+            "label": "supplier confirms",
+            "collectionIndex": 1,
+            "artifactIndex": 2
+          },
+          "right": {
+            "id": "payment-cancelled",
+            "from": "pending-payment",
+            "to": "cancelled",
+            "label": "customer cancels",
+            "collectionIndex": 7,
+            "artifactIndex": 8
+          },
+          "point": [
+            401.1,
+            112
+          ]
+        }
+      ],
+      "detours": [],
+      "truncated": false
+    },
+    "repair": "Advisory only: this mode places or routes these relationships itself. Report them; do not remove relationships or meaning to reduce crossings."
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\hexagonal-architecture.json",
+    "sha256": "42a84bd7c65d23cc8ac4d689b984adfaee90af7976ae5c3c05392d85820fe519",
+    "bytes": 6147
+  },
+  "artifact": {
+    "path": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\01-arquitectura-hexagonal.html",
+    "sha256": "6411c39c00fcfeafc0f39f0b284255f82569a1ea0d3f64b6f1b5ea2d50ba4dc8",
+    "bytes": 829238
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\01-arquitectura-hexagonal.finalize.json",
+    "summaryReceipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\01-arquitectura-hexagonal.finalize-summary.json",
+    "browserCheckReceipt": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\01-arquitectura-hexagonal.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-23T16:32:33.920Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 5466,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "56a623e7-154e-45c8-86cb-52948728cce1",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\reservation-lifecycle.json",
+  "output": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\03-ciclo-de-vida.html",
+  "specification": {
+    "sha256": "442e2009700bd11172afb2b66abacd9cfe6143fb94da94290cdc6e2c5e0b94a9",
+    "bytes": 5798
+  },
+  "artifact": {
+    "sha256": "19da4192dccc8636387a3472350f0fd3ef7ab757665a9a9e8dd81e889a457e68",
+    "bytes": 835992
+  }
+}

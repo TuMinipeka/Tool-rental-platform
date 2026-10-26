@@ -6,6 +6,8 @@ Este documento registra tres ampliaciones realizadas exclusivamente en el backen
 
 La cobertura general de la rúbrica permanece en [requirements-coverage.md](requirements-coverage.md); los contratos completos de la API están en [rest-api.md](rest-api.md).
 
+Para practicar cambios de backend con límite de dos horas, consulta el [kit Ver → Hacer → Explicar](aprendizaje-backend/README.md). Incluye el caso de confirmación o rechazo de reservas, cinco simulacros, solucionario separado y mapas Archify interactivos.
+
 ## Resumen de lo implementado
 
 | Posible requerimiento | Resultado | Evidencia principal |

@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Mapa interactivo del backend · Tool Rental Platform</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-soft: #edf1f7;
+      --text: #172033;
+      --muted: #58647a;
+      --line: #d7deea;
+      --accent: #3056d3;
+      --accent-soft: #e8edff;
+      --success: #087f5b;
+      --shadow: 0 16px 46px rgba(23, 32, 51, .10);
+    }
+    [data-theme="dark"] {
+      --bg: #0d111b;
+      --surface: #151c29;
+      --surface-soft: #20293a;
+      --text: #edf2ff;
+      --muted: #aebbd0;
+      --line: #303c51;
+      --accent: #9bb2ff;
+      --accent-soft: #1d2b55;
+      --success: #69dbb3;
+      --shadow: 0 18px 50px rgba(0, 0, 0, .28);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+    a { color: inherit; }
+    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 64px; }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: flex-start;
+      margin-bottom: 38px;
+    }
+    .eyebrow { color: var(--accent); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; font-size: .76rem; }
+    h1 { max-width: 760px; margin: 8px 0 12px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.03; letter-spacing: -.045em; }
+    .lead { max-width: 720px; margin: 0; color: var(--muted); font-size: 1.04rem; }
+    button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 650;
+      cursor: pointer;
+    }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+    .method {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--line);
+      box-shadow: var(--shadow);
+      margin-bottom: 42px;
+    }
+    .method article { background: var(--surface); padding: 22px; }
+    .method span { color: var(--accent); font-weight: 800; }
+    .method h2 { margin: 6px 0; font-size: 1.15rem; }
+    .method p { margin: 0; color: var(--muted); }
+    .section-head { display: flex; justify-content: space-between; gap: 20px; align-items: end; margin-bottom: 18px; }
+    .section-head h2 { margin: 0; font-size: 1.55rem; letter-spacing: -.025em; }
+    .section-head p { margin: 0; color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .diagram {
+      display: flex;
+      flex-direction: column;
+      min-height: 240px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface);
+      text-decoration: none;
+      box-shadow: 0 8px 30px rgba(23, 32, 51, .06);
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .diagram:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: var(--shadow); }
+    .diagram:first-child { grid-column: 1 / -1; min-height: 210px; }
+    .diagram .number { color: var(--accent); font-weight: 800; font-size: .82rem; }
+    .diagram h3 { margin: 18px 0 8px; font-size: 1.34rem; letter-spacing: -.02em; }
+    .diagram p { margin: 0 0 20px; color: var(--muted); max-width: 70ch; }
+    .diagram .open { margin-top: auto; color: var(--accent); font-weight: 750; }
+    .practice {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-top: 42px;
+    }
+    .panel { border: 1px solid var(--line); border-radius: 18px; background: var(--surface); padding: 24px; }
+    .panel h2 { margin-top: 0; }
+    .timeline { display: grid; gap: 12px; }
+    .phase { display: grid; grid-template-columns: 90px 1fr; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .phase:last-child { border: 0; padding-bottom: 0; }
+    .phase strong { color: var(--accent); }
+    .checklist { display: grid; gap: 12px; }
+    .checklist label { display: flex; gap: 10px; align-items: flex-start; color: var(--muted); }
+    .checklist input { margin-top: 4px; accent-color: var(--accent); }
+    .progress { height: 8px; border-radius: 999px; background: var(--surface-soft); overflow: hidden; margin: 18px 0 8px; }
+    .progress > div { height: 100%; width: 0; background: var(--success); transition: width .2s ease; }
+    .progress-label { color: var(--muted); font-size: .9rem; }
+    footer { margin-top: 38px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+    code { color: var(--text); background: var(--surface-soft); padding: .16em .4em; border-radius: 6px; }
+    @media (max-width: 780px) {
+      header { display: block; }
+      header button { margin-top: 18px; }
+      .method, .grid, .practice { grid-template-columns: 1fr; }
+      .diagram:first-child { grid-column: auto; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <div class="eyebrow">Preparación backend · Spring Boot</div>
+        <h1>Entiende el flujo. Cambia el patrón. Defiéndelo.</h1>
+        <p class="lead">Cinco mapas interactivos conectan el enunciado del examen con las capas, estados, seguridad y datos reales de Tool Rental Platform.</p>
+      </div>
+      <button id="theme" type="button" aria-label="Cambiar tema">Cambiar tema</button>
+    </header>
+
+    <section class="method" aria-label="Método de aprendizaje">
+      <article><span>01</span><h2>Ver</h2><p>Recorre una petición real y abre la evidencia de código desde cada nodo.</p></article>
+      <article><span>02</span><h2>Hacer</h2><p>Cierra los mapas y resuelve uno de los cinco simulacros con límite de tiempo.</p></article>
+      <article><span>03</span><h2>Explicar</h2><p>Dibuja el recorrido de memoria y sustenta reglas, atomicidad y pruebas.</p></article>
+    </section>
+
+    <section aria-labelledby="maps-title">
+      <div class="section-head">
+        <div><div class="eyebrow">Explorar</div><h2 id="maps-title">Cinco vistas del mismo backend</h2></div>
+        <p>Cada vista abre un visor Archify autónomo.</p>
+      </div>
+      <div class="grid">
+        <a class="diagram" href="01-arquitectura-hexagonal.html">
+          <span class="number">MAPA 01</span><h3>Arquitectura hexagonal</h3>
+          <p>Desde el proveedor y el JWT hasta PostgreSQL, con la dirección real de dependencias entre Infrastructure, Application y Domain.</p>
+          <span class="open">Abrir mapa →</span>
+        </a>
+        <a class="diagram" href="02-secuencia-decision.html">
+          <span class="number">MAPA 02</span><h3>Confirmar o rechazar</h3>
+          <p>Orden temporal de la petición, autorización, bloqueo, transición y respuesta.</p>
+          <span class="open">Abrir secuencia →</span>
+        </a>
+        <a class="diagram" href="03-ciclo-de-vida.html">
+          <span class="number">MAPA 03</span><h3>Ciclo de vida</h3>
+          <p>Estados válidos, caminos de pago y terminaciones de una reserva.</p>
+          <span class="open">Abrir estados →</span>
+        </a>
+        <a class="diagram" href="04-jwt-autorizacion.html">
+          <span class="number">MAPA 04</span><h3>JWT y autorización</h3>
+          <p>Diferencia entre validar el token, obtener el actor y comprobar propiedad.</p>
+          <span class="open">Abrir seguridad →</span>
+        </a>
+        <a class="diagram" href="05-modelo-relacional.html">
+          <span class="number">MAPA 05</span><h3>Modelo relacional</h3>
+          <p>Usuarios, proveedores, inventario, reservas y las referencias que sostienen disponibilidad.</p>
+          <span class="open">Abrir ERD →</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="practice" aria-label="Preparación de examen">
+      <article class="panel">
+        <div class="eyebrow">120 minutos</div><h2>Orden de ejecución</h2>
+        <div class="timeline">
+          <div class="phase"><strong>0–10</strong><span>Actor, estados, errores y evidencia.</span></div>
+          <div class="phase"><strong>10–25</strong><span>Rastrear un flujo existente semejante.</span></div>
+          <div class="phase"><strong>25–70</strong><span>Domain → Application → Infrastructure.</span></div>
+          <div class="phase"><strong>70–95</strong><span>Pruebas de regla, permiso y rollback.</span></div>
+          <div class="phase"><strong>95–110</strong><span>Insomnia, JWT y consulta SQL.</span></div>
+          <div class="phase"><strong>110–120</strong><span>Diff, evidencia y commit.</span></div>
+        </div>
+      </article>
+      <article class="panel">
+        <div class="eyebrow">Recuperación activa</div><h2>¿Puedes explicarlo sin mirar?</h2>
+        <div class="checklist" id="checklist">
+          <label><input type="checkbox"> Dibujo las seis responsabilidades en orden.</label>
+          <label><input type="checkbox"> Diferencio autenticación de autorización.</label>
+          <label><input type="checkbox"> Justifico la transacción atómica.</label>
+          <label><input type="checkbox"> Enumero 200, 401, 403, 404 y 409.</label>
+          <label><input type="checkbox"> Propongo una prueba por cada riesgo.</label>
+        </div>
+        <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+        <div class="progress-label" id="progress-label" aria-live="polite">0 de 5 dominadas</div>
+      </article>
+    </section>
+
+    <footer>
+      Evidencia fijada al commit <code>e3da9000e88168cb10c56d730ffd114c35c1bd69</code>. Las vistas describen código existente; los cinco simulacros de la guía son prácticas hipotéticas.
+    </footer>
+  </main>
+  <script>
+    const root = document.documentElement;
+    const themeButton = document.getElementById('theme');
+    const savedTheme = localStorage.getItem('backend-kit-theme');
+    if (savedTheme) root.dataset.theme = savedTheme;
+    themeButton.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('backend-kit-theme', root.dataset.theme);
+    });
+
+    const checks = [...document.querySelectorAll('#checklist input')];
+    const savedChecks = JSON.parse(localStorage.getItem('backend-kit-checks') || '[]');
+    checks.forEach((input, index) => { input.checked = Boolean(savedChecks[index]); });
+    function updateProgress() {
+      const completed = checks.filter(input => input.checked).length;
+      document.getElementById('bar').style.width = `${completed / checks.length * 100}%`;
+      document.getElementById('progress-label').textContent = `${completed} de ${checks.length} dominadas`;
+      localStorage.setItem('backend-kit-checks', JSON.stringify(checks.map(input => input.checked)));
+    }
+    checks.forEach(input => input.addEventListener('change', updateProgress));
+    updateProgress();
+  </script>
+</body>
+</html>

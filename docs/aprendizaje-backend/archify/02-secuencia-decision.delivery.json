@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "d493eaba-6ef5-4ced-be6a-1fa35bffbf95",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\reservation-decision-sequence.json",
+  "output": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\02-secuencia-decision.html",
+  "specification": {
+    "sha256": "1fc3fcc210337ee164f6651d19d4cf7d5e9158c56a8ed82b5b1ad8105c021f6d",
+    "bytes": 5554
+  },
+  "artifact": {
+    "sha256": "dc8a319766c1458e2e73a938aba3d03a732fb67ecc990608278909d265388e8d",
+    "bytes": 824761
+  }
+}

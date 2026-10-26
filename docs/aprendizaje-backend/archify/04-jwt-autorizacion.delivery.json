@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "aa71b9bd-f5ef-4461-b48f-e3866fc619f3",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\jwt-authorization-sequence.json",
+  "output": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\04-jwt-autorizacion.html",
+  "specification": {
+    "sha256": "72ea63bf128c26c7358e5eedd25e3b174493c33a5d57c531262749d40e7d5cdc",
+    "bytes": 5519
+  },
+  "artifact": {
+    "sha256": "cefe80d79af1fa0943b57952cb6b81b0b4dd72cd52388809b03afdd427a3b705",
+    "bytes": 825563
+  }
+}

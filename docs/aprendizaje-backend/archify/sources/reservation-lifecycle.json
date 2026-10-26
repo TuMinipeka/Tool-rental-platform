@@ -1,0 +1,53 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Ciclo de vida de Reservation",
+    "locale": "es",
+    "output": "docs/aprendizaje-backend/archify/03-ciclo-de-vida.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/TuMinipeka/Tool-rental-platform.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "e3da9000e88168cb10c56d730ffd114c35c1bd69"
+    },
+    "views": [
+      {"id": "decision", "label": "Decisión del proveedor", "focus": ["pending", "confirmed", "rejected"], "note": "El simulacro se concentra en estas dos salidas desde PENDING."},
+      {"id": "payment", "label": "Pago", "focus": ["pending", "pending-payment", "confirmed", "payment-failed", "expired"], "note": "La retención de pago añade estados que el enunciado simplificado no menciona."},
+      {"id": "termination", "label": "Terminación", "focus": ["confirmed", "cancellation-review", "cancelled", "no-show"], "note": "Una reserva confirmada puede terminar por cancelación, revisión o inasistencia."}
+    ]
+  },
+  "mainPath": ["pending", "pending-payment", "confirmed", "cancellation-review", "cancelled"],
+  "states": [
+    {"id": "pending", "type": "start", "label": "PENDING", "sublabel": "solicitud creada", "tag": "decidible", "step": "01", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/valueobject/ReservationStatus.java", "line": 3, "end_line": 12}, {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 191, "end_line": 207}]},
+    {"id": "pending-payment", "type": "waiting", "label": "PENDING_PAYMENT", "sublabel": "retención vigente", "tag": "espera", "step": "02", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 210, "end_line": 230}]},
+    {"id": "confirmed", "type": "success", "label": "CONFIRMED", "sublabel": "tarifa congelada", "tag": "activa", "step": "03", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 191, "end_line": 207}, {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 233, "end_line": 241}]},
+    {"id": "rejected", "type": "failure", "label": "REJECTED", "sublabel": "proveedor rechazó", "tag": "terminal", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 367, "end_line": 370}]},
+    {"id": "cancelled", "type": "failure", "label": "CANCELLED", "sublabel": "operación cancelada", "tag": "terminal", "step": "05", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 373, "end_line": 380}]},
+    {"id": "payment-failed", "type": "failure", "label": "PAYMENT_FAILED", "sublabel": "pago fallido", "tag": "terminal", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 244, "end_line": 249}]},
+    {"id": "expired", "type": "failure", "label": "EXPIRED", "sublabel": "retención vencida", "tag": "terminal", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 252, "end_line": 259}]},
+    {"id": "cancellation-review", "type": "decision", "label": "CANCELLATION_REVIEW", "sublabel": "resolución pendiente", "tag": "revisión", "step": "04", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 383, "end_line": 393}]},
+    {"id": "no-show", "type": "failure", "label": "NO_SHOW", "sublabel": "cliente no asistió", "tag": "terminal", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 395, "end_line": 399}]}
+  ],
+  "transitions": [
+    {"id": "pending-hold", "from": "pending", "to": "pending-payment", "label": "hold"},
+    {"id": "pending-confirmed", "from": "pending", "to": "confirmed", "label": "supplier confirms", "variant": "emphasis"},
+    {"id": "pending-rejected", "from": "pending", "to": "rejected", "label": "supplier rejects", "variant": "security"},
+    {"id": "pending-cancelled", "from": "pending", "to": "cancelled", "label": "customer cancels"},
+    {"id": "payment-confirmed", "from": "pending-payment", "to": "confirmed", "label": "paid", "variant": "emphasis"},
+    {"id": "payment-failed-transition", "from": "pending-payment", "to": "payment-failed", "label": "payment fails", "variant": "security"},
+    {"id": "payment-expired", "from": "pending-payment", "to": "expired", "label": "hold expires"},
+    {"id": "payment-cancelled", "from": "pending-payment", "to": "cancelled", "label": "customer cancels"},
+    {"id": "confirmed-review", "from": "confirmed", "to": "cancellation-review", "label": "review"},
+    {"id": "review-confirmed", "from": "cancellation-review", "to": "confirmed", "label": "review rejected"},
+    {"id": "review-cancelled", "from": "cancellation-review", "to": "cancelled", "label": "approved"},
+    {"id": "confirmed-cancelled", "from": "confirmed", "to": "cancelled", "label": "cancel"},
+    {"id": "confirmed-no-show", "from": "confirmed", "to": "no-show", "label": "mark no-show", "variant": "security"}
+  ],
+  "cards": [
+    {"dot": "emerald", "title": "Regla del simulacro", "items": ["Solo PENDING acepta confirmación o rechazo", "REJECTED es terminal", "CONFIRMED registra fecha de confirmación"]},
+    {"dot": "amber", "title": "Modelo real", "items": ["El pago introduce una retención temporal", "La cancelación confirmada puede requerir revisión", "Cada transición tiene una precondición explícita"]}
+  ]
+}
+

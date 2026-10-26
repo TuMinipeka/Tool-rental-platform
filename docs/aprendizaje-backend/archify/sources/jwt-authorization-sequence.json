@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "De JWT a autorización del proveedor",
+    "locale": "es",
+    "output": "docs/aprendizaje-backend/archify/04-jwt-autorizacion.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/TuMinipeka/Tool-rental-platform.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "e3da9000e88168cb10c56d730ffd114c35c1bd69"
+    },
+    "views": [
+      {"id": "authentication", "label": "Autenticación", "focus": ["supplier", "filter", "decoder", "session"], "note": "Firma, emisor, expiración, propósito y sesión determinan si existe un Principal válido."},
+      {"id": "identity", "label": "Identidad", "focus": ["filter", "controller"], "note": "El sub del token llega como Principal y se convierte en UUID."},
+      {"id": "authorization", "label": "Autorización", "focus": ["controller", "usecase", "participants"], "note": "El caso de uso valida proveedor activo y propiedad de la reserva."}
+    ]
+  },
+  "participants": [
+    {"id": "supplier", "type": "external", "label": "Proveedor", "sublabel": "Bearer token", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 87, "end_line": 95}]},
+    {"id": "filter", "type": "security", "label": "SecurityFilterChain", "sublabel": "stateless", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/common/config/SecurityConfiguration.java", "line": 63, "end_line": 108}]},
+    {"id": "decoder", "type": "security", "label": "JwtDecoder", "sublabel": "HS256 + claims", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/common/config/SecurityConfiguration.java", "line": 111, "end_line": 137}]},
+    {"id": "session", "type": "database", "label": "Session validator", "sublabel": "sid activo", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/common/config/SecurityConfiguration.java", "line": 117, "end_line": 137}]},
+    {"id": "controller", "type": "backend", "label": "Controller + Actor", "sublabel": "sub a UUID", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/common/web/Actor.java", "line": 8, "end_line": 21}, {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 87, "end_line": 95}]},
+    {"id": "usecase", "type": "backend", "label": "Reservation UseCase", "sublabel": "propiedad", "sources": [{"path": "application/src/main/java/com/toolrental/application/reservation/usecase/ConfirmReservationUseCase.java", "line": 22, "end_line": 33}, {"path": "application/src/main/java/com/toolrental/application/reservation/usecase/RejectReservationUseCase.java", "line": 19, "end_line": 30}]},
+    {"id": "participants", "type": "database", "label": "ParticipantsPort", "sublabel": "perfil activo", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/port/repository/AtomicReservationManagement.java", "line": 27, "end_line": 39}]}
+  ],
+  "segments": [
+    {"from": 145, "to": 310, "label": "Autenticación"},
+    {"from": 320, "to": 500, "label": "Autorización de negocio"}
+  ],
+  "messages": [
+    {"id": "bearer", "from": "supplier", "to": "filter", "y": 160, "label": "Authorization: Bearer", "variant": "security"},
+    {"id": "decode", "from": "filter", "to": "decoder", "y": 205, "label": "verify signature and claims", "variant": "security"},
+    {"id": "sid", "from": "decoder", "to": "session", "y": 245, "label": "validate sid", "variant": "security"},
+    {"id": "active-session", "from": "session", "to": "decoder", "y": 280, "label": "active", "variant": "return"},
+    {"id": "principal", "from": "filter", "to": "controller", "y": 335, "label": "Principal(sub, roles)", "variant": "security"},
+    {"id": "actor", "from": "controller", "to": "usecase", "y": 380, "label": "ReservationId + SupplierId", "variant": "emphasis"},
+    {"id": "profile", "from": "usecase", "to": "participants", "y": 425, "label": "isSupplierActive(actor)"},
+    {"id": "profile-result", "from": "participants", "to": "usecase", "y": 460, "label": "active or inactive", "variant": "return"},
+    {"id": "authorized", "from": "usecase", "to": "controller", "y": 505, "label": "result or 403", "variant": "return"},
+    {"id": "http-result", "from": "controller", "to": "supplier", "y": 545, "label": "200 or ProblemDetail", "variant": "return"}
+  ],
+  "activations": [
+    {"participant": "filter", "from": 155, "to": 340, "type": "security"},
+    {"participant": "decoder", "from": 200, "to": 290, "type": "security"},
+    {"participant": "session", "from": 240, "to": 285, "type": "database"},
+    {"participant": "controller", "from": 330, "to": 550, "type": "backend"},
+    {"participant": "usecase", "from": 375, "to": 510, "type": "backend"},
+    {"participant": "participants", "from": 420, "to": 465, "type": "database"}
+  ],
+  "cards": [
+    {"dot": "violet", "title": "401 Authentication Required", "items": ["Falta token, firma inválida, propósito incorrecto o sesión inactiva"]},
+    {"dot": "rose", "title": "403 Access Denied", "items": ["El JWT es válido, pero el actor no es el proveedor propietario y activo"]},
+    {"dot": "cyan", "title": "Regla segura", "items": ["supplierId nunca llega libremente en el cuerpo", "La identidad procede del sub validado"]}
+  ]
+}
+

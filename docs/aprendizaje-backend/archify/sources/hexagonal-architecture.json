@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura hexagonal de la decisión de reserva",
+    "locale": "es",
+    "output": "docs/aprendizaje-backend/archify/01-arquitectura-hexagonal.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/TuMinipeka/Tool-rental-platform.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "e3da9000e88168cb10c56d730ffd114c35c1bd69"
+    },
+    "views": [
+      {
+        "id": "entrada",
+        "label": "Entrada HTTP",
+        "focus": ["supplier", "security", "controller"],
+        "note": "El token autentica; el controlador traduce UUID y Principal a tipos del caso de uso."
+      },
+      {
+        "id": "negocio",
+        "label": "Reglas",
+        "focus": ["usecase", "aggregate", "port"],
+        "note": "Application coordina; Domain protege estados y define el puerto requerido."
+      },
+      {
+        "id": "persistencia",
+        "label": "Transacción",
+        "focus": ["port", "adapter", "database"],
+        "note": "El adaptador bloquea, verifica y guarda en una sola transacción PostgreSQL."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "supplier",
+      "type": "external",
+      "label": "Proveedor",
+      "sublabel": "Insomnia o frontend",
+      "pos": [40, 250],
+      "size": [130, 64],
+      "sources": [
+        {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 87, "end_line": 95, "label": "Entrada del proveedor"}
+      ]
+    },
+    {
+      "id": "security",
+      "type": "security",
+      "label": "Spring Security",
+      "sublabel": "JWT y sesión activa",
+      "pos": [220, 250],
+      "size": [150, 64],
+      "sources": [
+        {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/common/config/SecurityConfiguration.java", "line": 69, "end_line": 120, "label": "Cadena JWT"}
+      ]
+    },
+    {
+      "id": "controller",
+      "type": "backend",
+      "label": "ReservationController",
+      "sublabel": "Adaptador REST",
+      "pos": [430, 250],
+      "size": [165, 64],
+      "tag": "Infrastructure",
+      "sources": [
+        {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 33, "end_line": 95, "label": "Controlador REST"}
+      ]
+    },
+    {
+      "id": "usecase",
+      "type": "backend",
+      "label": "Confirm / Reject UseCase",
+      "sublabel": "Coordinación y permisos",
+      "pos": [655, 250],
+      "size": [185, 70],
+      "tag": "Application",
+      "sources": [
+        {"path": "application/src/main/java/com/toolrental/application/reservation/usecase/ConfirmReservationUseCase.java", "line": 13, "end_line": 54, "label": "Confirmación"},
+        {"path": "application/src/main/java/com/toolrental/application/reservation/usecase/RejectReservationUseCase.java", "line": 10, "end_line": 32, "label": "Rechazo"}
+      ]
+    },
+    {
+      "id": "aggregate",
+      "type": "backend",
+      "label": "Reservation",
+      "sublabel": "Estados e invariantes",
+      "pos": [905, 100],
+      "size": [155, 66],
+      "tag": "Domain",
+      "sources": [
+        {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 191, "end_line": 207, "label": "Confirmar"},
+        {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 367, "end_line": 370, "label": "Rechazar"},
+        {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 409, "end_line": 412, "label": "Exigir pendiente"}
+      ]
+    },
+    {
+      "id": "port",
+      "type": "backend",
+      "label": "AtomicReservationManagement",
+      "sublabel": "Puerto transaccional",
+      "pos": [905, 390],
+      "size": [195, 70],
+      "tag": "Domain",
+      "sources": [
+        {"path": "domain/src/main/java/com/toolrental/domain/reservation/port/repository/AtomicReservationManagement.java", "line": 14, "end_line": 40, "label": "Contrato atómico"}
+      ]
+    },
+    {
+      "id": "adapter",
+      "type": "backend",
+      "label": "PersistenceAdapter",
+      "sublabel": "JPA, locks y mappers",
+      "pos": [905, 555],
+      "size": [175, 66],
+      "tag": "Infrastructure",
+      "sources": [
+        {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/out/persistence/ReservationPersistenceAdapter.java", "line": 129, "end_line": 172, "label": "Ejecución y bloqueos"}
+      ]
+    },
+    {
+      "id": "database",
+      "type": "database",
+      "label": "PostgreSQL",
+      "sublabel": "Estado y restricciones",
+      "pos": [655, 555],
+      "size": [160, 66],
+      "sources": [
+        {"path": "infrastructure/src/main/resources/db/migration/V1__create_initial_schema.sql", "line": 145, "end_line": 180, "label": "Tablas de reserva"}
+      ]
+    }
+  ],
+  "connections": [
+    {"id": "request", "from": "supplier", "to": "security", "label": "POST + JWT", "variant": "security"},
+    {"id": "principal", "from": "security", "to": "controller", "label": "Principal", "variant": "security"},
+    {"id": "invoke", "from": "controller", "to": "usecase", "label": "id + actor", "variant": "emphasis"},
+    {"id": "domain-rule", "from": "usecase", "to": "aggregate", "label": "decide", "variant": "emphasis"},
+    {"id": "uses-port", "from": "usecase", "to": "port", "label": "execute"},
+    {"id": "implements", "from": "port", "to": "adapter", "label": "implemented by", "variant": "dashed"},
+    {"id": "persistence", "from": "adapter", "to": "database", "label": "JPA + locks"}
+  ],
+  "cards": [
+    {"dot": "violet", "title": "Dirección de dependencias", "items": ["Infrastructure depende de Application", "Application depende de Domain", "Domain permanece libre de frameworks"]},
+    {"dot": "amber", "title": "Regla crítica", "items": ["Disponibilidad y confirmación comparten una transacción", "Un fallo no guarda cambios parciales"]}
+  ]
+}
+

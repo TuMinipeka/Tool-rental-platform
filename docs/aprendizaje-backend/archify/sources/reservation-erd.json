@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "diagram_type": "erd",
+  "meta": {
+    "title": "Modelo relacional de reserva y disponibilidad",
+    "locale": "es",
+    "output": "docs/aprendizaje-backend/archify/05-modelo-relacional.html",
+    "quality_profile": "standard",
+    "repository": {
+      "url": "https://github.com/TuMinipeka/Tool-rental-platform.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "e3da9000e88168cb10c56d730ffd114c35c1bd69"
+    },
+    "views": [
+      {"id": "ownership", "label": "Propiedad", "focus": ["users", "suppliers", "tools"], "note": "El proveedor es un usuario y posee las herramientas que puede gestionar."},
+      {"id": "inventory", "label": "Inventario", "focus": ["suppliers", "tools", "equipment-units"], "note": "Una herramienta agrupa unidades físicas; la reserva ocupa unidades concretas."},
+      {"id": "booking", "label": "Reserva", "focus": ["reservations", "reservation-items", "equipment-units"], "note": "La tabla puente congela tarifa y vincula cada reserva con sus unidades."}
+    ]
+  },
+  "layout": {"mode": "grid", "gapY": 42, "gapX": 78},
+  "entities": [
+    {
+      "id": "users", "label": "users", "tag": "identity", "row": 0, "col": 0,
+      "attributes": [
+        {"name": "user_id", "type": "uuid", "key": "pk"},
+        {"name": "email", "type": "varchar(320)", "key": "uk"},
+        {"name": "display_name", "type": "varchar(200)"},
+        {"name": "password_hash", "type": "varchar(255)"},
+        {"name": "account_status", "type": "varchar(20)"},
+        {"name": "registered_at", "type": "timestamptz"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 559, "end_line": 569, "label": "Tabla users"}]
+    },
+    {
+      "id": "suppliers", "label": "suppliers", "tag": "identity", "row": 1, "col": 0, "width": 251,
+      "attributes": [
+        {"name": "user_id", "type": "uuid", "key": ["pk", "fk"], "references": "users.user_id"},
+        {"name": "document_type", "type": "varchar(30)"},
+        {"name": "document_number", "type": "varchar(80)", "key": "uk"},
+        {"name": "business_name", "type": "varchar(200)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 434, "end_line": 441, "label": "Tabla suppliers"}]
+    },
+    {
+      "id": "customers", "label": "customers", "tag": "identity", "row": 2, "col": 0, "width": 251,
+      "attributes": [
+        {"name": "user_id", "type": "uuid", "key": ["pk", "fk"], "references": "users.user_id"},
+        {"name": "person_type", "type": "varchar(20)"},
+        {"name": "document_type", "type": "varchar(30)"},
+        {"name": "document_number", "type": "varchar(80)", "key": "uk"},
+        {"name": "billing_name", "type": "varchar(200)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 94, "end_line": 103, "label": "Tabla customers"}]
+    },
+    {
+      "id": "categories", "label": "categories", "tag": "catalog", "row": 0, "col": 1,
+      "attributes": [
+        {"name": "category_id", "type": "uuid", "key": "pk"},
+        {"name": "name", "type": "varchar(120)", "key": "uk"},
+        {"name": "description", "type": "varchar(500)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 82, "end_line": 87, "label": "Tabla categories"}]
+    },
+    {
+      "id": "tools", "label": "tools", "tag": "catalog", "row": 1, "col": 1, "width": 263,
+      "attributes": [
+        {"name": "tool_id", "type": "uuid", "key": "pk"},
+        {"name": "supplier_id", "type": "uuid", "key": "fk", "references": "suppliers.user_id"},
+        {"name": "category_id", "type": "uuid", "key": "fk", "references": "categories.category_id"},
+        {"name": "name", "type": "varchar(160)"},
+        {"name": "description", "type": "varchar(2000)"},
+        {"name": "current_daily_rate", "type": "numeric(19,4)"},
+        {"name": "rate_currency", "type": "char(3)"},
+        {"name": "publication_status", "type": "varchar(20)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 459, "end_line": 473, "label": "Tabla tools"}]
+    },
+    {
+      "id": "equipment-units", "label": "equipment_units", "tag": "catalog", "row": 2, "col": 1, "width": 251,
+      "attributes": [
+        {"name": "equipment_unit_id", "type": "uuid", "key": "pk"},
+        {"name": "tool_id", "type": "uuid", "key": "fk", "references": "tools.tool_id"},
+        {"name": "inventory_code", "type": "varchar(120)"},
+        {"name": "serial_number", "type": "varchar(160)"},
+        {"name": "current_condition", "type": "varchar(40)"},
+        {"name": "operational_status", "type": "varchar(20)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 145, "end_line": 155, "label": "Tabla equipment_units"}]
+    },
+    {
+      "id": "cancellation-policies", "label": "cancellation_policies", "tag": "booking", "row": 0, "col": 2, "width": 290,
+      "attributes": [
+        {"name": "cancellation_policy_id", "type": "uuid", "key": "pk"},
+        {"name": "policy_version", "type": "integer", "key": "uk"},
+        {"name": "cutoff_hours", "type": "integer"},
+        {"name": "late_cancellation_rate", "type": "numeric(5,4)"},
+        {"name": "no_show_rate", "type": "numeric(5,4)"},
+        {"name": "no_show_grace_minutes", "type": "integer"},
+        {"name": "active", "type": "boolean"},
+        {"name": "effective_at", "type": "timestamptz"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 65, "end_line": 75, "label": "Tabla cancellation_policies"}]
+    },
+    {
+      "id": "delivery-rates", "label": "delivery_rates", "tag": "booking", "row": 1, "col": 2, "width": 251,
+      "attributes": [
+        {"name": "delivery_rate_id", "type": "uuid", "key": "pk"},
+        {"name": "rate_version", "type": "integer", "key": "uk"},
+        {"name": "amount", "type": "numeric(19,4)"},
+        {"name": "currency", "type": "char(3)"},
+        {"name": "active", "type": "boolean"},
+        {"name": "effective_at", "type": "timestamptz"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 128, "end_line": 138, "label": "Tabla delivery_rates"}]
+    },
+    {
+      "id": "reservations", "label": "reservations", "tag": "booking", "row": 2, "col": 2, "width": 310,
+      "attributes": [
+        {"name": "reservation_id", "type": "uuid", "key": "pk"},
+        {"name": "customer_id", "type": "uuid", "key": "fk", "references": "customers.user_id"},
+        {"name": "created_at", "type": "timestamptz"},
+        {"name": "start_date", "type": "date"},
+        {"name": "return_date", "type": "date"},
+        {"name": "expires_at", "type": "timestamptz"},
+        {"name": "reservation_status", "type": "varchar(20)"},
+        {"name": "currency", "type": "char(3)"},
+        {"name": "confirmed_at", "type": "timestamptz"},
+        {"name": "scheduled_fulfillment_at", "type": "timestamptz"},
+        {"name": "fulfillment_method", "type": "varchar(30)"},
+        {"name": "delivery_rate_id", "type": "uuid", "key": "fk", "references": "delivery-rates.delivery_rate_id"},
+        {"name": "cancellation_policy_id", "type": "uuid", "key": "fk", "references": "cancellation-policies.cancellation_policy_id"},
+        {"name": "delivery_fee", "type": "numeric(19,4)"},
+        {"name": "effective_return_date", "type": "date"},
+        {"name": "delivery_address_line", "type": "varchar(300)"},
+        {"name": "delivery_city", "type": "varchar(120)"},
+        {"name": "delivery_region", "type": "varchar(120)"},
+        {"name": "delivery_country_code", "type": "char(2)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 373, "end_line": 400, "label": "Tabla reservations"}]
+    },
+    {
+      "id": "reservation-items", "label": "reservation_items", "tag": "booking", "row": 3, "col": 2, "width": 277,
+      "attributes": [
+        {"name": "reservation_id", "type": "uuid", "key": ["pk", "fk"], "references": "reservations.reservation_id"},
+        {"name": "equipment_unit_id", "type": "uuid", "key": ["pk", "fk"], "references": "equipment-units.equipment_unit_id"},
+        {"name": "agreed_daily_rate", "type": "numeric(19,4)"}
+      ],
+      "sources": [{"path": "docs/diagrams/physical-schema.sql", "line": 334, "end_line": 339, "label": "Tabla reservation_items"}]
+    }
+  ],
+  "relationships": [
+    {"id": "supplier-user", "from": "suppliers", "to": "users", "label": "perfil de", "fromCardinality": "one", "toCardinality": "one"},
+    {"id": "customer-user", "from": "customers", "to": "users", "label": "perfil de", "fromCardinality": "one", "toCardinality": "one"},
+    {"id": "tool-supplier", "from": "tools", "to": "suppliers", "label": "pertenece a", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "tool-category", "from": "tools", "to": "categories", "label": "clasificada como", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "unit-tool", "from": "equipment-units", "to": "tools", "label": "unidad de", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "reservation-customer", "from": "reservations", "to": "customers", "label": "solicitada por", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "reservation-delivery", "from": "reservations", "to": "delivery-rates", "label": "usa tarifa", "fromCardinality": "many", "fromOptional": true, "toCardinality": "one"},
+    {"id": "reservation-policy", "from": "reservations", "to": "cancellation-policies", "label": "congela política", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "item-reservation", "from": "reservation-items", "to": "reservations", "label": "línea de", "fromCardinality": "many", "toCardinality": "one"},
+    {"id": "item-unit", "from": "reservation-items", "to": "equipment-units", "label": "ocupa", "fromCardinality": "many", "toCardinality": "one"}
+  ],
+  "cards": [
+    {"dot": "cyan", "title": "Disponibilidad", "items": ["La ocupación se calcula por equipment_unit_id", "Una Tool puede tener varias unidades físicas"]},
+    {"dot": "emerald", "title": "Historia", "items": ["reservation_items congela agreed_daily_rate", "Cambiar la tarifa actual no reescribe reservas confirmadas"]},
+    {"dot": "amber", "title": "Estado", "items": ["reservations guarda status y confirmed_at", "Las restricciones CHECK refuerzan combinaciones válidas"]}
+  ]
+}
+

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "7dff39af-5d36-4fd4-b0f9-66f6d5881ec3",
+  "status": "current",
+  "command": "deliver",
+  "type": "erd",
+  "input": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\reservation-erd.json",
+  "output": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\05-modelo-relacional.html",
+  "specification": {
+    "sha256": "045809e395adea4b9ec94149e984f040766f781e3c5e6138017e3e20a00d8972",
+    "bytes": 10402
+  },
+  "artifact": {
+    "sha256": "ec3ec9223d596e95b7b8c69a9deb32e2634835e0c522b2790f379d0c8e0d7a9b",
+    "bytes": 875322
+  }
+}

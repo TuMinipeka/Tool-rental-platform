@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "5a45f937-110a-4007-bfdd-df1b09fb358d",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\sources\\hexagonal-architecture.json",
+  "output": "C:\\Users\\danie\\Documents\\Spring_Boot\\Tool-rental-platform\\docs\\aprendizaje-backend\\archify\\01-arquitectura-hexagonal.html",
+  "specification": {
+    "sha256": "42a84bd7c65d23cc8ac4d689b984adfaee90af7976ae5c3c05392d85820fe519",
+    "bytes": 6147
+  },
+  "artifact": {
+    "sha256": "6411c39c00fcfeafc0f39f0b284255f82569a1ea0d3f64b6f1b5ea2d50ba4dc8",
+    "bytes": 829238
+  }
+}

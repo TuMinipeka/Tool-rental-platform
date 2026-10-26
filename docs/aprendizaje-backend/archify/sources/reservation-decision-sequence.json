@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Secuencia de decisión de una reserva",
+    "locale": "es",
+    "output": "docs/aprendizaje-backend/archify/02-secuencia-decision.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/TuMinipeka/Tool-rental-platform.git",
+      "provider": "github",
+      "link_mode": "web",
+      "revision": "e3da9000e88168cb10c56d730ffd114c35c1bd69"
+    },
+    "views": [
+      {"id": "http", "label": "Entrada", "focus": ["supplier", "controller", "usecase"], "note": "El proveedor autenticado elige confirmation o rejection."},
+      {"id": "transaction", "label": "Transacción", "focus": ["usecase", "management", "database"], "note": "La reserva y las unidades quedan bloqueadas mientras se validan las reglas."},
+      {"id": "domain", "label": "Estado", "focus": ["usecase", "reservation"], "note": "El agregado exige PENDING y produce CONFIRMED o REJECTED."}
+    ]
+  },
+  "participants": [
+    {"id": "supplier", "type": "external", "label": "Proveedor", "sublabel": "JWT válido", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 87, "end_line": 95}]},
+    {"id": "controller", "type": "backend", "label": "Controller", "sublabel": "REST", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/in/rest/controllers/ReservationController.java", "line": 87, "end_line": 95}]},
+    {"id": "usecase", "type": "backend", "label": "UseCase", "sublabel": "autoriza y coordina", "sources": [{"path": "application/src/main/java/com/toolrental/application/reservation/usecase/ConfirmReservationUseCase.java", "line": 22, "end_line": 53}, {"path": "application/src/main/java/com/toolrental/application/reservation/usecase/RejectReservationUseCase.java", "line": 19, "end_line": 31}]},
+    {"id": "management", "type": "backend", "label": "Atomic Management", "sublabel": "puerto y adaptador", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/port/repository/AtomicReservationManagement.java", "line": 14, "end_line": 40}, {"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/out/persistence/ReservationPersistenceAdapter.java", "line": 129, "end_line": 172}]},
+    {"id": "reservation", "type": "backend", "label": "Reservation", "sublabel": "agregado", "sources": [{"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 191, "end_line": 207}, {"path": "domain/src/main/java/com/toolrental/domain/reservation/model/aggregate/Reservation.java", "line": 367, "end_line": 370}]},
+    {"id": "database", "type": "database", "label": "PostgreSQL", "sublabel": "filas bloqueadas", "sources": [{"path": "infrastructure/src/main/java/com/toolrental/infrastructure/reservation/adapters/out/persistence/repository/ReservationJpaRepository.java", "line": 35, "end_line": 53}]}
+  ],
+  "segments": [
+    {"from": 145, "to": 235, "label": "Entrada autenticada"},
+    {"from": 245, "to": 390, "label": "Validación atómica"},
+    {"from": 400, "to": 510, "label": "Transición y respuesta"}
+  ],
+  "messages": [
+    {"id": "post", "from": "supplier", "to": "controller", "y": 160, "label": "POST confirmation o rejection", "variant": "security"},
+    {"id": "execute", "from": "controller", "to": "usecase", "y": 205, "label": "execute(id, actor)", "variant": "emphasis"},
+    {"id": "atomic", "from": "usecase", "to": "management", "y": 260, "label": "execute(id, operation)", "variant": "emphasis"},
+    {"id": "lock", "from": "management", "to": "database", "y": 300, "label": "lock reservation and units"},
+    {"id": "context", "from": "database", "to": "management", "y": 340, "label": "transaction context", "variant": "return"},
+    {"id": "validate", "from": "management", "to": "usecase", "y": 380, "label": "locked context", "variant": "return"},
+    {"id": "transition", "from": "usecase", "to": "reservation", "y": 420, "label": "confirmWithRates() or reject()", "variant": "emphasis"},
+    {"id": "state", "from": "reservation", "to": "usecase", "y": 455, "label": "CONFIRMED or REJECTED", "variant": "return"},
+    {"id": "save", "from": "usecase", "to": "management", "y": 490, "label": "result to save"},
+    {"id": "response", "from": "usecase", "to": "controller", "y": 530, "label": "ReservationResponse", "variant": "return"},
+    {"id": "json", "from": "controller", "to": "supplier", "y": 565, "label": "200 JSON", "variant": "return"}
+  ],
+  "activations": [
+    {"participant": "controller", "from": 155, "to": 575, "type": "backend"},
+    {"participant": "usecase", "from": 200, "to": 535, "type": "backend"},
+    {"participant": "management", "from": 255, "to": 500, "type": "backend"},
+    {"participant": "database", "from": 295, "to": 345, "type": "database"},
+    {"participant": "reservation", "from": 415, "to": 460, "type": "backend"}
+  ],
+  "cards": [
+    {"dot": "emerald", "title": "Confirmar", "items": ["Revalida unidad, herramienta, moneda y ocupación", "Congela las tarifas y registra ReservationConfirmed"]},
+    {"dot": "rose", "title": "Rechazar", "items": ["Reutiliza autorización y bloqueo", "Exige PENDING y registra ReservationRejected"]},
+    {"dot": "amber", "title": "Fallo", "items": ["403 para actor ajeno", "404 para reserva inexistente", "409 para estado o disponibilidad", "La transacción no guarda cambios parciales"]}
+  ]
+}
+
